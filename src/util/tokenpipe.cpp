@@ -3,7 +3,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 #include <util/tokenpipe.h>
 
-#include <config/bitcoin-config.h>
+#include <config/navcoin-config.h>
 
 #ifndef WIN32
 

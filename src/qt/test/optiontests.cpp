@@ -3,7 +3,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <init.h>
-#include <qt/bitcoin.h>
+#include <qt/navcoin.h>
 #include <qt/test/optiontests.h>
 #include <test/util/setup_common.h>
 #include <util/system.h>
@@ -13,7 +13,7 @@
 
 #include <univalue.h>
 
-//! Entry point for BitcoinApplication tests.
+//! Entry point for NavcoinApplication tests.
 void OptionTests::optionTests()
 {
     // Test regression https://github.com/bitcoin/bitcoin/issues/24457. Ensure
@@ -35,8 +35,8 @@ void OptionTests::parametersInteraction()
 {
     // Test that the bug https://github.com/bitcoin-core/gui/issues/567 does not resurface.
     // It was fixed via https://github.com/bitcoin-core/gui/pull/568.
-    // With fListen=false in ~/.config/Bitcoin/Bitcoin-Qt.conf and all else left as default,
-    // bitcoin-qt should set both -listen and -listenonion to false and start successfully.
+    // With fListen=false in ~/.config/Navcoin/Navcoin-Qt.conf and all else left as default,
+    // navcoin-qt should set both -listen and -listenonion to false and start successfully.
     gArgs.ClearPathCache();
 
     gArgs.LockSettings([&](util::Settings& s) {

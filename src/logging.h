@@ -3,8 +3,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef BITCOIN_LOGGING_H
-#define BITCOIN_LOGGING_H
+#ifndef NAVCOIN_LOGGING_H
+#define NAVCOIN_LOGGING_H
 
 #include <fs.h>
 #include <tinyformat.h>
@@ -198,4 +198,4 @@ static inline void LogPrintf_(const std::string& logging_function, const std::st
         }                                    \
     } while (0)
 
-#endif // BITCOIN_LOGGING_H
+#endif // NAVCOIN_LOGGING_H

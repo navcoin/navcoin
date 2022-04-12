@@ -16,7 +16,7 @@ import os
 
 EXCLUDE = [
     # auto generated:
-    'src/qt/bitcoinstrings.cpp',
+    'src/qt/navcoinstrings.cpp',
     'src/chainparamsseeds.h',
     # other external copyrights:
     'src/reverse_iterator.h',
@@ -274,7 +274,7 @@ Usage:
     $ ./copyright_header.py report <base_directory> [verbose]
 
 Arguments:
-    <base_directory> - The base directory of a bitcoin source code repository.
+    <base_directory> - The base directory of a navcoin source code repository.
     [verbose] - Includes a list of every file of each subcategory in the report.
 """
 
@@ -427,7 +427,7 @@ Usage:
     $ ./copyright_header.py update <base_directory>
 
 Arguments:
-    <base_directory> - The base directory of a bitcoin source code repository.
+    <base_directory> - The base directory of a navcoin source code repository.
 """
 
 def print_file_action_message(filename, action):
@@ -550,7 +550,7 @@ Usage:
     $ ./copyright_header.py insert <file>
 
 Arguments:
-    <file> - A source file in the bitcoin repository.
+    <file> - A source file in the navcoin repository.
 """
 
 def insert_cmd(argv):
@@ -577,7 +577,7 @@ def insert_cmd(argv):
 ################################################################################
 
 USAGE = """
-copyright_header.py - utilities for managing copyright headers of 'The Bitcoin
+copyright_header.py - utilities for managing copyright headers of 'The Navcoin
 Core developers' in repository source files.
 
 Usage:

@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef BITCOIN_NODE_CHAINSTATE_H
-#define BITCOIN_NODE_CHAINSTATE_H
+#ifndef NAVCOIN_NODE_CHAINSTATE_H
+#define NAVCOIN_NODE_CHAINSTATE_H
 
 #include <cstdint>
 #include <functional>
@@ -84,4 +84,4 @@ std::optional<ChainstateLoadVerifyError> VerifyLoadedChainstate(ChainstateManage
                                                                 std::function<int64_t()> get_unix_time_seconds);
 } // namespace node
 
-#endif // BITCOIN_NODE_CHAINSTATE_H
+#endif // NAVCOIN_NODE_CHAINSTATE_H

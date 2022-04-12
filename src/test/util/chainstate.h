@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 //
-#ifndef BITCOIN_TEST_UTIL_CHAINSTATE_H
-#define BITCOIN_TEST_UTIL_CHAINSTATE_H
+#ifndef NAVCOIN_TEST_UTIL_CHAINSTATE_H
+#define NAVCOIN_TEST_UTIL_CHAINSTATE_H
 
 #include <clientversion.h>
 #include <fs.h>
@@ -52,4 +52,4 @@ CreateAndActivateUTXOSnapshot(node::NodeContext& node, const fs::path root, F ma
 }
 
 
-#endif // BITCOIN_TEST_UTIL_CHAINSTATE_H
+#endif // NAVCOIN_TEST_UTIL_CHAINSTATE_H

@@ -3,8 +3,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef BITCOIN_WALLET_DB_H
-#define BITCOIN_WALLET_DB_H
+#ifndef NAVCOIN_WALLET_DB_H
+#define NAVCOIN_WALLET_DB_H
 
 #include <clientversion.h>
 #include <fs.h>
@@ -242,4 +242,4 @@ bool IsBDBFile(const fs::path& path);
 bool IsSQLiteFile(const fs::path& path);
 } // namespace wallet
 
-#endif // BITCOIN_WALLET_DB_H
+#endif // NAVCOIN_WALLET_DB_H

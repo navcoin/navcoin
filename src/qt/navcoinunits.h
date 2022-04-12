@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef BITCOIN_QT_BITCOINUNITS_H
-#define BITCOIN_QT_BITCOINUNITS_H
+#ifndef NAVCOIN_QT_NAVCOINUNITS_H
+#define NAVCOIN_QT_NAVCOINUNITS_H
 
 #include <consensus/amount.h>
 
@@ -25,18 +25,18 @@
 #define THIN_SP_UTF8 REAL_THIN_SP_UTF8
 #define THIN_SP_HTML HTML_HACK_SP
 
-/** Bitcoin unit definitions. Encapsulates parsing and formatting
+/** Navcoin unit definitions. Encapsulates parsing and formatting
    and serves as list model for drop-down selection boxes.
 */
-class BitcoinUnits: public QAbstractListModel
+class NavcoinUnits: public QAbstractListModel
 {
     Q_OBJECT
 
 public:
-    explicit BitcoinUnits(QObject *parent);
+    explicit NavcoinUnits(QObject *parent);
 
-    /** Bitcoin units.
-      @note Source: https://en.bitcoin.it/wiki/Units . Please add only sensible ones
+    /** Navcoin units.
+      @note Source: https://en.navcoin.it/wiki/Units . Please add only sensible ones
      */
     enum Unit
     {
@@ -107,8 +107,8 @@ public:
     static CAmount maxMoney();
 
 private:
-    QList<BitcoinUnits::Unit> unitlist;
+    QList<NavcoinUnits::Unit> unitlist;
 };
-typedef BitcoinUnits::Unit BitcoinUnit;
+typedef NavcoinUnits::Unit NavcoinUnit;
 
-#endif // BITCOIN_QT_BITCOINUNITS_H
+#endif // NAVCOIN_QT_NAVCOINUNITS_H

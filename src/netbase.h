@@ -2,11 +2,11 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef BITCOIN_NETBASE_H
-#define BITCOIN_NETBASE_H
+#ifndef NAVCOIN_NETBASE_H
+#define NAVCOIN_NETBASE_H
 
 #if defined(HAVE_CONFIG_H)
-#include <config/bitcoin-config.h>
+#include <config/navcoin-config.h>
 #endif
 
 #include <compat.h>
@@ -256,4 +256,4 @@ bool Socks5(const std::string& strDest, uint16_t port, const ProxyCredentials* a
  */
 bool IsBadPort(uint16_t port);
 
-#endif // BITCOIN_NETBASE_H
+#endif // NAVCOIN_NETBASE_H

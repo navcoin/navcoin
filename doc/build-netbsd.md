@@ -2,7 +2,7 @@ NetBSD build guide
 ======================
 (updated for NetBSD 8.0)
 
-This guide describes how to build bitcoind and command-line utilities on NetBSD.
+This guide describes how to build navcoind and command-line utilities on NetBSD.
 
 This guide does not contain instructions for building the GUI.
 
@@ -27,7 +27,7 @@ git clone https://github.com/bitcoin/bitcoin.git
 
 See [dependencies.md](dependencies.md) for a complete overview.
 
-### Building Bitcoin Core
+### Building Navcoin Core
 
 **Important**: Use `gmake` (the non-GNU `make` will exit with an error).
 

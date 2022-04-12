@@ -1,6 +1,6 @@
-# Bootstrappable Bitcoin Core Builds
+# Bootstrappable Navcoin Core Builds
 
-This directory contains the files necessary to perform bootstrappable Bitcoin
+This directory contains the files necessary to perform bootstrappable Navcoin
 Core builds.
 
 [Bootstrappability][b17e] furthers our binary security guarantees by allowing us
@@ -57,7 +57,7 @@ and examples](#common-guix-build-invocation-patterns-and-examples) section below
 before starting a build. For a full list of customization options, see the
 [recognized environment variables][env-vars-list] section.*
 
-To build Bitcoin Core reproducibly with all default options, invoke the
+To build Navcoin Core reproducibly with all default options, invoke the
 following from the top of a clean repository:
 
 ```sh
@@ -80,14 +80,14 @@ crucial differences:
     * _**DETACHED_SIGS_REPO**_
 
       Set the directory where detached codesignatures can be found for the current
-      Bitcoin Core version being built.
+      Navcoin Core version being built.
 
       _REQUIRED environment variable_
 
 An invocation with all default options would look like:
 
 ```
-env DETACHED_SIGS_REPO=<path/to/bitcoin-detached-sigs> ./contrib/guix/guix-codesign
+env DETACHED_SIGS_REPO=<path/to/navcoin-detached-sigs> ./contrib/guix/guix-codesign
 ```
 
 ## Cleaning intermediate work directories

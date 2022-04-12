@@ -3,8 +3,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef BITCOIN_NODE_UTXO_SNAPSHOT_H
-#define BITCOIN_NODE_UTXO_SNAPSHOT_H
+#ifndef NAVCOIN_NODE_UTXO_SNAPSHOT_H
+#define NAVCOIN_NODE_UTXO_SNAPSHOT_H
 
 #include <uint256.h>
 #include <serialize.h>
@@ -35,4 +35,4 @@ public:
 };
 } // namespace node
 
-#endif // BITCOIN_NODE_UTXO_SNAPSHOT_H
+#endif // NAVCOIN_NODE_UTXO_SNAPSHOT_H

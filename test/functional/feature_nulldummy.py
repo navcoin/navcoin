@@ -26,7 +26,7 @@ from test_framework.script import (
     OP_0,
     OP_TRUE,
 )
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import NavcoinTestFramework
 from test_framework.util import (
     assert_equal,
     assert_raises_rpc_error,
@@ -43,7 +43,7 @@ def invalidate_nulldummy_tx(tx):
     tx.rehash()
 
 
-class NULLDUMMYTest(BitcoinTestFramework):
+class NULLDUMMYTest(NavcoinTestFramework):
     def set_test_params(self):
         self.num_nodes = 1
         self.setup_clean_chain = True

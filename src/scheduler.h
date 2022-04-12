@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef BITCOIN_SCHEDULER_H
-#define BITCOIN_SCHEDULER_H
+#ifndef NAVCOIN_SCHEDULER_H
+#define NAVCOIN_SCHEDULER_H
 
 #include <condition_variable>
 #include <functional>
@@ -146,4 +146,4 @@ public:
     size_t CallbacksPending();
 };
 
-#endif // BITCOIN_SCHEDULER_H
+#endif // NAVCOIN_SCHEDULER_H

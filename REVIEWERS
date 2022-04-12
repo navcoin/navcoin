@@ -25,7 +25,7 @@
 /doc/Doxyfile.in                            @aguycalled
 /doc/REST-interface.md                      @aguycalled
 /doc/benchmarking.md                        @aguycalled
-/doc/bitcoin-conf.md                        @aguycalled
+/doc/navcoin-conf.md                        @aguycalled
 /doc/build-freebsd.md                       @aguycalled
 /doc/build-netbsd.md                        @aguycalled
 /doc/build-openbsd.md                       @aguycalled
@@ -41,7 +41,7 @@
 /doc/translation_strings_policy.md          @aguycalled
 
 # Build aux
-/build-aux/m4/bitcoin_qt.m4                 @aguycalled
+/build-aux/m4/navcoin_qt.m4                 @aguycalled
 
 # MSVC build system
 /build_msvc/                                @aguycalled
@@ -55,7 +55,7 @@
 /src/test/net_peer_eviction_tests.cpp       @aguycalled
 /test/functional/mempool_updatefromblock.py @aguycalled
 /test/functional/feature_asmap.py           @aguycalled
-/test/functional/interface_bitcoin_cli.py   @aguycalled
+/test/functional/interface_navcoin_cli.py   @aguycalled
 
 # Backwards compatibility tests
 *_compatibility.py                          @aguycalled
@@ -83,7 +83,7 @@
 /src/wallet/                                @aguycalled
 
 # CLI
-/src/bitcoin-cli.cpp                        @aguycalled
+/src/navcoin-cli.cpp                        @aguycalled
 
 # Coinstats
 /src/node/coinstats.*                       @aguycalled

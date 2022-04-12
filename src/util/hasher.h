@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef BITCOIN_UTIL_HASHER_H
-#define BITCOIN_UTIL_HASHER_H
+#ifndef NAVCOIN_UTIL_HASHER_H
+#define NAVCOIN_UTIL_HASHER_H
 
 #include <crypto/siphash.h>
 #include <primitives/transaction.h>
@@ -92,4 +92,4 @@ public:
     size_t operator()(const Span<const unsigned char>& script) const;
 };
 
-#endif // BITCOIN_UTIL_HASHER_H
+#endif // NAVCOIN_UTIL_HASHER_H

@@ -8,7 +8,7 @@ from copy import deepcopy
 from decimal import Decimal
 import math
 
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import NavcoinTestFramework
 from test_framework.key import ECKey
 from test_framework.messages import (
     BIP125_SEQUENCE_NUMBER,
@@ -38,7 +38,7 @@ from test_framework.util import (
 from test_framework.wallet import MiniWallet
 
 
-class MempoolAcceptanceTest(BitcoinTestFramework):
+class MempoolAcceptanceTest(NavcoinTestFramework):
     def set_test_params(self):
         self.num_nodes = 1
         self.extra_args = [[

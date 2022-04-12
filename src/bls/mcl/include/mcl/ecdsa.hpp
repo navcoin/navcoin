@@ -15,7 +15,7 @@ namespace mcl { namespace ecdsa {
 
 enum {
 	SerializeOld = 0,
-	SerializeBitcoin = 1
+	SerializeNavcoin = 1
 };
 
 namespace local {
@@ -128,7 +128,7 @@ inline void init(bool *pb)
 	Ec::setOrder(Zn::getOp().mp);
 	Fp::setETHserialization(true);
 	Zn::setETHserialization(true);
-	p.serializeMode = SerializeBitcoin;
+	p.serializeMode = SerializeNavcoin;
 //	Ec::setIoMode(mcl::IoEcAffineSerialize);
 }
 
@@ -188,7 +188,7 @@ public:
 		case SerializeOld:
 			loadUncompressed(pb, is);
 			return;
-		case SerializeBitcoin:
+		case SerializeNavcoin:
 		default:
 			{
 				uint8_t header;
@@ -217,7 +217,7 @@ public:
 		case SerializeOld:
 			saveUncompressed(pb, os);
 			return;
-		case SerializeBitcoin:
+		case SerializeNavcoin:
 		default:
 			cybozu::writeChar(pb, os, 0x04);
 			if (!*pb) return;
@@ -273,7 +273,7 @@ inline void getPublicKey(PublicKey& pub, const SecretKey& sec)
 
 /*
   serialize/deserialize DER format
-  https://www.oreilly.com/library/view/programming-bitcoin/9781492031482/ch04.html
+  https://www.oreilly.com/library/view/programming-navcoin/9781492031482/ch04.html
 */
 struct Signature : public mcl::fp::Serializable<Signature> {
 	Zn r, s;
@@ -292,7 +292,7 @@ struct Signature : public mcl::fp::Serializable<Signature> {
 			r.load(pb, is, ioMode); if (!*pb) return;
 			s.load(pb, is, ioMode);
 			return;
-		case SerializeBitcoin:
+		case SerializeNavcoin:
 		default:
 			{
 				(void)ioMode;
@@ -325,7 +325,7 @@ struct Signature : public mcl::fp::Serializable<Signature> {
 				s.save(pb, os, ioMode);
 			}
 			return;
-		case SerializeBitcoin:
+		case SerializeNavcoin:
 		default:
 			{
 				(void)ioMode;

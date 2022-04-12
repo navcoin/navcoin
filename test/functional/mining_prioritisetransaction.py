@@ -9,12 +9,12 @@ import time
 
 from test_framework.blocktools import COINBASE_MATURITY
 from test_framework.messages import COIN, MAX_BLOCK_WEIGHT
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import NavcoinTestFramework
 from test_framework.util import assert_equal, assert_raises_rpc_error, create_confirmed_utxos, create_lots_of_big_transactions, gen_return_txouts
 from test_framework.wallet import MiniWallet
 
 
-class PrioritiseTransactionTest(BitcoinTestFramework):
+class PrioritiseTransactionTest(NavcoinTestFramework):
     def set_test_params(self):
         self.setup_clean_chain = True
         self.num_nodes = 1

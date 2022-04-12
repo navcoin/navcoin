@@ -7,10 +7,10 @@
 import time
 from decimal import Decimal
 
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import NavcoinTestFramework
 from test_framework.util import assert_equal, assert_raises_rpc_error
 
-class KeyPoolTest(BitcoinTestFramework):
+class KeyPoolTest(NavcoinTestFramework):
     def set_test_params(self):
         self.num_nodes = 1
 

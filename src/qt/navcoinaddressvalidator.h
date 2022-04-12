@@ -2,34 +2,34 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef BITCOIN_QT_BITCOINADDRESSVALIDATOR_H
-#define BITCOIN_QT_BITCOINADDRESSVALIDATOR_H
+#ifndef NAVCOIN_QT_NAVCOINADDRESSVALIDATOR_H
+#define NAVCOIN_QT_NAVCOINADDRESSVALIDATOR_H
 
 #include <QValidator>
 
 /** Base58 entry widget validator, checks for valid characters and
  * removes some whitespace.
  */
-class BitcoinAddressEntryValidator : public QValidator
+class NavcoinAddressEntryValidator : public QValidator
 {
     Q_OBJECT
 
 public:
-    explicit BitcoinAddressEntryValidator(QObject *parent);
+    explicit NavcoinAddressEntryValidator(QObject *parent);
 
     State validate(QString &input, int &pos) const override;
 };
 
-/** Bitcoin address widget validator, checks for a valid bitcoin address.
+/** Navcoin address widget validator, checks for a valid navcoin address.
  */
-class BitcoinAddressCheckValidator : public QValidator
+class NavcoinAddressCheckValidator : public QValidator
 {
     Q_OBJECT
 
 public:
-    explicit BitcoinAddressCheckValidator(QObject *parent);
+    explicit NavcoinAddressCheckValidator(QObject *parent);
 
     State validate(QString &input, int &pos) const override;
 };
 
-#endif // BITCOIN_QT_BITCOINADDRESSVALIDATOR_H
+#endif // NAVCOIN_QT_NAVCOINADDRESSVALIDATOR_H

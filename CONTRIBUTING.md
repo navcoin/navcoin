@@ -113,7 +113,7 @@ the pull request affects. Valid areas as:
 
   - `consensus` for changes to consensus critical code
   - `doc` for changes to the documentation
-  - `qt` or `gui` for changes to bitcoin-qt
+  - `qt` or `gui` for changes to navcoin-qt
   - `log` for changes to log messages
   - `staking` for changes to the staking code
   - `net` or `p2p` for changes to the peer-to-peer network code
@@ -400,7 +400,7 @@ Github-Pull: #<PR number>
 Rebased-From: <commit hash of the original commit>
 ```
 
-Also see the bitcoin's [backport.py script](
+Also see the navcoin's [backport.py script](
 https://github.com/bitcoin-core/bitcoin-maintainer-tools#backport).
 
 Copyright

@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef BITCOIN_UTIL_TRANSLATION_H
-#define BITCOIN_UTIL_TRANSLATION_H
+#ifndef NAVCOIN_UTIL_TRANSLATION_H
+#define NAVCOIN_UTIL_TRANSLATION_H
 
 #include <tinyformat.h>
 #include <functional>
@@ -65,4 +65,4 @@ inline bilingual_str _(const char* psz)
     return bilingual_str{psz, G_TRANSLATION_FUN ? (G_TRANSLATION_FUN)(psz) : psz};
 }
 
-#endif // BITCOIN_UTIL_TRANSLATION_H
+#endif // NAVCOIN_UTIL_TRANSLATION_H

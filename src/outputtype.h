@@ -3,8 +3,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef BITCOIN_OUTPUTTYPE_H
-#define BITCOIN_OUTPUTTYPE_H
+#ifndef NAVCOIN_OUTPUTTYPE_H
+#define NAVCOIN_OUTPUTTYPE_H
 
 #include <attributes.h>
 #include <script/signingprovider.h>
@@ -51,4 +51,4 @@ CTxDestination AddAndGetDestinationForScript(FillableSigningProvider& keystore, 
 /** Get the OutputType for a CTxDestination */
 std::optional<OutputType> OutputTypeFromDestination(const CTxDestination& dest);
 
-#endif // BITCOIN_OUTPUTTYPE_H
+#endif // NAVCOIN_OUTPUTTYPE_H

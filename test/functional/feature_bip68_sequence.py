@@ -19,7 +19,7 @@ from test_framework.messages import (
     CTxOut,
     tx_from_hex,
 )
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import NavcoinTestFramework
 from test_framework.util import (
     assert_equal,
     assert_greater_than,
@@ -36,7 +36,7 @@ SEQUENCE_LOCKTIME_MASK = 0x0000ffff
 # RPC error for non-BIP68 final transactions
 NOT_FINAL_ERROR = "non-BIP68-final"
 
-class BIP68Test(BitcoinTestFramework):
+class BIP68Test(NavcoinTestFramework):
     def set_test_params(self):
         self.num_nodes = 2
         self.extra_args = [

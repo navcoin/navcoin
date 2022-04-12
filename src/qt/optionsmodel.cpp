@@ -3,12 +3,12 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #if defined(HAVE_CONFIG_H)
-#include <config/bitcoin-config.h>
+#include <config/navcoin-config.h>
 #endif
 
 #include <qt/optionsmodel.h>
 
-#include <qt/bitcoinunits.h>
+#include <qt/navcoinunits.h>
 #include <qt/guiconstants.h>
 #include <qt/guiutil.h>
 
@@ -72,7 +72,7 @@ void OptionsModel::Init(bool resetSettings)
 
     // Display
     if (!settings.contains("nDisplayUnit"))
-        settings.setValue("nDisplayUnit", BitcoinUnits::BTC);
+        settings.setValue("nDisplayUnit", NavcoinUnits::BTC);
     nDisplayUnit = settings.value("nDisplayUnit").toInt();
 
     if (!settings.contains("strThirdPartyTxUrls"))
@@ -163,7 +163,7 @@ void OptionsModel::Init(bool resetSettings)
         // The call order is:
         //
         // InitParameterInteraction()
-        //     would set -listenonion=0 if it sees -listen=0, but for bitcoin-qt with
+        //     would set -listenonion=0 if it sees -listen=0, but for navcoin-qt with
         //     fListen=false -listen is 1 at this point
         //
         // OptionsModel::Init()

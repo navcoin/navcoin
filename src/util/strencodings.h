@@ -6,8 +6,8 @@
 /**
  * Utilities for converting data from/to strings.
  */
-#ifndef BITCOIN_UTIL_STRENCODINGS_H
-#define BITCOIN_UTIL_STRENCODINGS_H
+#ifndef NAVCOIN_UTIL_STRENCODINGS_H
+#define NAVCOIN_UTIL_STRENCODINGS_H
 
 #include <attributes.h>
 #include <span.h>
@@ -350,4 +350,4 @@ std::string Capitalize(std::string str);
  */
 std::optional<uint64_t> ParseByteUnits(const std::string& str, ByteUnit default_multiplier);
 
-#endif // BITCOIN_UTIL_STRENCODINGS_H
+#endif // NAVCOIN_UTIL_STRENCODINGS_H

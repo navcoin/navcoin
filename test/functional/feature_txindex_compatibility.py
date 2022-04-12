@@ -10,11 +10,11 @@ Previous releases are required by this test, see test/README.md.
 import os
 import shutil
 
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import NavcoinTestFramework
 from test_framework.wallet import MiniWallet
 
 
-class MempoolCompatibilityTest(BitcoinTestFramework):
+class MempoolCompatibilityTest(NavcoinTestFramework):
     def set_test_params(self):
         self.num_nodes = 3
         self.extra_args = [

@@ -1,16 +1,16 @@
 # It is not recommended to modify this file in-place, because it will
 # be overwritten during package upgrades. If you want to add further
 # options or overwrite existing ones then use
-# $ systemctl edit bitcoind.service
+# $ systemctl edit navcoind.service
 # See "man systemd.service" for details.
 
 # Note that almost all daemon options could be specified in
-# /etc/bitcoin/bitcoin.conf, but keep in mind those explicitly
+# /etc/navcoin/navcoin.conf, but keep in mind those explicitly
 # specified as arguments in ExecStart= will override those in the
 # config file.
 
 [Unit]
-Description=Bitcoin daemon
+Description=Navcoin daemon
 Documentation=https://github.com/bitcoin/bitcoin/blob/master/doc/init.md
 
 # https://www.freedesktop.org/wiki/Software/systemd/NetworkTarget/
@@ -18,20 +18,20 @@ After=network-online.target
 Wants=network-online.target
 
 [Service]
-ExecStart=/usr/bin/bitcoind -daemonwait \
-                            -pid=/run/bitcoind/bitcoind.pid \
-                            -conf=/etc/bitcoin/bitcoin.conf \
-                            -datadir=/var/lib/bitcoind
+ExecStart=/usr/bin/navcoind -daemonwait \
+                            -pid=/run/navcoind/navcoind.pid \
+                            -conf=/etc/navcoin/navcoin.conf \
+                            -datadir=/var/lib/navcoind
 
 # Make sure the config directory is readable by the service user
 PermissionsStartOnly=true
-ExecStartPre=/bin/chgrp bitcoin /etc/bitcoin
+ExecStartPre=/bin/chgrp navcoin /etc/navcoin
 
 # Process management
 ####################
 
 Type=forking
-PIDFile=/run/bitcoind/bitcoind.pid
+PIDFile=/run/navcoind/navcoind.pid
 Restart=on-failure
 TimeoutStartSec=infinity
 TimeoutStopSec=600
@@ -39,20 +39,20 @@ TimeoutStopSec=600
 # Directory creation and permissions
 ####################################
 
-# Run as bitcoin:bitcoin
-User=bitcoin
-Group=bitcoin
+# Run as navcoin:navcoin
+User=navcoin
+Group=navcoin
 
-# /run/bitcoind
-RuntimeDirectory=bitcoind
+# /run/navcoind
+RuntimeDirectory=navcoind
 RuntimeDirectoryMode=0710
 
-# /etc/bitcoin
-ConfigurationDirectory=bitcoin
+# /etc/navcoin
+ConfigurationDirectory=navcoin
 ConfigurationDirectoryMode=0710
 
-# /var/lib/bitcoind
-StateDirectory=bitcoind
+# /var/lib/navcoind
+StateDirectory=navcoind
 StateDirectoryMode=0710
 
 # Hardening measures

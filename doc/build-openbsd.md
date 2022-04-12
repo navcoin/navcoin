@@ -2,7 +2,7 @@
 
 **Updated for OpenBSD [7.0](https://www.openbsd.org/70.html)**
 
-This guide describes how to build bitcoind, command-line utilities, and GUI on OpenBSD.
+This guide describes how to build navcoind, command-line utilities, and GUI on OpenBSD.
 
 ## Preparation
 
@@ -17,8 +17,8 @@ pkg_add autoconf automake python
 
 See [dependencies.md](dependencies.md) for a complete overview.
 
-### 2. Clone Bitcoin Repo
-Clone the Bitcoin Core repository to a directory. All build scripts and commands will run from this directory.
+### 2. Clone Navcoin Repo
+Clone the Navcoin Core repository to a directory. All build scripts and commands will run from this directory.
 ``` bash
 git clone https://github.com/bitcoin/bitcoin.git
 ```
@@ -27,7 +27,7 @@ git clone https://github.com/bitcoin/bitcoin.git
 
 #### Wallet Dependencies
 
-It is not necessary to build wallet functionality to run either `bitcoind` or `bitcoin-qt`.
+It is not necessary to build wallet functionality to run either `navcoind` or `navcoin-qt`.
 
 ###### Descriptor Wallet Support
 
@@ -56,13 +56,13 @@ export BDB_PREFIX="$PWD/db4"
 #### GUI Dependencies
 ###### Qt5
 
-Bitcoin Core includes a GUI built with the cross-platform Qt Framework. To compile the GUI, Qt 5 is required.
+Navcoin Core includes a GUI built with the cross-platform Qt Framework. To compile the GUI, Qt 5 is required.
 
 ```bash
 pkg_add qt5
 ```
 
-## Building Bitcoin Core
+## Building Navcoin Core
 
 **Important**: Use `gmake` (the non-GNU `make` will exit with an error).
 
@@ -85,7 +85,7 @@ header-only library boost::process, which is available on OpenBSD, but contains
 certain system calls and preprocessor defines like `waitid()` and `WEXITED` that
 are not available.
 
-There are many ways to configure Bitcoin Core, here are a few common examples:
+There are many ways to configure Navcoin Core, here are a few common examples:
 
 ##### Descriptor Wallet and GUI:
 This enables the GUI and descriptor wallet support, assuming `sqlite` and `qt5` are installed.

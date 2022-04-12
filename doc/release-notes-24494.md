@@ -1,2 +1,2 @@
-To help prevent fingerprinting transactions created by the Bitcoin Core wallet, change output
+To help prevent fingerprinting transactions created by the Navcoin Core wallet, change output
 amounts are now randomized. (#24494)

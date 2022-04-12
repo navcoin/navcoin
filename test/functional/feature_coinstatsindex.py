@@ -25,7 +25,7 @@ from test_framework.script import (
     OP_FALSE,
     OP_RETURN,
 )
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import NavcoinTestFramework
 from test_framework.util import (
     assert_equal,
     assert_raises_rpc_error,
@@ -36,7 +36,7 @@ from test_framework.wallet import (
 )
 
 
-class CoinStatsIndexTest(BitcoinTestFramework):
+class CoinStatsIndexTest(NavcoinTestFramework):
     def set_test_params(self):
         self.setup_clean_chain = True
         self.num_nodes = 2

@@ -64,7 +64,7 @@ void serializeStrTest(const std::string& msg, const std::string& secHex, const s
 	normalizeSignature(sig);
 	CYBOZU_TEST_ASSERT(verify(sig, pub, msg.c_str(), msg.size()));
 	// recover mode
-	setSeriailzeMode(SerializeBitcoin);
+	setSeriailzeMode(SerializeNavcoin);
 }
 
 void serializeBinaryTest(const std::string& msg, const std::string& secHex, const std::string& pubHex, const std::string& sigHex)
@@ -95,7 +95,7 @@ void serializeBinaryTest(const std::string& msg, const std::string& secHex, cons
 	normalizeSignature(sig);
 	CYBOZU_TEST_ASSERT(verify(sig, pub, msg.c_str(), msg.size()));
 	// recover mode
-	setSeriailzeMode(SerializeBitcoin);
+	setSeriailzeMode(SerializeNavcoin);
 	char buf[100];
 	size_t n = sig.serialize(buf, sizeof(buf));
 	CYBOZU_TEST_ASSERT(n > 0);
@@ -151,7 +151,7 @@ CYBOZU_TEST_AUTO(serializePublicKey)
 	pub.normalize();
 
 	// recover mode
-	setSeriailzeMode(SerializeBitcoin);
+	setSeriailzeMode(SerializeNavcoin);
 	// uncompressed
 	uint8_t buf2[65];
 	n = pub.serialize(buf2, 65);

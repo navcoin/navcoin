@@ -1,6 +1,6 @@
-Bitcoin Core version *0.15.2* is now available from:
+Navcoin Core version *0.15.2* is now available from:
 
-  <https://bitcoincore.org/bin/bitcoin-core-0.15.2/>
+  <https://navcoincore.org/bin/navcoin-core-0.15.2/>
 
 This is a new minor version release, including various bugfixes and
 performance improvements, as well as updated translations.
@@ -11,15 +11,15 @@ Please report bugs using the issue tracker at GitHub:
 
 To receive security and update notifications, please subscribe to:
 
-  <https://bitcoincore.org/en/list/announcements/join/>
+  <https://navcoincore.org/en/list/announcements/join/>
 
 How to Upgrade
 ==============
 
 If you are running an older version, shut it down. Wait until it has completely
 shut down (which might take a few minutes for older versions), then run the 
-installer (on Windows) or just copy over `/Applications/Bitcoin-Qt` (on Mac)
-or `bitcoind`/`bitcoin-qt` (on Linux).
+installer (on Windows) or just copy over `/Applications/Navcoin-Qt` (on Mac)
+or `navcoind`/`navcoin-qt` (on Linux).
 
 The first time you run version 0.15.0 or higher, your chainstate database will
 be converted to a new format, which will take anywhere from a few minutes to
@@ -48,10 +48,10 @@ processing the entire blockchain.
 Compatibility
 ==============
 
-Bitcoin Core is extensively tested on multiple operating systems using
+Navcoin Core is extensively tested on multiple operating systems using
 the Linux kernel, macOS 10.8+, and Windows Vista and later. Windows XP is not supported.
 
-Bitcoin Core should also work on most other Unix-like systems but is not
+Navcoin Core should also work on most other Unix-like systems but is not
 frequently tested on them.
 
 
@@ -62,7 +62,7 @@ Denial-of-Service vulnerability CVE-2018-17144
 -------------------------------
 
 A denial-of-service vulnerability exploitable by miners has been discovered in
-Bitcoin Core versions 0.14.0 up to 0.16.2. It is recommended to upgrade any of
+Navcoin Core versions 0.14.0 up to 0.16.2. It is recommended to upgrade any of
 the vulnerable versions to 0.15.2 or 0.16.3 as soon as possible.
 
 0.15.2 Change log
@@ -87,9 +87,9 @@ the vulnerable versions to 0.15.2 or 0.16.3 as soon as possible.
 - #11289 `42ea47d` Add wallet backup text to import*, add* and dumpwallet RPCs (MeshCollider)
 - #11590 `6372a75` [Wallet] always show help-line of wallet encryption calls (Jonas Schnelli)
 
-### bitcoin-tx
+### navcoin-tx
 
-- #11554 `a69cc07` Sanity-check script sizes in bitcoin-tx (TheBlueMatt)
+- #11554 `a69cc07` Sanity-check script sizes in navcoin-tx (TheBlueMatt)
 
 ### Tests
 - #11277 `3a6cdd4` Add test for multiwallet batch RPC calls (Russell Yanofsky)

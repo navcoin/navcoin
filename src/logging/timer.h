@@ -3,8 +3,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef BITCOIN_LOGGING_TIMER_H
-#define BITCOIN_LOGGING_TIMER_H
+#ifndef NAVCOIN_LOGGING_TIMER_H
+#define NAVCOIN_LOGGING_TIMER_H
 
 #include <logging.h>
 #include <util/macros.h>
@@ -106,4 +106,4 @@ private:
     BCLog::Timer<std::chrono::seconds> PASTE2(logging_timer, __COUNTER__)(__func__, end_msg)
 
 
-#endif // BITCOIN_LOGGING_TIMER_H
+#endif // NAVCOIN_LOGGING_TIMER_H

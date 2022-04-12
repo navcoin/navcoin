@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef BITCOIN_POLICY_RBF_H
-#define BITCOIN_POLICY_RBF_H
+#ifndef NAVCOIN_POLICY_RBF_H
+#define NAVCOIN_POLICY_RBF_H
 
 #include <primitives/transaction.h>
 #include <txmempool.h>
@@ -99,4 +99,4 @@ std::optional<std::string> PaysForRBF(CAmount original_fees,
                                       CFeeRate relay_fee,
                                       const uint256& txid);
 
-#endif // BITCOIN_POLICY_RBF_H
+#endif // NAVCOIN_POLICY_RBF_H

@@ -2,41 +2,41 @@
 
 # backward compatibility for existing gentoo layout 
 #
-if [ -d "/var/lib/bitcoin/.bitcoin" ]; then
-	BITCOIND_DEFAULT_DATADIR="/var/lib/bitcoin/.bitcoin"
+if [ -d "/var/lib/navcoin/.navcoin" ]; then
+	NAVCOIND_DEFAULT_DATADIR="/var/lib/navcoin/.navcoin"
 else
-	BITCOIND_DEFAULT_DATADIR="/var/lib/bitcoind"
+	NAVCOIND_DEFAULT_DATADIR="/var/lib/navcoind"
 fi
 
-BITCOIND_CONFIGFILE=${BITCOIND_CONFIGFILE:-/etc/bitcoin/bitcoin.conf}
-BITCOIND_PIDDIR=${BITCOIND_PIDDIR:-/var/run/bitcoind}
-BITCOIND_PIDFILE=${BITCOIND_PIDFILE:-${BITCOIND_PIDDIR}/bitcoind.pid}
-BITCOIND_DATADIR=${BITCOIND_DATADIR:-${BITCOIND_DEFAULT_DATADIR}}
-BITCOIND_USER=${BITCOIND_USER:-${BITCOIN_USER:-bitcoin}}
-BITCOIND_GROUP=${BITCOIND_GROUP:-bitcoin}
-BITCOIND_BIN=${BITCOIND_BIN:-/usr/bin/bitcoind}
-BITCOIND_NICE=${BITCOIND_NICE:-${NICELEVEL:-0}}
-BITCOIND_OPTS="${BITCOIND_OPTS:-${BITCOIN_OPTS}}"
+NAVCOIND_CONFIGFILE=${NAVCOIND_CONFIGFILE:-/etc/navcoin/navcoin.conf}
+NAVCOIND_PIDDIR=${NAVCOIND_PIDDIR:-/var/run/navcoind}
+NAVCOIND_PIDFILE=${NAVCOIND_PIDFILE:-${NAVCOIND_PIDDIR}/navcoind.pid}
+NAVCOIND_DATADIR=${NAVCOIND_DATADIR:-${NAVCOIND_DEFAULT_DATADIR}}
+NAVCOIND_USER=${NAVCOIND_USER:-${NAVCOIN_USER:-navcoin}}
+NAVCOIND_GROUP=${NAVCOIND_GROUP:-navcoin}
+NAVCOIND_BIN=${NAVCOIND_BIN:-/usr/bin/navcoind}
+NAVCOIND_NICE=${NAVCOIND_NICE:-${NICELEVEL:-0}}
+NAVCOIND_OPTS="${NAVCOIND_OPTS:-${NAVCOIN_OPTS}}"
 
-name="Bitcoin Core Daemon"
-description="Bitcoin cryptocurrency P2P network daemon"
+name="Navcoin Core Daemon"
+description="Navcoin cryptocurrency P2P network daemon"
 
-command="/usr/bin/bitcoind"
-command_args="-pid=\"${BITCOIND_PIDFILE}\" \
-		-conf=\"${BITCOIND_CONFIGFILE}\" \
-		-datadir=\"${BITCOIND_DATADIR}\" \
+command="/usr/bin/navcoind"
+command_args="-pid=\"${NAVCOIND_PIDFILE}\" \
+		-conf=\"${NAVCOIND_CONFIGFILE}\" \
+		-datadir=\"${NAVCOIND_DATADIR}\" \
 		-daemon \
-		${BITCOIND_OPTS}"
+		${NAVCOIND_OPTS}"
 
-required_files="${BITCOIND_CONFIGFILE}"
-start_stop_daemon_args="-u ${BITCOIND_USER} \
-			-N ${BITCOIND_NICE} -w 2000"
-pidfile="${BITCOIND_PIDFILE}"
+required_files="${NAVCOIND_CONFIGFILE}"
+start_stop_daemon_args="-u ${NAVCOIND_USER} \
+			-N ${NAVCOIND_NICE} -w 2000"
+pidfile="${NAVCOIND_PIDFILE}"
 
 # The retry schedule to use when stopping the daemon. Could be either
 # a timeout in seconds or multiple signal/timeout pairs (like
 # "SIGKILL/180 SIGTERM/300")
-retry="${BITCOIND_SIGTERM_TIMEOUT}"
+retry="${NAVCOIND_SIGTERM_TIMEOUT}"
 
 depend() {
 	need localmount net
@@ -50,30 +50,30 @@ start_pre() {
 	checkpath \
 	-d \
 	--mode 0750 \
-	--owner "${BITCOIND_USER}:${BITCOIND_GROUP}" \
-	"${BITCOIND_DATADIR}"
+	--owner "${NAVCOIND_USER}:${NAVCOIND_GROUP}" \
+	"${NAVCOIND_DATADIR}"
 
 	checkpath \
 	-d \
 	--mode 0755 \
-	--owner "${BITCOIND_USER}:${BITCOIND_GROUP}" \
-	"${BITCOIND_PIDDIR}"
+	--owner "${NAVCOIND_USER}:${NAVCOIND_GROUP}" \
+	"${NAVCOIND_PIDDIR}"
 
 	checkpath -f \
-	-o "${BITCOIND_USER}:${BITCOIND_GROUP}" \
+	-o "${NAVCOIND_USER}:${NAVCOIND_GROUP}" \
 	-m 0660 \
-	"${BITCOIND_CONFIGFILE}"
+	"${NAVCOIND_CONFIGFILE}"
 
 	checkconfig || return 1
 }
 
 checkconfig()
 {
-	if grep -qs '^rpcuser=' "${BITCOIND_CONFIGFILE}" && \
-		! grep -qs '^rpcpassword=' "${BITCOIND_CONFIGFILE}" ; then
+	if grep -qs '^rpcuser=' "${NAVCOIND_CONFIGFILE}" && \
+		! grep -qs '^rpcpassword=' "${NAVCOIND_CONFIGFILE}" ; then
 		eerror ""
-		eerror "ERROR: You must set a secure rpcpassword to run bitcoind."
-		eerror "The setting must appear in ${BITCOIND_CONFIGFILE}"
+		eerror "ERROR: You must set a secure rpcpassword to run navcoind."
+		eerror "The setting must appear in ${NAVCOIND_CONFIGFILE}"
 		eerror ""
 		eerror "This password is security critical to securing wallets "
 		eerror "and must not be the same as the rpcuser setting."
@@ -85,7 +85,7 @@ checkconfig()
 		eerror "It is recommended that you also set alertnotify so you are "
 		eerror "notified of problems:"
 		eerror ""
-		eerror "ie: alertnotify=echo %%s | mail -s \"Bitcoin Alert\"" \
+		eerror "ie: alertnotify=echo %%s | mail -s \"Navcoin Alert\"" \
 			"admin@foo.com"
 		eerror ""
 		return 1

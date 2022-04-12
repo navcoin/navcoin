@@ -8,14 +8,14 @@
 import time
 
 from test_framework.blocktools import COINBASE_MATURITY
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import NavcoinTestFramework
 from test_framework.util import (
     assert_equal,
     set_node_times,
 )
 
 
-class TransactionTimeRescanTest(BitcoinTestFramework):
+class TransactionTimeRescanTest(NavcoinTestFramework):
     def set_test_params(self):
         self.setup_clean_chain = False
         self.num_nodes = 3

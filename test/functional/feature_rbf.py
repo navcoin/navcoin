@@ -17,7 +17,7 @@ from test_framework.messages import (
     SEQUENCE_FINAL,
 )
 from test_framework.script import CScript, OP_DROP
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import NavcoinTestFramework
 from test_framework.util import (
     assert_equal,
     assert_raises_rpc_error,
@@ -30,7 +30,7 @@ from test_framework.wallet import MiniWallet
 from test_framework.address import ADDRESS_BCRT1_UNSPENDABLE
 
 MAX_REPLACEMENT_LIMIT = 100
-class ReplaceByFeeTest(BitcoinTestFramework):
+class ReplaceByFeeTest(NavcoinTestFramework):
     def set_test_params(self):
         self.num_nodes = 1
         self.extra_args = [
@@ -49,7 +49,7 @@ class ReplaceByFeeTest(BitcoinTestFramework):
         self.wallet = MiniWallet(self.nodes[0])
         # the pre-mined test framework chain contains coinbase outputs to the
         # MiniWallet's default address in blocks 76-100 (see method
-        # BitcoinTestFramework._initialize_chain())
+        # NavcoinTestFramework._initialize_chain())
         self.wallet.rescan_utxos()
 
         self.log.info("Running test simple doublespend...")

@@ -3,8 +3,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef BITCOIN_WALLET_ISMINE_H
-#define BITCOIN_WALLET_ISMINE_H
+#ifndef NAVCOIN_WALLET_ISMINE_H
+#define NAVCOIN_WALLET_ISMINE_H
 
 #include <script/standard.h>
 
@@ -70,4 +70,4 @@ struct CachableAmount
 };
 } // namespace wallet
 
-#endif // BITCOIN_WALLET_ISMINE_H
+#endif // NAVCOIN_WALLET_ISMINE_H

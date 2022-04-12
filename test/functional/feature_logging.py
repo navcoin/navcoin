@@ -6,11 +6,11 @@
 
 import os
 
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import NavcoinTestFramework
 from test_framework.test_node import ErrorMatch
 
 
-class LoggingTest(BitcoinTestFramework):
+class LoggingTest(NavcoinTestFramework):
     def set_test_params(self):
         self.num_nodes = 1
         self.setup_clean_chain = True

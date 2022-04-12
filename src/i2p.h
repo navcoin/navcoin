@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef BITCOIN_I2P_H
-#define BITCOIN_I2P_H
+#ifndef NAVCOIN_I2P_H
+#define NAVCOIN_I2P_H
 
 #include <compat.h>
 #include <fs.h>
@@ -267,4 +267,4 @@ private:
 } // namespace sam
 } // namespace i2p
 
-#endif // BITCOIN_I2P_H
+#endif // NAVCOIN_I2P_H

@@ -7,7 +7,7 @@
    size.
 """
 
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import NavcoinTestFramework
 from test_framework.util import (
     assert_equal,
     assert_raises_rpc_error,
@@ -19,7 +19,7 @@ MAX_ANCESTORS = 25
 MAX_DESCENDANTS = 25
 
 
-class MempoolPackagesTest(BitcoinTestFramework):
+class MempoolPackagesTest(NavcoinTestFramework):
     def set_test_params(self):
         self.num_nodes = 1
         self.extra_args = [["-maxorphantx=1000"]]
