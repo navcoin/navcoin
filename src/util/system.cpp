@@ -797,12 +797,12 @@ void PrintExceptionContinue(const std::exception* pex, const char* pszThread)
 
 fs::path GetDefaultDataDir()
 {
-    // Windows: C:\Users\Username\AppData\Roaming\Navcoin
-    // macOS: ~/Library/Application Support/Navcoin
-    // Unix-like: ~/.navcoin
+    // Windows: C:\Users\Username\AppData\Roaming\Navcoin8
+    // macOS: ~/Library/Application Support/Navcoin8
+    // Unix-like: ~/.navcoin8
 #ifdef WIN32
     // Windows
-    return GetSpecialFolderPath(CSIDL_APPDATA) / "Navcoin";
+    return GetSpecialFolderPath(CSIDL_APPDATA) / "Navcoin8";
 #else
     fs::path pathRet;
     char* pszHome = getenv("HOME");
@@ -812,10 +812,10 @@ fs::path GetDefaultDataDir()
         pathRet = fs::path(pszHome);
 #ifdef MAC_OSX
     // macOS
-    return pathRet / "Library/Application Support/Navcoin";
+    return pathRet / "Library/Application Support/Navcoin8";
 #else
     // Unix-like
-    return pathRet / ".navcoin";
+    return pathRet / ".navcoin8";
 #endif
 #endif
 }
