@@ -56,6 +56,8 @@ class Scalar {
         uint256 Hash(const int& n) const;
 
         std::string GetString();
+
+        mclBnFr fr;
 };
 
 #endif // NAVCOIN_BLSCT_ARITH_SCALAR_H
