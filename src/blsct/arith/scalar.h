@@ -9,7 +9,10 @@
 #ifndef NAVCOIN_BLSCT_ARITH_SCALAR_H
 #define NAVCOIN_BLSCT_ARITH_SCALAR_H
 
-#include <bls.h>
+#include <bls/bls384_256.h>
+#include <bls/bls.h>
+
+#include <uint256.h>
 
 #define CHECK_AND_ASSERT_THROW_MES(expr, message) do {if(!(expr)) throw std::runtime_error(message);} while(0)
 

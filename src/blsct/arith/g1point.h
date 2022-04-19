@@ -5,7 +5,11 @@
 #ifndef NAVCOIN_BLSCT_ARITH_G1POINT_H
 #define NAVCOIN_BLSCT_ARITH_G1POINT_H
 
-#include <bls.h>
+#include <bls/bls384_256.h>
+#include <bls/bls.h>
+
+#include <blsct/arith/scalar.h>
+
 #include <hash.h>
 #include <uint256.h>
 #include <serialize.h>
@@ -26,8 +30,8 @@ class G1Point {
         G1Point(const G1Point& n);
         G1Point(const uint256 &b);
 
-        G1Point operator+(const Point &b) const;
-        G1Point operator-(const Point &b) const;
+        G1Point operator+(const G1Point &b) const;
+        G1Point operator-(const G1Point &b) const;
         G1Point operator*(const Scalar &b) const;
 
         G1Point Normalize() const;
@@ -37,7 +41,7 @@ class G1Point {
         static G1Point hashAndMap(std::vector<unsigned char>);
         static G1Point mulVec(std::vector<G1Point>, std::vector<Scalar>);
 
-        bool operator==(const Point& b) const;
+        bool operator==(const G1Point& b) const;
 
         static G1Point Rand();
 
