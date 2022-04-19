@@ -121,7 +121,7 @@ Scalar Scalar::operator~() const
 
     for (size_t i = 0; i < size; i++)
     {
-        fFrVch[i] = !frVch[i];
+        fFrVch[i] = ~frVch[i];
     }
 
     ret.SetVch(fFrVch);
@@ -131,16 +131,12 @@ Scalar Scalar::operator~() const
 
 Scalar Scalar::operator<<(const int &b) const
 {
-    /* Scalar ret; */
-    /* bn_lsh(ret.bn, this->bn, b); */
-    /* return ret; */
+    throw std::runtime_error("Needs to be implemented!");
 }
 
 Scalar Scalar::operator>>(const int &b) const
 {
-    /* Scalar ret; */
-    /* bn_rsh(ret.bn, this->bn, b); */
-    /* return ret; */
+    throw std::runtime_error("Needs to be implemented!");
 }
 
 void Scalar::operator=(const uint64_t& n)
@@ -162,8 +158,8 @@ bool Scalar::operator==(const Scalar &b) const
 
 std::vector<uint8_t> Scalar::GetVch() const
 {
-    std::vector<uint8_t> b;
-    mclBnFr_serialize(&b, b.size(), &fr);
+    std::vector<uint8_t> b(32);
+    mclBnFr_serialize(&b[0], b.size(), &fr);
     return b;
 }
 
@@ -188,12 +184,13 @@ Scalar Scalar::Negate() const
 
 int64_t Scalar::GetInt64() const
 {
-    /* int64_t ret = 0; */
-    /* for (int64_t i = 0; i < 64; i++) */
-    /* { */
-    /*     ret |= (int64_t)bn_get_bit(this->bn, i) << i; */
-    /* } */
-    /* return ret; */
+    int64_t ret = 0;
+    std::vector<uint8_t> vch = GetVch();
+    for (auto i = 0; i < 8; i++)
+    {
+        ret |= (int64_t) vch[vch.size()-i-1] << i*8;
+    }
+    return ret;
 }
 
 uint256 Scalar::Hash(const int& n) const
