@@ -129,14 +129,50 @@ Scalar Scalar::operator~() const
     return ret;
 }
 
-Scalar Scalar::operator<<(const int &b) const
+Scalar Scalar::operator<<(unsigned int shift) const
 {
-    throw std::runtime_error("Needs to be implemented!");
+    Scalar temp;
+
+    std::vector<uint8_t> vch = GetVch();
+    std::vector<uint8_t> finalVch (WIDTH);
+
+    for (int i = 0; i < WIDTH; i++)
+        finalVch[i] = 0;
+    int k = shift / 8;
+    shift = shift % 8;
+    for (int i = 0; i < WIDTH; i++) {
+        if (i + k + 1 < WIDTH && shift != 0)
+            finalVch[i + k + 1] |= (vch[i] >> (8 - shift));
+        if (i + k < WIDTH)
+            finalVch[i + k] |= (vch[i] << shift);
+    }
+
+    temp.SetVch(finalVch);
+
+    return temp;
 }
 
-Scalar Scalar::operator>>(const int &b) const
+Scalar Scalar::operator>>(unsigned int shift) const
 {
-    throw std::runtime_error("Needs to be implemented!");
+    Scalar temp;
+
+    std::vector<uint8_t> vch = GetVch();
+    std::vector<uint8_t> finalVch (WIDTH);
+
+    for (int i = 0; i < WIDTH; i++)
+        finalVch[i] = 0;
+    int k = shift / 8;
+    shift = shift % 8;
+    for (int i = 0; i < WIDTH; i++) {
+        if (i - k - 1 >= 0 && shift != 0)
+            finalVch[i - k - 1] |= (vch[i] << (8 - shift));
+        if (i - k >= 0)
+            finalVch[i - k] |= (vch[i] >> shift);
+    }
+
+    temp.SetVch(finalVch);
+
+    return temp;
 }
 
 void Scalar::operator=(const uint64_t& n)
@@ -158,8 +194,8 @@ bool Scalar::operator==(const Scalar &b) const
 
 std::vector<uint8_t> Scalar::GetVch() const
 {
-    std::vector<uint8_t> b(32);
-    mclBnFr_serialize(&b[0], b.size(), &fr);
+    std::vector<uint8_t> b(WIDTH);
+    mclBnFr_serialize(&b[0], WIDTH, &fr);
     return b;
 }
 

@@ -18,6 +18,8 @@
 
 class Scalar {
     public:
+        static constexpr int WIDTH = 256 / 8;
+
         Scalar(const uint64_t& n = 0);
         Scalar(const std::vector<uint8_t> &v);
         Scalar(const Scalar& n);
@@ -33,8 +35,8 @@ class Scalar {
         Scalar operator^(const Scalar &b) const;
         Scalar operator&(const Scalar &b) const;
         Scalar operator~() const;
-        Scalar operator<<(const int &b) const;
-        Scalar operator>>(const int &b) const;
+        Scalar operator<<(unsigned int shift) const;
+        Scalar operator>>(unsigned int shift) const;
 
         bool operator==(const Scalar& b) const;
         bool operator==(const int &b) const;
