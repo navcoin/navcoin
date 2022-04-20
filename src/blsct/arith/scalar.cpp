@@ -129,6 +129,11 @@ Scalar Scalar::operator~() const
     return ret;
 }
 
+/**
+ * TODO: Need to investigate if this implementation is faster
+ * than just running fr += fr or using << 1
+ * more discussion over here: https://github.com/herumi/mcl/issues/144
+ */
 Scalar Scalar::operator<<(unsigned int shift) const
 {
     Scalar temp;
@@ -192,18 +197,6 @@ bool Scalar::operator==(const Scalar &b) const
     return mclBnFr_isEqual(&fr, &b.fr);
 }
 
-std::vector<uint8_t> Scalar::GetVch() const
-{
-    std::vector<uint8_t> b(WIDTH);
-    mclBnFr_serialize(&b[0], WIDTH, &fr);
-    return b;
-}
-
-void Scalar::SetVch(const std::vector<uint8_t> &b)
-{
-    mclBnFr_deserialize(&fr, &b[0], b.size());
-}
-
 Scalar Scalar::Invert() const
 {
     Scalar temp;
@@ -218,6 +211,22 @@ Scalar Scalar::Negate() const
     return temp;
 }
 
+Scalar Scalar::Rand()
+{
+    Scalar temp;
+
+    mclBnFr_setByCSPRNG(&temp.fr);
+
+    return temp;
+}
+
+Scalar Scalar::hashAndMap(std::vector<unsigned char>)
+{
+    /**
+     * TODO: Implement
+     */
+}
+
 int64_t Scalar::GetInt64() const
 {
     int64_t ret = 0;
@@ -229,10 +238,38 @@ int64_t Scalar::GetInt64() const
     return ret;
 }
 
+std::vector<uint8_t> Scalar::GetVch() const
+{
+    std::vector<uint8_t> b(WIDTH);
+    mclBnFr_serialize(&b[0], WIDTH, &fr);
+    return b;
+}
+
+void Scalar::SetVch(const std::vector<uint8_t> &b)
+{
+    mclBnFr_deserialize(&fr, &b[0], b.size());
+}
+
+void Scalar::SetPow2(const int& n)
+{
+    /**
+     * TODO: Implement
+     */
+}
+
 uint256 Scalar::Hash(const int& n) const
 {
-    /* CHashWriter hasher(0,0); */
-    /* hasher << *this; */
-    /* hasher << n; */
-    /* return hasher.GetHash(); */
+    CHashWriter hasher(0,0);
+    hasher << *this;
+    hasher << n;
+    return hasher.GetHash();
+}
+
+std::string Scalar::GetString(const int& r)
+{
+    char str[1024];
+
+    mclBnFr_getStr(str, sizeof(str), &fr, r);
+
+    return std::string(str);
 }

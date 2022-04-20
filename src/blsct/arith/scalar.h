@@ -12,7 +12,14 @@
 #include <bls/bls384_256.h>
 #include <bls/bls.h>
 
+#include <hash.h>
 #include <uint256.h>
+#include <serialize.h>
+#include <version.h>
+
+#include <stddef.h>
+#include <string>
+#include <vector>
 
 #define CHECK_AND_ASSERT_THROW_MES(expr, message) do {if(!(expr)) throw std::runtime_error(message);} while(0)
 
@@ -47,7 +54,6 @@ class Scalar {
         static Scalar Rand();
         static Scalar hashAndMap(std::vector<unsigned char>);
 
-        bool GetBit(size_t n) const;
         int64_t GetInt64() const;
 
         std::vector<uint8_t> GetVch() const;
@@ -57,7 +63,26 @@ class Scalar {
 
         uint256 Hash(const int& n) const;
 
-        std::string GetString();
+        std::string GetString(const int& r = 16);
+
+        unsigned int GetSerializeSize() const
+        {
+            return ::GetSerializeSize(GetVch());
+        }
+
+        template<typename Stream>
+            void Serialize(Stream& s) const
+            {
+                ::Serialize(s, GetVch());
+            }
+
+        template<typename Stream>
+            void Unserialize(Stream& s)
+            {
+                std::vector<uint8_t> vch;
+                ::Unserialize(s, vch);
+                SetVch(vch);
+            }
 
         mclBnFr fr;
 };
