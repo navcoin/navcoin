@@ -27,6 +27,8 @@
 #include <util/translation.h>
 #include <util/url.h>
 
+#include <blsct/arith/scalar.h>
+
 #include <any>
 #include <functional>
 #include <optional>
@@ -111,6 +113,87 @@ int fork_daemon(bool nochdir, bool noclose, TokenPipeEnd& endpoint)
 
 static bool AppInit(NodeContext& node, int argc, char* argv[])
 {
+    blsInit(5, MCLBN_COMPILED_TIME_VAR);
+    mclBn_setETHserialization(1);
+
+    Scalar val0 = 0;
+    Scalar val1 = 1;
+    Scalar val2 = 2;
+    Scalar val3 = 3;
+    Scalar val4 = 4;
+    Scalar val8 = 8;
+    Scalar val1661992960 = 1661992960;
+
+    Scalar val4L1 = val4 << 1;
+    Scalar val4R1 = val4 >> 1;
+    Scalar val4R2 = val4 >> 2;
+
+    std::vector<uint8_t> val4Vch = val4.GetVch();
+    std::vector<uint8_t> val4L1Vch = val4L1.GetVch();
+    std::vector<uint8_t> val4R1Vch = val4R1.GetVch();
+    std::vector<uint8_t> val4R2Vch = val4R2.GetVch();
+    std::vector<uint8_t> val1661992960Vch = val1661992960.GetVch();
+
+    printf("4 << 0: ");
+    for (size_t i = 0; i < val4Vch.size(); i++) {
+        printf("%u,", val4Vch[i]);
+    }
+    printf("\n");
+
+    printf("4 << 1: ");
+    for (size_t i = 0; i < val4L1Vch.size(); i++) {
+        printf("%u,", val4L1Vch[i]);
+    }
+    printf("\n");
+
+    printf("4 >> 1: ");
+    for (size_t i = 0; i < val4R1Vch.size(); i++) {
+        printf("%u,", val4R1Vch[i]);
+    }
+    printf("\n");
+
+    printf("4 >> 2: ");
+    for (size_t i = 0; i < val4R2Vch.size(); i++) {
+        printf("%u,", val4R2Vch[i]);
+    }
+    printf("\n");
+
+    printf("val1661992960Vch: ");
+    for (size_t i = 0; i < val1661992960Vch.size(); i++) {
+        printf("%u,", val1661992960Vch[i]);
+    }
+    printf("\n");
+
+    printf("4 >> 1 == 2 is %s\n", 4 >> 1 == 2 ? "true" : "false");
+    printf("val4 >> 1 == val2 is %s\n", val4 >> 1 == val2 ? "true" : "false");
+    printf("val4 << 1 == val8 is %s\n", val4 << 1 == val8 ? "true" : "false");
+    printf("val0 %u\n", val0.GetInt64());
+    printf("val1 %u\n", val1.GetInt64());
+    printf("val8 %u\n", val8.GetInt64());
+    printf("val1661992960 %u\n", val1661992960.GetInt64());
+
+    std::cout << "val1661992960 hex: " << val1661992960.GetString(/*16*/) << std::endl;
+    std::cout << "val1661992960 dec: " << val1661992960.GetString(10) << std::endl;
+
+    Scalar rand = Scalar::Rand();
+
+    std::cout << "rand dec: " << rand.GetString(10) << std::endl;
+
+    Scalar temp;
+    temp.SetPow2(3);
+
+    std::vector<uint8_t> tempVch = temp.GetVch();
+
+    std::cout << "scalar 2 SetPow2(3): " << temp.GetString(10) << std::endl;
+
+    printf("temp: ");
+    for (size_t i = 0; i < tempVch.size(); i++) {
+        printf("%u,", tempVch[i]);
+    }
+    printf("\n");
+
+    throw std::runtime_error("test");
+
     bool fRet = false;
 
     util::ThreadSetInternalName("init");

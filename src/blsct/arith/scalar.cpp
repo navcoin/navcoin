@@ -57,8 +57,9 @@ Scalar Scalar::operator|(const Scalar &b) const
     Scalar ret;
     std::vector<uint8_t> frVch = GetVch();
     std::vector<uint8_t> bFrVch = b.GetVch();
-    std::vector<uint8_t> fFrVch;
     size_t size = std::max(frVch.size(), bFrVch.size());
+
+    std::vector<uint8_t> fFrVch(size);
 
     for (size_t i = 0; i < size; i++)
     {
@@ -77,8 +78,10 @@ Scalar Scalar::operator^(const Scalar &b) const
     Scalar ret;
     std::vector<uint8_t> frVch = GetVch();
     std::vector<uint8_t> bFrVch = b.GetVch();
-    std::vector<uint8_t> fFrVch;
+
     size_t size = std::max(frVch.size(), bFrVch.size());
+
+    std::vector<uint8_t> fFrVch(size);
 
     for (size_t i = 0; i < size; i++)
     {
@@ -97,8 +100,10 @@ Scalar Scalar::operator&(const Scalar &b) const
     Scalar ret;
     std::vector<uint8_t> frVch = GetVch();
     std::vector<uint8_t> bFrVch = b.GetVch();
-    std::vector<uint8_t> fFrVch;
+
     size_t size = std::max(frVch.size(), bFrVch.size());
+
+    std::vector<uint8_t> fFrVch(size);
 
     for (size_t i = 0; i < size; i++)
     {
@@ -116,8 +121,10 @@ Scalar Scalar::operator~() const
 {
     Scalar ret;
     std::vector<uint8_t> frVch = GetVch();
-    std::vector<uint8_t> fFrVch;
+
     size_t size = frVch.size();
+
+    std::vector<uint8_t> fFrVch(size);
 
     for (size_t i = 0; i < size; i++)
     {
@@ -250,11 +257,15 @@ void Scalar::SetVch(const std::vector<uint8_t> &b)
     mclBnFr_deserialize(&fr, &b[0], b.size());
 }
 
-void Scalar::SetPow2(const int& n)
+void Scalar::SetPow2(int n)
 {
-    /**
-     * TODO: Implement
-     */
+    Scalar temp = 1;
+    while (n != 0) {
+        temp = temp * 2;
+        --n;
+    }
+
+    fr = temp.fr;
 }
 
 uint256 Scalar::Hash(const int& n) const

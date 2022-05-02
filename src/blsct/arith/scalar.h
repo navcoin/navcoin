@@ -59,7 +59,7 @@ class Scalar {
         std::vector<uint8_t> GetVch() const;
         void SetVch(const std::vector<uint8_t>& b);
 
-        void SetPow2(const int& n);
+        void SetPow2(int n);
 
         uint256 Hash(const int& n) const;
 
