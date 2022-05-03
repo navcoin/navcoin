@@ -36,7 +36,7 @@ class G1Point {
         G1Point Double() const;
 
         static G1Point getBasePoint();
-        static G1Point hashAndMap(std::vector<unsigned char>);
+        static G1Point hashAndMap(std::vector<unsigned char> &v);
         static G1Point mulVec(std::vector<G1Point> gVec, std::vector<Scalar> sVec);
 
         bool operator==(const G1Point& b) const;

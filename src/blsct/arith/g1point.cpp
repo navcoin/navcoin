@@ -69,11 +69,11 @@ G1Point G1Point::getBasePoint()
      */
 }
 
-G1Point G1Point::hashAndMap(std::vector<unsigned char>)
+G1Point G1Point::hashAndMap(std::vector<unsigned char> &v)
 {
-    /**
-     * TODO: IMPLMENT THIS FUNCTION
-     */
+    G1Point temp;
+    mclBnG1_hashAndMapTo(&temp.p, &v[0], v.size());
+    return temp;
 }
 
 G1Point G1Point::mulVec(std::vector<G1Point> gVec, std::vector<Scalar> sVec)
