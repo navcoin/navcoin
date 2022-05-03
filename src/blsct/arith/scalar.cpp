@@ -227,13 +227,6 @@ Scalar Scalar::Rand()
     return temp;
 }
 
-Scalar Scalar::hashAndMap(std::vector<unsigned char>)
-{
-    /**
-     * TODO: Implement
-     */
-}
-
 int64_t Scalar::GetInt64() const
 {
     int64_t ret = 0;

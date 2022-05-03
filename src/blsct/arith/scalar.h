@@ -52,7 +52,6 @@ class Scalar {
         Scalar Negate() const;
 
         static Scalar Rand();
-        static Scalar hashAndMap(std::vector<unsigned char>);
 
         int64_t GetInt64() const;
 
