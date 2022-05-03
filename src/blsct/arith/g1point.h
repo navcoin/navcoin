@@ -19,11 +19,9 @@
 #include <string>
 #include <vector>
 
-#define CHECK_AND_ASSERT_THROW_MES(expr, message) do {if(!(expr)) throw std::runtime_error(message);} while(0)
-
 class G1Point {
     public:
-        static const size_t POINT_SIZE = 48;
+        static constexpr int WIDTH = 384 / 8;
 
         G1Point();
         G1Point(const std::vector<uint8_t>& v);
@@ -39,7 +37,7 @@ class G1Point {
 
         static G1Point getBasePoint();
         static G1Point hashAndMap(std::vector<unsigned char>);
-        static G1Point mulVec(std::vector<G1Point>, std::vector<Scalar>);
+        static G1Point mulVec(std::vector<G1Point> gVec, std::vector<Scalar> sVec);
 
         bool operator==(const G1Point& b) const;
 
@@ -50,7 +48,28 @@ class G1Point {
         std::vector<uint8_t> GetVch() const;
         void SetVch(const std::vector<uint8_t>& b);
 
-        std::string GetString();
+        std::string GetString(const int& r = 16);
+
+        mclBnG1 p;
+
+        unsigned int GetSerializeSize() const
+        {
+            return ::GetSerializeSize(GetVch());
+        }
+
+        template<typename Stream>
+            void Serialize(Stream& s) const
+            {
+                ::Serialize(s, GetVch());
+            }
+
+        template<typename Stream>
+            void Unserialize(Stream& s)
+            {
+                std::vector<uint8_t> vch;
+                ::Unserialize(s, vch);
+                SetVch(vch);
+            }
 };
 
 #endif // NAVCOIN_BLSCT_ARITH_G1POINT_H
