@@ -95,6 +95,8 @@ G1Point G1Point::Rand()
 {
     G1Point ret;
 
+    mclBnG1_setStr(&ret.p, "1 1 1", 5, 0);
+
     return ret * Scalar::Rand();
 }
 
