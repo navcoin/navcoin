@@ -72,18 +72,12 @@ G1Point G1Point::hashAndMap(std::vector<unsigned char> &v)
 
 G1Point G1Point::mulVec(std::vector<G1Point> gVec, std::vector<Scalar> sVec)
 {
-    /*
-     * Not sure about this implementation, will get back to it later
+    if (gVec.size() != sVec.size())
+        throw std::runtime_error(__func__ + ": gVec and sVec size must be equal");
+
+    /**
+     * TODO: Finish this implementation
      */
-    /* size_t size = std::max(gVec.size(), sVec.size()); */
-
-    /* std::vector<G1Point> retVec(size); */
-
-    /* for (size_t i = 0; i < size; ++i) { */
-    /*     retVec[i] = gVec[i] * sVec[i]; */
-    /* } */
-
-    /* return retVec; */
 }
 
 bool G1Point::operator==(const G1Point& b) const
