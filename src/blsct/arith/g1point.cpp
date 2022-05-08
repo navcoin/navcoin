@@ -6,9 +6,7 @@
 
 G1Point::G1Point()
 {
-    /**
-     * TODO: IMPLMENT THIS FUNCTION
-     */
+    mclBnG1_clear(&p);
 }
 
 G1Point::G1Point(const std::vector<uint8_t>& v)
@@ -23,9 +21,7 @@ G1Point::G1Point(const G1Point& n)
 
 G1Point::G1Point(const uint256 &b)
 {
-    /**
-     * TODO: IMPLMENT THIS FUNCTION
-     */
+    mclBnG1_deserialize(&p, b.begin(), WIDTH);
 }
 
 G1Point G1Point::operator+(const G1Point &b) const
@@ -64,9 +60,7 @@ G1Point G1Point::Double() const
 
 G1Point G1Point::getBasePoint()
 {
-    /**
-     * TODO: IMPLMENT THIS FUNCTION
-     */
+    return G1Point();
 }
 
 G1Point G1Point::hashAndMap(std::vector<unsigned char> &v)
@@ -99,11 +93,9 @@ bool G1Point::operator==(const G1Point& b) const
 
 G1Point G1Point::Rand()
 {
-    /* G1Point ret; */
+    G1Point ret;
 
-    /* mclBnG1_setByCSPRNG(&temp.p); */
-
-    /* return ret; */
+    return ret * Scalar::Rand();
 }
 
 bool G1Point::IsUnity() const
