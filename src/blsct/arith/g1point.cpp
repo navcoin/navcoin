@@ -70,14 +70,36 @@ G1Point G1Point::hashAndMap(std::vector<unsigned char> &v)
     return temp;
 }
 
-G1Point G1Point::mulVec(std::vector<G1Point> gVec, std::vector<Scalar> sVec)
+G1Point G1Point::mulVec(const std::vector<G1Point> gVec, const std::vector<Scalar> sVec)
 {
     if (gVec.size() != sVec.size())
-        throw std::runtime_error(__func__ + ": gVec and sVec size must be equal");
+        throw std::runtime_error("G1Point::mulVec(): gVec and sVec size must be equal");
 
-    /**
-     * TODO: Finish this implementation
-     */
+    size_t vecCount = gVec.size();
+
+    std::vector<mclBnG1> vecG1 (vecCount);
+    std::vector<mclBnFr> vecFr (vecCount);
+
+    for (size_t i = 0; i < vecCount; ++i) {
+        vecG1[i] = gVec[i].p;
+        vecFr[i] = sVec[i].fr;
+    }
+
+    return G1Point::mulVec(vecG1, vecFr);
+}
+
+G1Point G1Point::mulVec(const std::vector<mclBnG1> gVec, const std::vector<mclBnFr> sVec)
+{
+    if (gVec.size() != sVec.size())
+        throw std::runtime_error("G1Point::mulVec(): gVec and sVec size must be equal");
+
+    G1Point ret;
+
+    size_t vecCount = gVec.size();
+
+    mclBnG1_mulVec(&ret.p, gVec.data(), sVec.data(), vecCount);
+
+    return ret;
 }
 
 bool G1Point::operator==(const G1Point& b) const
