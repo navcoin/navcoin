@@ -134,6 +134,7 @@ BITCOIN_CORE_H = \
   bech32.h \
   blockencodings.h \
   blockfilter.h \
+  blsct/bulletproofs.h \
   chain.h \
   chainparams.h \
   chainparamsbase.h \
@@ -566,6 +567,7 @@ libbitcoin_consensus_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libbitcoin_consensus_a_SOURCES = \
   arith_uint256.cpp \
   arith_uint256.h \
+  blsct/bulletproofs.cpp \
   consensus/amount.h \
   consensus/merkle.cpp \
   consensus/merkle.h \
@@ -603,6 +605,7 @@ libbitcoin_common_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libbitcoin_common_a_SOURCES = \
   base58.cpp \
   bech32.cpp \
+  blsct/bulletproofs.cpp \
   chainparams.cpp \
   coins.cpp \
   common/bloom.cpp \
@@ -868,6 +871,7 @@ endif
 libbitcoinkernel_la_SOURCES = \
   kernel/bitcoinkernel.cpp \
   arith_uint256.cpp \
+  blsct/bulletproofs.cpp \
   blockfilter.cpp \
   chain.cpp \
   chainparamsbase.cpp \
