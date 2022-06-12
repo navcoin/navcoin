@@ -10,6 +10,7 @@
 #include <node/miner.h>
 #include <policy/policy.h>
 #include <script/standard.h>
+#include <timedata.h>
 #include <txmempool.h>
 #include <uint256.h>
 #include <util/strencodings.h>
@@ -51,7 +52,7 @@ BlockAssembler MinerTestingSetup::AssemblerForTest(const CChainParams& params)
 
     options.nBlockMaxWeight = MAX_BLOCK_WEIGHT;
     options.blockMinFeeRate = blockMinFeeRate;
-    return BlockAssembler(m_node.chainman->ActiveChainstate(), *m_node.mempool, params, options);
+    return BlockAssembler{m_node.chainman->ActiveChainstate(), *m_node.mempool, options};
 }
 
 constexpr static struct {
@@ -587,7 +588,7 @@ BOOST_AUTO_TEST_CASE(CreateNewBlock_validity)
             pblock->nNonce = bi.nonce;
         }
         std::shared_ptr<const CBlock> shared_pblock = std::make_shared<const CBlock>(*pblock);
-        BOOST_CHECK(Assert(m_node.chainman)->ProcessNewBlock(chainparams, shared_pblock, true, nullptr));
+        BOOST_CHECK(Assert(m_node.chainman)->ProcessNewBlock(shared_pblock, true, nullptr));
         pblock->hashPrevBlock = pblock->GetHash();
     }
 
