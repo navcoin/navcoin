@@ -27,9 +27,6 @@
 #include <util/translation.h>
 #include <util/url.h>
 
-#include <blsct/arith/scalar.h>
-#include <blsct/arith/g1point.h>
-
 #include <any>
 #include <functional>
 #include <optional>
