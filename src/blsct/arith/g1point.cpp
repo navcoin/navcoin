@@ -56,6 +56,7 @@ G1Point G1Point::Double() const
 {
     G1Point temp;
     mclBnG1_dbl(&temp.p, &p);
+    return temp;
 }
 
 G1Point G1Point::getBasePoint()
