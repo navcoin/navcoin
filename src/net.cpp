@@ -2238,6 +2238,24 @@ void CConnman::ThreadMessageHandler()
     }
 }
 
+void CConnman::ThreadDandelion()
+{
+    /* SetSyscallSandboxPolicy(SyscallSandboxPolicy::DANDELION); */
+
+    /* int64_t nCurrTime = GetTimeMicros(); */
+    /* int64_t nNextDandelionShuffle = PoissonNextSend(nCurrTime, DANDELION_SHUFFLE_INTERVAL); */
+
+    /* while (!flagInterruptDandelionProc) */
+    /* { */
+    /*     nCurrTime = GetTimeMicros(); */
+    /*     if (nCurrTime > nNextDandelionShuffle) { */
+    /*         DandelionShuffle(); */
+    /*         nNextDandelionShuffle = PoissonNextSend(nCurrTime, DANDELION_SHUFFLE_INTERVAL); */
+    /*         condDandelionProc.wait_until(lock, std::chrono::steady_clock::now() + std::chrono::milliseconds(100), [this]() EXCLUSIVE_LOCKS_REQUIRED(mutexMsgProc) { return flagInterruptDandelionProc; }); */
+    /*     } */
+    /* } */
+}
+
 void CConnman::ThreadI2PAcceptIncoming()
 {
     static constexpr auto err_wait_begin = 1s;
@@ -2565,6 +2583,9 @@ bool CConnman::Start(CScheduler& scheduler, const Options& connOptions)
     // Process messages
     threadMessageHandler = std::thread(&util::TraceThread, "msghand", [this] { ThreadMessageHandler(); });
 
+    // Process dandelion
+    threadDandelion = std::thread(&util::TraceThread, "dandelion", [this] { ThreadDandelion(); });
+
     if (connOptions.m_i2p_accept_incoming && m_i2p_sam_session.get() != nullptr) {
         threadI2PAcceptIncoming =
             std::thread(&util::TraceThread, "i2paccept", [this] { ThreadI2PAcceptIncoming(); });
@@ -2599,6 +2620,12 @@ void CConnman::Interrupt()
     }
     condMsgProc.notify_all();
 
+    {
+        LOCK(mutexDandelionProc);
+        flagInterruptDandelionProc = true;
+    }
+    condDandelionProc.notify_all();
+
     interruptNet();
     InterruptSocks5(true);
 
@@ -2622,6 +2649,8 @@ void CConnman::StopThreads()
     }
     if (threadMessageHandler.joinable())
         threadMessageHandler.join();
+    if (threadDandelion.joinable())
+        threadDandelion.join();
     if (threadOpenConnections.joinable())
         threadOpenConnections.join();
     if (threadOpenAddedConnections.joinable())

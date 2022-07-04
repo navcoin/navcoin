@@ -665,6 +665,19 @@ UniValue MempoolInfoToJSON(const CTxMemPool& pool)
     return ret;
 }
 
+UniValue StempoolInfoToJSON(const CTxMemPool& pool)
+{
+    // Make sure this call is atomic in the pool.
+    LOCK(pool.cs);
+    UniValue ret(UniValue::VOBJ);
+    ret.pushKV("loaded", pool.IsLoaded());
+    ret.pushKV("size", (int64_t)pool.size());
+    ret.pushKV("bytes", (int64_t)pool.GetTotalTxSize());
+    ret.pushKV("usage", (int64_t)pool.DynamicMemoryUsage());
+    ret.pushKV("unbroadcastcount", uint64_t{pool.GetUnbroadcastTxs().size()});
+    return ret;
+}
+
 static RPCHelpMan getmempoolinfo()
 {
     return RPCHelpMan{"getmempoolinfo",

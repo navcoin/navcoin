@@ -23,6 +23,7 @@ enum class SyscallSandboxPolicy {
     TOR_CONTROL,
     TX_INDEX,
     VALIDATION_SCRIPT_CHECK,
+    DANDELION,
 
     // 3. Shutdown
     SHUTOFF,

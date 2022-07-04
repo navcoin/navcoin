@@ -33,6 +33,10 @@ struct TxStateConfirmed {
 struct TxStateInMempool {
 };
 
+//! State of transaction added to stempool.
+struct TxStateInStempool {
+};
+
 //! State of rejected transaction that conflicts with a confirmed block.
 struct TxStateConflicted {
     uint256 conflicting_block_hash;
@@ -63,10 +67,10 @@ struct TxStateUnrecognized {
 };
 
 //! All possible CWalletTx states
-using TxState = std::variant<TxStateConfirmed, TxStateInMempool, TxStateConflicted, TxStateInactive, TxStateUnrecognized>;
+using TxState = std::variant<TxStateConfirmed, TxStateInMempool, TxStateInStempool, TxStateConflicted, TxStateInactive, TxStateUnrecognized>;
 
 //! Subset of states transaction sync logic is implemented to handle.
-using SyncTxState = std::variant<TxStateConfirmed, TxStateInMempool, TxStateInactive>;
+using SyncTxState = std::variant<TxStateConfirmed, TxStateInMempool, TxStateInStempool, TxStateInactive>;
 
 //! Try to interpret deserialized TxStateUnrecognized data as a recognized state.
 static inline TxState TxStateInterpretSerialized(TxStateUnrecognized data)
@@ -89,6 +93,7 @@ static inline uint256 TxStateSerializedBlockHash(const TxState& state)
     return std::visit(util::Overloaded{
         [](const TxStateInactive& inactive) { return inactive.abandoned ? uint256::ONE : uint256::ZERO; },
         [](const TxStateInMempool& in_mempool) { return uint256::ZERO; },
+        [](const TxStateInStempool& in_stempool) { return uint256::ZERO; },
         [](const TxStateConfirmed& confirmed) { return confirmed.confirmed_block_hash; },
         [](const TxStateConflicted& conflicted) { return conflicted.conflicting_block_hash; },
         [](const TxStateUnrecognized& unrecognized) { return unrecognized.block_hash; }
@@ -101,6 +106,7 @@ static inline int TxStateSerializedIndex(const TxState& state)
     return std::visit(util::Overloaded{
         [](const TxStateInactive& inactive) { return inactive.abandoned ? -1 : 0; },
         [](const TxStateInMempool& in_mempool) { return 0; },
+        [](const TxStateInStempool& in_stempool) { return 0; },
         [](const TxStateConfirmed& confirmed) { return confirmed.position_in_block; },
         [](const TxStateConflicted& conflicted) { return -1; },
         [](const TxStateUnrecognized& unrecognized) { return unrecognized.index; }
@@ -285,6 +291,8 @@ public:
     bool IsEquivalentTo(const CWalletTx& tx) const;
 
     bool InMempool() const;
+
+    bool InStempool() const;
 
     int64_t GetTxTime() const;
 

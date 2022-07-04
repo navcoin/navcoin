@@ -293,7 +293,7 @@ bool CachedTxIsTrusted(const CWallet& wallet, const CWalletTx& wtx, std::set<uin
     if (!wallet.m_spend_zero_conf_change || !CachedTxIsFromMe(wallet, wtx, ISMINE_ALL)) return false;
 
     // Don't trust unconfirmed transactions from us unless they are in the mempool.
-    if (!wtx.InMempool()) return false;
+    if (!wtx.InMempool() || !wtx.InStempool()) return false;
 
     // Trusted if all inputs are from us and are in the mempool:
     for (const CTxIn& txin : wtx.tx->vin)
@@ -338,7 +338,7 @@ Balance GetBalance(const CWallet& wallet, const int min_depth, bool avoid_reuse)
                 ret.m_mine_trusted += tx_credit_mine;
                 ret.m_watchonly_trusted += tx_credit_watchonly;
             }
-            if (!is_trusted && tx_depth == 0 && wtx.InMempool()) {
+            if (!is_trusted && tx_depth == 0 && (wtx.InMempool() || wtx.InStempool())) {
                 ret.m_mine_untrusted_pending += tx_credit_mine;
                 ret.m_watchonly_untrusted_pending += tx_credit_watchonly;
             }

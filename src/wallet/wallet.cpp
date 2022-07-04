@@ -1166,7 +1166,7 @@ bool CWallet::AbandonTransaction(const uint256& hashTx)
     auto it = mapWallet.find(hashTx);
     assert(it != mapWallet.end());
     const CWalletTx& origtx = it->second;
-    if (GetTxDepthInMainChain(origtx) != 0 || origtx.InMempool()) {
+    if (GetTxDepthInMainChain(origtx) != 0 || origtx.InMempool() || origtx.InStempool()) {
         return false;
     }
 
@@ -1186,6 +1186,7 @@ bool CWallet::AbandonTransaction(const uint256& hashTx)
         if (currentconfirm == 0 && !wtx.isAbandoned()) {
             // If the orig tx was not in block/mempool, none of its spends can be in mempool
             assert(!wtx.InMempool());
+            assert(!wtx.InStempool());
             wtx.m_state = TxStateInactive{/*abandoned=*/true};
             wtx.MarkDirty();
             batch.WriteTx(wtx);

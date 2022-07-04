@@ -111,6 +111,23 @@ static CTxMemPool* GetMemPool(const std::any& context, HTTPRequest* req)
 }
 
 /**
+ * Get the node context stempool.
+ *
+ * @param[in]  req The HTTP request, whose status code will be set if node
+ *                 context mempool is not found.
+ * @returns        Pointer to the stempool or nullptr if no stempool found.
+ */
+static CTxMemPool* GetStemPool(const std::any& context, HTTPRequest* req)
+{
+    auto node_context = util::AnyPtr<NodeContext>(context);
+    if (!node_context || !node_context->stempool) {
+        RESTERR(req, HTTP_NOT_FOUND, "Stempool disabled or instance not found");
+        return nullptr;
+    }
+    return node_context->stempool.get();
+}
+
+/**
  * Get the node context chainstatemanager.
  *
  * @param[in]  req The HTTP request, whose status code will be set if node
@@ -627,6 +644,53 @@ static bool rest_mempool_contents(const std::any& context, HTTPRequest* req, con
         UniValue mempoolObject = MempoolToJSON(*mempool, true);
 
         std::string strJSON = mempoolObject.write() + "\n";
+        req->WriteHeader("Content-Type", "application/json");
+        req->WriteReply(HTTP_OK, strJSON);
+        return true;
+    }
+    default: {
+        return RESTERR(req, HTTP_NOT_FOUND, "output format not found (available: json)");
+    }
+    }
+}
+
+static bool rest_stempool_info(const std::any& context, HTTPRequest* req, const std::string& strURIPart)
+{
+    if (!CheckWarmup(req))
+        return false;
+    const CTxMemPool* stempool = GetStemPool(context, req);
+    if (!stempool) return false;
+    std::string param;
+    const RESTResponseFormat rf = ParseDataFormat(param, strURIPart);
+
+    switch (rf) {
+    case RESTResponseFormat::JSON: {
+        UniValue stempoolInfoObject = StempoolInfoToJSON(*stempool);
+
+        std::string strJSON = stempoolInfoObject.write() + "\n";
+        req->WriteHeader("Content-Type", "application/json");
+        req->WriteReply(HTTP_OK, strJSON);
+        return true;
+    }
+    default: {
+        return RESTERR(req, HTTP_NOT_FOUND, "output format not found (available: json)");
+    }
+    }
+}
+
+static bool rest_stempool_contents(const std::any& context, HTTPRequest* req, const std::string& strURIPart)
+{
+    if (!CheckWarmup(req)) return false;
+    const CTxMemPool* stempool = GetStemPool(context, req);
+    if (!stempool) return false;
+    std::string param;
+    const RESTResponseFormat rf = ParseDataFormat(param, strURIPart);
+
+    switch (rf) {
+    case RESTResponseFormat::JSON: {
+        UniValue stempoolObject = StempoolToJSON(*stempool, true);
+
+        std::string strJSON = stempoolObject.write() + "\n";
         req->WriteHeader("Content-Type", "application/json");
         req->WriteReply(HTTP_OK, strJSON);
         return true;

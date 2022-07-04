@@ -19,6 +19,11 @@ bool CWalletTx::InMempool() const
     return state<TxStateInMempool>();
 }
 
+bool CWalletTx::InStempool() const
+{
+    return state<TxStateInStempool>();
+}
+
 int64_t CWalletTx::GetTxTime() const
 {
     int64_t n = nTimeSmart;
