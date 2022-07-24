@@ -51,6 +51,17 @@ static const bool DEFAULT_WHITELISTRELAY = true;
 /** Default for -whitelistforcerelay. */
 static const bool DEFAULT_WHITELISTFORCERELAY = false;
 
+/** Expected time between Dandelion routing shuffles (in seconds). */
+static const int DANDELION_SHUFFLE_INTERVAL = 600;
+/** Maximum number of outbound peers designated as Dandelion destinations */
+static const int DANDELION_MAX_DESTINATIONS = 2;
+/** The minimum amount of time a Dandelion transaction is embargoed (seconds) */
+static const int DANDELION_EMBARGO_MINIMUM = 10;
+/** The average additional embargo time beyond the minimum amount (seconds) */
+static const int DANDELION_EMBARGO_AVG_ADD = 20;
+/** Probability (percentage) that a Dandelion transaction enters fluff phase */
+static const unsigned int DANDELION_FLUFF = 10;
+
 /** Time after which to disconnect, after waiting for a ping response (or inactivity). */
 static constexpr std::chrono::minutes TIMEOUT_INTERVAL{20};
 /** Run the feeler connection loop once every 2 minutes. **/
@@ -235,6 +246,26 @@ bool SeenLocal(const CService& addr);
 bool IsLocal(const CService& addr);
 bool GetLocal(CService &addr, const CNetAddr *paddrPeer = nullptr);
 CAddress GetLocalAddress(const CNetAddr *paddrPeer, ServiceFlags nLocalServices);
+
+bool IsDandelionInbound(const CNode* const pnode);
+bool IsDandelionOutbound(const CNode* const pnode);
+bool IsLocalDandelionDestinationSet();
+bool SetLocalDandelionDestination();
+CNode* GetDandelionDestination(CNode* pfrom);
+bool LocalDandelionDestinationPushInventory(const CInv& inv);
+bool InsertDandelionEmbargo(const uint256& hash, const int64_t& embargo);
+bool IsTxDandelionEmbargoed(const uint256& hash);
+bool RemoveDandelionEmbargo(const uint256& hash);
+bool InsertDandelionAggregationSessionEmbargo(const uint256& hash, const int64_t& embargo);
+bool IsDandelionAggregationSessionEmbargoed(const uint256& hash);
+bool RemoveDandelionAggregationSessionEmbargo(const uint256& hash);
+bool InsertDandelionEncryptedCandidateEmbargo(const uint256 &ec, const int64_t& embargo);
+bool IsDandelionEncryptedCandidateEmbargoed(const uint256 &ec);
+bool RemoveDandelionEncryptedCandidateEmbargo(const uint256 &ec);
+CNode* SelectFromDandelionDestinations();
+void CloseDandelionConnections(const CNode* const pnode);
+std::string GetDandelionRoutingDataDebugString();
+void DandelionShuffle();
 
 
 extern bool fDiscover;
@@ -1153,11 +1184,8 @@ struct LocalServiceInfo {
     bool fMsgProcWake GUARDED_BY(mutexMsgProc);
 
     std::condition_variable condMsgProc;
-    std::condition_variable condDandelionProc;
     Mutex mutexMsgProc;
-    Mutex mutexDandelionProc;
     std::atomic<bool> flagInterruptMsgProc{false};
-    std::atomic<bool> flagInterruptDandelionProc{false};
 
     /**
      * This is signaled when network activity should cease.
