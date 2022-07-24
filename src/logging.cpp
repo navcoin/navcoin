@@ -264,6 +264,8 @@ std::string LogCategoryToStr(BCLog::LogFlags category)
         return "util";
     case BCLog::LogFlags::BLOCKSTORE:
         return "blockstorage";
+    case BCLog::LogFlags::DANDELION:
+        return "dandelion";
     case BCLog::LogFlags::ALL:
         return "all";
     }

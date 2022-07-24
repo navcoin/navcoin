@@ -2618,18 +2618,18 @@ void CConnman::ThreadDandelion()
     auto nextShuffle = std::chrono::steady_clock::now() + GetRandMicros(intervalTime);
 
     while (!interruptNet) {
-        while (nextShuffle > std::chrono::steady_clock::now()) {
-            auto sleepUntil = std::chrono::steady_clock::now() + sleepTime;
-            if (nextShuffle < sleepUntil) {
-                sleepUntil = nextShuffle;
-            }
-            std::this_thread::sleep_until(sleepUntil);
+        if (std::chrono::steady_clock::now() > nextShuffle) {
+            // Lock node pointers
+            LOCK(m_nodes_mutex);
+            DandelionShuffle();
+            nextShuffle = std::chrono::steady_clock::now() + GetRandMicros(intervalTime);
         }
 
-        // Lock node pointers
-        LOCK(m_nodes_mutex);
-        DandelionShuffle();
-        nextShuffle = std::chrono::steady_clock::now() + GetRandMicros(intervalTime);
+        auto sleepUntil = std::chrono::steady_clock::now() + sleepTime;
+        if (nextShuffle < sleepUntil) {
+            sleepUntil = nextShuffle;
+        }
+        std::this_thread::sleep_until(sleepUntil);
     }
 }
 
