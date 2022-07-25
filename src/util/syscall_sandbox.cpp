@@ -897,6 +897,10 @@ void SetSyscallSandboxPolicy(SyscallSandboxPolicy syscall_policy)
         break;
     case SyscallSandboxPolicy::VALIDATION_SCRIPT_CHECK: // Thread: scriptch.<N>
         break;
+    case SyscallSandboxPolicy::DANDELION: // Thread: dandelion
+        seccomp_policy_builder.AllowFileSystem();
+        seccomp_policy_builder.AllowNetwork();
+        break;
     case SyscallSandboxPolicy::SHUTOFF: // Thread: main thread (state: shutoff)
         seccomp_policy_builder.AllowFileSystem();
         break;
