@@ -642,30 +642,30 @@ std::string GetDandelionRoutingDataDebugString() {
     std::string dandelionRoutingDataDebugString = "";
     dandelionRoutingDataDebugString.append("  vDandelionInbound: ");
     for(auto const& e : vDandelionInbound) {
-        dandelionRoutingDataDebugString.append(std::to_string(e->GetId())+" ");
+        dandelionRoutingDataDebugString.append(ToString(e->GetId())+" ");
     }
     dandelionRoutingDataDebugString.append("\n");
     dandelionRoutingDataDebugString.append("  vDandelionOutbound: ");
     for(auto const& e : vDandelionOutbound) {
-        dandelionRoutingDataDebugString.append(std::to_string(e->GetId())+" ");
+        dandelionRoutingDataDebugString.append(ToString(e->GetId())+" ");
 
     }
     dandelionRoutingDataDebugString.append("\n");
     dandelionRoutingDataDebugString.append("  vDandelionDestination: ");
     for(auto const& e : vDandelionDestination) {
-        dandelionRoutingDataDebugString.append(std::to_string(e->GetId())+" ");
+        dandelionRoutingDataDebugString.append(ToString(e->GetId())+" ");
     }
     dandelionRoutingDataDebugString.append("\n");
     dandelionRoutingDataDebugString.append("  mDandelionRoutes: ");
     for(auto const& e : mDandelionRoutes) {
-        dandelionRoutingDataDebugString.append("("+std::to_string(e.first->GetId())+","+std::to_string(e.second->GetId())+") ");
+        dandelionRoutingDataDebugString.append("("+ToString(e.first->GetId())+","+ToString(e.second->GetId())+") ");
     }
     dandelionRoutingDataDebugString.append("\n");
     dandelionRoutingDataDebugString.append("  localDandelionDestination: ");
     if(localDandelionDestination==nullptr) {
         dandelionRoutingDataDebugString.append("nullptr");
     } else {
-        dandelionRoutingDataDebugString.append(std::to_string(localDandelionDestination->GetId()));
+        dandelionRoutingDataDebugString.append(ToString(localDandelionDestination->GetId()));
     }
     dandelionRoutingDataDebugString.append("\n");
     return dandelionRoutingDataDebugString;
