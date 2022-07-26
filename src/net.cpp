@@ -396,7 +396,7 @@ bool SetLocalDandelionDestination()
 {
     if (!IsLocalDandelionDestinationSet()) {
         localDandelionDestination = SelectFromDandelionDestinations();
-        LogPrint(BCLog::DANDELION, "Set local Dandelion destination:\n%s", GetDandelionRoutingDataDebugString());
+        LogPrint(BCLog::DANDELION, "Set local Dandelion destination:\n%s\n", GetDandelionRoutingDataDebugString());
     }
     return IsLocalDandelionDestinationSet();
 }
@@ -411,7 +411,7 @@ CNode* GetDandelionDestination(CNode* pfrom)
     CNode* newPto = SelectFromDandelionDestinations();
     if (newPto!=nullptr) {
         mDandelionRoutes.insert(std::make_pair(pfrom, newPto));
-        LogPrint(BCLog::DANDELION, "Added Dandelion route:\n%s", GetDandelionRoutingDataDebugString());
+        LogPrint(BCLog::DANDELION, "Added Dandelion route:\n%s\n", GetDandelionRoutingDataDebugString());
     }
     return newPto;
 }
@@ -673,7 +673,7 @@ std::string GetDandelionRoutingDataDebugString() {
 
 void DandelionShuffle() {
     // Dandelion debug message
-    LogPrint(BCLog::DANDELION, "Before Dandelion shuffle:\n%s", GetDandelionRoutingDataDebugString());
+    LogPrint(BCLog::DANDELION, "Before Dandelion shuffle:\n%s\n", GetDandelionRoutingDataDebugString());
 
     auto prevDestination = localDandelionDestination;
     // Iterate through mDandelionRoutes to facilitate bookkeeping
@@ -729,7 +729,7 @@ void DandelionShuffle() {
     localDandelionDestination = SelectFromDandelionDestinations();
 
     // Dandelion debug message
-    LogPrint(BCLog::DANDELION, "After Dandelion shuffle:\n%s", GetDandelionRoutingDataDebugString());
+    LogPrint(BCLog::DANDELION, "After Dandelion shuffle:\n%s\n", GetDandelionRoutingDataDebugString());
 }
 
 CNode* CConnman::FindNode(const CNetAddr& ip)
