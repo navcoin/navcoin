@@ -8,6 +8,7 @@
 #include <bls/bls384_256.h>
 #include <bls/bls.h>
 
+#include <blsct/arith/mcl_initializer.h>
 #include <blsct/arith/scalar.h>
 
 #include <hash.h>
@@ -17,7 +18,9 @@
 
 #include <stddef.h>
 #include <string>
-#include <vector>
+
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/lock_guard.hpp>
 
 class G1Point {
     public:
@@ -26,21 +29,26 @@ class G1Point {
         G1Point();
         G1Point(const std::vector<uint8_t>& v);
         G1Point(const G1Point& n);
-        G1Point(const uint256 &b);
+        G1Point(const uint256& b);
+        G1Point(const mclBnG1& p);
 
-        G1Point operator+(const G1Point &b) const;
-        G1Point operator-(const G1Point &b) const;
-        G1Point operator*(const Scalar &b) const;
+        static void Init();
 
-        G1Point Normalize() const;
+        void operator=(const mclBnG1& p);
+        G1Point operator+(const G1Point& b) const;
+        G1Point operator-(const G1Point& b) const;
+        G1Point operator*(const Scalar& b) const;
+
         G1Point Double() const;
 
-        static G1Point getBasePoint();
-        static G1Point hashAndMap(std::vector<unsigned char> &v);
-        static G1Point mulVec(const std::vector<G1Point> gVec, const std::vector<Scalar> sVec);
-        static G1Point mulVec(const std::vector<mclBnG1> gVec, const std::vector<mclBnFr> sVec);
+        static G1Point GetBasePoint();
+        static G1Point MapToG1(std::vector<uint8_t>& vec);
+        static G1Point HashAndMap(std::vector<uint8_t>& vec);
+        static G1Point MulVec(const std::vector<G1Point> gVec, const std::vector<Scalar> sVec);
+        static G1Point MulVec(const std::vector<mclBnG1> gVec, const std::vector<mclBnFr> sVec);
 
         bool operator==(const G1Point& b) const;
+        bool operator!=(const G1Point& b) const;
 
         static G1Point Rand();
 
@@ -49,9 +57,7 @@ class G1Point {
         std::vector<uint8_t> GetVch() const;
         void SetVch(const std::vector<uint8_t>& b);
 
-        std::string GetString(const int& r = 16);
-
-        mclBnG1 p;
+        std::string GetString(const int& ioMode = 16);
 
         unsigned int GetSerializeSize() const
         {
@@ -71,6 +77,12 @@ class G1Point {
                 ::Unserialize(s, vch);
                 SetVch(vch);
             }
+
+        mclBnG1 p;
+
+    private:
+        static mclBnG1 G;  // using mclBnG1 instead of G1Point to get around chiken-and-egg issue issue
+        static boost::mutex init_mutex;
 };
 
 #endif // NAVCOIN_BLSCT_ARITH_G1POINT_H
