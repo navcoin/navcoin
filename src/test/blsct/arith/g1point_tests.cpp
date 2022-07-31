@@ -178,26 +178,37 @@ BOOST_AUTO_TEST_CASE(test_g1point_hash_and_map)
     BOOST_CHECK(p == q);
 }
 
-BOOST_AUTO_TEST_CASE(test_g1point_mulvec_scalar)
+BOOST_AUTO_TEST_CASE(test_g1point_mulvec_scalar_g1point)
 {
+    auto p1 = G1Point::GetBasePoint();
+    auto p2 = p1.Double();
+    std::vector<G1Point> ps { p1, p2 };
+
+    Scalar s1(2), s2(3);
+    std::vector<Scalar> ss { s1, s2 };
+
+    // p should be G^2 + (G+G)^3 = G^8
+    auto p = G1Point::MulVec(ps, ss);
+    auto q = G1Point::GetBasePoint() * 8;
+
+    BOOST_CHECK(p == q);
 }
 
 BOOST_AUTO_TEST_CASE(test_g1point_mulvec_mcl)
 {
     auto basePoint = G1Point::GetBasePoint();
-    mclBnG1 g1, g2;
-    g1 = basePoint.p;
-    mclBnG1_dbl(&g2, &g1);
-    std::vector gs { g1, g2 };
+    mclBnG1 p1, p2;
+    p1 = basePoint.p;
+    mclBnG1_dbl(&p2, &p1);
+    std::vector<mclBnG1> ps { p1, p2 };
 
-    mclBnFr f1, f2;
-    mclBnFr_setInt(&f1, 2);
-    mclBnFr_setInt(&f2, 3);
-    std::vector fs { f1, f2 };
+    mclBnFr s1, s2;
+    mclBnFr_setInt(&s1, 2);
+    mclBnFr_setInt(&s2, 3);
+    std::vector<mclBnFr> ss { s1, s2 };
 
     // p should be G^2 + (G+G)^3 = G^8
-    auto p = G1Point::MulVec(gs, fs);
-
+    auto p = G1Point::MulVec(ps, ss);
     auto q = basePoint * 8;
 
     BOOST_CHECK(p == q);
