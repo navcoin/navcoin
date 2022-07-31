@@ -7,6 +7,7 @@
 #include <boost/test/unit_test.hpp>
 #include <blsct/arith/g1point.h>
 #include <blsct/arith/mcl_initializer.h>
+#include <algorithm>
 #include <set>
 #include <streams.h>
 
@@ -138,10 +139,43 @@ BOOST_AUTO_TEST_CASE(test_g1point_map_to_g1)
         0xff, 0xfe, 0x5b, 0xfe, 0xff, 0xff, 0xff, 0xff, 
     };
     G1Point::MapToG1(num48Byte);
+
+    // cannot map empty vector to a point
+    std::vector<uint8_t> empty_vec;
+    BOOST_CHECK_THROW(G1Point::MapToG1(empty_vec), std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(test_g1point_hash_and_map)
 {
+    std::vector<uint8_t> vec{
+        0x73, 0xed, 0xa7, 0x53, 0x29, 0x9d, 0x7d, 0x48, 0x33, 0x39, 
+        0xd8, 0x08, 0x09, 0xa1, 0xd8, 0x05, 0x53, 0xbd, 0xa4, 0x02, 
+        0xff, 0xfe, 0x5b, 0xfe, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 
+        0xd8, 0x08, 0x09, 0xa1, 0xd8, 0x05, 0x53, 0xbd, 0xa4, 0x02, 
+        0xff, 0xfe, 0x5b, 0xfe, 0xff, 0xff, 0xff, 0xff, 
+    };
+
+    // use separate hash function to hash vec
+    mclBnFp h;
+    if (mclBnFp_setHashOf(&h, &vec[0], vec.size()))
+    {
+        BOOST_FAIL("mclBnFp_setHashOf failed");
+    }
+    char buf[1024];
+    size_t serSize = mclBnFp_serialize(buf, sizeof(buf), &h);
+    if (serSize == 0)
+    {
+        BOOST_FAIL("mclBnFp_serialize failed");
+    }
+    std::vector<uint8_t> hashedVec(buf, buf + serSize);
+    // mclBpFp_serialize serializes its value in big-endian
+
+    // then get g1 point from the hash 
+    auto p = G1Point::MapToG1(hashedVec, Endianness::Big);
+
+    // next, directly get g1 point from the vec, using integrated hash function
+    auto q = G1Point::HashAndMap(vec);
+    BOOST_CHECK(p == q);
 }
 
 BOOST_AUTO_TEST_CASE(test_g1point_mulvec_scalar)

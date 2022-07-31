@@ -100,14 +100,24 @@ G1Point G1Point::GetBasePoint()
     return g;
 }
 
-G1Point G1Point::MapToG1(std::vector<uint8_t>& vec)
+G1Point G1Point::MapToG1(std::vector<uint8_t>& vec, Endianness e)
 {
     G1Point temp;
     mclBnFp v;
-    if (mclBnFp_setLittleEndianMod(&v, &vec[0], vec.size()) != 0)
+    if (e == Endianness::Little)
     {
-        throw std::runtime_error("G1Point::MapToG1(): mclBnFp_setLittleEndianMod failed");
+        if (mclBnFp_setLittleEndianMod(&v, &vec[0], vec.size()) != 0)
+        {
+            throw std::runtime_error("G1Point::MapToG1(): mclBnFp_setLittleEndianMod failed");
+        }
+    } else 
+    {
+        if (mclBnFp_setBigEndianMod(&v, &vec[0], vec.size()) != 0)
+        {
+            throw std::runtime_error("G1Point::MapToG1(): mclBnFp_setBigEndianMod failed");
+        }
     }
+
     if (mclBnFp_mapToG1(&temp.p, &v) != 0)
     {
         throw std::runtime_error("G1Point::MapToG1(): mclBnFp_mapToG1 failed");

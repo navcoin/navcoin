@@ -22,6 +22,11 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/lock_guard.hpp>
 
+enum class Endianness {
+    Big,
+    Little
+};
+
 class G1Point {
     public:
         static constexpr int WIDTH = 384 / 8;
@@ -42,7 +47,7 @@ class G1Point {
         G1Point Double() const;
 
         static G1Point GetBasePoint();
-        static G1Point MapToG1(std::vector<uint8_t>& vec);
+        static G1Point MapToG1(std::vector<uint8_t>& vec, Endianness e = Endianness::Little);
         static G1Point HashAndMap(std::vector<uint8_t>& vec);
         static G1Point MulVec(const std::vector<G1Point> gVec, const std::vector<Scalar> sVec);
         static G1Point MulVec(const std::vector<mclBnG1> gVec, const std::vector<mclBnFr> sVec);
