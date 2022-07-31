@@ -5,84 +5,85 @@
 #ifndef NAVCOIN_BLSCT_ARITH_G1POINT_H
 #define NAVCOIN_BLSCT_ARITH_G1POINT_H
 
-#include <bls/bls384_256.h>
-#include <bls/bls.h>
-
-#include <blsct/arith/mcl_initializer.h>
-#include <blsct/arith/scalar.h>
-
-#include <hash.h>
-#include <uint256.h>
-#include <serialize.h>
-#include <version.h>
-
 #include <stddef.h>
 #include <string>
 
-#include <boost/thread/mutex.hpp>
+#include <bls/bls.h>
+#include <bls/bls384_256.h> // must include this before bls/bls.h
 #include <boost/thread/lock_guard.hpp>
+#include <boost/thread/mutex.hpp>
 
-class G1Point {
-    public:
-        static constexpr int WIDTH = 384 / 8;
+#include <blsct/arith/mcl_initializer.h>
+#include <blsct/arith/scalar.h>
+#include <hash.h>
+#include <serialize.h>
+#include <uint256.h>
+#include <version.h>
 
-        G1Point();
-        G1Point(const std::vector<uint8_t>& v);
-        G1Point(const G1Point& n);
-        G1Point(const uint256& b);
-        G1Point(const mclBnG1& p);
+enum class Endianness {
+    Big,
+    Little
+};
 
-        static void Init();
+class G1Point
+{
+public:
+    static constexpr int WIDTH = 384 / 8;
 
-        void operator=(const mclBnG1& p);
-        G1Point operator+(const G1Point& b) const;
-        G1Point operator-(const G1Point& b) const;
-        G1Point operator*(const Scalar& b) const;
+    G1Point();
+    G1Point(const std::vector<uint8_t>& v);
+    G1Point(const G1Point& n);
+    G1Point(const uint256& b);
+    G1Point(const mclBnG1& p);
 
-        G1Point Double() const;
+    static void Init();
 
-        static G1Point GetBasePoint();
-        static G1Point MapToG1(std::vector<uint8_t>& vec);
-        static G1Point HashAndMap(std::vector<uint8_t>& vec);
-        static G1Point MulVec(const std::vector<G1Point> gVec, const std::vector<Scalar> sVec);
-        static G1Point MulVec(const std::vector<mclBnG1> gVec, const std::vector<mclBnFr> sVec);
+    void operator=(const mclBnG1& p);
+    G1Point operator+(const G1Point& b) const;
+    G1Point operator-(const G1Point& b) const;
+    G1Point operator*(const Scalar& b) const;
 
-        bool operator==(const G1Point& b) const;
-        bool operator!=(const G1Point& b) const;
+    G1Point Double() const;
 
-        static G1Point Rand();
+    static G1Point GetBasePoint();
+    static G1Point MapToG1(const std::vector<uint8_t>& vec, const Endianness e = Endianness::Little);
+    static G1Point MapToG1(const std::string& s, const Endianness e = Endianness::Little);
+    static G1Point HashAndMap(const std::vector<uint8_t>& vec);
+    static G1Point MulVec(const std::vector<G1Point>& g_vec, const std::vector<Scalar>& s_vec);
+    static G1Point MulVec(const std::vector<mclBnG1>& g_vec, const std::vector<mclBnFr>& s_vec);
+    static G1Point Rand();
 
-        bool IsUnity() const;
+    bool operator==(const G1Point& b) const;
+    bool operator!=(const G1Point& b) const;
 
-        std::vector<uint8_t> GetVch() const;
-        void SetVch(const std::vector<uint8_t>& b);
+    bool IsUnity() const;
 
-        std::string GetString(const int& ioMode = 16);
+    std::vector<uint8_t> GetVch() const;
+    void SetVch(const std::vector<uint8_t>& b);
 
-        unsigned int GetSerializeSize() const
-        {
-            return ::GetSerializeSize(GetVch());
-        }
+    std::string GetString(const int& radix = 16) const;
 
-        template<typename Stream>
-            void Serialize(Stream& s) const
-            {
-                ::Serialize(s, GetVch());
-            }
+    unsigned int GetSerializeSize() const;
 
-        template<typename Stream>
-            void Unserialize(Stream& s)
-            {
-                std::vector<uint8_t> vch;
-                ::Unserialize(s, vch);
-                SetVch(vch);
-            }
+    template <typename Stream>
+    void Serialize(Stream& s) const
+    {
+        ::Serialize(s, GetVch());
+    }
 
-        mclBnG1 p;
+    template <typename Stream>
+    void Unserialize(Stream& s)
+    {
+        std::vector<uint8_t> vch;
+        ::Unserialize(s, vch);
+        SetVch(vch);
+    }
 
-    private:
-        static mclBnG1 G;  // using mclBnG1 instead of G1Point to get around chiken-and-egg issue issue
-        static boost::mutex init_mutex;
+    mclBnG1 m_p;
+
+private:
+    static mclBnG1 m_g; // Using mclBnG1 instead of G1Point to get around chiken-and-egg issue
+    static boost::mutex m_init_mutex;
 };
 
 #endif // NAVCOIN_BLSCT_ARITH_G1POINT_H

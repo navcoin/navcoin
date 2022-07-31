@@ -133,8 +133,10 @@ BITCOIN_CORE_H = \
   bech32.h \
   blockencodings.h \
   blockfilter.h \
-  blsct/arith/scalar.h \
+  blsct/arith/elements.h \
   blsct/arith/g1point.h \
+  blsct/arith/mcl_initializer.h \
+  blsct/arith/scalar.h \
   chain.h \
   chainparams.h \
   chainparamsbase.h \
@@ -358,8 +360,10 @@ libbitcoin_node_a_SOURCES = \
   banman.cpp \
   blockencodings.cpp \
   blockfilter.cpp \
-  blsct/arith/scalar.cpp \
+  blsct/arith/elements.cpp \
   blsct/arith/g1point.cpp \
+  blsct/arith/mcl_initializer.cpp \
+  blsct/arith/scalar.cpp \
   chain.cpp \
   consensus/tx_verify.cpp \
   dbwrapper.cpp \
@@ -880,8 +884,10 @@ libbitcoinkernel_la_SOURCES = \
   kernel/bitcoinkernel.cpp \
   arith_uint256.cpp \
   blockfilter.cpp \
-  blsct/arith/scalar.cpp \
+  blsct/arith/elements.cpp \
   blsct/arith/g1point.cpp \
+  blsct/arith/mcl_initializer.cpp \
+  blsct/arith/scalar.cpp \
   chain.cpp \
   chainparamsbase.cpp \
   chainparams.cpp \

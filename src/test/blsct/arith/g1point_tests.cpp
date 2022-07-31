@@ -6,47 +6,51 @@
 
 #include <boost/test/unit_test.hpp>
 #include <blsct/arith/g1point.h>
+#include <blsct/arith/scalar.h>
 #include <blsct/arith/mcl_initializer.h>
+#include <blsct/arith/elements.h>
+#include <algorithm>
 #include <set>
 #include <streams.h>
 
-struct G1PointTests {
-    G1PointTests() 
+struct BlsctArithG1PointTests 
+{
+    BlsctArithG1PointTests()
     { 
         G1Point::Init();
     }
 };
 
-BOOST_TEST_GLOBAL_FIXTURE(G1PointTests);
+BOOST_TEST_GLOBAL_FIXTURE(BlsctArithG1PointTests);
 
 BOOST_AUTO_TEST_CASE(test_g1point_constructors)
 {
-    // default
+    // Default
     {
         G1Point p;
         BOOST_CHECK(p.IsUnity() == true);
     }
 
-    // vector<uint8_t>
+    // std::vector<uint8_t>
     {
-        auto G = G1Point::GetBasePoint();
-        auto vch = G.GetVch();
+        auto g = G1Point::GetBasePoint();
+        auto vch = g.GetVch();
         G1Point p(vch);
-        BOOST_CHECK(G == p);
+        BOOST_CHECK(g == p);
     }
 
     // G1Point
     {
-        auto G = G1Point::GetBasePoint();
-        G1Point p(G);
-        BOOST_CHECK(G == p);
+        auto g = G1Point::GetBasePoint();
+        G1Point p(g);
+        BOOST_CHECK(g == p);
     }
 
     // mclBnG1
     {
-        auto G = G1Point::GetBasePoint();
-        G1Point p(G.p);
-        BOOST_CHECK(G == p);
+        auto g = G1Point::GetBasePoint();
+        G1Point p(g.m_p);
+        BOOST_CHECK(g == p);
     }
 
     // uint256
@@ -59,119 +63,260 @@ BOOST_AUTO_TEST_CASE(test_g1point_constructors)
 
 BOOST_AUTO_TEST_CASE(test_g1point_assign_op)
 {
-    auto G = G1Point::GetBasePoint();
-    auto b = G + G;
+    auto g = G1Point::GetBasePoint();
+    auto b = g + g;
     auto c = b;
     BOOST_CHECK(b == c);
 }
 
 BOOST_AUTO_TEST_CASE(test_g1point_point_add_sub)
 {
-    auto G = G1Point::GetBasePoint();
-    auto p = G + G;
-    auto q = p - G;
-    BOOST_CHECK(q == G);
+    auto g = G1Point::GetBasePoint();
+    auto p = g + g;
+    auto q = p - g;
+    BOOST_CHECK(q == g);
 }
 
 BOOST_AUTO_TEST_CASE(test_g1point_point_mul)
 {
-    auto G = G1Point::GetBasePoint();
-    auto p = G + G + G;
-    auto q = G * 3;
+    auto g = G1Point::GetBasePoint();
+    auto p = g + g + g;
+    auto q = g * 3;
     BOOST_CHECK(p == q);
 }
 
 BOOST_AUTO_TEST_CASE(test_g1point_point_equal_or_not_equal)
 {
-    auto G = G1Point::GetBasePoint();
-    BOOST_CHECK(G == G);
+    auto g = G1Point::GetBasePoint();
+    BOOST_CHECK(g == g);
 
-    auto p = G + G;
-    BOOST_CHECK(G != p);
+    auto p = g + g;
+    BOOST_CHECK(g != p);
 }
 
 BOOST_AUTO_TEST_CASE(test_g1point_double)
 {
-    auto G = G1Point::GetBasePoint();
-    auto G2 = G + G;
-    auto GD = G.Double();
-    BOOST_CHECK(G2 == GD);
+    auto g = G1Point::GetBasePoint();
+    auto g2 = g + g;
+    auto gd = g.Double();
+    BOOST_CHECK(g2 == gd);
 
-    auto G4 = G2 + G2;
-    auto GDD = GD.Double();
-    BOOST_CHECK(G4 == GDD);
+    auto g4 = g2 + g2;
+    auto gdd = gd.Double();
+    BOOST_CHECK(g4 == gdd);
 }
 
 BOOST_AUTO_TEST_CASE(test_g1point_get_base_point)
 {
-    auto G = G1Point::GetBasePoint();
-    char gAct[1024];
-    if (mclBnG1_getStr(gAct, sizeof(gAct), &G.p, 10) == 0)
-    {
+    auto g = G1Point::GetBasePoint();
+    char g_act[1024];
+    if (mclBnG1_getStr(g_act, sizeof(g_act), &g.m_p, 10) == 0) {
         BOOST_FAIL("Failed to get string representation of G");
     }
-    const char* gExp = "1 3685416753713387016781088315183077757961620795782546409894578378688607592378376318836054947676345821548104185464507 1339506544944476473020471379941921221584933875938349620426543736416511423956333506472724655353366534992391756441569";
-    BOOST_CHECK_EQUAL(gExp, gAct);
+    const char* g_exp = "1 3685416753713387016781088315183077757961620795782546409894578378688607592378376318836054947676345821548104185464507 1339506544944476473020471379941921221584933875938349620426543736416511423956333506472724655353366534992391756441569";
+    BOOST_CHECK_EQUAL(g_exp, g_act);
 }
 
 BOOST_AUTO_TEST_CASE(test_g1point_map_to_g1)
 {
-    // differnt numbers should be mapped to different points 
+    // Differnt numbers should be mapped to different points
     std::set<std::string> xs;
-    const size_t numXs = 1000;
-    for(size_t i=0; i<numXs; ++i)
-    {
+    const size_t num_xs = 1000;
+    for (size_t i=0; i<num_xs; ++i) {
         auto s = std::to_string(i);
         std::vector<unsigned char> v(s.begin(), s.end());
         auto p = G1Point::MapToG1(v);
         xs.insert(p.GetString());
     }
-    BOOST_CHECK_EQUAL(xs.size(), numXs);
+    BOOST_CHECK_EQUAL(xs.size(), num_xs);
 
-    // just check if MapToG1 accepts a large number
-    std::vector<uint8_t> num48Byte{
-
-        0x73, 0xed, 0xa7, 0x53, 0x29, 0x9d, 0x7d, 0x48, 0x33, 0x39, 
-        0xd8, 0x08, 0x09, 0xa1, 0xd8, 0x05, 0x53, 0xbd, 0xa4, 0x02, 
-        0xff, 0xfe, 0x5b, 0xfe, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 
-        0xd8, 0x08, 0x09, 0xa1, 0xd8, 0x05, 0x53, 0xbd, 0xa4, 0x02, 
-        0xff, 0xfe, 0x5b, 0xfe, 0xff, 0xff, 0xff, 0xff, 
+    // Just check if MapToG1 accepts a large number
+    std::vector<uint8_t> num_48_byte{
+        0x73,
+        0xed,
+        0xa7,
+        0x53,
+        0x29,
+        0x9d,
+        0x7d,
+        0x48,
+        0x33,
+        0x39,
+        0xd8,
+        0x08,
+        0x09,
+        0xa1,
+        0xd8,
+        0x05,
+        0x53,
+        0xbd,
+        0xa4,
+        0x02,
+        0xff,
+        0xfe,
+        0x5b,
+        0xfe,
+        0xff,
+        0xff,
+        0xff,
+        0xff,
+        0x00,
+        0x00,
+        0xd8,
+        0x08,
+        0x09,
+        0xa1,
+        0xd8,
+        0x05,
+        0x53,
+        0xbd,
+        0xa4,
+        0x02,
+        0xff,
+        0xfe,
+        0x5b,
+        0xfe,
+        0xff,
+        0xff,
+        0xff,
+        0xff,
     };
-    G1Point::MapToG1(num48Byte);
+    G1Point::MapToG1(num_48_byte);
+
+    // Empty vector should not be mapped to a point
+    std::vector<uint8_t> empty_vec;
+    BOOST_CHECK_THROW(G1Point::MapToG1(empty_vec), std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(test_g1point_hash_and_map)
 {
+    std::vector<uint8_t> vec{
+        0x73,
+        0xed,
+        0xa7,
+        0x53,
+        0x29,
+        0x9d,
+        0x7d,
+        0x48,
+        0x33,
+        0x39,
+        0xd8,
+        0x08,
+        0x09,
+        0xa1,
+        0xd8,
+        0x05,
+        0x53,
+        0xbd,
+        0xa4,
+        0x02,
+        0xff,
+        0xfe,
+        0x5b,
+        0xfe,
+        0xff,
+        0xff,
+        0xff,
+        0xff,
+        0x00,
+        0x00,
+        0xd8,
+        0x08,
+        0x09,
+        0xa1,
+        0xd8,
+        0x05,
+        0x53,
+        0xbd,
+        0xa4,
+        0x02,
+        0xff,
+        0xfe,
+        0x5b,
+        0xfe,
+        0xff,
+        0xff,
+        0xff,
+        0xff,
+    };
+
+    // Use separate hash function to hash vec
+    mclBnFp h;
+    if (mclBnFp_setHashOf(&h, &vec[0], vec.size())) {
+        BOOST_FAIL("mclBnFp_setHashOf failed");
+    }
+    char buf[1024];
+    size_t ser_size = mclBnFp_serialize(buf, sizeof(buf), &h);
+    if (ser_size == 0) {
+        BOOST_FAIL("mclBnFp_serialize failed");
+    }
+    std::vector<uint8_t> hashedVec(buf, buf + ser_size);
+    // mclBpFp_serialize serializes its value in big-endian
+
+    // Then get g1 point from the hash
+    auto p = G1Point::MapToG1(hashedVec, Endianness::Big);
+
+    // Next, directly get g1 point from the vec, using integrated hash function
+    auto q = G1Point::HashAndMap(vec);
+    BOOST_CHECK(p == q);
 }
 
-BOOST_AUTO_TEST_CASE(test_g1point_mulvec_scalar)
+BOOST_AUTO_TEST_CASE(test_g1point_mulvec_scalar_g1point)
 {
+    auto p1 = G1Point::GetBasePoint();
+    auto p2 = p1.Double();
+    std::vector<G1Point> ps { p1, p2 };
+
+    Scalar s1(2), s2(3);
+    std::vector<Scalar> ss { s1, s2 };
+
+    // p should be G^2 + (G+G)^3 = G^8
+    auto p = G1Point::MulVec(ps, ss);
+    auto q = G1Point::GetBasePoint() * 8;
+
+    BOOST_CHECK(p == q);
 }
 
-BOOST_AUTO_TEST_CASE(test_g1point_mulvec_mclbnfr)
+BOOST_AUTO_TEST_CASE(test_g1point_mulvec_mcl)
 {
+    auto base_point = G1Point::GetBasePoint();
+    mclBnG1 p1, p2;
+    p1 = base_point.m_p;
+    mclBnG1_dbl(&p2, &p1);
+    std::vector<mclBnG1> ps { p1, p2 };
+
+    mclBnFr s1, s2;
+    mclBnFr_setInt(&s1, 2);
+    mclBnFr_setInt(&s2, 3);
+    std::vector<mclBnFr> ss { s1, s2 };
+
+    // p should be G^2 + (G+G)^3 = G^8
+    auto p = G1Point::MulVec(ps, ss);
+    auto q = base_point * 8;
+
+    BOOST_CHECK(p == q);
 }
 
 BOOST_AUTO_TEST_CASE(test_g1point_rand)
 {
-    unsigned int numTries = 1000;
-    unsigned int numDups = 0; 
+    unsigned int num_tries = 1000;
+    unsigned int num_dups = 0;
     auto x = G1Point::Rand();
-    for(size_t i=0; i<numTries; ++i)
-    {
+    for (size_t i = 0; i < num_tries; ++i) {
         auto y = G1Point::Rand();
-        if (x == y) ++numDups;
+        if (x == y) ++num_dups;
     }
-    auto dupRatio = numDups / (float) numTries;
+    auto dupRatio = num_dups / (float) num_tries;
     BOOST_CHECK(dupRatio < 0.001);
 }
 
 BOOST_AUTO_TEST_CASE(test_g1point_is_unity)
 {
-    auto G = G1Point::GetBasePoint();
-    BOOST_CHECK_EQUAL(G.IsUnity(), false);
+    auto g = G1Point::GetBasePoint();
+    BOOST_CHECK_EQUAL(g.IsUnity(), false);
 
-    auto p = G - G;
+    auto p = g - g;
     BOOST_CHECK_EQUAL(p.IsUnity(), true);
 }
 
@@ -189,17 +334,17 @@ BOOST_AUTO_TEST_CASE(test_g1point_get_set_vch)
 
 BOOST_AUTO_TEST_CASE(test_g1point_get_string)
 {
-    auto G = G1Point::GetBasePoint();
-    const char* gExp = "1 3685416753713387016781088315183077757961620795782546409894578378688607592378376318836054947676345821548104185464507 1339506544944476473020471379941921221584933875938349620426543736416511423956333506472724655353366534992391756441569";
-    auto gAct = G.GetString(10);
-    BOOST_CHECK(gExp == gAct);
+    auto g = G1Point::GetBasePoint();
+    const char* g_exp = "1 3685416753713387016781088315183077757961620795782546409894578378688607592378376318836054947676345821548104185464507 1339506544944476473020471379941921221584933875938349620426543736416511423956333506472724655353366534992391756441569";
+    auto g_act = g.GetString(10);
+    BOOST_CHECK(g_exp == g_act);
 }
 
 BOOST_AUTO_TEST_CASE(test_g1point_get_serialize_size)
 {
     G1Point p(uint256::ONE);
-    auto serSize = p.GetSerializeSize();
-    BOOST_CHECK_EQUAL(serSize, 49);
+    auto ser_size = p.GetSerializeSize();
+    BOOST_CHECK_EQUAL(ser_size, 49ul);
 }
 
 BOOST_AUTO_TEST_CASE(test_g1point_serialize_unserialize)
@@ -207,7 +352,7 @@ BOOST_AUTO_TEST_CASE(test_g1point_serialize_unserialize)
     G1Point p(uint256::ONE);
     CDataStream st(0, 0);
     p.Serialize(st);
-    BOOST_CHECK_EQUAL(st.size(), 49);
+    BOOST_CHECK_EQUAL(st.size(), 49ul);
 
     G1Point q;
     BOOST_CHECK(p != q);
@@ -215,150 +360,3 @@ BOOST_AUTO_TEST_CASE(test_g1point_serialize_unserialize)
     q.Unserialize(st);
     BOOST_CHECK(p == q);
 }
-
-// returns true if prover can convince that it known a, b s.t.
-// P = g^a h^b and c = <a, b> (a)
-// P is a binding vector commitment to a,b
-template<int N>
-bool CalcSimplestInnerProductArgument(
-    mclBnFr (&a)[N], mclBnFr (&b)[N], mclBnG1 (&g)[N], mclBnG1 (&h)[N], 
-    mclBnFr& c, mclBnG1& P)
-{
-    // simplest proof system
-    // 1. prover sends a,b to verifier
-    // 2. verifier checks if P = g^a h^b and c = <a, b> holds
-
-    // P = g^a h^b
-    mclBnG1 gIp;
-    mclBnG1_mulVec(&gIp, g, a, N);
-    mclBnG1 hIp;
-    mclBnG1_mulVec(&hIp, h, b, N);
-    mclBnG1 PAct;
-    mclBnG1_add(&PAct, &gIp, &hIp);
-    bool pMatched = mclBnG1_isEqual(&PAct, &P);
-
-    // c = <a, b>
-    mclBnFr cAct;
-    mclBnFr_clear(&cAct);
-    for(size_t i = 0; i < N; ++i)
-    {
-        mclBnFr ip;
-        mclBnFr_mul(&ip, &a[i], &b[i]);
-        mclBnFr_add(&cAct, &cAct, &ip);
-    }
-    bool cMatched = mclBnFr_isEqual(&cAct, &c);
-
-    return pMatched && cMatched;
-}
-
-// TODO use Scalar and G1Point
-BOOST_AUTO_TEST_CASE(test_g1point_simplest_inner_product)
-{
-    char buf[1024];
-
-    // Setup
-    const size_t n = 2;
-
-    // g[n]
-    mclBnG1 g[n]; 
-    for(size_t i = 0; i < n; ++i)
-    {
-        mclBnFr r;
-        mclBnFr_setByCSPRNG(&r);
-        mclBnFr_getStr(buf, sizeof(buf), &r, 16);
-        mclBnG1_hashAndMapTo(&g[i], buf, sizeof(buf));
-    }
-
-    // h[n]
-    mclBnG1 h[n];
-    for(size_t i = 0; i < n; ++i)
-    {
-        mclBnFr r;
-        mclBnFr_setByCSPRNG(&r);
-        mclBnFr_getStr(buf, sizeof(buf), &r, 16);
-        mclBnG1_hashAndMapTo(&h[i], buf, sizeof(buf));
-    }
-
-    // a[n]
-    mclBnFr a[n]; 
-    for(size_t i = 0; i < n; ++i)
-    {
-        mclBnFr_setByCSPRNG(&a[i]);
-    }
-
-    // b[n]
-    mclBnFr b[n]; 
-    for(size_t i = 0; i < n; ++i)
-    {
-        mclBnFr_setByCSPRNG(&b[i]);
-    }
-
-    // c = <a, b>
-    mclBnFr c;
-    mclBnFr_clear(&c);
-    for(size_t i = 0; i < n; ++i)
-    {
-        mclBnFr ip;
-        mclBnFr_mul(&ip, &a[i], &b[i]);
-        mclBnFr_add(&c, &c, &ip);
-    }
-
-    // P = g^a h^b
-    mclBnG1 gIp;
-    mclBnG1_mulVec(&gIp, g, a, n);
-    mclBnG1 hIp;
-    mclBnG1_mulVec(&hIp, h, b, n);
-    mclBnG1 P;
-    mclBnG1_add(&P, &gIp, &hIp);
-
-    bool result = CalcSimplestInnerProductArgument<n>(a, b, g, h, c, P);
-    BOOST_CHECK_EQUAL(result, true);
-}
-
-// template<int N>
-// bool CalcImprovedInnerProductArgument(
-//     mclBnG1 (&g)[N], mclBnG1 (&h)[N], 
-//     mclBnG1& u, mclBnG1 &P,
-//     mclBnFr (&a)[N], mclBnFr (&b)[N])
-// {
-//     if (n == 1)
-//     {
-//         // Prover passes a,b to Verifier
-//         // Verifier computes c=a*b and returns if P=g^a h^b u^c holds
-//         return true;
-//     }
-//     else 
-//     {
-//         // Prover computes nn, cL, cR, L, R
-//         int nn = n / 2;
-//         mclBnFr cL, cR;
-//         mclBnG1 L, R;    
-
-//         // Prover passes L, R to Verifier
-
-//         // Verifier get random x and send it to Prover
-//         mclBnFr x;
-//         mclBnFr_setByCSPRNG(&x);
-
-//         // Prover and Verifier compute gg, hh, PP
-
-//         // Prover computes aa, bb
-
-//         return CalcImprovedInnerProductArgument<nn>(gg, hh, PP, u, aa, bb);
-//     }
-// }
-
-// template<int N>
-// bool CalcImprovedInnerProductArgument(
-//     mclBnG1 (&g)[N], mclBnG1 (&h)[N], 
-//     mclBnG1& u, mclBnG1 &P,
-//     mclBnFr (&a)[N], mclBnFr (&b)[N])
-// {
-//     // Prover's input:
-//     // g, h, u, P, a, b
-    
-//     // Verifier's input:
-//     // g, h, u, P
-
-//     return CalcImprovedInnerProductArgument<N>(g, h, u, P, a, b);
-// }

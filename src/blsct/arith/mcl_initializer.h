@@ -9,32 +9,18 @@
 #ifndef NAVCOIN_BLSCT_ARITH_MCL_INITIALIZER_H
 #define NAVCOIN_BLSCT_ARITH_MCL_INITIALIZER_H
 
-#include <bls/bls384_256.h>
 #include <bls/bls.h>
-#include <boost/thread/mutex.hpp>
+#include <bls/bls384_256.h> // must include this before bls/bls.h
 #include <boost/thread/lock_guard.hpp>
+#include <boost/thread/mutex.hpp>
 
 class MclInitializer
 {
-    public:
-        static void Init()
-        {
-            boost::lock_guard<boost::mutex> lock(MclInitializer::init_mutex);
-            static bool fInit = false;
-            if (fInit)
-                return;
+public:
+    static void Init();
 
-            if (blsInit(MCL_BLS12_381, MCLBN_COMPILED_TIME_VAR) != 0)
-            {
-                throw std::runtime_error("blsInit failed");
-            }
-            mclBn_setETHserialization(1);
-
-            fInit = true;
-        }
-
-    private:
-        inline static boost::mutex init_mutex;
+private:
+    inline static boost::mutex m_init_mutex;
 };
 
 #endif // NAVCOIN_BLSCT_ARITH_MCL_INITIALIZER_H

@@ -6,7 +6,7 @@
 
 Scalar::Scalar(const int64_t& n)
 {
-    mclBnFr_setInt(&fr, n);
+    mclBnFr_setInt(&m_fr, n);
 }
 
 Scalar::Scalar(const std::vector<uint8_t> &v)
@@ -16,25 +16,24 @@ Scalar::Scalar(const std::vector<uint8_t> &v)
 
 Scalar::Scalar(const Scalar& n)
 {
-    fr = n.fr;
+    m_fr = n.m_fr;
 }
 
 Scalar::Scalar(const mclBnFr& nFr)
 {
-    fr = nFr;
+    m_fr = nFr;
 }
 
 Scalar::Scalar(const uint256& n)
 {
     // uint256 deserialization is big-endian
-    mclBnFr_setBigEndianMod(&fr, n.data(), 32);
+    mclBnFr_setBigEndianMod(&m_fr, n.data(), 32);
 }
 
-Scalar::Scalar(const std::string& s, int ioMode)
+Scalar::Scalar(const std::string& s, int radix)
 {
-    int r = mclBnFr_setStr(&fr, s.c_str(), s.length(), ioMode);
-    if (r == -1) 
-    {
+    auto r = mclBnFr_setStr(&m_fr, s.c_str(), s.length(), radix);
+    if (r == -1) {
         throw std::runtime_error(std::string("Failed to instantiate Scalar from '") + s);
     }
 }
@@ -47,28 +46,28 @@ void Scalar::Init()
 Scalar Scalar::operator+(const Scalar &b) const
 {
     Scalar ret;
-    mclBnFr_add(&ret.fr, &fr, &b.fr);
+    mclBnFr_add(&ret.m_fr, &m_fr, &b.m_fr);
     return ret;
 }
 
 Scalar Scalar::operator-(const Scalar &b) const
 {
     Scalar ret;
-    mclBnFr_sub(&ret.fr, &fr, &b.fr);
+    mclBnFr_sub(&ret.m_fr, &m_fr, &b.m_fr);
     return ret;
 }
 
 Scalar Scalar::operator*(const Scalar &b) const
 {
     Scalar ret;
-    mclBnFr_mul(&ret.fr, &fr, &b.fr);
+    mclBnFr_mul(&ret.m_fr, &m_fr, &b.m_fr);
     return ret;
 }
 
 Scalar Scalar::operator/(const Scalar &b) const
 {
     Scalar ret;
-    mclBnFr_div(&ret.fr, &fr, &b.fr);
+    mclBnFr_div(&ret.m_fr, &m_fr, &b.m_fr);
     return ret;
 }
 
@@ -76,146 +75,98 @@ Scalar Scalar::ApplyBitwiseOp(const Scalar& a, const Scalar& b,
     std::function<uint8_t(uint8_t, uint8_t)> op) const
 {
     Scalar ret;
-    auto aVec = a.GetVch();
-    auto bVec = b.GetVch();
+    auto a_vec = a.GetVch();
+    auto b_vec = b.GetVch();
 
-    // if sizes are the same, bVec becomes longer and aVec becomes shorter 
-    auto& longer = aVec.size() > bVec.size() ? aVec : bVec; 
-    auto& shorter = bVec.size() < aVec.size() ? bVec : aVec;
+    // If sizes are the same, bVec becomes longer and aVec becomes shorter
+    auto& longer = a_vec.size() > b_vec.size() ? a_vec : b_vec;
+    auto& shorter = b_vec.size() < a_vec.size() ? b_vec : a_vec;
 
-    std::vector<uint8_t> cVec(longer.size());
+    std::vector<uint8_t> c_vec(longer.size());
 
-    for (size_t i = 0; i < shorter.size(); i++)
-    {
+    for (size_t i = 0; i < shorter.size(); i++) {
         uint8_t l = longer[i];
         uint8_t r = shorter[i];
-        cVec[i] = op(l, r);
+        c_vec[i] = op(l, r);
     }
 
-    // will do nothing if sizes are the same
-    for (size_t i = shorter.size(); i < longer.size(); i++)
-    {
-        cVec[i] = op(longer[i], 0);
+    // Does nothing if sizes are the same
+    for (size_t i = shorter.size(); i < longer.size(); i++) {
+        c_vec[i] = op(longer[i], 0);
     }
-     
-    ret.SetVch(cVec);
+
+    ret.SetVch(c_vec);
 
     return ret;
 }
 
 Scalar Scalar::operator|(const Scalar &b) const
 {
-    auto op = [](uint8_t a, uint8_t b) -> uint8_t { return a|b; };
+    auto op = [](uint8_t a, uint8_t b) -> uint8_t { return a | b; };
     return ApplyBitwiseOp(*this, b, op);
 }
 
 Scalar Scalar::operator^(const Scalar &b) const
 {
-    auto op = [](uint8_t a, uint8_t b) -> uint8_t { return a^b; };
+    auto op = [](uint8_t a, uint8_t b) -> uint8_t { return a ^ b; };
     return ApplyBitwiseOp(*this, b, op);
 }
 
 Scalar Scalar::operator&(const Scalar &b) const
 {
-    auto op = [](uint8_t a, uint8_t b) -> uint8_t { return a&b; };
+    auto op = [](uint8_t a, uint8_t b) -> uint8_t { return a & b; };
     return ApplyBitwiseOp(*this, b, op);
 }
 
 Scalar Scalar::operator~() const
 {
-    // getting complement of lower 8 bytes only since when 32-byte buffer is 
-    // fully complemented, mclBrFr_deserialize returns undesired result
-    int64_t nComplementScalar = ~GetInt64();
-    Scalar ret(nComplementScalar);
+    // Getting complement of lower 8 bytes only since when 32-byte buffer is fully complemented,
+    // mclBrFr_deserialize returns undesired result
+    int64_t n_complement_scalar = ~GetInt64();
+    Scalar ret(n_complement_scalar);
 
     return ret;
 }
 
-/**
- * TODO: Need to investigate if this implementation is faster
- * than just running fr += fr or using << 1
- * more discussion over here: https://github.com/herumi/mcl/issues/144
- */
 Scalar Scalar::operator<<(unsigned int shift) const
 {
     mclBnFr next;
-    mclBnFr prev = fr;
-    for(size_t i = 0; i < shift; ++i)
-    {
+    mclBnFr prev = m_fr;
+    for (size_t i = 0; i < shift; ++i) {
         mclBnFr_add(&next, &prev, &prev);    
         prev = next;
     }
     Scalar ret(prev);
 
     return ret;
-
-    // replaced below implementation with above has problem when shift is above 7
-
-    // Scalar temp;
-
-    // std::vector<uint8_t> vch = GetVch();
-    // std::vector<uint8_t> finalVch (WIDTH);
-
-    // for (int i = 0; i < WIDTH; i++)
-    //     finalVch[i] = 0;
-    // int k = shift / 8;
-    // shift = shift % 8;
-    // for (int i = 0; i < WIDTH; i++) {
-    //     if (i + k + 1 < WIDTH && shift != 0)
-    //         finalVch[i + k + 1] |= (vch[i] >> (8 - shift));
-    //     if (i + k < WIDTH)
-    //         finalVch[i + k] |= (vch[i] << shift);
-    // }
-
-    // temp.SetVch(finalVch);
-
-    // return temp;
 }
 
-// assumes that fr contains a number within int64_t range
+/** 
+ * Assumes that fr contains a number within int64_t range
+ */
 Scalar Scalar::operator>>(unsigned int shift) const
 {
     int64_t n = GetInt64();
     Scalar ret(n >> shift);
 
     return ret;
-
-    // Scalar temp;
-
-    // std::vector<uint8_t> vch = GetVch();
-    // std::vector<uint8_t> finalVch (WIDTH);
-
-    // for (int i = 0; i < WIDTH; i++)
-    //     finalVch[i] = 0;
-    // int k = shift / 8;
-    // shift = shift % 8;
-    // for (int i = 0; i < WIDTH; i++) {
-    //     if (i - k - 1 >= 0 && shift != 0)
-    //         finalVch[i - k - 1] |= (vch[i] << (8 - shift));
-    //     if (i - k >= 0)
-    //         finalVch[i - k] |= (vch[i] >> shift);
-    // }
-
-    // temp.SetVch(finalVch);
-
-    // return temp;
 }
 
 void Scalar::operator=(const uint64_t& n)
 {
-    mclBnFr_setInt(&fr, (mclInt) n);
+    mclBnFr_setInt(&m_fr, (mclInt)n);
 }
 
 bool Scalar::operator==(const int &b) const
 {
     Scalar temp;
     temp = b;
-    return mclBnFr_isEqual(&fr, &temp.fr);
+    return mclBnFr_isEqual(&m_fr, &temp.m_fr);
 }
 
 bool Scalar::operator==(const Scalar &b) const
 {
-    return mclBnFr_isEqual(&fr, &b.fr);
+    return mclBnFr_isEqual(&m_fr, &b.m_fr);
 }
 
 bool Scalar::operator!=(const int &b) const
@@ -231,24 +182,58 @@ bool Scalar::operator!=(const Scalar &b) const
 Scalar Scalar::Invert() const
 {
     Scalar temp;
-    mclBnFr_inv(&temp.fr, &fr);
+    mclBnFr_inv(&temp.m_fr, &m_fr);
     return temp;
 }
 
 Scalar Scalar::Negate() const
 {
     Scalar temp;
-    mclBnFr_neg(&temp.fr, &fr);
+    mclBnFr_neg(&temp.m_fr, &m_fr);
     return temp;
 }
 
-Scalar Scalar::Rand()
+Scalar Scalar::Square() const
+{
+    Scalar temp;
+    mclBnFr_sqr(&temp.m_fr, &m_fr);
+    return temp;
+}
+
+Scalar Scalar::Cube() const
+{
+    Scalar temp(m_fr);
+    temp = temp * temp.Square();
+    return temp;
+}
+
+Scalar Scalar::Pow(const Scalar& n) const
+{
+    // A variant of double-and-add method
+    Scalar temp(1);
+    mclBnFr bit_val;
+    bit_val = m_fr;
+    auto bits = n.GetBits();
+
+    for (auto it = bits.rbegin(); it != bits.rend(); ++it) {
+        Scalar s(bit_val);
+        if (*it) {
+            mclBnFr_mul(&temp.m_fr, &temp.m_fr, &bit_val);
+        }
+        mclBnFr_mul(&bit_val, &bit_val, &bit_val);
+    }
+    return temp;
+}
+
+Scalar Scalar::Rand(bool exclude_zero)
 {
     Scalar temp;
 
-    if (mclBnFr_setByCSPRNG(&temp.fr) != 0)
-    {
-        throw std::runtime_error(std::string("Failed to generate random number"));
+    while (true) {
+        if (mclBnFr_setByCSPRNG(&temp.m_fr) != 0) {
+            throw std::runtime_error(std::string("Failed to generate random number"));
+        }
+        if (!exclude_zero || mclBnFr_isZero(&temp.m_fr) != 1) break;
     }
     return temp;
 }
@@ -257,8 +242,7 @@ int64_t Scalar::GetInt64() const
 {
     int64_t ret = 0;
     std::vector<uint8_t> vch = GetVch();
-    for (auto i = 0; i < 8; i++)
-    {
+    for (auto i = 0; i < 8; ++i) {
         ret |= (int64_t) vch[vch.size()-i-1] << i*8;
     }
     return ret;
@@ -267,8 +251,7 @@ int64_t Scalar::GetInt64() const
 std::vector<uint8_t> Scalar::GetVch() const
 {
     std::vector<uint8_t> b(WIDTH);
-    if (mclBnFr_serialize(&b[0], WIDTH, &fr) == 0)
-    {
+    if (mclBnFr_serialize(&b[0], WIDTH, &m_fr) == 0) {
         throw std::runtime_error(std::string("Failed to serialize mclBnFr"));
     }
     return b;
@@ -276,8 +259,7 @@ std::vector<uint8_t> Scalar::GetVch() const
 
 void Scalar::SetVch(const std::vector<uint8_t> &v)
 {
-    if (mclBnFr_setBigEndianMod(&fr, &v[0], v.size()) == -1)
-    {
+    if (mclBnFr_setBigEndianMod(&m_fr, &v[0], v.size()) == -1) {
         throw std::runtime_error(std::string("Failed to setBigEndianMod vector"));
     }
 }
@@ -290,7 +272,7 @@ void Scalar::SetPow2(int n)
         --n;
     }
 
-    fr = temp.fr;
+    m_fr = temp.m_fr;
 }
 
 uint256 Scalar::Hash(const int& n) const
@@ -301,18 +283,29 @@ uint256 Scalar::Hash(const int& n) const
     return hasher.GetHash();
 }
 
-std::string Scalar::GetString(const int& r) const
+std::string Scalar::GetString(const int8_t radix) const
 {
     char str[1024];
 
-    if (mclBnFr_getStr(str, sizeof(str), &fr, r) == 0)
-    {
+    if (mclBnFr_getStr(str, sizeof(str), &m_fr, radix) == 0) {
         throw std::runtime_error(std::string("Failed to get string representation of mclBnFr"));
     }
     return std::string(str);
 }
 
-// since GetVch returns 32-byte vector, maximum bit index is 8 * 32 - 1 = 255
+std::vector<bool> Scalar::GetBits() const
+{
+    auto bitStr = GetString(2);
+    std::vector<bool> vec;
+    for (auto& c : bitStr) {
+        vec.push_back(c == '0' ? 0 : 1);
+    }
+    return vec;
+}
+
+/** 
+ * Since GetVch returns 32-byte vector, maximum bit index is 8 * 32 - 1 = 255
+ */
 bool Scalar::GetBit(uint8_t n) const 
 {
     std::vector<uint8_t> vch = GetVch();
@@ -326,23 +319,7 @@ bool Scalar::GetBit(uint8_t n) const
     return bit;
 }
 
-Scalar Scalar::HashAndMap(std::vector<unsigned char> vch) {
-/*
-it hashes a value and maps it as a valid point in the g1 group
-uint256 goes up to ~0x0
-but the range of the g1 group is smaller
-2^256 would not be a valid element
-when using the hashAndMap function you need to set map mode to 0
-and then set it back to 5 after
-
-  mcl.setMapToMode(0);
-  let g = d.mapToG1();
-  mcl.setMapToMode(5);
-
-something like this (this is js code and using other functions)
---
-it should be hashed and mod the order before set
- */
-    Scalar x;
-    return x;
+unsigned int Scalar::GetSerializeSize() const
+{
+    return ::GetSerializeSize(GetVch());
 }
