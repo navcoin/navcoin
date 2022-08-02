@@ -10,6 +10,7 @@
 
 #include <blsct/arith/mcl_initializer.h>
 #include <blsct/arith/scalar.h>
+#include <blsct/arith/scalars.h>
 
 #include <hash.h>
 #include <uint256.h>
@@ -43,14 +44,15 @@ class G1Point {
         G1Point operator+(const G1Point& b) const;
         G1Point operator-(const G1Point& b) const;
         G1Point operator*(const Scalar& b) const;
+        G1Point operator^(const Scalars& ss) const;  // using ^ as pow operator here
 
         G1Point Double() const;
 
         static G1Point GetBasePoint();
         static G1Point MapToG1(std::vector<uint8_t>& vec, Endianness e = Endianness::Little);
         static G1Point HashAndMap(std::vector<uint8_t>& vec);
-        static G1Point MulVec(const std::vector<G1Point> gVec, const std::vector<Scalar> sVec);
-        static G1Point MulVec(const std::vector<mclBnG1> gVec, const std::vector<mclBnFr> sVec);
+        static G1Point MulVec(const std::vector<G1Point>& gVec, const std::vector<Scalar>& sVec);
+        static G1Point MulVec(const std::vector<mclBnG1>& gVec, const std::vector<mclBnFr>& sVec);
 
         bool operator==(const G1Point& b) const;
         bool operator!=(const G1Point& b) const;

@@ -3,6 +3,8 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <blsct/arith/g1point.h>
+#include <blsct/arith/scalars.h>
+#include <numeric>
 
 mclBnG1 G1Point::G;
 boost::mutex G1Point::init_mutex;
@@ -87,6 +89,18 @@ G1Point G1Point::operator*(const Scalar& b) const
     return ret;
 }
 
+G1Point G1Point::operator^(const Scalars& ss) const
+{
+    Scalar m(1);
+    for(Scalar s: ss.sVec)
+    {
+        m = m * s;
+    }
+    auto ret = (*this) * m;
+
+    return ret;
+}
+
 G1Point G1Point::Double() const
 {
     G1Point temp;
@@ -136,7 +150,7 @@ G1Point G1Point::HashAndMap(std::vector<uint8_t>& vec)
     return temp;
 }
 
-G1Point G1Point::MulVec(const std::vector<G1Point> gVec, const std::vector<Scalar> sVec)
+G1Point G1Point::MulVec(const std::vector<G1Point>& gVec, const std::vector<Scalar>& sVec)
 {
     if (gVec.size() != sVec.size())
         throw std::runtime_error("G1Point::mulVec(): gVec and sVec size must be equal");
@@ -154,7 +168,7 @@ G1Point G1Point::MulVec(const std::vector<G1Point> gVec, const std::vector<Scala
     return G1Point::MulVec(vecG1, vecFr);
 }
 
-G1Point G1Point::MulVec(const std::vector<mclBnG1> gVec, const std::vector<mclBnFr> sVec)
+G1Point G1Point::MulVec(const std::vector<mclBnG1>& gVec, const std::vector<mclBnFr>& sVec)
 {
     if (gVec.size() != sVec.size())
         throw std::runtime_error("G1Point::mulVec(): gVec and sVec size must be equal");

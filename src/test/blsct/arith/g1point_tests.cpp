@@ -6,6 +6,9 @@
 
 #include <boost/test/unit_test.hpp>
 #include <blsct/arith/g1point.h>
+#include <blsct/arith/g1points.h>
+#include <blsct/arith/scalar.h>
+#include <blsct/arith/scalars.h>
 #include <blsct/arith/mcl_initializer.h>
 #include <algorithm>
 #include <set>
@@ -313,114 +316,169 @@ bool CalcSimplestInnerProductArgument(
     return pMatched && cMatched;
 }
 
-// TODO use Scalar and G1Point
+// NOTE: this test checks that the library is capable of 
+// performing required calculation
+//
+// prover and verifier know:
+// g, h, c, P
+//
+// then prover convinces verifier that the prover knows a,b s.t.
+// P = g^a h^b and c = <a,b>
+//
 BOOST_AUTO_TEST_CASE(test_g1point_simplest_inner_product)
 {
-    char buf[1024];
+    //////////
+    // setup
 
-    // Setup
-    const size_t n = 2;
+    // g is a G1 point
+    std::string gStr = "this is g";
+    std::vector<uint8_t> gVec(gStr.begin(), gStr.end());
+    auto g = G1Point::MapToG1(gVec);
 
-    // g[n]
-    mclBnG1 g[n]; 
-    for(size_t i = 0; i < n; ++i)
-    {
-        mclBnFr r;
-        mclBnFr_setByCSPRNG(&r);
-        mclBnFr_getStr(buf, sizeof(buf), &r, 16);
-        mclBnG1_hashAndMapTo(&g[i], buf, sizeof(buf));
-    }
+    // h is a G1 point
+    std::string hStr = "this is h";
+    std::vector<uint8_t> hVec(hStr.begin(), hStr.end());
+    auto h = G1Point::MapToG1(hVec);
 
-    // h[n]
-    mclBnG1 h[n];
-    for(size_t i = 0; i < n; ++i)
-    {
-        mclBnFr r;
-        mclBnFr_setByCSPRNG(&r);
-        mclBnFr_getStr(buf, sizeof(buf), &r, 16);
-        mclBnG1_hashAndMapTo(&h[i], buf, sizeof(buf));
-    }
+    // a is Scalar vector
+    Scalar a1(2), a2(3);
+    std::vector<Scalar> aVec { a1, a2 };
+    Scalars a(aVec);
 
-    // a[n]
-    mclBnFr a[n]; 
-    for(size_t i = 0; i < n; ++i)
-    {
-        mclBnFr_setByCSPRNG(&a[i]);
-    }
+    // b is Scalar vector
+    Scalar b1(5), b2(7);
+    std::vector<Scalar> bVec { b1, b2 };
+    Scalars b(bVec);
 
-    // b[n]
-    mclBnFr b[n]; 
-    for(size_t i = 0; i < n; ++i)
-    {
-        mclBnFr_setByCSPRNG(&b[i]);
-    }
+    // P is G1 point
+    auto P = (g ^ a) + (h ^ b);
 
-    // c = <a, b>
-    mclBnFr c;
-    mclBnFr_clear(&c);
-    for(size_t i = 0; i < n; ++i)
-    {
-        mclBnFr ip;
-        mclBnFr_mul(&ip, &a[i], &b[i]);
-        mclBnFr_add(&c, &c, &ip);
-    }
+    // c is Scalar
+    auto c = (a * b).Sum(); 
 
-    // P = g^a h^b
-    mclBnG1 gIp;
-    mclBnG1_mulVec(&gIp, g, a, n);
-    mclBnG1 hIp;
-    mclBnG1_mulVec(&hIp, h, b, n);
-    mclBnG1 P;
-    mclBnG1_add(&P, &gIp, &hIp);
+    //////////
+    // proof
 
-    bool result = CalcSimplestInnerProductArgument<n>(a, b, g, h, c, P);
-    BOOST_CHECK_EQUAL(result, true);
+    auto proofP = (g ^ a) + (h ^ b);
+    auto proofC = (a * b).Sum(); 
+
+    /////////////////
+    // verification
+
+    BOOST_CHECK(P == proofP);
+    BOOST_CHECK(c == proofC);
 }
 
-// template<int N>
-// bool CalcImprovedInnerProductArgument(
-//     mclBnG1 (&g)[N], mclBnG1 (&h)[N], 
-//     mclBnG1& u, mclBnG1 &P,
-//     mclBnFr (&a)[N], mclBnFr (&b)[N])
-// {
-//     if (n == 1)
-//     {
-//         // Prover passes a,b to Verifier
-//         // Verifier computes c=a*b and returns if P=g^a h^b u^c holds
-//         return true;
-//     }
-//     else 
-//     {
-//         // Prover computes nn, cL, cR, L, R
-//         int nn = n / 2;
-//         mclBnFr cL, cR;
-//         mclBnG1 L, R;    
-
-//         // Prover passes L, R to Verifier
-
-//         // Verifier get random x and send it to Prover
-//         mclBnFr x;
-//         mclBnFr_setByCSPRNG(&x);
-
-//         // Prover and Verifier compute gg, hh, PP
-
-//         // Prover computes aa, bb
-
-//         return CalcImprovedInnerProductArgument<nn>(gg, hh, PP, u, aa, bb);
-//     }
-// }
-
-// template<int N>
-// bool CalcImprovedInnerProductArgument(
-//     mclBnG1 (&g)[N], mclBnG1 (&h)[N], 
-//     mclBnG1& u, mclBnG1 &P,
-//     mclBnFr (&a)[N], mclBnFr (&b)[N])
-// {
-//     // Prover's input:
-//     // g, h, u, P, a, b
+void perform_logarithmic_inner_product_proof(
+    size_t& n,
+    G1Points& g, G1Points& h, 
+    G1Point& u, G1Point& p,
+    Scalars& a, Scalars& b
+)
+{
     
-//     // Verifier's input:
-//     // g, h, u, P
+}
 
-//     return CalcImprovedInnerProductArgument<N>(g, h, u, P, a, b);
-// }
+// NOTE: this test checks that the library is capable of 
+// performing required calculation
+//
+// prover and verifier know:
+// g, h, u, P
+//
+// for a given P, prover proves that it has vectors a, b s.t. 
+// P = g^a h^b u^<a,b>
+//
+BOOST_AUTO_TEST_CASE(test_g1point_logrithmic_inner_product)
+{
+    //////////
+    // setup
+
+    // g is a G1 point
+    std::string gStr = "this is g";
+    std::vector<uint8_t> gVec(gStr.begin(), gStr.end());
+    auto g = G1Point::MapToG1(gVec);
+
+    // h is a G1 point
+    std::string hStr = "this is h";
+    std::vector<uint8_t> hVec(hStr.begin(), hStr.end());
+    auto h = G1Point::MapToG1(hVec);
+
+    // u is a G1 point
+    std::string uStr = "this is u";
+    std::vector<uint8_t> uVec(uStr.begin(), uStr.end());
+    auto u = G1Point::MapToG1(uVec);
+
+    // a is Scalar vector
+    Scalar a1(2), a2(3);
+    std::vector<Scalar> aVec { a1, a2 };
+    Scalars a(aVec);
+
+    // b is Scalar vector
+    Scalar b1(5), b2(7);
+    std::vector<Scalar> bVec { b1, b2 };
+    Scalars b(bVec);
+
+    //////////
+    // proof
+}
+
+/*
+  pub fn perform_improved_inner_product_argument(&self,
+    n: usize,
+    g: &EcPoints<'a>, h: &EcPoints<'a>,
+    u: &EcPoint1<'a>, p: &EcPoint1<'a>,  
+    a: &FieldElems, b: &FieldElems, 
+  ) -> bool {
+    if n == 1 {
+      // prover sends a,b to verifier
+
+      // verifier computers c = a*b
+      let c = &a[0] * &b[0];
+
+      // verifier accepts if P = g^a h^b u^c holds
+      let ga = &g[0] * &a[0];
+      let hb = &h[0] * &b[0];
+      let uc = u * &c;
+
+      let rhs = self.vector_add(&[&ga , &hb, &uc]);
+      p == &rhs 
+
+    } else {
+      // prover computes L,R whose length is n/2
+      let nn = n / 2;
+      let cL = self.field_elem_mul(&a.to(..nn), &b.from(nn..)).sum();
+      let cR = self.field_elem_mul(&a.from(nn..), &b.to(..nn)).sum();
+      let L = self.vector_add(&vec![
+        &(&g.from(nn..) * &a.to(..nn)).sum(),
+        &(&h.to(..nn) * &b.from(nn..)).sum(),
+        &self.scalar_mul(u, &cL),
+      ]);
+      let R = self.vector_add(&vec![
+        &(&g.to(..nn) * &a.from(nn..)).sum(),
+        &(&h.from(nn..) * &b.to(..nn)).sum(),
+        &(u * &cR),
+      ]);
+
+      // prover passes L,R to verifier
+
+      // verifier chooses x in Z^*_p and sends to prover
+      let x = self.f.rand_elem();
+
+      // both prover and verifier compute gg,hh,PP
+      let gg = &(&g.to(..nn) * &x.inv()) * &(&g.from(nn..) * &x);
+      let hh = &(&h.to(..nn) * &x) * &(&h.from(nn..) * &x.inv());
+      
+      let pp = self.vector_add(&vec![
+        &(&L * &x.sq()),
+        p,
+        &(&R * &x.sq().inv()),
+      ]);
+
+      // prover computes aa, bb
+      let aa = &(&a.to(..nn) * &x) + &(&a.from(nn..) * &x.inv());
+      let bb = &(&b.to(..nn) * &x.inv()) + &(&b.from(nn..) * &x);
+      self.perform_improved_inner_product_argument(
+        nn, &gg, &hh, u, &pp, &aa, &bb)
+    }
+  }
+*/
