@@ -92,7 +92,7 @@ G1Point G1Point::operator*(const Scalar& b) const
 G1Point G1Point::operator^(const Scalars& ss) const
 {
     Scalar m(1);
-    for(Scalar s: ss.sVec)
+    for(Scalar s: ss.vec)
     {
         m = m * s;
     }

@@ -330,22 +330,13 @@ BOOST_AUTO_TEST_CASE(test_g1point_simplest_inner_product)
     //////////
     // setup
 
-    // g is a G1 point
-    auto g = G1Point::MapToG1("this is g");
+    auto g = G1Point::MapToG1("g");
+    auto h = G1Point::MapToG1("h");
 
-    // h is a G1 point
-    auto h = G1Point::MapToG1("this is h");
-
-    // a is Scalar vector
     Scalars a(std::vector { Scalar {2}, Scalar {3} });
-
-    // b is Scalar vector
     Scalars b(std::vector { Scalar {5}, Scalar {7} });
 
-    // P is G1 point
     auto P = (g ^ a) + (h ^ b);
-
-    // c is Scalar
     auto c = (a * b).Sum(); 
 
     //////////
@@ -361,14 +352,17 @@ BOOST_AUTO_TEST_CASE(test_g1point_simplest_inner_product)
     BOOST_CHECK(c == proofC);
 }
 
-void perform_logarithmic_inner_product_proof(
+bool perform_logarithmic_inner_product_proof(
     size_t& n,
     G1Points& g, G1Points& h, 
-    G1Point& u, G1Point& p,
+    G1Point& u, G1Point& P,
     Scalars& a, Scalars& b
 )
 {
+    auto n = n / 2;
+    auto cL = a.To(n);
 
+    return true;
 }
 
 // NOTE: this test checks that the library is capable of 
@@ -385,33 +379,34 @@ BOOST_AUTO_TEST_CASE(test_g1point_logrithmic_inner_product)
     //////////
     // setup
 
-    // g is a G1 point
-    std::string gStr = "this is g";
-    std::vector<uint8_t> gVec(gStr.begin(), gStr.end());
-    auto g = G1Point::MapToG1(gVec);
+    auto g = G1Points(std::vector {
+        G1Point::MapToG1("g1"),
+        G1Point::MapToG1("g2")
+    });
+    auto h = G1Points(std::vector {
+        G1Point::MapToG1("h1"),
+        G1Point::MapToG1("h2")
+    });
+    auto u = G1Point::MapToG1("u");
 
-    // h is a G1 point
-    std::string hStr = "this is h";
-    std::vector<uint8_t> hVec(hStr.begin(), hStr.end());
-    auto h = G1Point::MapToG1(hVec);
+    // TODO properly calculate P
+    auto P = G1Point::GetBasePoint();
 
-    // u is a G1 point
-    std::string uStr = "this is u";
-    std::vector<uint8_t> uVec(uStr.begin(), uStr.end());
-    auto u = G1Point::MapToG1(uVec);
+    // a, b are Scalar vectors
+    Scalars a(std::vector { Scalar {2}, Scalar {3} });
+    Scalars b(std::vector { Scalar {5}, Scalar {7} });
 
-    // a is Scalar vector
-    Scalar a1(2), a2(3);
-    std::vector<Scalar> aVec { a1, a2 };
-    Scalars a(aVec);
-
-    // b is Scalar vector
-    Scalar b1(5), b2(7);
-    std::vector<Scalar> bVec { b1, b2 };
-    Scalars b(bVec);
+    size_t n = 4;
 
     //////////
     // proof
+    auto result = perform_logarithmic_inner_product_proof(
+        n,
+        g, h, 
+        u, P,
+        a, b
+    );
+    BOOST_CHECK_EQUAL(result, true);
 }
 
 /*

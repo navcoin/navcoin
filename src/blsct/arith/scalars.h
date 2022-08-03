@@ -10,19 +10,15 @@
 #define NAVCOIN_BLSCT_ARITH_SCALARS_H
 
 #include <blsct/arith/scalar.h>
+#include <blsct/arith/elements.h>
 
 #include <vector>
 
-class Scalars {
+class Scalars: public Elements<Scalar> {
     public:
-        Scalars(const std::vector<Scalar>& sVec);
-        Scalar Sum() const;
+        Scalars(const std::vector<Scalar>& sVec) : Elements(sVec) {}
 
         Scalars operator*(const Scalars& other) const;
-        bool operator==(const Scalars& other) const;
-        bool operator!=(const Scalars& other) const;
-
-        std::vector<Scalar> sVec;
 };
 
 #endif // NAVCOIN_BLSCT_ARITH_SCALARS_H

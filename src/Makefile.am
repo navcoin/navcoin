@@ -133,6 +133,7 @@ BITCOIN_CORE_H = \
   bech32.h \
   blockencodings.h \
   blockfilter.h \
+  blsct/arith/elements.h \
   blsct/arith/scalar.h \
   blsct/arith/scalars.h \
   blsct/arith/g1point.h \
