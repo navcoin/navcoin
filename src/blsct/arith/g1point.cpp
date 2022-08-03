@@ -114,7 +114,7 @@ G1Point G1Point::GetBasePoint()
     return g;
 }
 
-G1Point G1Point::MapToG1(std::vector<uint8_t>& vec, Endianness e)
+G1Point G1Point::MapToG1(const std::vector<uint8_t>& vec, const Endianness e)
 {
     G1Point temp;
     mclBnFp v;
@@ -139,7 +139,13 @@ G1Point G1Point::MapToG1(std::vector<uint8_t>& vec, Endianness e)
     return temp;
 }
 
-G1Point G1Point::HashAndMap(std::vector<uint8_t>& vec)
+G1Point G1Point::MapToG1(const std::string& s, const Endianness e)
+{
+    std::vector<uint8_t> vec(s.begin(), s.end());
+    return MapToG1(vec);
+}
+
+G1Point G1Point::HashAndMap(const std::vector<uint8_t>& vec)
 {
     mclBnG1 p;
     if (mclBnG1_hashAndMapTo(&p, &vec[0], vec.size()) != 0)
@@ -219,7 +225,7 @@ void G1Point::SetVch(const std::vector<uint8_t>& b)
     }
 }
 
-std::string G1Point::GetString(const int& ioMode)
+std::string G1Point::GetString(const int& ioMode) const
 {
     char str[1024];
     if (mclBnG1_getStr(str, sizeof(str), &p, ioMode) == 0)

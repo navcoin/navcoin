@@ -49,22 +49,22 @@ class G1Point {
         G1Point Double() const;
 
         static G1Point GetBasePoint();
-        static G1Point MapToG1(std::vector<uint8_t>& vec, Endianness e = Endianness::Little);
-        static G1Point HashAndMap(std::vector<uint8_t>& vec);
+        static G1Point MapToG1(const std::vector<uint8_t>& vec, const Endianness e = Endianness::Little);
+        static G1Point MapToG1(const std::string& s, const Endianness e = Endianness::Little);
+        static G1Point HashAndMap(const std::vector<uint8_t>& vec);
         static G1Point MulVec(const std::vector<G1Point>& gVec, const std::vector<Scalar>& sVec);
         static G1Point MulVec(const std::vector<mclBnG1>& gVec, const std::vector<mclBnFr>& sVec);
+        static G1Point Rand();
 
         bool operator==(const G1Point& b) const;
         bool operator!=(const G1Point& b) const;
-
-        static G1Point Rand();
 
         bool IsUnity() const;
 
         std::vector<uint8_t> GetVch() const;
         void SetVch(const std::vector<uint8_t>& b);
 
-        std::string GetString(const int& ioMode = 16);
+        std::string GetString(const int& ioMode = 16) const;
 
         unsigned int GetSerializeSize() const
         {

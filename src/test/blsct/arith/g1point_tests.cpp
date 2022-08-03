@@ -331,24 +331,16 @@ BOOST_AUTO_TEST_CASE(test_g1point_simplest_inner_product)
     // setup
 
     // g is a G1 point
-    std::string gStr = "this is g";
-    std::vector<uint8_t> gVec(gStr.begin(), gStr.end());
-    auto g = G1Point::MapToG1(gVec);
+    auto g = G1Point::MapToG1("this is g");
 
     // h is a G1 point
-    std::string hStr = "this is h";
-    std::vector<uint8_t> hVec(hStr.begin(), hStr.end());
-    auto h = G1Point::MapToG1(hVec);
+    auto h = G1Point::MapToG1("this is h");
 
     // a is Scalar vector
-    Scalar a1(2), a2(3);
-    std::vector<Scalar> aVec { a1, a2 };
-    Scalars a(aVec);
+    Scalars a(std::vector { Scalar {2}, Scalar {3} });
 
     // b is Scalar vector
-    Scalar b1(5), b2(7);
-    std::vector<Scalar> bVec { b1, b2 };
-    Scalars b(bVec);
+    Scalars b(std::vector { Scalar {5}, Scalar {7} });
 
     // P is G1 point
     auto P = (g ^ a) + (h ^ b);
@@ -376,7 +368,7 @@ void perform_logarithmic_inner_product_proof(
     Scalars& a, Scalars& b
 )
 {
-    
+
 }
 
 // NOTE: this test checks that the library is capable of 
