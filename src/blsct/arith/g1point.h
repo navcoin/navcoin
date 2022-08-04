@@ -10,7 +10,6 @@
 
 #include <blsct/arith/mcl_initializer.h>
 #include <blsct/arith/scalar.h>
-#include <blsct/arith/scalars.h>
 
 #include <hash.h>
 #include <uint256.h>
@@ -44,7 +43,7 @@ class G1Point {
         G1Point operator+(const G1Point& b) const;
         G1Point operator-(const G1Point& b) const;
         G1Point operator*(const Scalar& b) const;
-        G1Point operator^(const Scalars& ss) const;  // using ^ as pow operator here
+        G1Point operator^(const Scalar& b) const;  // using ^ as pow operator here
 
         G1Point Double() const;
 

@@ -135,9 +135,7 @@ BITCOIN_CORE_H = \
   blockfilter.h \
   blsct/arith/elements.h \
   blsct/arith/scalar.h \
-  blsct/arith/scalars.h \
   blsct/arith/g1point.h \
-  blsct/arith/g1points.h \
   chain.h \
   chainparams.h \
   chainparamsbase.h \
@@ -362,9 +360,7 @@ libbitcoin_node_a_SOURCES = \
   blockencodings.cpp \
   blockfilter.cpp \
   blsct/arith/scalar.cpp \
-  blsct/arith/scalars.cpp \
   blsct/arith/g1point.cpp \
-  blsct/arith/g1points.cpp \
   chain.cpp \
   consensus/tx_verify.cpp \
   dbwrapper.cpp \

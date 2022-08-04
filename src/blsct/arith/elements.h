@@ -13,37 +13,74 @@
 #include <cstddef>
 #include <stdexcept>
 
-template<class T>
+#include <blsct/arith/scalar.h>
+#include <blsct/arith/g1point.h>
+
+// expecting below instantiations only:
+//
+// - Elements<G1Point, Scalar>
+// - Elements<Scalar, G1Point>
+//
+// where T is the element type and U is the type of the interacting element
+// e.g. Elements<G1Point,Scalar> represents vector of G1Point that interacts with Scalar
+//
+template<class Element, class Other>  
 class Elements {
     public:
-        Elements(const std::vector<T>& vec)
+        Elements<Element,Other>(const std::vector<Element>& vec)
         {
             this->vec = vec;
         }
 
-        T Sum() const
+        Element Sum() const
         {
-            T ret;
-            for(T s: vec)
+            Element ret;
+            for(Element s: vec)
             {
                 ret = ret + s;
             }
             return ret;
         }
 
-        inline void ConfirmSizesMatch(const Elements& other) const
+        inline void ConfirmSizesMatch(const size_t& otherSize) const
         {
-            if (vec.size() != other.vec.size())
+            if (vec.size() != otherSize)
             {
-                throw std::runtime_error("sizes of elements's are expected to be the same, but different");
+                throw std::runtime_error("sizes of elements are expected to be the same, but different");
             }
         }
 
-        Elements operator+(const Elements& other) const
+        // [p1, p2] ^ [s1, s2] = [p1^s1, p2^s2] where ^ is ec scalar multiplication
+        Elements<G1Point,Scalar> operator^(const Elements<Scalar,G1Point>& other) const
+        {
+            ConfirmSizesMatch(other.vec.size());
+
+            std::vector<G1Point> ret;
+            for(size_t i = 0; i < vec.size(); ++i)
+            {
+                ret.push_back(vec[i] ^ other.vec[i]);
+            }
+            return ret;
+        }
+
+        // [a1, a2] * [b1, b2] = [a1*b1, a2*b2]
+        Elements<Scalar,G1Point> operator*(const Elements<Scalar,G1Point>& other) const
+        {
+            ConfirmSizesMatch(other.vec.size());
+
+            std::vector<Scalar> ret;
+            for(size_t i = 0; i < vec.size(); ++i)
+            {
+                ret.push_back(vec[i] * other.vec[i]);
+            }
+            return ret;
+        }
+        
+        Elements<Element,Other> operator+(const Elements<Element,Other>& other) const
         {
             ConfirmSizesMatch(other);
 
-            std::vector<T> ret;
+            std::vector<Element> ret;
             for(size_t i = 0; i < vec.size(); ++i)
             {
                 ret.push_back(vec[i] + other.vec[i]);
@@ -51,14 +88,15 @@ class Elements {
             return ret;
         }
 
-        Elements<T> From(const size_t fromIndex) const
+        // returns elements slice [fromIndex, vec.size()) 
+        Elements<Element,Other> From(const size_t fromIndex) const
         {
-            if (fromIndex < 0 || fromIndex >= vec.size())
+            if (fromIndex >= vec.size())
             {
-                throw std::runtime_error("index out of range");
+                throw std::runtime_error("index out of range in From");
             }
 
-            std::vector<T> ret;
+            std::vector<Element> ret;
             for(size_t i = fromIndex; i < vec.size(); ++i)
             {
                 ret.push_back(vec[i]);
@@ -66,22 +104,23 @@ class Elements {
             return ret;
         }
 
-        Elements<T> To(const size_t toIndex) const
+        // returns elements slice [0, toIndex) 
+        Elements<Element,Other> To(const size_t toIndex) const
         {
-            if (toIndex < 0 || toIndex >= vec.size())
+            if (toIndex >= vec.size())
             {
-                throw std::runtime_error("index out of range");
+                throw std::runtime_error("index out of range in To");
             }
 
-            std::vector<T> ret;
-            for(size_t i = 0; i <= toIndex; ++i)
+            std::vector<Element> ret;
+            for(size_t i = 0; i < toIndex; ++i)
             {
                 ret.push_back(vec[i]);
             }
             return ret;
         }
 
-        bool operator==(const Elements<T>& other) const 
+        bool operator==(const Elements<Element,Other>& other) const 
         {
             if (vec.size() != other.vec.size())
             {
@@ -96,13 +135,16 @@ class Elements {
             return ret;
         }
 
-        bool operator!=(const Elements<T>& other) const
+        bool operator!=(const Elements<Element,Other>& other) const
         {
             return !operator==(other);
         }
 
-        std::vector<T> vec;
+        std::vector<Element> vec;
 };
+
+using Scalars = Elements<Scalar,G1Point>;
+using G1Points = Elements<G1Point,Scalar>;
 
 #endif // NAVCOIN_BLSCT_ARITH_ELEMENTS_H
 

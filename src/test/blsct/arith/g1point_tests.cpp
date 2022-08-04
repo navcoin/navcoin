@@ -6,10 +6,9 @@
 
 #include <boost/test/unit_test.hpp>
 #include <blsct/arith/g1point.h>
-#include <blsct/arith/g1points.h>
 #include <blsct/arith/scalar.h>
-#include <blsct/arith/scalars.h>
 #include <blsct/arith/mcl_initializer.h>
+#include <blsct/arith/elements.h>
 #include <algorithm>
 #include <set>
 #include <streams.h>
@@ -336,13 +335,13 @@ BOOST_AUTO_TEST_CASE(test_g1point_simplest_inner_product)
     Scalars a(std::vector { Scalar {2}, Scalar {3} });
     Scalars b(std::vector { Scalar {5}, Scalar {7} });
 
-    auto P = (g ^ a) + (h ^ b);
+    auto P = (g ^ a.Sum()) + (h ^ b.Sum());
     auto c = (a * b).Sum(); 
 
     //////////
     // proof
 
-    auto proofP = (g ^ a) + (h ^ b);
+    auto proofP = (g ^ a.Sum()) + (h ^ b.Sum());
     auto proofC = (a * b).Sum(); 
 
     /////////////////
@@ -353,14 +352,18 @@ BOOST_AUTO_TEST_CASE(test_g1point_simplest_inner_product)
 }
 
 bool perform_logarithmic_inner_product_proof(
-    size_t& n,
-    G1Points& g, G1Points& h, 
-    G1Point& u, G1Point& P,
-    Scalars& a, Scalars& b
+    const size_t& n,
+    const G1Points& g, const G1Points& h, 
+    const G1Point& u, const G1Point& P,
+    const Scalars& a, const Scalars& b
 )
 {
-    auto n = n / 2;
-    auto cL = a.To(n);
+    auto nn = n / 2;
+
+    auto cL = a.To(nn) * b.From(nn);
+    auto cR = a.From(nn) * b.To(nn);
+
+    auto L = g.From(nn) ^ a.To(nn);
 
     return true;
 }
@@ -396,7 +399,7 @@ BOOST_AUTO_TEST_CASE(test_g1point_logrithmic_inner_product)
     Scalars a(std::vector { Scalar {2}, Scalar {3} });
     Scalars b(std::vector { Scalar {5}, Scalar {7} });
 
-    size_t n = 4;
+    size_t n = 2;
 
     //////////
     // proof

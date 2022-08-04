@@ -3,7 +3,6 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <blsct/arith/g1point.h>
-#include <blsct/arith/scalars.h>
 #include <numeric>
 
 mclBnG1 G1Point::G;
@@ -89,15 +88,9 @@ G1Point G1Point::operator*(const Scalar& b) const
     return ret;
 }
 
-G1Point G1Point::operator^(const Scalars& ss) const
+G1Point G1Point::operator^(const Scalar& b) const
 {
-    Scalar m(1);
-    for(Scalar s: ss.vec)
-    {
-        m = m * s;
-    }
-    auto ret = (*this) * m;
-
+    auto ret = (*this) * b;
     return ret;
 }
 
