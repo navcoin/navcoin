@@ -24,7 +24,7 @@
 // where T is the element type and U is the type of the interacting element
 // e.g. Elements<G1Point,Scalar> represents vector of G1Point that interacts with Scalar
 //
-template<class Element, class Other>  
+template<typename Element, typename Other>  
 class Elements {
     public:
         Elements<Element,Other>(const std::vector<Element>& vec)
@@ -50,7 +50,9 @@ class Elements {
             }
         }
 
-        // [p1, p2] ^ [s1, s2] = [p1^s1, p2^s2] where ^ is ec scalar multiplication
+        // G1Points x Scalars
+        // [p1, p2] ^ [s1, s2] = [p1^s1, p2^s2] 
+        // where ^ is elliptic curve scalar multiplication
         Elements<G1Point,Scalar> operator^(const Elements<Scalar,G1Point>& other) const
         {
             ConfirmSizesMatch(other.vec.size());
@@ -63,6 +65,7 @@ class Elements {
             return ret;
         }
 
+        // Scalars x Scalars
         // [a1, a2] * [b1, b2] = [a1*b1, a2*b2]
         Elements<Scalar,G1Point> operator*(const Elements<Scalar,G1Point>& other) const
         {
@@ -93,7 +96,7 @@ class Elements {
         {
             if (fromIndex >= vec.size())
             {
-                throw std::runtime_error("index out of range in From");
+                throw std::runtime_error("from index out of range");
             }
 
             std::vector<Element> ret;
@@ -109,7 +112,7 @@ class Elements {
         {
             if (toIndex >= vec.size())
             {
-                throw std::runtime_error("index out of range in To");
+                throw std::runtime_error("to index out of range");
             }
 
             std::vector<Element> ret;

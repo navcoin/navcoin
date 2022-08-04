@@ -360,11 +360,47 @@ bool perform_logarithmic_inner_product_proof(
 {
     auto nn = n / 2;
 
-    auto cL = a.To(nn) * b.From(nn);
-    auto cR = a.From(nn) * b.To(nn);
+    auto cL = (a.To(nn) * b.From(nn)).Sum();
+    auto cR = (a.From(nn) * b.To(nn)).Sum();
 
-    auto L = g.From(nn) ^ a.To(nn);
+    auto L = (g.From(nn) ^ a.To(nn)).Sum() + (h.To(nn) ^ b.From(nn)).Sum();
+    auto R = (g.To(nn) ^ a.From(nn)).Sum() + (h.From(nn) ^ b.To(nn)).Sum();
+/*
+      let nn = n / 2;
+      let cL = self.field_elem_mul(&a.to(..nn), &b.from(nn..)).sum();
+      let cR = self.field_elem_mul(&a.from(nn..), &b.to(..nn)).sum();
+      let L = self.vector_add(&vec![
+        &(&g.from(nn..) * &a.to(..nn)).sum(),
+        &(&h.to(..nn) * &b.from(nn..)).sum(),
+        &self.scalar_mul(u, &cL),
+      ]);
+      let R = self.vector_add(&vec![
+        &(&g.to(..nn) * &a.from(nn..)).sum(),
+        &(&h.from(nn..) * &b.to(..nn)).sum(),
+        &(u * &cR),
+      ]);
 
+      // prover passes L,R to verifier
+
+      // verifier chooses x in Z^*_p and sends to prover
+      let x = self.f.rand_elem();
+
+      // both prover and verifier compute gg,hh,PP
+      let gg = &(&g.to(..nn) * &x.inv()) * &(&g.from(nn..) * &x);
+      let hh = &(&h.to(..nn) * &x) * &(&h.from(nn..) * &x.inv());
+      
+      let pp = self.vector_add(&vec![
+        &(&L * &x.sq()),
+        p,
+        &(&R * &x.sq().inv()),
+      ]);
+
+      // prover computes aa, bb
+      let aa = &(&a.to(..nn) * &x) + &(&a.from(nn..) * &x.inv());
+      let bb = &(&b.to(..nn) * &x.inv()) + &(&b.from(nn..) * &x);
+      self.perform_improved_inner_product_argument(
+        nn, &gg, &hh, u, &pp, &aa, &bb)
+*/
     return true;
 }
 
