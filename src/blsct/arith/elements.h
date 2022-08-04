@@ -18,21 +18,18 @@
 
 // expecting below instantiations only:
 //
-// - Elements<G1Point, Scalar>
-// - Elements<Scalar, G1Point>
+// - Elements<G1Point>
+// - Elements<Scalar>
 //
-// where T is the element type and U is the type of the interacting element
-// e.g. Elements<G1Point,Scalar> represents vector of G1Point that interacts with Scalar
-//
-template<typename Element, typename Other>  
+template<typename T>  
 class Elements {
     public:
-        Elements<Element,Other>(const std::vector<Element>& vec)
+        Elements<T>(const std::vector<T>& vec)
         {
             this->vec = vec;
         }
 
-        Element Sum() const
+        T Sum() const
         {
             Element ret;
             for(Element s: vec)
@@ -53,7 +50,7 @@ class Elements {
         // G1Points x Scalars
         // [p1, p2] ^ [s1, s2] = [p1^s1, p2^s2] 
         // where ^ is elliptic curve scalar multiplication
-        Elements<G1Point,Scalar> operator^(const Elements<Scalar,G1Point>& other) const
+        Elements<G1Point> operator^(const Elements<Scalar>& other) const
         {
             ConfirmSizesMatch(other.vec.size());
 
@@ -67,7 +64,7 @@ class Elements {
 
         // Scalars x Scalars
         // [a1, a2] * [b1, b2] = [a1*b1, a2*b2]
-        Elements<Scalar,G1Point> operator*(const Elements<Scalar,G1Point>& other) const
+        Elements<Scalar> operator*(const Elements<Scalar>& other) const
         {
             ConfirmSizesMatch(other.vec.size());
 
@@ -79,7 +76,7 @@ class Elements {
             return ret;
         }
         
-        Elements<Element,Other> operator+(const Elements<Element,Other>& other) const
+        Elements<T> operator+(const Elements<T>& other) const
         {
             ConfirmSizesMatch(other);
 
@@ -92,7 +89,7 @@ class Elements {
         }
 
         // returns elements slice [fromIndex, vec.size()) 
-        Elements<Element,Other> From(const size_t fromIndex) const
+        Elements<T> From(const size_t fromIndex) const
         {
             if (fromIndex >= vec.size())
             {
@@ -108,7 +105,7 @@ class Elements {
         }
 
         // returns elements slice [0, toIndex) 
-        Elements<Element,Other> To(const size_t toIndex) const
+        Elements<T> To(const size_t toIndex) const
         {
             if (toIndex >= vec.size())
             {
@@ -123,7 +120,7 @@ class Elements {
             return ret;
         }
 
-        bool operator==(const Elements<Element,Other>& other) const 
+        bool operator==(const Elements<T>& other) const 
         {
             if (vec.size() != other.vec.size())
             {
@@ -138,16 +135,16 @@ class Elements {
             return ret;
         }
 
-        bool operator!=(const Elements<Element,Other>& other) const
+        bool operator!=(const Elements<T>& other) const
         {
             return !operator==(other);
         }
 
-        std::vector<Element> vec;
+        std::vector<T> vec;
 };
 
-using Scalars = Elements<Scalar,G1Point>;
-using G1Points = Elements<G1Point,Scalar>;
+using Scalars = Elements<Scalar>;
+using G1Points = Elements<G1Point>;
 
 #endif // NAVCOIN_BLSCT_ARITH_ELEMENTS_H
 
