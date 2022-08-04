@@ -88,12 +88,6 @@ G1Point G1Point::operator*(const Scalar& b) const
     return ret;
 }
 
-G1Point G1Point::operator^(const Scalar& b) const
-{
-    auto ret = (*this) * b;
-    return ret;
-}
-
 G1Point G1Point::Double() const
 {
     G1Point temp;

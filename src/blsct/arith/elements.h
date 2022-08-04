@@ -60,7 +60,7 @@ class Elements {
             std::vector<G1Point> ret;
             for(size_t i = 0; i < vec.size(); ++i)
             {
-                ret.push_back(vec[i] ^ other.vec[i]);
+                ret.push_back(vec[i] * other.vec[i]);
             }
             return ret;
         }
