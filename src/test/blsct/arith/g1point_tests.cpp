@@ -335,13 +335,13 @@ BOOST_AUTO_TEST_CASE(test_g1point_simplest_inner_product)
     Scalars a(std::vector { Scalar {2}, Scalar {3} });
     Scalars b(std::vector { Scalar {5}, Scalar {7} });
 
-    auto P = (g ^ a.Sum()) + (h ^ b.Sum());
+    auto P = (g * a.Sum()) + (h * b.Sum());
     auto c = (a * b).Sum(); 
 
     //////////
     // proof
 
-    auto proofP = (g ^ a.Sum()) + (h ^ b.Sum());
+    auto proofP = (g * a.Sum()) + (h * b.Sum());
     auto proofC = (a * b).Sum(); 
 
     /////////////////

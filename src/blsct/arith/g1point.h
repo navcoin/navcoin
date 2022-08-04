@@ -43,7 +43,6 @@ class G1Point {
         G1Point operator+(const G1Point& b) const;
         G1Point operator-(const G1Point& b) const;
         G1Point operator*(const Scalar& b) const;
-        G1Point operator^(const Scalar& b) const;  // using ^ as pow operator here
 
         G1Point Double() const;
 

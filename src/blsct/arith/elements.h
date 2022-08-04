@@ -31,8 +31,8 @@ class Elements {
 
         T Sum() const
         {
-            Element ret;
-            for(Element s: vec)
+            T ret;
+            for(T s: vec)
             {
                 ret = ret + s;
             }
@@ -80,42 +80,10 @@ class Elements {
         {
             ConfirmSizesMatch(other);
 
-            std::vector<Element> ret;
+            std::vector<T> ret;
             for(size_t i = 0; i < vec.size(); ++i)
             {
                 ret.push_back(vec[i] + other.vec[i]);
-            }
-            return ret;
-        }
-
-        // returns elements slice [fromIndex, vec.size()) 
-        Elements<T> From(const size_t fromIndex) const
-        {
-            if (fromIndex >= vec.size())
-            {
-                throw std::runtime_error("from index out of range");
-            }
-
-            std::vector<Element> ret;
-            for(size_t i = fromIndex; i < vec.size(); ++i)
-            {
-                ret.push_back(vec[i]);
-            }
-            return ret;
-        }
-
-        // returns elements slice [0, toIndex) 
-        Elements<T> To(const size_t toIndex) const
-        {
-            if (toIndex >= vec.size())
-            {
-                throw std::runtime_error("to index out of range");
-            }
-
-            std::vector<Element> ret;
-            for(size_t i = 0; i < toIndex; ++i)
-            {
-                ret.push_back(vec[i]);
             }
             return ret;
         }
@@ -138,6 +106,38 @@ class Elements {
         bool operator!=(const Elements<T>& other) const
         {
             return !operator==(other);
+        }
+
+        // returns elements slice [fromIndex, vec.size()) 
+        Elements<T> From(const size_t fromIndex) const
+        {
+            if (fromIndex >= vec.size())
+            {
+                throw std::runtime_error("from index out of range");
+            }
+
+            std::vector<T> ret;
+            for(size_t i = fromIndex; i < vec.size(); ++i)
+            {
+                ret.push_back(vec[i]);
+            }
+            return ret;
+        }
+
+        // returns elements slice [0, toIndex) 
+        Elements<T> To(const size_t toIndex) const
+        {
+            if (toIndex >= vec.size())
+            {
+                throw std::runtime_error("to index out of range");
+            }
+
+            std::vector<T> ret;
+            for(size_t i = 0; i < toIndex; ++i)
+            {
+                ret.push_back(vec[i]);
+            }
+            return ret;
         }
 
         std::vector<T> vec;
