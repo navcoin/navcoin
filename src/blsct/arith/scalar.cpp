@@ -242,13 +242,17 @@ Scalar Scalar::Negate() const
     return temp;
 }
 
-Scalar Scalar::Rand()
+Scalar Scalar::Rand(bool excludeZero)
 {
     Scalar temp;
 
-    if (mclBnFr_setByCSPRNG(&temp.fr) != 0)
+    while(true)
     {
-        throw std::runtime_error(std::string("Failed to generate random number"));
+        if (mclBnFr_setByCSPRNG(&temp.fr) != 0)
+        {
+            throw std::runtime_error(std::string("Failed to generate random number"));
+        }
+        if (excludeZero && mclBnFr_isZero(&temp.fr) == 1) continue;
     }
     return temp;
 }

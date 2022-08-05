@@ -334,16 +334,21 @@ BOOST_AUTO_TEST_CASE(test_scalar_negate)
 
 BOOST_AUTO_TEST_CASE(test_scalar_rand)
 {
-    unsigned int numTries = 1000000;
-    unsigned int numDups = 0; 
-    auto x = Scalar::Rand();
-    for(size_t i=0; i<numTries; ++i)
+    std::vector<bool> tf {true, false};
+    for(auto excludeZero: tf)
     {
-        auto y = Scalar::Rand();
-        if (x == y) ++numDups;
+        unsigned int numTries = 1000000;
+        unsigned int numDups = 0; 
+        auto x = Scalar::Rand();
+        for(size_t i=0; i<numTries; ++i)
+        {
+            auto y = Scalar::Rand(excludeZero);
+            if (excludeZero && y == 0) BOOST_FAIL("expected non-zero");
+            if (x == y) ++numDups;
+        }
+        auto dupRatio = numDups / (float) numTries;
+        BOOST_CHECK(dupRatio < 0.000001);
     }
-    auto dupRatio = numDups / (float) numTries;
-    BOOST_CHECK(dupRatio < 0.000001);
 }
 
 BOOST_AUTO_TEST_CASE(test_scalar_getint64)

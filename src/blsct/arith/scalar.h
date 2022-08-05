@@ -63,7 +63,7 @@ class Scalar {
         Scalar Invert() const;
         Scalar Negate() const;
 
-        static Scalar Rand();
+        static Scalar Rand(bool excludeZero = false);
 
         int64_t GetInt64() const;
 
