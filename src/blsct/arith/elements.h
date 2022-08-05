@@ -78,7 +78,7 @@ class Elements {
         
         Elements<T> operator+(const Elements<T>& other) const
         {
-            ConfirmSizesMatch(other);
+            ConfirmSizesMatch(other.vec.size());
 
             std::vector<T> ret;
             for(size_t i = 0; i < vec.size(); ++i)
@@ -127,7 +127,7 @@ class Elements {
         // returns elements slice [0, toIndex) 
         Elements<T> To(const size_t toIndex) const
         {
-            if (toIndex >= vec.size())
+            if (toIndex > vec.size())
             {
                 throw std::runtime_error("to index out of range");
             }
