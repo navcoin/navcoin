@@ -48,8 +48,8 @@ class Elements {
         }
 
         // G1Points x Scalars
-        // [p1, p2] ^ [s1, s2] = [p1^s1, p2^s2] 
-        // where ^ is elliptic curve scalar multiplication
+        // [p1, p2] ^ [s1, s2] = [p1*s1, p2*s2] 
+        // where * is elliptic curve scalar multiplication
         Elements<G1Point> operator^(const Elements<Scalar>& other) const
         {
             ConfirmSizesMatch(other.vec.size());
@@ -58,6 +58,19 @@ class Elements {
             for(size_t i = 0; i < vec.size(); ++i)
             {
                 ret.push_back(vec[i] * other.vec[i]);
+            }
+            return ret;
+        }
+
+        // G1Points x Scalar
+        // [p1, p2] ^ s = [p1*s, p2*s] 
+        // where * on rhs is elliptic curve scalar multiplication
+        Elements<G1Point> operator^(const Scalar& s) const
+        {
+            std::vector<G1Point> ret;
+            for(size_t i = 0; i < vec.size(); ++i)
+            {
+                ret.push_back(vec[i] * s);
             }
             return ret;
         }
@@ -76,6 +89,21 @@ class Elements {
             return ret;
         }
         
+        // Scalars x Scalar
+        // [s1, s2] * t = [s1*t, s2*t] 
+        // where * on rhs is scalar multiplication
+        Elements<Scalar> operator*(const Scalar& s) const
+        {
+            std::vector<Scalar> ret;
+            for(size_t i = 0; i < vec.size(); ++i)
+            {
+                ret.push_back(vec[i] * s);
+            }
+            return ret;
+        }
+
+        // G1Points + G1Points
+        // [p1, p2] * [q1, q2] = [p1+q1, p2+q2] 
         Elements<T> operator+(const Elements<T>& other) const
         {
             ConfirmSizesMatch(other.vec.size());

@@ -131,11 +131,6 @@ Scalar Scalar::operator~() const
     return ret;
 }
 
-/**
- * TODO: Need to investigate if this implementation is faster
- * than just running fr += fr or using << 1
- * more discussion over here: https://github.com/herumi/mcl/issues/144
- */
 Scalar Scalar::operator<<(unsigned int shift) const
 {
     mclBnFr next;
@@ -148,28 +143,6 @@ Scalar Scalar::operator<<(unsigned int shift) const
     Scalar ret(prev);
 
     return ret;
-
-    // replaced below implementation with above has problem when shift is above 7
-
-    // Scalar temp;
-
-    // std::vector<uint8_t> vch = GetVch();
-    // std::vector<uint8_t> finalVch (WIDTH);
-
-    // for (int i = 0; i < WIDTH; i++)
-    //     finalVch[i] = 0;
-    // int k = shift / 8;
-    // shift = shift % 8;
-    // for (int i = 0; i < WIDTH; i++) {
-    //     if (i + k + 1 < WIDTH && shift != 0)
-    //         finalVch[i + k + 1] |= (vch[i] >> (8 - shift));
-    //     if (i + k < WIDTH)
-    //         finalVch[i + k] |= (vch[i] << shift);
-    // }
-
-    // temp.SetVch(finalVch);
-
-    // return temp;
 }
 
 // assumes that fr contains a number within int64_t range
@@ -179,26 +152,6 @@ Scalar Scalar::operator>>(unsigned int shift) const
     Scalar ret(n >> shift);
 
     return ret;
-
-    // Scalar temp;
-
-    // std::vector<uint8_t> vch = GetVch();
-    // std::vector<uint8_t> finalVch (WIDTH);
-
-    // for (int i = 0; i < WIDTH; i++)
-    //     finalVch[i] = 0;
-    // int k = shift / 8;
-    // shift = shift % 8;
-    // for (int i = 0; i < WIDTH; i++) {
-    //     if (i - k - 1 >= 0 && shift != 0)
-    //         finalVch[i - k - 1] |= (vch[i] << (8 - shift));
-    //     if (i - k >= 0)
-    //         finalVch[i - k] |= (vch[i] >> shift);
-    // }
-
-    // temp.SetVch(finalVch);
-
-    // return temp;
 }
 
 void Scalar::operator=(const uint64_t& n)
@@ -239,6 +192,13 @@ Scalar Scalar::Negate() const
 {
     Scalar temp;
     mclBnFr_neg(&temp.fr, &fr);
+    return temp;
+}
+
+Scalar Scalar::Square() const
+{
+    Scalar temp;
+    mclBnFr_sqr(&temp.fr, &fr);
     return temp;
 }
 
@@ -328,25 +288,4 @@ bool Scalar::GetBit(uint8_t n) const
     const bool bit = (vch[vchIdx] & mask) != 0;
 
     return bit;
-}
-
-Scalar Scalar::HashAndMap(std::vector<unsigned char> vch) {
-/*
-it hashes a value and maps it as a valid point in the g1 group
-uint256 goes up to ~0x0
-but the range of the g1 group is smaller
-2^256 would not be a valid element
-when using the hashAndMap function you need to set map mode to 0
-and then set it back to 5 after
-
-  mcl.setMapToMode(0);
-  let g = d.mapToG1();
-  mcl.setMapToMode(5);
-
-something like this (this is js code and using other functions)
---
-it should be hashed and mod the order before set
- */
-    Scalar x;
-    return x;
 }

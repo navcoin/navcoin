@@ -332,6 +332,14 @@ BOOST_AUTO_TEST_CASE(test_scalar_negate)
     BOOST_CHECK(b == c);
 }
 
+BOOST_AUTO_TEST_CASE(test_scalar_square)
+{
+    Scalar a(9);
+    Scalar b(81);
+    Scalar c = a.Square();
+    BOOST_CHECK(b == c);
+}
+
 BOOST_AUTO_TEST_CASE(test_scalar_rand)
 {
     std::vector<bool> tf {true, false};

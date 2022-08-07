@@ -62,6 +62,7 @@ class Scalar {
 
         Scalar Invert() const;
         Scalar Negate() const;
+        Scalar Square() const;
 
         static Scalar Rand(bool excludeZero = false);
 
@@ -78,8 +79,6 @@ class Scalar {
 
         bool GetBit(uint8_t n) const;
 
-        static Scalar HashAndMap(std::vector<unsigned char> vch);
-        
         unsigned int GetSerializeSize() const
         {
             return ::GetSerializeSize(GetVch());
