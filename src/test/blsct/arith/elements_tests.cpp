@@ -215,10 +215,10 @@ BOOST_AUTO_TEST_CASE(test_elements_from)
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_elements_first_n_powers)
+BOOST_AUTO_TEST_CASE(test_elements_first_n_pow)
 {
     Scalar k(3);
-    auto pows = Scalars::FirstNPowers(3, k);
+    auto pows = Scalars::FirstNPow(3, k);
     Scalar p1(1);
     Scalar p2(3);
     Scalar p3(9);
@@ -228,9 +228,9 @@ BOOST_AUTO_TEST_CASE(test_elements_first_n_powers)
     BOOST_CHECK(pows[2] == p3);
 }
 
-BOOST_AUTO_TEST_CASE(test_elements_random_vector)
+BOOST_AUTO_TEST_CASE(test_elements_rand_vec)
 {
-    auto xs = Scalars::RandomVector(3);
+    auto xs = Scalars::RandVec(3);
     BOOST_CHECK(xs.size() == 3);
 }
 

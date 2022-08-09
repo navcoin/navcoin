@@ -400,45 +400,108 @@ BOOST_AUTO_TEST_CASE(test_g1point_improved_inner_product)
 bool PerformInnerProductRangeProof(
     size_t n,
     Scalar upsilon, Scalar gamma,
-    G1Point h, G1Points gg, G1Points hh,
-    std::vector<Scalar> aL
+    G1Point g, G1Point h, 
+    G1Points gg, G1Points hh,
+    Scalars aL,
+    Scalar t1, Scalar t2
 )
 {
-    // Scalar one(1);
-    // Scalar two(2);
-    // auto ones = Scalars::FirstNPowers(n, one);
-    // auto twoPows = Scalars::FirstNPowers(n, two);
+    // Prover on input upsilon, gamma computes
+    Scalar one(1);
+    Scalar two(2);
+    auto ones = Scalars::FirstNPow(n, one);
+    auto twoPows = Scalars::FirstNPow(n, two);
 
-    // auto aR = aL - ones;
-    // auto alpha = Scalar::Rand();
-    // auto A = h * alpha + gg^aL + hh^aR;
+    auto aR = aL - ones;
+    auto alpha = Scalar::Rand();
+    auto A = (h * alpha) + (gg ^ aL).Sum() + (hh ^ aR).Sum();
 
+    auto sL = Scalars::RandVec(n);
+    auto sR = Scalars::RandVec(n);
+    auto rho = Scalar::Rand();
+    auto S = (h * rho) + (gg ^ sL).Sum() + (hh ^ sR).Sum();
+
+    // prover sends A,S to verifier
+
+    // verifier selects challenge points y,z and send to prover
+    // auto y = Scalar::Rand(true);
+    Scalar y(10);
+    auto z = Scalar::Rand(true);
+    auto ys = ones * y;  
+
+    // prover computes
+    auto tau1 = Scalar::Rand(true);
+    auto tau2 = Scalar::Rand(true);
+    auto T1 = g * t1 + h * tau1;
+    auto T2 = g * t2 + h * tau2;
+
+    // prover sends T1,T2 to verifier
+
+    // verifier select random challenge x and selnd to prover
+    auto x = Scalar::Rand(true);
+
+    // prover computes
+    auto l = aL - ones * z + sL * x;
+    auto r = ys * (aR + ones * z + sR * x) + twoPows * z.Square();
+    auto tHat = (l * r).Sum();
+    auto tauX = tau2 * x.Square() + tau1 * x + z.Square() * gamma;
+    auto mu = alpha + rho * x;
+
+    // prover sends l,r,tHat,tauX,mu to verifier
+
+    // (64)
+    std::vector<G1Point> hh2;
+    for(size_t i = 0; i < n; ++i)
+    {
+        Scalar ii(i);
+        // auto h2 = hh[i] * y.Pow(ii.Invert());
+        // hh2.push_back(h2);
+    }
+
+    return false;
 }
 
 // NOTE: this test checks that the library is capable of 
 // performing required types of calculations. 
-//
 BOOST_AUTO_TEST_CASE(test_g1point_inner_product_range_proof)
 {
-    size_t n = 4;
+    auto gamma = Scalar::Rand();
+    Scalars aL(std::vector {
+        Scalar {1}, 
+        Scalar {0},
+        Scalar {0},
+        Scalar {1}
+    });
+    size_t n = aL.size();
     auto upsilon = 9;
-    auto gamma = Scalar::Rand(true);
-    std::vector<Scalar> aL {1, 0, 0, 1};
 
+    auto g = G1Point::MapToG1("h");
     auto h = G1Point::MapToG1("h");
+
     auto gg = G1Points(std::vector {
         G1Point::MapToG1("g1"),
-        G1Point::MapToG1("g2")
+        G1Point::MapToG1("g2"),
+        G1Point::MapToG1("g3"),
+        G1Point::MapToG1("g4")
     });
     auto hh = G1Points(std::vector {
         G1Point::MapToG1("h1"),
-        G1Point::MapToG1("h2")
+        G1Point::MapToG1("h2"),
+        G1Point::MapToG1("h3"),
+        G1Point::MapToG1("h4")
     });
+
+    // not calculating actual t1 and t2 and using random numbers
+    auto t1 = Scalar::Rand(true);
+    auto t2 = Scalar::Rand(true);
 
     auto result = PerformInnerProductRangeProof(
         n, upsilon, gamma,
-        h, gg, hh,
-        aL
+        g, h, 
+        gg, hh,
+        aL,
+        t1, t2
     );
+    // due to incorrect t1 and t2, the result becomes false
     BOOST_CHECK_EQUAL(result, false);
 }

@@ -340,6 +340,15 @@ BOOST_AUTO_TEST_CASE(test_scalar_square)
     BOOST_CHECK(b == c);
 }
 
+BOOST_AUTO_TEST_CASE(test_scalar_pow)
+{
+    Scalar a(3);
+    Scalar b(4);
+    Scalar c(81);
+    Scalar d = a.Pow(b);
+    BOOST_CHECK(c == d);
+}
+
 BOOST_AUTO_TEST_CASE(test_scalar_rand)
 {
     std::vector<bool> tf {true, false};

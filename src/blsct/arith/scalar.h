@@ -63,6 +63,7 @@ class Scalar {
         Scalar Invert() const;
         Scalar Negate() const;
         Scalar Square() const;
+        Scalar Pow(const Scalar& n) const;
 
         static Scalar Rand(bool excludeZero = false);
 

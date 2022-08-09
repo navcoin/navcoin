@@ -202,6 +202,18 @@ Scalar Scalar::Square() const
     return temp;
 }
 
+Scalar Scalar::Pow(const Scalar& n) const
+{
+    Scalar temp;
+    mclBnFr_setInt(&temp.fr, 1);
+
+    for(auto i = 0; i < n.GetInt64(); ++i)
+    {
+        mclBnFr_mul(&temp.fr, &temp.fr, &fr);
+    }
+    return temp;
+}
+
 Scalar Scalar::Rand(bool excludeZero)
 {
     Scalar temp;

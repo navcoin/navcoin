@@ -59,7 +59,7 @@ class Elements {
             }
         }
 
-        static Elements<Scalar> FirstNPowers(const size_t& n, const Scalar& k)
+        static Elements<Scalar> FirstNPow(const size_t& n, const Scalar& k)
         {
             Elements<Scalar> temp;
             Scalar x(1);
@@ -71,7 +71,7 @@ class Elements {
             return temp;
         }
 
-        static Elements<Scalar> RandomVector(const size_t& n, const bool excludeZero = false)
+        static Elements<Scalar> RandVec(const size_t& n, const bool excludeZero = false)
         {
             Elements<Scalar> temp;
             for(size_t i = 0; i < n; ++i)
@@ -137,11 +137,23 @@ class Elements {
             return ret;
         }
 
-        // G1Points + G1Points
-        // [p1, p2] * [q1, q2] = [p1+q1, p2+q2] 
+        // [p1, p2] + [q1, q2] = [p1+q1, p2+q2] 
         Elements<T> operator+(const Elements<T>& other) const
         {
-            ConfirmSizesMatch(other.vec.size());
+            ConfirmSizesMatch(other.size());
+
+            std::vector<T> ret;
+            for(size_t i = 0; i < vec.size(); ++i)
+            {
+                ret.push_back(vec[i] + other.vec[i]);
+            }
+            return ret;
+        }
+
+        // [p1, p2] - [q1, q2] = [p1-q1, p2-q2] 
+        Elements<T> operator-(const Elements<T>& other) const
+        {
+            ConfirmSizesMatch(other.size());
 
             std::vector<T> ret;
             for(size_t i = 0; i < vec.size(); ++i)
@@ -153,7 +165,7 @@ class Elements {
 
         bool operator==(const Elements<T>& other) const 
         {
-            if (vec.size() != other.vec.size())
+            if (vec.size() != other.size())
             {
                 return false;
             }
@@ -161,7 +173,7 @@ class Elements {
             bool ret = true;
             for(size_t i = 0; i < vec.size(); ++i)
             {
-                ret = ret && (vec[i] == other.vec[i]);
+                ret = ret && (vec[i] == other[i]);
             }
             return ret;
         }
@@ -174,7 +186,7 @@ class Elements {
         // returns elements slice [fromIndex, vec.size()) 
         Elements<T> From(const size_t fromIndex) const
         {
-            if (fromIndex >= vec.size())
+            if (fromIndex >= size())
             {
                 throw std::runtime_error("from index out of range");
             }
@@ -190,7 +202,7 @@ class Elements {
         // returns elements slice [0, toIndex) 
         Elements<T> To(const size_t toIndex) const
         {
-            if (toIndex > vec.size())
+            if (toIndex > size())
             {
                 throw std::runtime_error("to index out of range");
             }
