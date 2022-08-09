@@ -212,7 +212,7 @@ Scalar Scalar::Rand(bool excludeZero)
         {
             throw std::runtime_error(std::string("Failed to generate random number"));
         }
-        if (excludeZero && mclBnFr_isZero(&temp.fr) == 1) continue;
+        if (!excludeZero || mclBnFr_isZero(&temp.fr) != 1) break;
     }
     return temp;
 }

@@ -263,7 +263,7 @@ BOOST_AUTO_TEST_CASE(test_g1point_get_serialize_size)
 {
     G1Point p(uint256::ONE);
     auto serSize = p.GetSerializeSize();
-    BOOST_CHECK_EQUAL(serSize, 49);
+    BOOST_CHECK_EQUAL(serSize, 49ul);
 }
 
 BOOST_AUTO_TEST_CASE(test_g1point_serialize_unserialize)
@@ -271,7 +271,7 @@ BOOST_AUTO_TEST_CASE(test_g1point_serialize_unserialize)
     G1Point p(uint256::ONE);
     CDataStream st(0, 0);
     p.Serialize(st);
-    BOOST_CHECK_EQUAL(st.size(), 49);
+    BOOST_CHECK_EQUAL(st.size(), 49ul);
 
     G1Point q;
     BOOST_CHECK(p != q);
@@ -280,43 +280,8 @@ BOOST_AUTO_TEST_CASE(test_g1point_serialize_unserialize)
     BOOST_CHECK(p == q);
 }
 
-// returns true if prover can convince that it known a, b s.t.
-// P = g^a h^b and c = <a, b> (a)
-// P is a binding vector commitment to a,b
-template<int N>
-bool CalcSimplestInnerProductArgument(
-    mclBnFr (&a)[N], mclBnFr (&b)[N], mclBnG1 (&g)[N], mclBnG1 (&h)[N], 
-    mclBnFr& c, mclBnG1& P)
-{
-    // simplest proof system
-    // 1. prover sends a,b to verifier
-    // 2. verifier checks if P = g^a h^b and c = <a, b> holds
-
-    // P = g^a h^b
-    mclBnG1 gIp;
-    mclBnG1_mulVec(&gIp, g, a, N);
-    mclBnG1 hIp;
-    mclBnG1_mulVec(&hIp, h, b, N);
-    mclBnG1 PAct;
-    mclBnG1_add(&PAct, &gIp, &hIp);
-    bool pMatched = mclBnG1_isEqual(&PAct, &P);
-
-    // c = <a, b>
-    mclBnFr cAct;
-    mclBnFr_clear(&cAct);
-    for(size_t i = 0; i < N; ++i)
-    {
-        mclBnFr ip;
-        mclBnFr_mul(&ip, &a[i], &b[i]);
-        mclBnFr_add(&cAct, &cAct, &ip);
-    }
-    bool cMatched = mclBnFr_isEqual(&cAct, &c);
-
-    return pMatched && cMatched;
-}
-
 // NOTE: this test checks that the library is capable of 
-// performing required calculation
+// performing required types of calculations
 //
 // prover and verifier know:
 // g, h, c, P
@@ -351,7 +316,7 @@ BOOST_AUTO_TEST_CASE(test_g1point_simplest_inner_product)
     BOOST_CHECK(c == proofC);
 }
 
-bool perform_logarithmic_inner_product_proof(
+bool PerformImprovedInnerProductProof(
     const size_t& n,
     const G1Points& g, const G1Points& h, 
     const G1Point& u, const G1Point& P,
@@ -370,8 +335,8 @@ bool perform_logarithmic_inner_product_proof(
         auto cL = (a.To(nn) * b.From(nn)).Sum();
         auto cR = (a.From(nn) * b.To(nn)).Sum();
 
-        auto L = (g.From(nn) ^ a.To(nn)).Sum() + (h.To(nn) ^ b.From(nn)).Sum();
-        auto R = (g.To(nn) ^ a.From(nn)).Sum() + (h.From(nn) ^ b.To(nn)).Sum();
+        auto L = (g.From(nn) ^ a.To(nn)).Sum() + (h.To(nn) ^ b.From(nn)).Sum() + u * cL;
+        auto R = (g.To(nn) ^ a.From(nn)).Sum() + (h.From(nn) ^ b.To(nn)).Sum() + u * cR;
 
         auto x = Scalar::Rand(true);
 
@@ -383,12 +348,12 @@ bool perform_logarithmic_inner_product_proof(
         auto aa = a.To(nn) * x + a.From(nn) * x.Invert();  // aa in Z^nn
         auto bb = b.To(nn) * x.Invert() + b.From(nn) * x;  // bb in Z^nn
 
-        return perform_logarithmic_inner_product_proof(nn, gg, hh, u, PP, aa, bb);
+        return PerformImprovedInnerProductProof(nn, gg, hh, u, PP, aa, bb);
     }
 }
 
 // NOTE: this test checks that the library is capable of 
-// performing required calculation
+// performing required types of calculations. 
 //
 // prover and verifier know:
 // g, h, u, P
@@ -396,7 +361,7 @@ bool perform_logarithmic_inner_product_proof(
 // for a given P, prover proves that it has vectors a, b s.t. 
 // P = g^a h^b u^<a,b>
 //
-BOOST_AUTO_TEST_CASE(test_g1point_logrithmic_inner_product)
+BOOST_AUTO_TEST_CASE(test_g1point_improved_inner_product)
 {
     //////////
     // setup
@@ -411,7 +376,7 @@ BOOST_AUTO_TEST_CASE(test_g1point_logrithmic_inner_product)
     });
     auto u = G1Point::MapToG1("u");
 
-    // TODO properly calculate P
+    // not equal to the actual P
     auto P = G1Point::GetBasePoint();
 
     // a, b are Scalar vectors
@@ -422,72 +387,31 @@ BOOST_AUTO_TEST_CASE(test_g1point_logrithmic_inner_product)
 
     //////////
     // proof
-    auto result = perform_logarithmic_inner_product_proof(
+    auto result = PerformImprovedInnerProductProof(
         n,
         g, h, 
         u, P,
         a, b
     );
-    BOOST_CHECK_EQUAL(result, true);
+    // 
+    BOOST_CHECK_EQUAL(result, false);  // since P is bad, the result should be false
 }
 
-/*
-  pub fn perform_improved_inner_product_argument(&self,
-    n: usize,
-    g: &EcPoints<'a>, h: &EcPoints<'a>,
-    u: &EcPoint1<'a>, p: &EcPoint1<'a>,  
-    a: &FieldElems, b: &FieldElems, 
-  ) -> bool {
-    if n == 1 {
-      // prover sends a,b to verifier
+bool PerformInnerProductRangeProof(
+    Scalar upsilon, Scalar gamma
+)
+{
 
-      // verifier computers c = a*b
-      let c = &a[0] * &b[0];
+}
 
-      // verifier accepts if P = g^a h^b u^c holds
-      let ga = &g[0] * &a[0];
-      let hb = &h[0] * &b[0];
-      let uc = u * &c;
+// NOTE: this test checks that the library is capable of 
+// performing required types of calculations. 
+//
+BOOST_AUTO_TEST_CASE(test_g1point_inner_product_range_proof)
+{
+    size_t n = 4;
+    auto upsilon = 9;
+    std::vector<Scalar> aL {1, 0, 0, 1};
+    //Scalar::  
 
-      let rhs = self.vector_add(&[&ga , &hb, &uc]);
-      p == &rhs 
-
-    } else {
-      // prover computes L,R whose length is n/2
-      let nn = n / 2;
-      let cL = self.field_elem_mul(&a.to(..nn), &b.from(nn..)).sum();
-      let cR = self.field_elem_mul(&a.from(nn..), &b.to(..nn)).sum();
-      let L = self.vector_add(&vec![
-        &(&g.from(nn..) * &a.to(..nn)).sum(),
-        &(&h.to(..nn) * &b.from(nn..)).sum(),
-        &self.scalar_mul(u, &cL),
-      ]);
-      let R = self.vector_add(&vec![
-        &(&g.to(..nn) * &a.from(nn..)).sum(),
-        &(&h.from(nn..) * &b.to(..nn)).sum(),
-        &(u * &cR),
-      ]);
-
-      // prover passes L,R to verifier
-
-      // verifier chooses x in Z^*_p and sends to prover
-      let x = self.f.rand_elem();
-
-      // both prover and verifier compute gg,hh,PP
-      let gg = &(&g.to(..nn) * &x.inv()) * &(&g.from(nn..) * &x);
-      let hh = &(&h.to(..nn) * &x) * &(&h.from(nn..) * &x.inv());
-      
-      let pp = self.vector_add(&vec![
-        &(&L * &x.sq()),
-        p,
-        &(&R * &x.sq().inv()),
-      ]);
-
-      // prover computes aa, bb
-      let aa = &(&a.to(..nn) * &x) + &(&a.from(nn..) * &x.inv());
-      let bb = &(&b.to(..nn) * &x.inv()) + &(&b.from(nn..) * &x);
-      self.perform_improved_inner_product_argument(
-        nn, &gg, &hh, u, &pp, &aa, &bb)
-    }
-  }
-*/
+}

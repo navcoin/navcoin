@@ -24,6 +24,8 @@
 template<typename T>  
 class Elements {
     public:
+        Elements<T>() {}
+
         Elements<T>(const std::vector<T>& vec)
         {
             this->vec = vec;
@@ -39,6 +41,16 @@ class Elements {
             return ret;
         }
 
+        T operator[](int index) const
+        {
+            return vec[index];
+        }
+
+        size_t size() const
+        {
+            return vec.size();
+        }
+
         inline void ConfirmSizesMatch(const size_t& otherSize) const
         {
             if (vec.size() != otherSize)
@@ -47,17 +59,29 @@ class Elements {
             }
         }
 
+        static Elements<Scalar> FirstNPowers(const uint64_t& n, Scalar& k)
+        {
+            Elements<Scalar> temp;
+            Scalar x(1);
+            for(size_t i = 0; i < n; ++i)
+            {
+                temp.vec.push_back(x);    
+                x = x * k;
+            }
+            return temp;
+        }
+
         // G1Points x Scalars
         // [p1, p2] ^ [s1, s2] = [p1*s1, p2*s2] 
         // where * is elliptic curve scalar multiplication
         Elements<G1Point> operator^(const Elements<Scalar>& other) const
         {
-            ConfirmSizesMatch(other.vec.size());
+            ConfirmSizesMatch(other.size());
 
             std::vector<G1Point> ret;
-            for(size_t i = 0; i < vec.size(); ++i)
+            for(size_t i = 0; i < size(); ++i)
             {
-                ret.push_back(vec[i] * other.vec[i]);
+                ret.push_back(vec[i] * other[i]);
             }
             return ret;
         }
@@ -68,7 +92,7 @@ class Elements {
         Elements<G1Point> operator^(const Scalar& s) const
         {
             std::vector<G1Point> ret;
-            for(size_t i = 0; i < vec.size(); ++i)
+            for(size_t i = 0; i < size(); ++i)
             {
                 ret.push_back(vec[i] * s);
             }
@@ -79,12 +103,12 @@ class Elements {
         // [a1, a2] * [b1, b2] = [a1*b1, a2*b2]
         Elements<Scalar> operator*(const Elements<Scalar>& other) const
         {
-            ConfirmSizesMatch(other.vec.size());
+            ConfirmSizesMatch(other.size());
 
             std::vector<Scalar> ret;
             for(size_t i = 0; i < vec.size(); ++i)
             {
-                ret.push_back(vec[i] * other.vec[i]);
+                ret.push_back(vec[i] * other[i]);
             }
             return ret;
         }
@@ -168,6 +192,7 @@ class Elements {
             return ret;
         }
 
+    private:
         std::vector<T> vec;
 };
 
