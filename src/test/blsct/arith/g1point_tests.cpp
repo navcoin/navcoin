@@ -398,9 +398,20 @@ BOOST_AUTO_TEST_CASE(test_g1point_improved_inner_product)
 }
 
 bool PerformInnerProductRangeProof(
-    Scalar upsilon, Scalar gamma
+    size_t n,
+    Scalar upsilon, Scalar gamma,
+    G1Point h, G1Points gg, G1Points hh,
+    std::vector<Scalar> aL
 )
 {
+    // Scalar one(1);
+    // Scalar two(2);
+    // auto ones = Scalars::FirstNPowers(n, one);
+    // auto twoPows = Scalars::FirstNPowers(n, two);
+
+    // auto aR = aL - ones;
+    // auto alpha = Scalar::Rand();
+    // auto A = h * alpha + gg^aL + hh^aR;
 
 }
 
@@ -411,7 +422,23 @@ BOOST_AUTO_TEST_CASE(test_g1point_inner_product_range_proof)
 {
     size_t n = 4;
     auto upsilon = 9;
+    auto gamma = Scalar::Rand(true);
     std::vector<Scalar> aL {1, 0, 0, 1};
-    //Scalar::  
 
+    auto h = G1Point::MapToG1("h");
+    auto gg = G1Points(std::vector {
+        G1Point::MapToG1("g1"),
+        G1Point::MapToG1("g2")
+    });
+    auto hh = G1Points(std::vector {
+        G1Point::MapToG1("h1"),
+        G1Point::MapToG1("h2")
+    });
+
+    auto result = PerformInnerProductRangeProof(
+        n, upsilon, gamma,
+        h, gg, hh,
+        aL
+    );
+    BOOST_CHECK_EQUAL(result, false);
 }

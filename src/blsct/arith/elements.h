@@ -59,7 +59,7 @@ class Elements {
             }
         }
 
-        static Elements<Scalar> FirstNPowers(const uint64_t& n, Scalar& k)
+        static Elements<Scalar> FirstNPowers(const size_t& n, const Scalar& k)
         {
             Elements<Scalar> temp;
             Scalar x(1);
@@ -67,6 +67,17 @@ class Elements {
             {
                 temp.vec.push_back(x);    
                 x = x * k;
+            }
+            return temp;
+        }
+
+        static Elements<Scalar> RandomVector(const size_t& n, const bool excludeZero = false)
+        {
+            Elements<Scalar> temp;
+            for(size_t i = 0; i < n; ++i)
+            {
+                auto x = Scalar::Rand(excludeZero);
+                temp.vec.push_back(x);    
             }
             return temp;
         }

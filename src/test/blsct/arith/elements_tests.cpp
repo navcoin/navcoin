@@ -228,6 +228,12 @@ BOOST_AUTO_TEST_CASE(test_elements_first_n_powers)
     BOOST_CHECK(pows[2] == p3);
 }
 
+BOOST_AUTO_TEST_CASE(test_elements_random_vector)
+{
+    auto xs = Scalars::RandomVector(3);
+    BOOST_CHECK(xs.size() == 3);
+}
+
 BOOST_AUTO_TEST_CASE(test_elements_to)
 {
     Scalars ss(std::vector {Scalar{1}, Scalar{2}, Scalar{3}});
