@@ -342,11 +342,30 @@ BOOST_AUTO_TEST_CASE(test_scalar_square)
 
 BOOST_AUTO_TEST_CASE(test_scalar_pow)
 {
-    Scalar a(3);
-    Scalar b(4);
-    Scalar c(81);
-    Scalar d = a.Pow(b);
-    BOOST_CHECK(c == d);
+    struct TestCase {
+        int64_t a; int64_t b; int64_t c;
+    };
+    std::vector testCases {
+        TestCase {2, 0, 1},
+        TestCase {2, 1, 2},
+        TestCase {2, 2, 4},
+        TestCase {2, 3, 8},
+        TestCase {3, 5, 243},
+        TestCase {195, 7, 10721172396796875},
+    };
+    for(auto tc : testCases)
+    {
+        Scalar a(tc.a);
+        Scalar b(tc.b);
+        Scalar c(tc.c);
+        Scalar d = a.Pow(b);
+        printf("%s ^ %s = %s\n", a.GetString(10).c_str(), b.GetString(10).c_str(), d.GetString(10).c_str());
+        BOOST_CHECK(c == d);
+    }
+
+    // this is to check if calclation finishes within a reasonable amount of time
+    Scalar y(1);
+    y.Invert().Pow(y.Invert());
 }
 
 BOOST_AUTO_TEST_CASE(test_scalar_rand)
@@ -506,7 +525,35 @@ BOOST_AUTO_TEST_CASE(test_scalar_getstring)
     BOOST_CHECK(act_int64_min == s);
 }
 
-BOOST_AUTO_TEST_CASE(test_scalar_getbit)
+BOOST_AUTO_TEST_CASE(test_scalar_get_bits)
+{
+    // n is group order r minus 1
+    std::vector<uint8_t> nVec{
+        0x73, 0xed, 0xa7, 0x53, 0x29, 0x9d, 0x7d, 0x48, 0x33, 0x39, 
+        0xd8, 0x08, 0x09, 0xa1, 0xd8, 0x05, 0x53, 0xbd, 0xa4, 0x02, 
+        0xff, 0xfe, 0x5b, 0xfe, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 
+        0x00, 0x00,
+    };
+    std::string nHex("73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000000");
+    std::string nBin("111001111101101101001110101001100101001100111010111110101001000001100110011100111011000000010000000100110100001110110000000010101010011101111011010010000000010111111111111111001011011111111101111111111111111111111111111111100000000000000000000000000000000");
+
+    auto u = uint256(nVec);
+    Scalar s(u);
+
+    std::string exp = nBin;
+    auto bs = s.GetBits();
+
+    BOOST_CHECK(bs.size() == exp.size());
+    for(size_t i = 0; i < bs.size(); ++i)
+    {
+        auto expC = exp[i];
+        auto actC = bs[i] == true ? '1' : '0';
+        BOOST_CHECK(expC == actC);
+    }
+}
+
+
+BOOST_AUTO_TEST_CASE(test_scalar_get_bit)
 {
     {
         Scalar a(0b100000001);

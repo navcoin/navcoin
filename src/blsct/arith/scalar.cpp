@@ -204,12 +204,21 @@ Scalar Scalar::Square() const
 
 Scalar Scalar::Pow(const Scalar& n) const
 {
-    Scalar temp;
-    mclBnFr_setInt(&temp.fr, 1);
+    // using double-and-add method
+    Scalar temp(1);
+    mclBnFr bitVal;
+    bitVal = fr;
+    auto bits = n.GetBits();
 
-    for(auto i = 0; i < n.GetInt64(); ++i)
+    for(auto it = bits.rbegin(); it != bits.rend(); ++it)
     {
-        mclBnFr_mul(&temp.fr, &temp.fr, &fr);
+        printf("b=%c\n", *it ? '1' : '0');
+        Scalar s(bitVal);
+        if (*it) 
+        {
+            mclBnFr_mul(&temp.fr, &temp.fr, &bitVal);
+        }
+        mclBnFr_mul(&bitVal, &bitVal, &bitVal);
     }
     return temp;
 }
@@ -286,6 +295,17 @@ std::string Scalar::GetString(const int& r) const
         throw std::runtime_error(std::string("Failed to get string representation of mclBnFr"));
     }
     return std::string(str);
+}
+
+std::vector<bool> Scalar::GetBits() const
+{
+    auto bitStr = GetString(2);
+    std::vector<bool> vec;
+    for(auto& c : bitStr)
+    {
+        vec.push_back(c == '0' ? 0 : 1);
+    }
+    return vec;
 }
 
 // since GetVch returns 32-byte vector, maximum bit index is 8 * 32 - 1 = 255

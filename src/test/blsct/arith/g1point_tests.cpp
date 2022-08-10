@@ -424,8 +424,7 @@ bool PerformInnerProductRangeProof(
     // prover sends A,S to verifier
 
     // verifier selects challenge points y,z and send to prover
-    // auto y = Scalar::Rand(true);
-    Scalar y(10);
+    auto y = Scalar::Rand(true);
     auto z = Scalar::Rand(true);
     auto ys = ones * y;  
 
@@ -449,13 +448,16 @@ bool PerformInnerProductRangeProof(
 
     // prover sends l,r,tHat,tauX,mu to verifier
 
+    printf("y(hex)=%s\n", y.GetString(16).c_str());
+    printf("y(bin)=%s\n", y.GetString(2).c_str());
     // (64)
     std::vector<G1Point> hh2;
     for(size_t i = 0; i < n; ++i)
     {
         Scalar ii(i);
-        // auto h2 = hh[i] * y.Pow(ii.Invert());
-        // hh2.push_back(h2);
+        auto h2 = hh[i] * y;
+        //auto yy = y.Pow(ii.Invert());
+        //hh2.push_back(h2);
     }
 
     return false;

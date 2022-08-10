@@ -79,6 +79,7 @@ class Scalar {
         std::string GetString(const int& r = 16) const;
 
         bool GetBit(uint8_t n) const;
+        std::vector<bool> GetBits() const;
 
         unsigned int GetSerializeSize() const
         {
