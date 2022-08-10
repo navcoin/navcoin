@@ -26,12 +26,12 @@ BOOST_AUTO_TEST_CASE(test_elements_constructors)
 {
     Scalars ss(std::vector {Scalar{1}, Scalar{2}});
     auto g = G1Point::GetBasePoint();
-    BOOST_CHECK(ss.size() == 2);
+    BOOST_CHECK(ss.Size() == 2);
     BOOST_CHECK(ss[0].GetInt64() == 1);
     BOOST_CHECK(ss[1].GetInt64() == 2);
 
     G1Points g1s(std::vector {g, g + g});
-    BOOST_CHECK(g1s.size() == 2);
+    BOOST_CHECK(g1s.Size() == 2);
 }
 
 BOOST_AUTO_TEST_CASE(test_elements_sum)
@@ -49,29 +49,47 @@ BOOST_AUTO_TEST_CASE(test_elements_sum)
     }
 }
 
+BOOST_AUTO_TEST_CASE(test_elements_add)
+{
+    {
+        Scalars ss;
+        Scalar x(1);
+        ss.Add(x);
+        BOOST_CHECK_EQUAL(ss.Size(), 1);
+        BOOST_CHECK_EQUAL(ss[0].GetInt64(), 1);
+    }
+    {
+        G1Points g1s;
+        auto g = G1Point::GetBasePoint();
+        g1s.Add(g);
+        BOOST_CHECK_EQUAL(g1s.Size(), 1);
+        BOOST_CHECK(g1s[0] == g);
+    }
+}
+
 BOOST_AUTO_TEST_CASE(test_elements_confirm_sizes_match)
 {
     {
         Scalars s1(std::vector {Scalar{1}});
         Scalars s2(std::vector {Scalar{1}, Scalar{2}});
-        BOOST_CHECK_THROW(s1.ConfirmSizesMatch(s2.size()), std::runtime_error);
+        BOOST_CHECK_THROW(s1.ConfirmSizesMatch(s2.Size()), std::runtime_error);
     }
     {
         Scalars s1(std::vector {Scalar{2}, Scalar{3}});
         Scalars s2(std::vector {Scalar{1}, Scalar{2}});
-        BOOST_CHECK_NO_THROW(s1.ConfirmSizesMatch(s2.size()));
+        BOOST_CHECK_NO_THROW(s1.ConfirmSizesMatch(s2.Size()));
     }
     {
         auto g = G1Point::GetBasePoint();
         G1Points gg(std::vector {g, g + g});
         G1Points hh(std::vector {g});
-        BOOST_CHECK_THROW(gg.ConfirmSizesMatch(hh.size()), std::runtime_error);
+        BOOST_CHECK_THROW(gg.ConfirmSizesMatch(hh.Size()), std::runtime_error);
     }
     {
         auto g = G1Point::GetBasePoint();
         G1Points gg(std::vector {g, g + g});
         G1Points hh(std::vector {g, g * 3});
-        BOOST_CHECK_NO_THROW(gg.ConfirmSizesMatch(hh.size()));
+        BOOST_CHECK_NO_THROW(gg.ConfirmSizesMatch(hh.Size()));
     }
 }
 
@@ -222,7 +240,7 @@ BOOST_AUTO_TEST_CASE(test_elements_first_n_pow)
     Scalar p1(1);
     Scalar p2(3);
     Scalar p3(9);
-    BOOST_CHECK(pows.size() == 3);
+    BOOST_CHECK(pows.Size() == 3);
     BOOST_CHECK(pows[0] == p1);
     BOOST_CHECK(pows[1] == p2);
     BOOST_CHECK(pows[2] == p3);
@@ -231,7 +249,7 @@ BOOST_AUTO_TEST_CASE(test_elements_first_n_pow)
 BOOST_AUTO_TEST_CASE(test_elements_rand_vec)
 {
     auto xs = Scalars::RandVec(3);
-    BOOST_CHECK(xs.size() == 3);
+    BOOST_CHECK(xs.Size() == 3);
 }
 
 BOOST_AUTO_TEST_CASE(test_elements_to)
@@ -239,7 +257,7 @@ BOOST_AUTO_TEST_CASE(test_elements_to)
     Scalars ss(std::vector {Scalar{1}, Scalar{2}, Scalar{3}});
     {
         auto tt = ss.To(0);
-        BOOST_CHECK(tt.size() == 0);
+        BOOST_CHECK(tt.Size() == 0);
     }
     {
         auto tt = ss.To(1);
@@ -263,7 +281,7 @@ BOOST_AUTO_TEST_CASE(test_elements_to)
     G1Points gg(std::vector {g, g + g, g + g + g});
     {
         auto hh = gg.To(0);
-        BOOST_CHECK(hh.size() == 0);
+        BOOST_CHECK(hh.Size() == 0);
     }
     {
         auto hh = gg.To(1);

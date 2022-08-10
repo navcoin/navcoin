@@ -398,7 +398,7 @@ BOOST_AUTO_TEST_CASE(test_g1point_improved_inner_product)
 }
 
 bool PerformInnerProductRangeProof(
-    size_t n,
+    size_t n, G1Point V,
     Scalar upsilon, Scalar gamma,
     G1Point g, G1Point h, 
     G1Points gg, G1Points hh,
@@ -448,19 +448,34 @@ bool PerformInnerProductRangeProof(
 
     // prover sends l,r,tHat,tauX,mu to verifier
 
-    printf("y(hex)=%s\n", y.GetString(16).c_str());
-    printf("y(bin)=%s\n", y.GetString(2).c_str());
     // (64)
-    std::vector<G1Point> hh2;
+    G1Points hh2;
     for(size_t i = 0; i < n; ++i)
     {
         Scalar ii(i);
-        auto h2 = hh[i] * y;
-        //auto yy = y.Pow(ii.Invert());
-        //hh2.push_back(h2);
+        auto h2 = hh[i] * y.Pow(ii.Invert());
+        hh2.Add(h2);
     }
+    
+    // (65)
+    auto deltaYz = (ones * ys).Sum() * (z - z.Square()) - (ones * twoPows).Sum() * z.Cube();
+    auto lhs_65 = g * tHat + h * tauX;
+    auto rhs_65 = V * z.Square() + g * deltaYz + T1 * x + T2 * x.Square();
+    //BOOST_CHECK(lhs_65 == rhs_65);
+    
+    // (66), (67)
+    auto lhs_66_67 = 
+        A 
+        + (S * x) 
+        + (gg ^ (z.Invert())).Sum() 
+        + (hh2 ^ (ys * z + twoPows * z.Square())).Sum();
+    auto rhs_66_67 = h * mu + (gg ^ l).Sum() + (hh2 ^ r).Sum();
+    //BOOST_CHECK(lhs_66_67 == rhs_66_67);
 
-    return false;
+    // (68)
+    auto result = tHat == (l * r).Sum();
+
+    return result;
 }
 
 // NOTE: this test checks that the library is capable of 
@@ -474,7 +489,7 @@ BOOST_AUTO_TEST_CASE(test_g1point_inner_product_range_proof)
         Scalar {0},
         Scalar {1}
     });
-    size_t n = aL.size();
+    size_t n = aL.Size();
     auto upsilon = 9;
 
     auto g = G1Point::MapToG1("h");
@@ -493,12 +508,15 @@ BOOST_AUTO_TEST_CASE(test_g1point_inner_product_range_proof)
         G1Point::MapToG1("h4")
     });
 
+    auto V = h * gamma + g * upsilon;
+
     // not calculating actual t1 and t2 and using random numbers
     auto t1 = Scalar::Rand(true);
     auto t2 = Scalar::Rand(true);
 
     auto result = PerformInnerProductRangeProof(
-        n, upsilon, gamma,
+        n, V, 
+        upsilon, gamma,
         g, h, 
         gg, hh,
         aL,

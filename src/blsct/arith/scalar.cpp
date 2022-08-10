@@ -202,6 +202,13 @@ Scalar Scalar::Square() const
     return temp;
 }
 
+Scalar Scalar::Cube() const
+{
+    Scalar temp(fr);
+    temp = temp * temp.Square();
+    return temp;
+}
+
 Scalar Scalar::Pow(const Scalar& n) const
 {
     // using double-and-add method
@@ -212,7 +219,6 @@ Scalar Scalar::Pow(const Scalar& n) const
 
     for(auto it = bits.rbegin(); it != bits.rend(); ++it)
     {
-        printf("b=%c\n", *it ? '1' : '0');
         Scalar s(bitVal);
         if (*it) 
         {

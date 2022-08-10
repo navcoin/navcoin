@@ -340,6 +340,14 @@ BOOST_AUTO_TEST_CASE(test_scalar_square)
     BOOST_CHECK(b == c);
 }
 
+BOOST_AUTO_TEST_CASE(test_scalar_cube)
+{
+    Scalar a(3);
+    Scalar b(27);
+    Scalar c = a.Cube();
+    BOOST_CHECK(b == c);
+}
+
 BOOST_AUTO_TEST_CASE(test_scalar_pow)
 {
     struct TestCase {

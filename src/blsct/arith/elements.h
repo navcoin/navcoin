@@ -46,9 +46,14 @@ class Elements {
             return vec[index];
         }
 
-        size_t size() const
+        size_t Size() const
         {
             return vec.size();
+        }
+
+        void Add(const T x)
+        {
+            vec.push_back(x);
         }
 
         inline void ConfirmSizesMatch(const size_t& otherSize) const
@@ -87,10 +92,10 @@ class Elements {
         // where * is elliptic curve scalar multiplication
         Elements<G1Point> operator^(const Elements<Scalar>& other) const
         {
-            ConfirmSizesMatch(other.size());
+            ConfirmSizesMatch(other.Size());
 
             std::vector<G1Point> ret;
-            for(size_t i = 0; i < size(); ++i)
+            for(size_t i = 0; i < Size(); ++i)
             {
                 ret.push_back(vec[i] * other[i]);
             }
@@ -103,7 +108,7 @@ class Elements {
         Elements<G1Point> operator^(const Scalar& s) const
         {
             std::vector<G1Point> ret;
-            for(size_t i = 0; i < size(); ++i)
+            for(size_t i = 0; i < Size(); ++i)
             {
                 ret.push_back(vec[i] * s);
             }
@@ -114,7 +119,7 @@ class Elements {
         // [a1, a2] * [b1, b2] = [a1*b1, a2*b2]
         Elements<Scalar> operator*(const Elements<Scalar>& other) const
         {
-            ConfirmSizesMatch(other.size());
+            ConfirmSizesMatch(other.Size());
 
             std::vector<Scalar> ret;
             for(size_t i = 0; i < vec.size(); ++i)
@@ -140,7 +145,7 @@ class Elements {
         // [p1, p2] + [q1, q2] = [p1+q1, p2+q2] 
         Elements<T> operator+(const Elements<T>& other) const
         {
-            ConfirmSizesMatch(other.size());
+            ConfirmSizesMatch(other.Size());
 
             std::vector<T> ret;
             for(size_t i = 0; i < vec.size(); ++i)
@@ -153,7 +158,7 @@ class Elements {
         // [p1, p2] - [q1, q2] = [p1-q1, p2-q2] 
         Elements<T> operator-(const Elements<T>& other) const
         {
-            ConfirmSizesMatch(other.size());
+            ConfirmSizesMatch(other.Size());
 
             std::vector<T> ret;
             for(size_t i = 0; i < vec.size(); ++i)
@@ -165,7 +170,7 @@ class Elements {
 
         bool operator==(const Elements<T>& other) const 
         {
-            if (vec.size() != other.size())
+            if (vec.size() != other.Size())
             {
                 return false;
             }
@@ -186,7 +191,7 @@ class Elements {
         // returns elements slice [fromIndex, vec.size()) 
         Elements<T> From(const size_t fromIndex) const
         {
-            if (fromIndex >= size())
+            if (fromIndex >= Size())
             {
                 throw std::runtime_error("from index out of range");
             }
@@ -202,7 +207,7 @@ class Elements {
         // returns elements slice [0, toIndex) 
         Elements<T> To(const size_t toIndex) const
         {
-            if (toIndex > size())
+            if (toIndex > Size())
             {
                 throw std::runtime_error("to index out of range");
             }

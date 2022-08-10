@@ -185,8 +185,8 @@ bool G1Point::operator!=(const G1Point& b) const
 
 G1Point G1Point::Rand()
 {
-    auto G = GetBasePoint();
-    return G * Scalar::Rand();
+   auto G = GetBasePoint();
+   return G * Scalar::Rand();
 }
 
 bool G1Point::IsUnity() const
