@@ -473,7 +473,7 @@ bool PerformInnerProductRangeProof(
         A 
         + (S * x) 
         + (gg ^ (z.Invert())).Sum() 
-        + (hh2 ^ (ys * z + twoPows * z.Square())).Sum();
+        + (hh2 ^ (yPows * z + twoPows * z.Square())).Sum();
     auto rhs_66_67 = h * mu + (gg ^ l).Sum() + (hh2 ^ r).Sum();
     //BOOST_CHECK(lhs_66_67 == rhs_66_67);
 
