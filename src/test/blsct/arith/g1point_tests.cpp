@@ -297,8 +297,8 @@ BOOST_AUTO_TEST_CASE(test_g1point_simplest_inner_product)
     auto g = G1Point::MapToG1("g");
     auto h = G1Point::MapToG1("h");
 
-    Scalars a(std::vector { Scalar {2}, Scalar {3} });
-    Scalars b(std::vector { Scalar {5}, Scalar {7} });
+    Scalars a(std::vector<Scalar> { Scalar {2}, Scalar {3} });
+    Scalars b(std::vector<Scalar> { Scalar {5}, Scalar {7} });
 
     auto P = (g * a.Sum()) + (h * b.Sum());
     auto c = (a * b).Sum(); 
@@ -380,8 +380,8 @@ BOOST_AUTO_TEST_CASE(test_g1point_improved_inner_product)
     auto P = G1Point::GetBasePoint();
 
     // a, b are Scalar vectors
-    Scalars a(std::vector { Scalar {2}, Scalar {3} });
-    Scalars b(std::vector { Scalar {5}, Scalar {7} });
+    Scalars a(std::vector<Scalar> { Scalar {2}, Scalar {3} });
+    Scalars b(std::vector<Scalar> { Scalar {5}, Scalar {7} });
 
     size_t n = 2;
 
@@ -483,7 +483,7 @@ bool PerformInnerProductRangeProof(
 BOOST_AUTO_TEST_CASE(test_g1point_inner_product_range_proof)
 {
     auto gamma = Scalar::Rand();
-    Scalars aL(std::vector {
+    Scalars aL(std::vector<Scalar> {
         Scalar {1}, 
         Scalar {0},
         Scalar {0},
