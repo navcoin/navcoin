@@ -246,6 +246,16 @@ BOOST_AUTO_TEST_CASE(test_elements_first_n_pow)
     BOOST_CHECK(pows[2] == p3);
 }
 
+BOOST_AUTO_TEST_CASE(test_elements_repeat_n)
+{
+    Scalar k(3);
+    auto pows = Scalars::RepeatN(3, k);
+    BOOST_CHECK(pows.Size() == 3);
+    BOOST_CHECK(pows[0] == k);
+    BOOST_CHECK(pows[1] == k);
+    BOOST_CHECK(pows[2] == k);
+}
+
 BOOST_AUTO_TEST_CASE(test_elements_rand_vec)
 {
     auto xs = Scalars::RandVec(3);

@@ -522,6 +522,5 @@ BOOST_AUTO_TEST_CASE(test_g1point_inner_product_range_proof)
         gg, hh,
         aL
     );
-    // due to incorrect t1 and t2, the result becomes false
-    BOOST_CHECK_EQUAL(result, false);
+    BOOST_CHECK_EQUAL(result, true);
 }
