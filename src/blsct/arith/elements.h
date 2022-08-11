@@ -76,6 +76,16 @@ class Elements {
             return temp;
         }
 
+        static Elements<Scalar> RepeatN(const size_t& n, const Scalar& k)
+        {
+            Elements<Scalar> temp;
+            for(size_t i = 0; i < n; ++i)
+            {
+                temp.vec.push_back(k);    
+            }
+            return temp;
+        }
+
         static Elements<Scalar> RandVec(const size_t& n, const bool excludeZero = false)
         {
             Elements<Scalar> temp;

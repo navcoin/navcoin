@@ -402,8 +402,7 @@ bool PerformInnerProductRangeProof(
     Scalar upsilon, Scalar gamma,
     G1Point g, G1Point h, 
     G1Points gg, G1Points hh,
-    Scalars aL,
-    Scalar t1, Scalar t2
+    Scalars aL
 )
 {
     // Prover on input upsilon, gamma computes
@@ -426,11 +425,17 @@ bool PerformInnerProductRangeProof(
     // verifier selects challenge points y,z and send to prover
     auto y = Scalar::Rand(true);
     auto z = Scalar::Rand(true);
-    auto ys = ones * y;  
+    auto yPows = Scalars::FirstNPow(n, y);  
+    auto zs = Scalars::RepeatN(n, z);  
 
     // prover computes
     auto tau1 = Scalar::Rand(true);
     auto tau2 = Scalar::Rand(true);
+    
+    // t1 = <l0, r0>, t2 = <l1, r1>
+    auto t1 = (sL * (yPows * (aR + zs)) + twoPows * z.Square()).Sum();
+    auto t2 = (sL * (yPows * sR)).Sum();
+
     auto T1 = g * t1 + h * tau1;
     auto T2 = g * t2 + h * tau2;
 
@@ -441,7 +446,7 @@ bool PerformInnerProductRangeProof(
 
     // prover computes
     auto l = aL - ones * z + sL * x;
-    auto r = ys * (aR + ones * z + sR * x) + twoPows * z.Square();
+    auto r = yPows * (aR + ones * z + sR * x) + twoPows * z.Square();
     auto tHat = (l * r).Sum();
     auto tauX = tau2 * x.Square() + tau1 * x + z.Square() * gamma;
     auto mu = alpha + rho * x;
@@ -458,7 +463,7 @@ bool PerformInnerProductRangeProof(
     }
     
     // (65)
-    auto deltaYz = (ones * ys).Sum() * (z - z.Square()) - (ones * twoPows).Sum() * z.Cube();
+    auto deltaYz = (ones * yPows).Sum() * (z - z.Square()) - (ones * twoPows).Sum() * z.Cube();
     auto lhs_65 = g * tHat + h * tauX;
     auto rhs_65 = V * z.Square() + g * deltaYz + T1 * x + T2 * x.Square();
     //BOOST_CHECK(lhs_65 == rhs_65);
@@ -510,17 +515,12 @@ BOOST_AUTO_TEST_CASE(test_g1point_inner_product_range_proof)
 
     auto V = h * gamma + g * upsilon;
 
-    // not calculating actual t1 and t2 and using random numbers
-    auto t1 = Scalar::Rand(true);
-    auto t2 = Scalar::Rand(true);
-
     auto result = PerformInnerProductRangeProof(
         n, V, 
         upsilon, gamma,
         g, h, 
         gg, hh,
-        aL,
-        t1, t2
+        aL
     );
     // due to incorrect t1 and t2, the result becomes false
     BOOST_CHECK_EQUAL(result, false);
