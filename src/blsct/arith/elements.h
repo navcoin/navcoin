@@ -102,57 +102,24 @@ class Elements {
         }
 
         // Scalars x Scalars
-        // [s1, s2] ^ [t1, t2] = [s1*t1, s2*t2] 
+        // [a1, a2] * [b1, b2] = [a1*b1, a2*b2]
         //
         // G1Points x Scalars
-        // [p1, p2] ^ [s1, s2] = [p1*s1, p2*s2] 
-        Elements<T> operator^(const Elements<Scalar>& other) const
+        // [p1, p2] * [a1, ba] = [p1*a1, p2*a2]
+        Elements<T> operator*(const Elements<Scalar>& other) const
         {
             ConfirmSizesMatch(other.Size());
 
-            Elements<T> ret;
-            for(size_t i = 0; i < Size(); ++i)
-            {
-                ret.vec.push_back(vec[i] * other[i]);
-            }
-            return ret;
-        }
-
-        // Scalars x Scalar
-        // [s1, s2] ^ s = [s1*s, s2*s] 
-        //
-        // G1Points x Scalar
-        // [p1, p2] ^ s = [p1*s, p2*s] 
-        Elements<T> operator^(const Scalar& s) const
-        {
             if constexpr (std::is_same_v<T, Scalar>) {
                 Elements<Scalar> ret;
-                for(size_t i = 0; i < Size(); ++i)
+                for(size_t i = 0; i < vec.size(); ++i)
                 {
-                    ret.vec.push_back(vec[i] * s);
+                    ret.vec.push_back(vec[i] * other[i]);
                 }
                 return ret;
             } else if constexpr (std::is_same_v<T, G1Point>) {
                 Elements<G1Point> ret;
                 for(size_t i = 0; i < Size(); ++i)
-                {
-                    ret.vec.push_back(vec[i] * s);
-                }
-                return ret;
-            } else {
-                throw std::runtime_error("Now implemented");
-            }
-        }
-
-        // Scalars x Scalars
-        // [a1, a2] * [b1, b2] = [a1*b1, a2*b2]
-        Elements<Scalar> operator*(const Elements<Scalar>& other) const
-        {
-            if constexpr (std::is_same_v<T, Scalar>) {
-                ConfirmSizesMatch(other.Size());
-
-                Elements<Scalar> ret;
-                for(size_t i = 0; i < vec.size(); ++i)
                 {
                     ret.vec.push_back(vec[i] * other[i]);
                 }

@@ -93,14 +93,14 @@ BOOST_AUTO_TEST_CASE(test_elements_confirm_sizes_match)
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_elements_operator_pow_caret_scalars)
+BOOST_AUTO_TEST_CASE(test_elements_operator_mul_scalars)
 {
     // G1Points ^ Scalars -> G1Points
     {
         Scalars ss(std::vector<Scalar> {Scalar{2}, Scalar{3}});
         auto g = G1Point::GetBasePoint();
         G1Points gg(std::vector<G1Point> {g, g + g});
-        auto hh = gg ^ ss;
+        auto hh = gg * ss;
 
         auto h1 = g * Scalar(2);
         auto h2 = (g + g) * Scalar(3);
@@ -112,7 +112,7 @@ BOOST_AUTO_TEST_CASE(test_elements_operator_pow_caret_scalars)
     {
         Scalars ss(std::vector<Scalar> {Scalar{2}, Scalar{3}});
         Scalars tt(std::vector<Scalar> {Scalar{3}, Scalar{4}});
-        auto uu = ss ^ tt;
+        auto uu = ss * tt;
 
         Scalars vv(std::vector<Scalar> {Scalar{6}, Scalar{12}});
 
@@ -120,16 +120,16 @@ BOOST_AUTO_TEST_CASE(test_elements_operator_pow_caret_scalars)
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_elements_operator_pow_caret_scalar)
+BOOST_AUTO_TEST_CASE(test_elements_operator_mul_scalar)
 {
     // Scalars * Scalar -> Scalars
     {
         Scalars ss(std::vector<Scalar> {Scalar{2}, Scalar{3}});
         Scalar z(5);
-        auto r1 = ss ^ z;
+        auto r1 = ss * z;
 
         auto zz = Scalars::RepeatN(ss.Size(), z);
-        auto r2 = ss ^ zz;
+        auto r2 = ss * zz;
 
         BOOST_CHECK(r1 == r2);
     }
@@ -138,12 +138,12 @@ BOOST_AUTO_TEST_CASE(test_elements_operator_pow_caret_scalar)
         auto g = G1Point::GetBasePoint();
         G1Points gg(std::vector<G1Point> {g, g + g});
         Scalar z(3);
-        auto r1 = gg ^ z;
+        auto r1 = gg * z;
 
-        // auto zz = Scalars::RepeatN(gg.Size(), z);
-        // auto r2 = gg * zz;
+        auto zz = Scalars::RepeatN(gg.Size(), z);
+        auto r2 = gg * zz;
 
-        // BOOST_CHECK(r1 == r2);
+        BOOST_CHECK(r1 == r2);
     }
 }
 

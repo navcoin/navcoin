@@ -28,24 +28,44 @@ BOOST_AUTO_TEST_CASE(test_integration_invert_zero)
     auto x = Scalar::Rand(true);
     Scalar zero(0);
     BOOST_CHECK(x.Pow(zero) == x.Pow(zero.Invert()));
-
 }
 
-// TODO write gg^z == gg^(ones * z)
+// gg^z == gg^(ones * z)
 BOOST_AUTO_TEST_CASE(test_integration_gg_ones_times_z)
 {
     auto z = Scalar::Rand(true);
-    auto gg = G1Points(std::vector {
+    auto gg = G1Points(std::vector<G1Point> {
         G1Point::MapToG1("g1"),
         G1Point::MapToG1("g2")
     });
-    auto r1 = gg ^ z;
+    auto r1 = gg * z;
 
     Scalar one(1);
     auto ones = Scalars::RepeatN(gg.Size(), one);
-    auto r2 = gg ^ (ones * z);
+    auto r2 = gg * (ones * z);
 
     BOOST_CHECK(r1 == r2);
+}
+
+BOOST_AUTO_TEST_CASE(test_integration_hmu_ggl)
+{
+    auto alpha = Scalar::Rand(true);
+    auto rho = Scalar::Rand(true);
+    auto x = Scalar::Rand(true);
+    auto mu = alpha + rho * x; 
+
+    auto gg = G1Points(std::vector<G1Point> {
+        G1Point::MapToG1("g1"),
+        G1Point::MapToG1("g2")
+    });
+    auto h = G1Point::MapToG1("h");
+
+    Scalars l(std::vector<Scalar> {
+        Scalar {2}, 
+        Scalar {3},
+    });
+    //auto hu_gl = (h * mu) + (gg * l);
+
 }
 
 bool PerformRangeProof(
@@ -64,12 +84,12 @@ bool PerformRangeProof(
 
     auto aR = aL - ones;
     auto alpha = Scalar::Rand();
-    auto A = (h * alpha) + (gg ^ aL).Sum() + (hh ^ aR).Sum();
+    auto A = (h * alpha) + (gg * aL).Sum() + (hh * aR).Sum();
 
     auto sL = Scalars::RandVec(n);
     auto sR = Scalars::RandVec(n);
     auto rho = Scalar::Rand();
-    auto S = (h * rho) + (gg ^ sL).Sum() + (hh ^ sR).Sum();
+    auto S = (h * rho) + (gg * sL).Sum() + (hh * sR).Sum();
 
     // prover sends A,S to verifier
 
@@ -117,11 +137,11 @@ bool PerformRangeProof(
         ((z - z.Square()) * (ones * yPows).Sum())
         - (z.Cube() * (ones * twoPows).Sum());
 
-    auto A1 = (gg ^ aL).Sum();
-    auto S1 = (gg ^ sL).Sum();
+    auto A1 = (gg * aL).Sum();
+    auto S1 = (gg * sL).Sum();
     auto l1 = aL - (ones * z) + sL * x;
-    auto test0_lhs = (gg ^ l1).Sum();
-    auto test0_rhs = A1 - (gg ^ (ones * z)).Sum() + S1 * x;  
+    auto test0_lhs = (gg * l1).Sum();
+    auto test0_rhs = A1 - (gg * (ones * z)).Sum() + S1 * x;  
     BOOST_CHECK(test0_lhs == test0_rhs);
     // auto test0_lhs = tHat;
     // auto test0_rhs = (upsilon * z.Square()) + deltaYz + (t1 * x) + (t2 * x.Square());
@@ -135,17 +155,17 @@ bool PerformRangeProof(
     auto rhs_65 = V * z.Square() + g * deltaYz + T1 * x + T2 * x.Square();
     //BOOST_CHECK(lhs_65 == rhs_65);
     
-    auto gg2 = gg ^ z.Invert();
-    auto gg1 = gg ^ (ones * z.Invert());
+    auto gg2 = gg * z.Invert();
+    auto gg1 = gg * (ones * z.Invert());
     BOOST_CHECK(gg1 == gg2);
 
     // (66), (67)
     auto lhs_66_67 = 
         A 
         + (S * x) 
-        - (gg ^ (ones * z)).Sum() 
-        + (hh2 ^ (yPows * z + twoPows * z.Square())).Sum();
-    auto rhs_66_67 = h * mu + (gg ^ l).Sum() + (hh2 ^ r).Sum();
+        - (gg * (ones * z)).Sum() 
+        + (hh2 * (yPows * z + twoPows * z.Square())).Sum();
+    auto rhs_66_67 = h * mu + (gg * l).Sum() + (hh2 * r).Sum();
     BOOST_CHECK(lhs_66_67 == rhs_66_67);
 
     // (68)
@@ -169,13 +189,13 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof)
     auto g = G1Point::MapToG1("h");
     auto h = G1Point::MapToG1("h");
 
-    auto gg = G1Points(std::vector {
+    auto gg = G1Points(std::vector<G1Point> {
         G1Point::MapToG1("g1"),
         G1Point::MapToG1("g2"),
         G1Point::MapToG1("g3"),
         G1Point::MapToG1("g4")
     });
-    auto hh = G1Points(std::vector {
+    auto hh = G1Points(std::vector<G1Point> {
         G1Point::MapToG1("h1"),
         G1Point::MapToG1("h2"),
         G1Point::MapToG1("h3"),
@@ -240,7 +260,7 @@ bool PerformImprovedInnerProductProof(
     if (n == 1)
     {
         auto c = (a * b).Sum();
-        return P == (g ^ a).Sum() + (h ^ b).Sum() + u * c;
+        return P == (g * a).Sum() + (h * b).Sum() + u * c;
     }
     else
     {
@@ -249,13 +269,13 @@ bool PerformImprovedInnerProductProof(
         auto cL = (a.To(nn) * b.From(nn)).Sum();
         auto cR = (a.From(nn) * b.To(nn)).Sum();
 
-        auto L = (g.From(nn) ^ a.To(nn)).Sum() + (h.To(nn) ^ b.From(nn)).Sum() + u * cL;
-        auto R = (g.To(nn) ^ a.From(nn)).Sum() + (h.From(nn) ^ b.To(nn)).Sum() + u * cR;
+        auto L = (g.From(nn) * a.To(nn)).Sum() + (h.To(nn) * b.From(nn)).Sum() + u * cL;
+        auto R = (g.To(nn) * a.From(nn)).Sum() + (h.From(nn) * b.To(nn)).Sum() + u * cR;
 
         auto x = Scalar::Rand(true);
 
-        auto gg = (g.To(nn) ^ x.Invert()) + (g.From(nn) ^ x);  // gg in G^nn
-        auto hh = (h.To(nn) ^ x) + (h.From(nn) ^ x.Invert());  // hh in G^nn
+        auto gg = (g.To(nn) * x.Invert()) + (g.From(nn) * x);  // gg in G^nn
+        auto hh = (h.To(nn) * x) + (h.From(nn) * x.Invert());  // hh in G^nn
 
         auto PP = L * x.Square() + P + (R * x.Square().Invert());
 
