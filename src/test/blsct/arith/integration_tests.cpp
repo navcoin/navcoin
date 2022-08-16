@@ -70,7 +70,8 @@ BOOST_AUTO_TEST_CASE(test_integration_offset_by_negation)
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_integration_hmu_ggl)
+// (66), (67) of the range proof excluding (h') part  
+BOOST_AUTO_TEST_CASE(test_integration_range_proof_66_67_excl_h_prime)
 {
     auto n = 2;
     Scalar one(1);
@@ -99,9 +100,96 @@ BOOST_AUTO_TEST_CASE(test_integration_hmu_ggl)
 
     auto A = h * alpha + (gg * aL).Sum();
     auto S = h * rho + (gg * sL).Sum();
-    auto P = A + (S * x) + (gg * (ones * z.Negate())).Sum();
+    auto P = A + (S * x) + (gg * z.Negate()).Sum();
 
     BOOST_CHECK(P == hmu_ggl);
+}
+
+BOOST_AUTO_TEST_CASE(test_integration_rebasing_base_point)
+{
+    auto n = 2;
+
+    Scalar one(1);
+    auto ones = Scalars::RepeatN(n, one);
+    Scalar two(n); 
+    auto twoPows = Scalars::FirstNPow(n, two);
+
+    auto y = Scalar::Rand(true);
+    auto z = Scalar::Rand(true);
+    auto yPows = Scalars::FirstNPow(n, y);
+    auto hh = G1Points(std::vector<G1Point> {
+        G1Point::MapToG1("h1"),
+        G1Point::MapToG1("h2")
+    });
+    {
+        auto hhp = hh * y;
+        auto lhs = hhp * two;
+        auto rhs = hh * y * two;
+        BOOST_CHECK(lhs == rhs);
+    }
+    {
+        auto hhp = hh * y.Negate();
+        auto lhs = hhp * two;
+        auto rhs = hh * y.Negate() * two;
+        BOOST_CHECK(lhs == rhs);
+    }
+    {
+        auto hhp = G1Points(std::vector<G1Point> {
+            hh[0],
+            hh[1] * y.Invert()
+        });
+        auto yPowsInv = Scalars::FirstNPow(n, y.Invert());
+        auto lhs = hhp * (yPows * z + twoPows * z.Square());
+        auto rhs = hh * (ones * z + twoPows * z.Square() * yPowsInv);
+        BOOST_CHECK(lhs == rhs);
+    }
+}
+
+BOOST_AUTO_TEST_CASE(test_integration_range_proof_66_67_only_h_prime)
+{
+    auto n = 2;
+
+    Scalar two(2); 
+    auto twoPows = Scalars::FirstNPow(n, two);
+    Scalar one(1);
+    auto ones = Scalars::RepeatN(n, one);
+
+    auto x = Scalar::Rand(true);
+    auto y = Scalar::Rand(true);
+    auto z = Scalar::Rand(true);
+    auto yPows = Scalars::FirstNPow(n, y);
+
+    Scalars aR(std::vector<Scalar> {
+        Scalar {1}, 
+        Scalar {1}
+    });
+    auto sR = Scalars::RandVec(n);
+    auto zs = ones * z; 
+    auto hh = G1Points(std::vector<G1Point> {
+        G1Point::MapToG1("h1"),
+        G1Point::MapToG1("h2")
+    });
+    auto A = hh * aR;
+    auto S = hh * sR;
+
+    auto hhp = G1Points(std::vector<G1Point> {
+        hh[0],
+        hh[1] * y.Invert()
+    });
+    auto yPowsInv = Scalars::FirstNInvPow(n, y);
+    auto lhs = hhp * (yPows * z + twoPows * z.Square());
+    auto rhs = hh * (ones * z + twoPows * z.Square() * yPowsInv);
+    BOOST_CHECK(lhs == rhs);
+
+    // auto hhpExp = yPows * z + twoPows * z.Square();
+    // auto Pp = hhp * hhpExp;
+    // auto rhs = hh * (ones * z + twoPows * z.Square() * y.Negate());
+    // BOOST_CHECK(Pp == rhs);
+
+    // auto rr = yPows * (aR + zs + sR * x) + (twoPows * z.Square()); 
+    // auto hhprr = hhp * rr;
+
+    // BOOST_CHECK(P == hhprr);
 }
 
 bool PerformRangeProof(

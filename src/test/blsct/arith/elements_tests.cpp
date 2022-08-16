@@ -290,6 +290,20 @@ BOOST_AUTO_TEST_CASE(test_elements_first_n_inv_pow)
     BOOST_CHECK(r[2] == one);
 }
 
+BOOST_AUTO_TEST_CASE(test_elements_multiply_inv_power_seq)
+{
+    Scalar k(2);
+    auto gg = G1Points(std::vector<G1Point> {
+        G1Point::MapToG1("g1"),
+        G1Point::MapToG1("g2"),
+        G1Point::MapToG1("g3")
+    });
+    auto r = gg.MultiplyInvPowerSeq(k);
+    BOOST_CHECK(r[0] == gg[0]);
+    BOOST_CHECK(r[1] == gg[1] * k.Invert());
+    BOOST_CHECK(r[2] == gg[2] * k.Invert() * k.Invert());
+}
+
 BOOST_AUTO_TEST_CASE(test_elements_repeat_n)
 {
     Scalar k(3);

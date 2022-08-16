@@ -71,7 +71,7 @@ class Elements {
                 Scalar x(1);
                 for(size_t i = 0; i < n; ++i)
                 {
-                    ret.Add(x);    
+                    ret.vec.push_back(x);
                     x = x * k;
                 }
                 return ret;
@@ -101,9 +101,26 @@ class Elements {
             for(size_t i = 0; i < n; ++i)
             {
                 auto x = Scalar::Rand(excludeZero);
-                ret.Add(x);    
+                ret.vec.push_back(x);    
             }
             return ret;
+        }
+
+        // returns [p1*k^0, p2*k^-1, ..., pn*k^-n-1]
+        Elements<G1Point> MultiplyInvPowerSeq(const Scalar& k) const
+        {
+            if constexpr (std::is_same_v<T, G1Point>) {
+                Elements<G1Point> ret;
+                Scalar x(1);
+                for(size_t i = 0; i < Size(); ++i)
+                {
+                    ret.vec.push_back(vec[i] * x);
+                    x = x * k.Invert();
+                }
+                return ret;
+            } else {
+                throw std::runtime_error("Now implemented");
+            }
         }
 
         // Scalars x Scalars
@@ -181,7 +198,7 @@ class Elements {
             Elements<T> ret;
             for(size_t i = 0; i < vec.size(); ++i)
             {
-                ret.Add(vec[i] - other.vec[i]);
+                ret.vec.push_back(vec[i] - other.vec[i]);
             }
             return ret;
         }
@@ -217,7 +234,7 @@ class Elements {
             Elements<T> ret;
             for(size_t i = fromIndex; i < vec.size(); ++i)
             {
-                ret.Add(vec[i]);
+                ret.vec.push_back(vec[i]);
             }
             return ret;
         }
@@ -233,11 +250,12 @@ class Elements {
             Elements<T> ret;
             for(size_t i = 0; i < toIndex; ++i)
             {
-                ret.Add(vec[i]);
+                ret.vec.push_back(vec[i]);
             }
             return ret;
         }
 
+    private:
         std::vector<T> vec;
 };
 
