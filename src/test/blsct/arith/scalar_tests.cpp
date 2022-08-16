@@ -367,7 +367,6 @@ BOOST_AUTO_TEST_CASE(test_scalar_pow)
         Scalar b(tc.b);
         Scalar c(tc.c);
         Scalar d = a.Pow(b);
-        printf("%s ^ %s = %s\n", a.GetString(10).c_str(), b.GetString(10).c_str(), d.GetString(10).c_str());
         BOOST_CHECK(c == d);
     }
 

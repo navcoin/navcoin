@@ -157,6 +157,27 @@ BOOST_AUTO_TEST_CASE(test_elements_operator_add)
     }
 }
 
+BOOST_AUTO_TEST_CASE(test_elements_operator_sub)
+{
+    {
+        Scalars ss(std::vector<Scalar> {Scalar{7}, Scalar{6}});
+        Scalars tt(std::vector<Scalar> {Scalar{3}, Scalar{4}});
+        auto uu = ss - tt;
+
+        Scalars vv(std::vector<Scalar> {Scalar{4}, Scalar{2}});
+        BOOST_CHECK(uu == vv);
+    }
+    {
+        auto g = G1Point::GetBasePoint();
+        G1Points gg(std::vector<G1Point> {g + g + g, g + g + g + g});
+        G1Points hh(std::vector<G1Point> {g, g});
+        auto ii = gg - hh;
+
+        G1Points jj(std::vector<G1Point> {g + g, g + g + g});
+        BOOST_CHECK(ii == jj);
+    }
+}
+
 BOOST_AUTO_TEST_CASE(test_elements_operator_eq)
 {
     {
