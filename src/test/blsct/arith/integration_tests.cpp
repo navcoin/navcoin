@@ -32,9 +32,21 @@ BOOST_AUTO_TEST_CASE(test_integration_invert_zero)
 }
 
 // TODO write gg^z == gg^(ones * z)
-// BOOST_AUTO_TEST_CASE(test_integration_invert_zero)
-// {
-// }
+BOOST_AUTO_TEST_CASE(test_integration_gg_ones_times_z)
+{
+    auto z = Scalar::Rand(true);
+    auto gg = G1Points(std::vector {
+        G1Point::MapToG1("g1"),
+        G1Point::MapToG1("g2")
+    });
+    auto r1 = gg ^ z;
+
+    Scalar one(1);
+    auto ones = Scalars::RepeatN(gg.Size(), one);
+    auto r2 = gg ^ (ones * z);
+
+    BOOST_CHECK(r1 == r2);
+}
 
 bool PerformRangeProof(
     size_t n, G1Point V,
@@ -181,6 +193,7 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof)
     );
     BOOST_CHECK_EQUAL(result, true);
 }
+
 // NOTE: this test checks that the library is capable of 
 // performing required types of calculations
 //
