@@ -172,24 +172,36 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_66_67_only_h_prime)
     auto A = hh * aR;
     auto S = hh * sR;
 
-    auto hhp = G1Points(std::vector<G1Point> {
-        hh[0],
-        hh[1] * y.Invert()
-    });
-    auto yPowsInv = Scalars::FirstNInvPow(n, y);
-    auto lhs = hhp * (yPows * z + twoPows * z.Square());
-    auto rhs = hh * (ones * z + twoPows * z.Square() * yPowsInv);
+    auto hhp = hh * Scalars::FirstNInvPow(n, y);
+
+    auto P = A + S * x + hhp * (yPows * z + twoPows * z.Square());
+    auto rr = yPows * (aR + zs + sR * x) + (twoPows * z.Square()); 
+    auto hhprr = hhp * rr;
+
+    BOOST_CHECK(P == hhprr);
+}
+
+BOOST_AUTO_TEST_CASE(test_integration_range_proof_65_h_part_only)
+{
+    auto gamma = Scalar::Rand();
+    auto x = Scalar::Rand(true);
+    auto tau1 = Scalar::Rand(true);
+    auto tau2 = Scalar::Rand(true);
+
+    // rhs
+    auto g = G1Point::MapToG1("g");
+    auto h = G1Point::MapToG1("h");
+    auto V = h * gamma;
+    auto z = Scalar::Rand(true);
+    auto T1 = h * tau1; 
+    auto T2 = h * tau2; 
+    auto rhs =  V * z.Square() + T1 * x + T2 * x.Square();
+    
+    // lhs
+    auto tauX = tau2 * x.Square() + tau1 * x + z.Square() * gamma;
+    auto lhs = h * tauX;
+
     BOOST_CHECK(lhs == rhs);
-
-    // auto hhpExp = yPows * z + twoPows * z.Square();
-    // auto Pp = hhp * hhpExp;
-    // auto rhs = hh * (ones * z + twoPows * z.Square() * y.Negate());
-    // BOOST_CHECK(Pp == rhs);
-
-    // auto rr = yPows * (aR + zs + sR * x) + (twoPows * z.Square()); 
-    // auto hhprr = hhp * rr;
-
-    // BOOST_CHECK(P == hhprr);
 }
 
 bool PerformRangeProof(
@@ -249,31 +261,12 @@ bool PerformRangeProof(
     // prover sends l,r,tHat,tauX,mu to verifier
 
     // (64)
-    G1Points hh2;
-    for(size_t i = 0; i < n; ++i) {
-        Scalar ii(i);
-        auto h2 = hh[i] * y.Pow(ii.Invert());
-        hh2.Add(h2);
-    }
+    auto hhp = hh * Scalars::FirstNInvPow(n, y);
     
     // (65)
     auto deltaYz = 
         ((z - z.Square()) * (ones * yPows).Sum())
         - (z.Cube() * (ones * twoPows).Sum());
-
-    auto A1 = (gg * aL).Sum();
-    auto S1 = (gg * sL).Sum();
-    auto l1 = aL - (ones * z) + sL * x;
-    auto test0_lhs = (gg * l1).Sum();
-    auto test0_rhs = A1 - (gg * (ones * z)).Sum() + S1 * x;  
-    BOOST_CHECK(test0_lhs == test0_rhs);
-    // auto test0_lhs = tHat;
-    // auto test0_rhs = (upsilon * z.Square()) + deltaYz + (t1 * x) + (t2 * x.Square());
-    // BOOST_CHECK(test0_lhs == test0_rhs);
-
-    auto test1_lhs = h * tauX;
-    auto test1_rhs = h * (gamma * z.Square() + (tau1 * x) + (tau2 * x.Square()));
-    BOOST_CHECK(test1_lhs == test1_rhs);
 
     auto lhs_65 = g * tHat + h * tauX;
     auto rhs_65 = V * z.Square() + g * deltaYz + T1 * x + T2 * x.Square();
@@ -284,9 +277,9 @@ bool PerformRangeProof(
         A 
         + (S * x) 
         - (gg * (ones * z)).Sum() 
-        + (hh2 * (yPows * z + twoPows * z.Square())).Sum();
-    auto rhs_66_67 = h * mu + (gg * l).Sum() + (hh2 * r).Sum();
-    //BOOST_CHECK(lhs_66_67 == rhs_66_67);
+        + (hhp * (yPows * z + twoPows * z.Square())).Sum();
+    auto rhs_66_67 = h * mu + (gg * l).Sum() + (hhp * r).Sum();
+    BOOST_CHECK(lhs_66_67 == rhs_66_67);
 
     // (68)
     auto result = tHat == (l * r).Sum();
@@ -306,7 +299,7 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof)
     size_t n = aL.Size();
     auto upsilon = 9;
 
-    auto g = G1Point::MapToG1("h");
+    auto g = G1Point::MapToG1("g");
     auto h = G1Point::MapToG1("h");
 
     auto gg = G1Points(std::vector<G1Point> {

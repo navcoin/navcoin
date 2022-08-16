@@ -106,23 +106,6 @@ class Elements {
             return ret;
         }
 
-        // returns [p1*k^0, p2*k^-1, ..., pn*k^-n-1]
-        Elements<G1Point> MultiplyInvPowerSeq(const Scalar& k) const
-        {
-            if constexpr (std::is_same_v<T, G1Point>) {
-                Elements<G1Point> ret;
-                Scalar x(1);
-                for(size_t i = 0; i < Size(); ++i)
-                {
-                    ret.vec.push_back(vec[i] * x);
-                    x = x * k.Invert();
-                }
-                return ret;
-            } else {
-                throw std::runtime_error("Now implemented");
-            }
-        }
-
         // Scalars x Scalars
         // [a1, a2] * [b1, b2] = [a1*b1, a2*b2]
         //
