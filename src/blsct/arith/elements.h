@@ -66,90 +66,126 @@ class Elements {
 
         static Elements<Scalar> FirstNPow(const size_t& n, const Scalar& k)
         {
-            Elements<Scalar> temp;
-            Scalar x(1);
-            for(size_t i = 0; i < n; ++i)
-            {
-                temp.vec.push_back(x);    
-                x = x * k;
+            if constexpr (std::is_same_v<T, Scalar>) {
+                Elements<Scalar> ret;
+                Scalar x(1);
+                for(size_t i = 0; i < n; ++i)
+                {
+                    ret.Add(x);    
+                    x = x * k;
+                }
+                return ret;
+            } else {
+                throw std::runtime_error("Now implemented");
             }
-            return temp;
         }
 
-        static Elements<Scalar> RepeatN(const size_t& n, const Scalar& k)
+        static Elements<T> RepeatN(const size_t& n, const T& k)
         {
-            Elements<Scalar> temp;
+            Elements<T> ret;
             for(size_t i = 0; i < n; ++i)
             {
-                temp.vec.push_back(k);    
+                ret.vec.push_back(k);    
             }
-            return temp;
+            return ret;
         }
 
         static Elements<Scalar> RandVec(const size_t& n, const bool excludeZero = false)
         {
-            Elements<Scalar> temp;
+            Elements<Scalar> ret;
             for(size_t i = 0; i < n; ++i)
             {
                 auto x = Scalar::Rand(excludeZero);
-                temp.vec.push_back(x);    
+                ret.Add(x);    
             }
-            return temp;
+            return ret;
         }
 
+        // Scalars x Scalars
+        // [s1, s2] ^ [t1, t2] = [s1*t1, s2*t2] 
+        //
         // G1Points x Scalars
         // [p1, p2] ^ [s1, s2] = [p1*s1, p2*s2] 
-        // where * is elliptic curve scalar multiplication
-        Elements<G1Point> operator^(const Elements<Scalar>& other) const
+        Elements<T> operator^(const Elements<Scalar>& other) const
         {
             ConfirmSizesMatch(other.Size());
 
-            std::vector<G1Point> ret;
+            Elements<T> ret;
             for(size_t i = 0; i < Size(); ++i)
             {
-                ret.push_back(vec[i] * other[i]);
+                ret.vec.push_back(vec[i] * other[i]);
             }
             return ret;
         }
 
+        // Scalars x Scalar
+        // [s1, s2] ^ s = [s1*s, s2*s] 
+        //
         // G1Points x Scalar
         // [p1, p2] ^ s = [p1*s, p2*s] 
-        // where * on rhs is elliptic curve scalar multiplication
-        Elements<G1Point> operator^(const Scalar& s) const
+        Elements<T> operator^(const Scalar& s) const
         {
-            std::vector<G1Point> ret;
-            for(size_t i = 0; i < Size(); ++i)
-            {
-                ret.push_back(vec[i] * s);
+            if constexpr (std::is_same_v<T, Scalar>) {
+                Elements<Scalar> ret;
+                for(size_t i = 0; i < Size(); ++i)
+                {
+                    ret.vec.push_back(vec[i] * s);
+                }
+                return ret;
+            } else if constexpr (std::is_same_v<T, G1Point>) {
+                Elements<G1Point> ret;
+                for(size_t i = 0; i < Size(); ++i)
+                {
+                    ret.vec.push_back(vec[i] * s);
+                }
+                return ret;
+            } else {
+                throw std::runtime_error("Now implemented");
             }
-            return ret;
         }
 
         // Scalars x Scalars
         // [a1, a2] * [b1, b2] = [a1*b1, a2*b2]
         Elements<Scalar> operator*(const Elements<Scalar>& other) const
         {
-            ConfirmSizesMatch(other.Size());
+            if constexpr (std::is_same_v<T, Scalar>) {
+                ConfirmSizesMatch(other.Size());
 
-            std::vector<Scalar> ret;
-            for(size_t i = 0; i < vec.size(); ++i)
-            {
-                ret.push_back(vec[i] * other[i]);
+                Elements<Scalar> ret;
+                for(size_t i = 0; i < vec.size(); ++i)
+                {
+                    ret.vec.push_back(vec[i] * other[i]);
+                }
+                return ret;
+            } else {
+                throw std::runtime_error("Now implemented");
             }
-            return ret;
         }
         
         // Scalars x Scalar
         // [s1, s2] * t = [s1*t, s2*t] 
-        // where * on rhs is scalar multiplication
-        Elements<Scalar> operator*(const Scalar& s) const
+        //
+        // G1Points x Scalar
+        // [p1, p2] ^ s = [p1*s, p2*s] 
+        Elements<T> operator*(const Scalar& s) const
         {
-            std::vector<Scalar> ret;
-            for(size_t i = 0; i < vec.size(); ++i)
-            {
-                ret.push_back(vec[i] * s);
+            if constexpr (std::is_same_v<T, Scalar>) {
+                Elements<Scalar> ret;
+                for(size_t i = 0; i < vec.size(); ++i)
+                {
+                    ret.vec.push_back(vec[i] * s);
+                }
+                return ret;
+            } else if constexpr (std::is_same_v<T, G1Point>) {
+                Elements<G1Point> ret;
+                for(size_t i = 0; i < vec.size(); ++i)
+                {
+                    ret.vec.push_back(vec[i] * s);
+                }
+                return ret;
+            } else {
+                throw std::runtime_error("Now implemented");
             }
-            return ret;
         }
 
         // [p1, p2] + [q1, q2] = [p1+q1, p2+q2] 
@@ -157,10 +193,10 @@ class Elements {
         {
             ConfirmSizesMatch(other.Size());
 
-            std::vector<T> ret;
+            Elements<T> ret;
             for(size_t i = 0; i < vec.size(); ++i)
             {
-                ret.push_back(vec[i] + other.vec[i]);
+                ret.Add(vec[i] + other.vec[i]);
             }
             return ret;
         }
@@ -170,10 +206,10 @@ class Elements {
         {
             ConfirmSizesMatch(other.Size());
 
-            std::vector<T> ret;
+            Elements<T> ret;
             for(size_t i = 0; i < vec.size(); ++i)
             {
-                ret.push_back(vec[i] - other.vec[i]);
+                ret.Add(vec[i] - other.vec[i]);
             }
             return ret;
         }
@@ -206,10 +242,10 @@ class Elements {
                 throw std::runtime_error("from index out of range");
             }
 
-            std::vector<T> ret;
+            Elements<T> ret;
             for(size_t i = fromIndex; i < vec.size(); ++i)
             {
-                ret.push_back(vec[i]);
+                ret.Add(vec[i]);
             }
             return ret;
         }
@@ -222,15 +258,14 @@ class Elements {
                 throw std::runtime_error("to index out of range");
             }
 
-            std::vector<T> ret;
+            Elements<T> ret;
             for(size_t i = 0; i < toIndex; ++i)
             {
-                ret.push_back(vec[i]);
+                ret.Add(vec[i]);
             }
             return ret;
         }
 
-    private:
         std::vector<T> vec;
 };
 
