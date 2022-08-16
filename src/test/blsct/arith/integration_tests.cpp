@@ -189,7 +189,6 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_65_h_part_only)
     auto tau2 = Scalar::Rand(true);
 
     // rhs
-    auto g = G1Point::MapToG1("g");
     auto h = G1Point::MapToG1("h");
     auto V = h * gamma;
     auto z = Scalar::Rand(true);
@@ -200,6 +199,56 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_65_h_part_only)
     // lhs
     auto tauX = tau2 * x.Square() + tau1 * x + z.Square() * gamma;
     auto lhs = h * tauX;
+
+    BOOST_CHECK(lhs == rhs);
+}
+
+BOOST_AUTO_TEST_CASE(test_integration_range_proof_65_g_part_only)
+{
+    auto n = 2;
+
+    auto x = Scalar::Rand(true);
+    auto y = Scalar::Rand(true);
+    auto z = Scalar::Rand(true);
+    auto upsilon = 2;
+
+    Scalar one(1);
+    Scalar two(2);
+    auto ones = Scalars::FirstNPow(n, one);
+    auto twoPows = Scalars::FirstNPow(n, two);
+    auto yPows = Scalars::FirstNPow(n, y);
+    auto zs = Scalars::RepeatN(n, z);
+
+    Scalars aL(std::vector<Scalar> {
+        Scalar {0}, 
+        Scalar {1}
+    });
+    auto aR = aL - ones;
+    auto sL = Scalars::RandVec(n);
+    auto sR = Scalars::RandVec(n);
+
+    auto l = (aL - ones * z) + sL * x;
+    auto r = yPows * (aR + ones * z + sR * x) + twoPows * z.Square();
+    auto tHat = (l * r).Sum();
+
+    auto g = G1Point::MapToG1("g");
+    
+    auto V = g * upsilon;
+    auto deltaYz = 
+        ((z - z.Square()) * (ones * yPows).Sum())
+        - (z.Cube() * (ones * twoPows).Sum());
+
+    auto t1 = (sL * (yPows * (aR + zs)) + twoPows * z.Square()).Sum();
+    auto t2 = (sL * (yPows * sR)).Sum();
+
+    auto T1 = g * t1; 
+    auto T2 = g * t2; 
+
+    // rhs
+    auto lhs = g * tHat;
+
+    // lhs
+    auto rhs = V * z.Square() + g * deltaYz + T1 * x + T2 * x.Square();
 
     BOOST_CHECK(lhs == rhs);
 }
@@ -233,7 +282,7 @@ bool PerformRangeProof(
     auto y = Scalar::Rand(true);
     auto z = Scalar::Rand(true);
     auto yPows = Scalars::FirstNPow(n, y);  
-    auto zs = Scalars::RepeatN(n, z);  
+    auto zs = Scalars::RepeatN(n, z);
 
     // prover computes
     auto tau1 = Scalar::Rand(true);
