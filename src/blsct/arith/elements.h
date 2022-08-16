@@ -80,6 +80,11 @@ class Elements {
             }
         }
 
+        static Elements<Scalar> FirstNInvPow(const size_t& n, const Scalar& k)
+        {
+            return FirstNPow(n, k.Invert());
+        }
+
         static Elements<T> RepeatN(const size_t& n, const T& k)
         {
             Elements<T> ret;

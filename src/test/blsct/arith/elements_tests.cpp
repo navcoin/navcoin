@@ -278,6 +278,18 @@ BOOST_AUTO_TEST_CASE(test_elements_first_n_pow)
     BOOST_CHECK(pows[2] == p3);
 }
 
+BOOST_AUTO_TEST_CASE(test_elements_first_n_inv_pow)
+{
+    Scalar k(3);
+    auto pows = Scalars::FirstNPow(3, k);
+    auto invPows = Scalars::FirstNInvPow(3, k);
+    auto r = pows * invPows;
+    Scalar one(1); 
+    BOOST_CHECK(r[0] == one);
+    BOOST_CHECK(r[1] == one);
+    BOOST_CHECK(r[2] == one);
+}
+
 BOOST_AUTO_TEST_CASE(test_elements_repeat_n)
 {
     Scalar k(3);
