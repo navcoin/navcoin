@@ -207,7 +207,6 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_65_g_part_only_excl_ts)
 {
     auto n = 2;
 
-    auto x = Scalar::Rand(true);
     auto y = Scalar::Rand(true);
     auto z = Scalar::Rand(true);
     auto upsilon = 2;
@@ -230,6 +229,11 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_65_g_part_only_excl_ts)
     auto l = aL - oneN * z;  // (39)
     auto r = yN * (aR + oneN * z) + twoN * z.Square();  // (39)
     auto tHat = (l * r).Sum();
+
+    auto l0 = aL - oneN * z;
+    auto r0 = yN * (aR + oneN * z) + twoN *  z.Square();
+    auto lrEquiv = (l0 * r0).Sum();
+    BOOST_CHECK(tHat == lrEquiv);
 
     auto g = G1Point::MapToG1("g");
     
@@ -270,19 +274,18 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_65_g_part_ts_only)
     auto sL = Scalars::RandVec(n);
     auto sR = Scalars::RandVec(n);
 
-    //auto l0 = (aL - ones * z) + twoPows * z.Square();
     auto l1 = sL;
     auto r0 = yN * (aR + oneN * z) + twoN *  z.Square();
     auto r1 = yN * sR;
 
-    // t(x) = <l0, r0> + <l1, r0> * x + <l1, r1> * x^2
     auto tHat = (l1 * r0).Sum() * x + (l1 * r1).Sum() * x.Square();
+
+    // t(x) = <l0, r0> + <l1, r0> * x + <l1, r1> * x^2
+    auto t1 = (l1 * r0).Sum();
+    auto t2 = (l1 * r1).Sum();
 
     auto g = G1Point::MapToG1("g");
     
-    auto t1 = (l1 * r0).Sum(); // (sL * (yPows * (aR + zs)) + twoPows * z.Square()).Sum();
-    auto t2 = (l1 * r1).Sum(); // (sL * (yPows * sR)).Sum();
-
     auto T1 = g * t1; 
     auto T2 = g * t2; 
 
@@ -319,38 +322,38 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_65_g_part_only)
     auto sL = Scalars::RandVec(n);
     auto sR = Scalars::RandVec(n);
 
-    auto l0 = (aL - oneN * z) + twoN * z.Square();
+    auto l0 = (aL - oneN * z);
     auto l1 = sL;
     auto r0 = yN * (aR + oneN * z) + twoN *  z.Square();
     auto r1 = yN * sR;
 
-    auto l = (aL - oneN * z) + sL * x;
-    auto r = yN * (aR + oneN * z + sR * x) + twoN * z.Square();
-    auto tHat = (l * r).Sum();
+    // lhs
+
+    // tHat = <l,r> = t(x) = <l0, r0> + <l1, r0> * x + <l1, r1> * x^2
+    auto t0 = (l0 * r0).Sum();
+    auto t1 = (l1 * r0).Sum();
+    auto t2 = (l1 * r1).Sum();
+    auto tHat = t0 + t1 * x + t2 * x.Square();
 
     auto g = G1Point::MapToG1("g");
     
+    auto lhs = g * tHat;
+
+    // rhs
+    auto T1 = g * t1; 
+    auto T2 = g * t2; 
+
     auto V = g * upsilon;
     auto deltaYz = 
         ((z - z.Square()) * (oneN * yN).Sum())
         - (z.Cube() * (oneN * twoN).Sum());
 
-    auto t1 = (sL * (yN * (aR + zs)) + twoN * z.Square()).Sum();
-    auto t2 = (sL * (yN * sR)).Sum();
-
-    auto T1 = g * t1; 
-    auto T2 = g * t2; 
-
-    // lhs
-    auto lhs = g * tHat;
-
-    // rhs
     auto rhs = V * z.Square() + g * deltaYz + T1 * x + T2 * x.Square();
 
-    //BOOST_CHECK(lhs == rhs);
+    BOOST_CHECK(lhs == rhs);
 }
 
-bool PerformRangeProof(
+void PerformRangeProof(
     size_t n, G1Point V,
     Scalar upsilon, Scalar gamma,
     G1Point g, G1Point h, 
@@ -358,7 +361,7 @@ bool PerformRangeProof(
     Scalars aL
 )
 {
-    // Prover on input upsilon, gamma computes
+    // on input upsilon and gamma, prover computes
     Scalar one(1);
     Scalar two(2);
     auto oneN = Scalars::FirstNPow(n, one);
@@ -378,17 +381,23 @@ bool PerformRangeProof(
     // verifier selects challenge points y,z and send to prover
     auto y = Scalar::Rand(true);
     auto z = Scalar::Rand(true);
+
+    // define vector ploynomials l(x), r(x) and t(x)
+    // t(x) = <l(x),r(x)> = <l0, r0> + <l1, r0> * x + <l1, r1> * x^2
     auto yN = Scalars::FirstNPow(n, y);  
     auto zs = Scalars::RepeatN(n, z);
+    auto l0 = (aL - oneN * z);
+    auto l1 = sL;
+    auto r0 = yN * (aR + oneN * z) + twoN *  z.Square();
+    auto r1 = yN * sR;
+
+    auto t0 = (l0 * r0).Sum();
+    auto t1 = (l1 * r0).Sum();
+    auto t2 = (l1 * r1).Sum();
 
     // prover computes
     auto tau1 = Scalar::Rand(true);
     auto tau2 = Scalar::Rand(true);
-    
-    // t1 = <l0, r0>, t2 = <l1, r1>
-    auto t1 = (sL * (yN * (aR + zs)) + twoN * z.Square()).Sum();
-    auto t2 = (sL * (yN * sR)).Sum();
-
     auto T1 = g * t1 + h * tau1;
     auto T2 = g * t2 + h * tau2;
 
@@ -398,9 +407,9 @@ bool PerformRangeProof(
     auto x = Scalar::Rand(true);
 
     // prover computes
-    auto l = (aL - oneN * z) + sL * x;
-    auto r = yN * (aR + oneN * z + sR * x) + twoN * z.Square();
-    auto tHat = (l * r).Sum();
+
+    // tHat = <l,r> = t(x)
+    auto tHat = t0 + t1 * x + t2 * x.Square();
     auto tauX = tau2 * x.Square() + tau1 * x + z.Square() * gamma;
     auto mu = alpha + rho * x;
 
@@ -416,9 +425,12 @@ bool PerformRangeProof(
 
     auto lhs_65 = g * tHat + h * tauX;
     auto rhs_65 = V * z.Square() + g * deltaYz + T1 * x + T2 * x.Square();
-    //BOOST_CHECK(lhs_65 == rhs_65);
+    BOOST_CHECK(lhs_65 == rhs_65);
     
     // (66), (67)
+    auto l = (aL - oneN * z) + sL * x;
+    auto r = yN * (aR + oneN * z + sR * x) + twoN * z.Square();
+
     auto lhs_66_67 = 
         A 
         + (S * x) 
@@ -428,9 +440,8 @@ bool PerformRangeProof(
     BOOST_CHECK(lhs_66_67 == rhs_66_67);
 
     // (68)
-    auto result = tHat == (l * r).Sum();
-
-    return result;
+    auto rhs_68 = (l * r).Sum();
+    BOOST_CHECK(tHat == rhs_68);
 }
 
 BOOST_AUTO_TEST_CASE(test_integration_range_proof)
@@ -463,14 +474,13 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof)
 
     auto V = h * gamma + g * upsilon;
 
-    auto result = PerformRangeProof(
+    PerformRangeProof(
         n, V, 
         upsilon, gamma,
         g, h, 
         gg, hh,
         aL
     );
-    BOOST_CHECK_EQUAL(result, true);
 }
 
 // NOTE: this test checks that the library is capable of 
