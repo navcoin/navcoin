@@ -267,27 +267,27 @@ BOOST_AUTO_TEST_CASE(test_elements_from)
 
 BOOST_AUTO_TEST_CASE(test_elements_first_n_pow)
 {
-    Scalar k(3);
-    auto pows = Scalars::FirstNPow(3, k);
-    Scalar p1(1);
-    Scalar p2(3);
-    Scalar p3(9);
-    BOOST_CHECK(pows.Size() == 3);
-    BOOST_CHECK(pows[0] == p1);
-    BOOST_CHECK(pows[1] == p2);
-    BOOST_CHECK(pows[2] == p3);
-}
-
-BOOST_AUTO_TEST_CASE(test_elements_first_n_inv_pow)
-{
-    Scalar k(3);
-    auto pows = Scalars::FirstNPow(3, k);
-    auto invPows = Scalars::FirstNInvPow(3, k);
-    auto r = pows * invPows;
-    Scalar one(1); 
-    BOOST_CHECK(r[0] == one);
-    BOOST_CHECK(r[1] == one);
-    BOOST_CHECK(r[2] == one);
+    {
+        Scalar k(3);
+        auto pows = Scalars::FirstNPow(3, k);
+        Scalar p1(1);
+        Scalar p2(3);
+        Scalar p3(9);
+        BOOST_CHECK(pows.Size() == 3);
+        BOOST_CHECK(pows[0] == p1);
+        BOOST_CHECK(pows[1] == p2);
+        BOOST_CHECK(pows[2] == p3);
+    }
+    {
+        Scalar k(3);
+        auto pows = Scalars::FirstNPow(3, k);
+        auto invPows = Scalars::FirstNPow(3, k.Invert());
+        auto r = pows * invPows;
+        Scalar one(1); 
+        BOOST_CHECK(r[0] == one);
+        BOOST_CHECK(r[1] == one);
+        BOOST_CHECK(r[2] == one);
+    }
 }
 
 BOOST_AUTO_TEST_CASE(test_elements_repeat_n)
