@@ -443,7 +443,7 @@ void PerformRangeProof(
     auto zs = Scalars::RepeatN(n, z);
     auto l0 = (aL - oneN * z);
     auto l1 = sL;
-    auto r0 = yN * (aR + oneN * z) + twoN *  z.Square();
+    auto r0 = yN * (aR + oneN * z) + twoN * z.Square();
     auto r1 = yN * sR;
 
     auto t0 = (l0 * r0).Sum();
