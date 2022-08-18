@@ -474,7 +474,7 @@ bool RangeProof(
 
     // prover sends T1,T2 to verifier
 
-    // verifier select random challenge x and selnd to prover
+    // verifier select random challenge x and send to prover
     auto x = Scalar::Rand(true);
 
     // prover computes
