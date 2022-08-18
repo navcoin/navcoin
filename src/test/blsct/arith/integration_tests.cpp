@@ -408,7 +408,7 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_65_g_part_only)
 //     // BOOST_CHECK(tHat == rhs_68);
 // }
 
-void PerformRangeProof(
+bool PerformRangeProof(
     size_t n, G1Point V,
     Scalar upsilon, Scalar gamma,
     G1Point g, G1Point h, 
@@ -480,7 +480,7 @@ void PerformRangeProof(
 
     auto lhs_65 = g * tHat + h * tauX;
     auto rhs_65 = V * z.Square() + g * deltaYz + T1 * x + T2 * x.Square();
-    BOOST_CHECK(lhs_65 == rhs_65);
+    if (lhs_65 != rhs_65) return false;
     
     // (66), (67)
     auto l = (aL - oneN * z) + sL * x;
@@ -492,11 +492,12 @@ void PerformRangeProof(
         - (gg * (oneN * z)).Sum() 
         + (hhp * (yN * z + twoN * z.Square())).Sum();
     auto rhs_66_67 = h * mu + (gg * l).Sum() + (hhp * r).Sum();
-    BOOST_CHECK(lhs_66_67 == rhs_66_67);
+    if (lhs_66_67 != rhs_66_67) return false;
 
     // (68)
     auto rhs_68 = (l * r).Sum();
-    BOOST_CHECK(tHat == rhs_68);
+
+    return tHat == rhs_68;
 }
 
 BOOST_AUTO_TEST_CASE(test_integration_range_proof)
@@ -529,13 +530,14 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof)
 
     auto V = h * gamma + g * upsilon;
 
-    PerformRangeProof(
+    auto res = PerformRangeProof(
         n, V, 
         upsilon, gamma,
         g, h, 
         gg, hh,
         aL
     );
+    BOOST_CHECK(res == true);
 }
 
 // NOTE: this test checks that the library is capable of 
