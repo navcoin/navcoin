@@ -536,7 +536,7 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof)
         Scalar {1}
     });
     size_t n = aL.Size();
-    auto upsilon = 9;
+    Scalar upsilon(9);
 
     auto g = G1Point::MapToG1("g");
     auto h = G1Point::MapToG1("h");
