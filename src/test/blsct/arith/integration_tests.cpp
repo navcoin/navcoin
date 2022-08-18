@@ -457,7 +457,7 @@ bool RangeProof(
     // t(x) = <l(x),r(x)> = <l0, r0> + (<l1, r0> + <l0, r1>) * x + <l1, r1> * x^2
     auto yN = Scalars::FirstNPow(n, y);  
     auto zs = Scalars::RepeatN(n, z);
-    auto l0 = (aL - oneN * z);
+    auto l0 = aL - oneN * z;
     auto l1 = sL;
     auto r0 = yN * (aR + oneN * z) + twoN * z.Square();
     auto r1 = yN * sR;
