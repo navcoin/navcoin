@@ -353,67 +353,83 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_65_g_part_only)
     BOOST_CHECK(lhs == rhs);
 }
 
-// BOOST_AUTO_TEST_CASE(test_integration_range_proof_play_ground)
-// {
-//     auto n = 2;
+// prover and verifier know:
+// g, h, u, P
+//
+// for a given P, prover proves that it has vectors a, b s.t. 
+// P = g^a h^b u^<a,b>
+bool InnerProductArgument(
+    const size_t& n,
+    const G1Points& gg, const G1Points& hh, 
+    const G1Point& u, const G1Point& P,
+    const Scalars& a, const Scalars& b
+)
+{
+    if (n == 1)
+    {
+        auto c = (a * b).Sum();
+        return P == (gg * a).Sum() + (hh * b).Sum() + u * c;
+    }
+    else
+    {
+        auto np = n / 2;
 
-//     auto x = Scalar::Rand(true);
-//     auto y = Scalar::Rand(true);
-//     auto z = Scalar::Rand(true);
-//     auto upsilon = 2;
+        auto cL = (a.To(np) * b.From(np)).Sum();
+        auto cR = (a.From(np) * b.To(np)).Sum();
 
-//     Scalar one(1);
-//     Scalar two(2);
-//     auto oneN = Scalars::FirstNPow(n, one);
-//     auto twoN = Scalars::FirstNPow(n, two);
-//     auto yN = Scalars::FirstNPow(n, y);
-//     auto zs = Scalars::RepeatN(n, z);
+        auto L = (gg.From(np) * a.To(np)).Sum() + (hh.To(np) * b.From(np)).Sum() + u * cL;
+        auto R = (gg.To(np) * a.From(np)).Sum() + (hh.From(np) * b.To(np)).Sum() + u * cR;
 
-//     Scalars aL(std::vector<Scalar> {
-//         Scalar {0}, 
-//         Scalar {1}
-//     });
-//     auto aR = aL - oneN;
-//     auto sL = Scalars::RandVec(n);
-//     auto sR = Scalars::RandVec(n);
+        auto x = Scalar::Rand(true);
 
-//     auto l0 = (aL - oneN * z);
-//     auto l1 = sL;
-//     auto r0 = yN * (aR + oneN * z) + twoN * z.Square();
-//     auto r1 = yN * sR;
+        auto ggp = (gg.To(np) * x.Invert()) + (gg.From(np) * x);
+        auto hhp = (hh.To(np) * x) + (hh.From(np) * x.Invert());
 
-//     // lhs
+        auto Pp = L * x.Square() + P + (R * x.Square().Invert());
 
-//     // tHat = <l,r> = t(x) = <l0, r0> + <l1, r0> * x + <l1, r1> * x^2
-//     auto t0 = (l0 * r0).Sum();
-//     auto t1 = (l1 * r0).Sum() + (l0 * r1).Sum();
-//     auto t2 = (l1 * r1).Sum();
+        auto ap = a.To(np) * x + a.From(np) * x.Invert();  // aa in Z^nn
+        auto bp = b.To(np) * x.Invert() + b.From(np) * x;  // bb in Z^nn
 
-//     auto tHat = t0 + t1 * x + t2 * x.Square();
+        return InnerProductArgument(np, ggp, hhp, u, Pp, ap, bp);
+    }
+}
 
-//     auto g = G1Point::MapToG1("g");
-    
-//     auto lhs = g * tHat;
+BOOST_AUTO_TEST_CASE(test_integration_inner_product_argument)
+{
+    auto n = 2;
 
-//     auto l = (aL - oneN * z + sL * x);
-//     auto r = yN * (aR + oneN * z + sR * x) + twoN * z.Square();
-//     auto lr = (l * r).Sum();
-//     BOOST_CHECK(tHat == lr);
+    auto gg = G1Points(std::vector {
+        G1Point::MapToG1("g1"),
+        G1Point::MapToG1("g2")
+    });
+    auto hh = G1Points(std::vector {
+        G1Point::MapToG1("h1"),
+        G1Point::MapToG1("h2")
+    });
+    auto u = G1Point::MapToG1("u");
 
-//     // auto l = (aL - oneN * z) + sL * x;
-//     // auto r = yN * (aR + oneN * z + sR * x) + twoN * z.Square();
+    // a, b are Scalar vectors
+    Scalars a(std::vector<Scalar> { Scalar {2}, Scalar {3} });
+    Scalars b(std::vector<Scalar> { Scalar {5}, Scalar {7} });
 
-//     // (68)
-//     // auto rhs_68 = (l * r).Sum();
-//     // BOOST_CHECK(tHat == rhs_68);
-// }
+    auto P = (gg * a).Sum() + (hh * b).Sum() + u * (a * b).Sum();
 
-bool PerformRangeProof(
+    auto res = InnerProductArgument(
+        n,
+        gg, hh, 
+        u, P,
+        a, b
+    );
+    BOOST_CHECK_EQUAL(res, true);
+}
+
+bool RangeProof(
     size_t n, G1Point V,
     Scalar upsilon, Scalar gamma,
     G1Point g, G1Point h, 
     G1Points gg, G1Points hh,
-    Scalars aL
+    Scalars aL,
+    bool useInnerProductArgument
 )
 {
     // on input upsilon and gamma, prover computes
@@ -486,18 +502,28 @@ bool PerformRangeProof(
     auto l = (aL - oneN * z) + sL * x;
     auto r = yN * (aR + oneN * z + sR * x) + twoN * z.Square();
 
-    auto lhs_66_67 = 
+    auto P = 
         A 
         + (S * x) 
         - (gg * (oneN * z)).Sum() 
         + (hhp * (yN * z + twoN * z.Square())).Sum();
-    auto rhs_66_67 = h * mu + (gg * l).Sum() + (hhp * r).Sum();
-    if (lhs_66_67 != rhs_66_67) return false;
 
-    // (68)
-    auto rhs_68 = (l * r).Sum();
+    if (useInnerProductArgument) 
+    {
+        auto u = G1Point::Rand();
+        auto Pp = P + h * mu.Negate() + u * (l * r).Sum();
+        return InnerProductArgument(n, gg, hhp, u, Pp, l, r);
+    } 
+    else 
+    {
+        auto rhs_66_67 = h * mu + (gg * l).Sum() + (hhp * r).Sum();
+        if (P != rhs_66_67) return false;
 
-    return tHat == rhs_68;
+        // (68)
+        auto rhs_68 = (l * r).Sum();
+
+        return tHat == rhs_68;
+    }
 }
 
 BOOST_AUTO_TEST_CASE(test_integration_range_proof)
@@ -530,129 +556,18 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof)
 
     auto V = h * gamma + g * upsilon;
 
-    auto res = PerformRangeProof(
-        n, V, 
-        upsilon, gamma,
-        g, h, 
-        gg, hh,
-        aL
-    );
-    BOOST_CHECK(res == true);
-}
-
-// NOTE: this test checks that the library is capable of 
-// performing required types of calculations
-//
-// prover and verifier know:
-// g, h, c, P
-//
-// then prover convinces verifier that the prover knows a,b s.t.
-// P = g^a h^b and c = <a,b>
-//
-BOOST_AUTO_TEST_CASE(test_integration_simplest_inner_product)
-{
-    //////////
-    // setup
-
-    auto g = G1Point::MapToG1("g");
-    auto h = G1Point::MapToG1("h");
-
-    Scalars a(std::vector<Scalar> { Scalar {2}, Scalar {3} });
-    Scalars b(std::vector<Scalar> { Scalar {5}, Scalar {7} });
-
-    auto P = (g * a.Sum()) + (h * b.Sum());
-    auto c = (a * b).Sum(); 
-
-    //////////
-    // proof
-
-    auto proofP = (g * a.Sum()) + (h * b.Sum());
-    auto proofC = (a * b).Sum(); 
-
-    /////////////////
-    // verification
-
-    BOOST_CHECK(P == proofP);
-    BOOST_CHECK(c == proofC);
-}
-
-bool PerformImprovedInnerProductProof(
-    const size_t& n,
-    const G1Points& g, const G1Points& h, 
-    const G1Point& u, const G1Point& P,
-    const Scalars& a, const Scalars& b
-)
-{
-    if (n == 1)
+    for(auto i = 0; i < 2; ++i)
     {
-        auto c = (a * b).Sum();
-        return P == (g * a).Sum() + (h * b).Sum() + u * c;
-    }
-    else
-    {
-        auto nn = n / 2;
+        auto testCaseBool = i != 0;
+        auto res = RangeProof(
+            n, V, 
+            upsilon, gamma,
+            g, h, 
+            gg, hh,
+            aL,
+            testCaseBool
+        );
+        BOOST_CHECK(res == true);
 
-        auto cL = (a.To(nn) * b.From(nn)).Sum();
-        auto cR = (a.From(nn) * b.To(nn)).Sum();
-
-        auto L = (g.From(nn) * a.To(nn)).Sum() + (h.To(nn) * b.From(nn)).Sum() + u * cL;
-        auto R = (g.To(nn) * a.From(nn)).Sum() + (h.From(nn) * b.To(nn)).Sum() + u * cR;
-
-        auto x = Scalar::Rand(true);
-
-        auto gg = (g.To(nn) * x.Invert()) + (g.From(nn) * x);  // gg in G^nn
-        auto hh = (h.To(nn) * x) + (h.From(nn) * x.Invert());  // hh in G^nn
-
-        auto PP = L * x.Square() + P + (R * x.Square().Invert());
-
-        auto aa = a.To(nn) * x + a.From(nn) * x.Invert();  // aa in Z^nn
-        auto bb = b.To(nn) * x.Invert() + b.From(nn) * x;  // bb in Z^nn
-
-        return PerformImprovedInnerProductProof(nn, gg, hh, u, PP, aa, bb);
-    }
-}
-
-// NOTE: this test checks that the library is capable of 
-// performing required types of calculations. 
-//
-// prover and verifier know:
-// g, h, u, P
-//
-// for a given P, prover proves that it has vectors a, b s.t. 
-// P = g^a h^b u^<a,b>
-//
-BOOST_AUTO_TEST_CASE(test_integration_improved_inner_product)
-{
-    //////////
-    // setup
-
-    auto g = G1Points(std::vector {
-        G1Point::MapToG1("g1"),
-        G1Point::MapToG1("g2")
-    });
-    auto h = G1Points(std::vector {
-        G1Point::MapToG1("h1"),
-        G1Point::MapToG1("h2")
-    });
-    auto u = G1Point::MapToG1("u");
-
-    // not equal to the actual P
-    auto P = G1Point::GetBasePoint();
-
-    // a, b are Scalar vectors
-    Scalars a(std::vector<Scalar> { Scalar {2}, Scalar {3} });
-    Scalars b(std::vector<Scalar> { Scalar {5}, Scalar {7} });
-
-    size_t n = 2;
-
-    //////////
-    // proof
-    auto result = PerformImprovedInnerProductProof(
-        n,
-        g, h, 
-        u, P,
-        a, b
-    );
-    // 
-    BOOST_CHECK_EQUAL(result, false);  // since P is bad, the result should be false
+    }   
 }
