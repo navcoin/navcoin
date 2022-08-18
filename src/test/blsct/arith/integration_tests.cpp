@@ -387,8 +387,8 @@ bool InnerProductArgument(
 
         auto Pp = L * x.Square() + P + (R * x.Square().Invert());
 
-        auto ap = a.To(np) * x + a.From(np) * x.Invert();  // aa in Z^nn
-        auto bp = b.To(np) * x.Invert() + b.From(np) * x;  // bb in Z^nn
+        auto ap = a.To(np) * x + a.From(np) * x.Invert();
+        auto bp = b.To(np) * x.Invert() + b.From(np) * x;
 
         return InnerProductArgument(np, ggp, hhp, u, Pp, ap, bp);
     }
