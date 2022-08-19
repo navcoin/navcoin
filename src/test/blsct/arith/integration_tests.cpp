@@ -216,7 +216,6 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_65_g_part_only_excl_ts)
     auto oneN = Scalars::FirstNPow(n, one);
     auto twoN = Scalars::FirstNPow(n, two);
     auto yN = Scalars::FirstNPow(n, y);
-    auto zs = Scalars::RepeatN(n, z);
 
     Scalars aL(std::vector<Scalar> {
         Scalar {0}, 
@@ -264,7 +263,6 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_65_g_part_ts_only)
     auto oneN = Scalars::FirstNPow(n, one);
     auto twoN = Scalars::FirstNPow(n, two);
     auto yN = Scalars::FirstNPow(n, y);
-    auto zs = Scalars::RepeatN(n, z);
 
     Scalars aL(std::vector<Scalar> {
         Scalar {0}, 
@@ -312,7 +310,6 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_65_g_part_only)
     auto oneN = Scalars::FirstNPow(n, one);
     auto twoN = Scalars::FirstNPow(n, two);
     auto yN = Scalars::FirstNPow(n, y);
-    auto zs = Scalars::RepeatN(n, z);
 
     Scalars aL(std::vector<Scalar> {
         Scalar {0}, 
@@ -424,8 +421,7 @@ BOOST_AUTO_TEST_CASE(test_integration_inner_product_argument)
 }
 
 bool RangeProof(
-    size_t n, G1Point V,
-    Scalar upsilon, Scalar gamma,
+    size_t n, G1Point V, Scalar gamma,
     G1Point g, G1Point h, 
     G1Points gg, G1Points hh,
     Scalars aL,
@@ -456,7 +452,6 @@ bool RangeProof(
     // define vector ploynomials l(x), r(x) and t(x)
     // t(x) = <l(x),r(x)> = <l0, r0> + (<l1, r0> + <l0, r1>) * x + <l1, r1> * x^2
     auto yN = Scalars::FirstNPow(n, y);  
-    auto zs = Scalars::RepeatN(n, z);
     auto l0 = (aL - oneN * z);
     auto l1 = sL;
     auto r0 = yN * (aR + oneN * z) + twoN * z.Square();
@@ -560,8 +555,7 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof)
     {
         auto testCaseBool = i != 0;
         auto res = RangeProof(
-            n, V, 
-            upsilon, gamma,
+            n, V, gamma,
             g, h, 
             gg, hh,
             aL,
