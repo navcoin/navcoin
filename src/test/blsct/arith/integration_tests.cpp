@@ -452,7 +452,7 @@ bool RangeProof(
     // define vector ploynomials l(x), r(x) and t(x)
     // t(x) = <l(x),r(x)> = <l0, r0> + (<l1, r0> + <l0, r1>) * x + <l1, r1> * x^2
     auto yN = Scalars::FirstNPow(n, y);  
-    auto l0 = (aL - oneN * z);
+    auto l0 = aL - oneN * z;
     auto l1 = sL;
     auto r0 = yN * (aR + oneN * z) + twoN * z.Square();
     auto r1 = yN * sR;
@@ -469,7 +469,7 @@ bool RangeProof(
 
     // prover sends T1,T2 to verifier
 
-    // verifier select random challenge x and selnd to prover
+    // verifier select random challenge x and send to prover
     auto x = Scalar::Rand(true);
 
     // prover computes
@@ -531,7 +531,7 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof)
         Scalar {1}
     });
     size_t n = aL.Size();
-    auto upsilon = 9;
+    Scalar upsilon(9);
 
     auto g = G1Point::MapToG1("g");
     auto h = G1Point::MapToG1("h");
