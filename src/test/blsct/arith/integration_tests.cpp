@@ -4,17 +4,16 @@
 //
 #include <test/util/setup_common.h>
 
-#include <boost/test/unit_test.hpp>
-#include <blsct/arith/g1point.h>
-#include <blsct/arith/scalar.h>
-#include <blsct/arith/mcl_initializer.h>
-#include <blsct/arith/elements.h>
 #include <algorithm>
+#include <blsct/arith/elements.h>
+#include <blsct/arith/g1point.h>
+#include <blsct/arith/mcl_initializer.h>
+#include <blsct/arith/scalar.h>
+#include <boost/test/unit_test.hpp>
 #include <set>
 #include <streams.h>
 
-struct BlsctArithIntegrationTests 
-{
+struct BlsctArithIntegrationTests {
     BlsctArithIntegrationTests()
     {
         MclInitializer::Init();
@@ -35,10 +34,9 @@ BOOST_AUTO_TEST_CASE(test_integration_invert_zero)
 BOOST_AUTO_TEST_CASE(test_integration_gg_ones_times_z)
 {
     auto z = Scalar::Rand(true);
-    auto gg = G1Points(std::vector<G1Point> {
+    auto gg = G1Points(std::vector<G1Point>{
         G1Point::MapToG1("g1"),
-        G1Point::MapToG1("g2")
-    });
+        G1Point::MapToG1("g2")});
     auto r1 = gg * z;
 
     Scalar one(1);
@@ -56,7 +54,7 @@ BOOST_AUTO_TEST_CASE(test_integration_offset_by_negation)
 
         auto r1 = basis - z;
         auto r2 = basis + z.Negate();
-        
+
         BOOST_CHECK(r1 == r2);
     }
     {
@@ -66,12 +64,12 @@ BOOST_AUTO_TEST_CASE(test_integration_offset_by_negation)
 
         auto r1 = g * (basis - z);
         auto r2 = g * (basis + z.Negate());
-        
+
         BOOST_CHECK(r1 == r2);
     }
 }
 
-// (66), (67) of the range proof excluding (h') part  
+// (66), (67) of the range proof excluding (h') part
 BOOST_AUTO_TEST_CASE(test_integration_range_proof_66_67_excl_h_prime)
 {
     auto n = 2;
@@ -82,18 +80,16 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_66_67_excl_h_prime)
     auto alpha = Scalar::Rand(true);
     auto rho = Scalar::Rand(true);
     auto x = Scalar::Rand(true);
-    auto mu = alpha + rho * x; 
+    auto mu = alpha + rho * x;
 
-    auto gg = G1Points(std::vector<G1Point> {
+    auto gg = G1Points(std::vector<G1Point>{
         G1Point::MapToG1("g1"),
-        G1Point::MapToG1("g2")
-    });
+        G1Point::MapToG1("g2")});
     auto h = G1Point::MapToG1("h");
 
-    Scalars al(std::vector<Scalar> {
-        Scalar {1}, 
-        Scalar {1}
-    });
+    Scalars al(std::vector<Scalar>{
+        Scalar{1},
+        Scalar{1}});
     auto sl = Scalars::RandVec(n);
     auto ll = al - (ones * z) + (sl * x);
 
@@ -112,16 +108,15 @@ BOOST_AUTO_TEST_CASE(test_integration_rebasing_base_point)
 
     Scalar one(1);
     auto one_n = Scalars::RepeatN(n, one);
-    Scalar two(n); 
+    Scalar two(n);
     auto two_n = Scalars::FirstNPow(n, two);
 
     auto y = Scalar::Rand(true);
     auto z = Scalar::Rand(true);
     auto y_n = Scalars::FirstNPow(n, y);
-    auto hh = G1Points(std::vector<G1Point> {
+    auto hh = G1Points(std::vector<G1Point>{
         G1Point::MapToG1("h1"),
-        G1Point::MapToG1("h2")
-    });
+        G1Point::MapToG1("h2")});
     {
         auto hhp = hh * y;
         auto lhs = hhp * two;
@@ -135,10 +130,9 @@ BOOST_AUTO_TEST_CASE(test_integration_rebasing_base_point)
         BOOST_CHECK(lhs == rhs);
     }
     {
-        auto hhp = G1Points(std::vector<G1Point> {
+        auto hhp = G1Points(std::vector<G1Point>{
             hh[0],
-            hh[1] * y.Invert()
-        });
+            hh[1] * y.Invert()});
         auto y_pows_inv = Scalars::FirstNPow(n, y.Invert());
         auto lhs = hhp * (y_n * z + two_n * z.Square());
         auto rhs = hh * (one_n * z + two_n * z.Square() * y_pows_inv);
@@ -150,7 +144,7 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_66_67_only_h_prime)
 {
     auto n = 2;
 
-    Scalar two(2); 
+    Scalar two(2);
     auto two_n = Scalars::FirstNPow(n, two);
     Scalar one(1);
     auto one_n = Scalars::RepeatN(n, one);
@@ -160,23 +154,21 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_66_67_only_h_prime)
     auto z = Scalar::Rand(true);
     auto y_n = Scalars::FirstNPow(n, y);
 
-    Scalars ar(std::vector<Scalar> {
-        Scalar {1}, 
-        Scalar {1}
-    });
+    Scalars ar(std::vector<Scalar>{
+        Scalar{1},
+        Scalar{1}});
     auto sr = Scalars::RandVec(n);
-    auto zs = one_n * z; 
-    auto hh = G1Points(std::vector<G1Point> {
+    auto zs = one_n * z;
+    auto hh = G1Points(std::vector<G1Point>{
         G1Point::MapToG1("h1"),
-        G1Point::MapToG1("h2")
-    });
+        G1Point::MapToG1("h2")});
     auto a = hh * ar;
     auto s = hh * sr;
 
     auto hhp = hh * Scalars::FirstNPow(n, y.Invert());
 
     auto p = a + s * x + hhp * (y_n * z + two_n * z.Square());
-    auto rr = y_n * (ar + zs + sr * x) + (two_n * z.Square()); 
+    auto rr = y_n * (ar + zs + sr * x) + (two_n * z.Square());
     auto hhprr = hhp * rr;
 
     BOOST_CHECK(p == hhprr);
@@ -193,10 +185,10 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_65_h_part_only)
     auto h = G1Point::MapToG1("h");
     auto V = h * gamma;
     auto z = Scalar::Rand(true);
-    auto t1 = h * tau1; 
-    auto t2 = h * tau2; 
-    auto rhs =  V * z.Square() + t1 * x + t2 * x.Square();
-    
+    auto t1 = h * tau1;
+    auto t2 = h * tau2;
+    auto rhs = V * z.Square() + t1 * x + t2 * x.Square();
+
     // LHS
     auto tauX = tau2 * x.Square() + tau1 * x + z.Square() * gamma;
     auto lhs = h * tauX;
@@ -218,16 +210,15 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_65_g_part_only_excl_ts)
     auto two_n = Scalars::FirstNPow(n, two);
     auto y_n = Scalars::FirstNPow(n, y);
 
-    Scalars al(std::vector<Scalar> {
-        Scalar {0}, 
-        Scalar {1}
-    });
+    Scalars al(std::vector<Scalar>{
+        Scalar{0},
+        Scalar{1}});
     auto ar = al - one_n;
     auto sl = Scalars::RandVec(n);
     auto sr = Scalars::RandVec(n);
 
-    auto l = al - one_n * z;  // (39)
-    auto r = y_n * (ar + one_n * z) + two_n * z.Square();  // (39)
+    auto l = al - one_n * z;                              // (39)
+    auto r = y_n * (ar + one_n * z) + two_n * z.Square(); // (39)
     auto t_hat = (l * r).Sum();
 
     auto l0 = al - one_n * z;
@@ -236,11 +227,10 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_65_g_part_only_excl_ts)
     BOOST_CHECK(t_hat == lr_equiv);
 
     auto g = G1Point::MapToG1("g");
-    
+
     auto v = g * upsilon;
-    auto delta_yz = 
-        ((z - z.Square()) * (one_n * y_n).Sum())
-        - (z.Cube() * (one_n * two_n).Sum());
+    auto delta_yz =
+        ((z - z.Square()) * (one_n * y_n).Sum()) - (z.Cube() * (one_n * two_n).Sum());
 
     // LHS
     auto lhs = g * t_hat;
@@ -265,10 +255,9 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_65_g_part_ts_only)
     auto two_n = Scalars::FirstNPow(n, two);
     auto y_n = Scalars::FirstNPow(n, y);
 
-    Scalars al(std::vector<Scalar> {
-        Scalar {0}, 
-        Scalar {1}
-    });
+    Scalars al(std::vector<Scalar>{
+        Scalar{0},
+        Scalar{1}});
     auto ar = al - one_n;
     auto sl = Scalars::RandVec(n);
     auto sr = Scalars::RandVec(n);
@@ -284,9 +273,9 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_65_g_part_ts_only)
     auto t2 = (l1 * r1).Sum();
 
     auto g = G1Point::MapToG1("g");
-    
-    auto cap_t1 = g * t1; 
-    auto cap_t2 = g * t2; 
+
+    auto cap_t1 = g * t1;
+    auto cap_t2 = g * t2;
 
     // LHS
     auto lhs = g * t_hat;
@@ -312,10 +301,9 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_65_g_part_only)
     auto two_n = Scalars::FirstNPow(n, two);
     auto y_n = Scalars::FirstNPow(n, y);
 
-    Scalars al(std::vector<Scalar> {
-        Scalar {0}, 
-        Scalar {1}
-    });
+    Scalars al(std::vector<Scalar>{
+        Scalar{0},
+        Scalar{1}});
     auto ar = al - one_n;
     auto sl = Scalars::RandVec(n);
     auto sr = Scalars::RandVec(n);
@@ -334,17 +322,16 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_65_g_part_only)
     auto t_hat = t0 + t1 * x + t2 * x.Square();
 
     auto g = G1Point::MapToG1("g");
-    
+
     auto lhs = g * t_hat;
 
     // RHS
-    auto cap_t1 = g * t1; 
-    auto cap_t2 = g * t2; 
+    auto cap_t1 = g * t1;
+    auto cap_t2 = g * t2;
 
     auto v = g * upsilon;
-    auto delta_yz = 
-        ((z - z.Square()) * (one_n * y_n).Sum())
-        - (z.Cube() * (one_n * two_n).Sum());
+    auto delta_yz =
+        ((z - z.Square()) * (one_n * y_n).Sum()) - (z.Cube() * (one_n * two_n).Sum());
 
     auto rhs = v * z.Square() + g * delta_yz + cap_t1 * x + cap_t2 * x.Square();
 
@@ -354,14 +341,13 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_65_g_part_only)
 // Prover and verifier know:
 // g, h, u, P
 //
-// For a given P, prover proves that it has vectors a, b s.t. 
+// For a given P, prover proves that it has vectors a, b s.t.
 // P = g^a h^b u^<a,b>
 bool InnerProductArgument(
     const size_t& n,
-    const G1Points& gg, const G1Points& hh, 
+    const G1Points& gg, const G1Points& hh,
     const G1Point& u, const G1Point& p,
-    const Scalars& a, const Scalars& b
-)
+    const Scalars& a, const Scalars& b)
 {
     if (n == 1) {
         auto c = (a * b).Sum();
@@ -393,38 +379,34 @@ BOOST_AUTO_TEST_CASE(test_integration_inner_product_argument)
 {
     auto n = 2;
 
-    auto gg = G1Points(std::vector {
+    auto gg = G1Points(std::vector{
         G1Point::MapToG1("g1"),
-        G1Point::MapToG1("g2")
-    });
-    auto hh = G1Points(std::vector {
+        G1Point::MapToG1("g2")});
+    auto hh = G1Points(std::vector{
         G1Point::MapToG1("h1"),
-        G1Point::MapToG1("h2")
-    });
+        G1Point::MapToG1("h2")});
     auto u = G1Point::MapToG1("u");
 
     // a, b are Scalar vectors
-    Scalars a(std::vector<Scalar> { Scalar {2}, Scalar {3} });
-    Scalars b(std::vector<Scalar> { Scalar {5}, Scalar {7} });
+    Scalars a(std::vector<Scalar>{Scalar{2}, Scalar{3}});
+    Scalars b(std::vector<Scalar>{Scalar{5}, Scalar{7}});
 
     auto p = (gg * a).Sum() + (hh * b).Sum() + u * (a * b).Sum();
 
     auto res = InnerProductArgument(
         n,
-        gg, hh, 
+        gg, hh,
         u, p,
-        a, b
-    );
+        a, b);
     BOOST_CHECK_EQUAL(res, true);
 }
 
 bool RangeProof(
     size_t n, G1Point V, Scalar gamma,
-    G1Point g, G1Point h, 
+    G1Point g, G1Point h,
     G1Points gg, G1Points hh,
     Scalars al,
-    bool use_inner_product_argument
-)
+    bool use_inner_product_argument)
 {
     // On input upsilon and gamma, prover computes
     Scalar one(1);
@@ -449,7 +431,7 @@ bool RangeProof(
 
     // Define vector ploynomials l(x), r(x) and t(x)
     // t(x) = <l(x),r(x)> = <l0, r0> + (<l1, r0> + <l0, r1>) * x + <l1, r1> * x^2
-    auto y_n = Scalars::FirstNPow(n, y);  
+    auto y_n = Scalars::FirstNPow(n, y);
     auto l0 = al - one_n * z;
     auto l1 = sl;
     auto r0 = y_n * (ar + one_n * z) + two_n * z.Square();
@@ -481,25 +463,21 @@ bool RangeProof(
 
     // (64)
     auto hhp = hh * Scalars::FirstNPow(n, y.Invert());
-    
+
     // (65)
-    auto delta_yz = 
-        ((z - z.Square()) * (one_n * y_n).Sum())
-        - (z.Cube() * (one_n * two_n).Sum());
+    auto delta_yz =
+        ((z - z.Square()) * (one_n * y_n).Sum()) - (z.Cube() * (one_n * two_n).Sum());
 
     auto lhs_65 = g * t_hat + h * tau_x;
     auto rhs_65 = V * z.Square() + g * delta_yz + cap_t1 * x + cap_t2 * x.Square();
     if (lhs_65 != rhs_65) return false;
-    
+
     // (66), (67)
     auto l = (al - one_n * z) + sl * x;
     auto r = y_n * (ar + one_n * z + sr * x) + two_n * z.Square();
 
-    auto p = 
-        a 
-        + (s * x) 
-        - (gg * (one_n * z)).Sum() 
-        + (hhp * (y_n * z + two_n * z.Square())).Sum();
+    auto p =
+        a + (s * x) - (gg * (one_n * z)).Sum() + (hhp * (y_n * z + two_n * z.Square())).Sum();
 
     if (use_inner_product_argument) {
         auto u = G1Point::Rand();
@@ -519,30 +497,27 @@ bool RangeProof(
 BOOST_AUTO_TEST_CASE(test_integration_range_proof)
 {
     auto gamma = Scalar::Rand();
-    Scalars al(std::vector<Scalar> {
-        Scalar {1}, 
-        Scalar {0},
-        Scalar {0},
-        Scalar {1}
-    });
+    Scalars al(std::vector<Scalar>{
+        Scalar{1},
+        Scalar{0},
+        Scalar{0},
+        Scalar{1}});
     size_t n = al.Size();
     Scalar upsilon(9);
 
     auto g = G1Point::MapToG1("g");
     auto h = G1Point::MapToG1("h");
 
-    auto gg = G1Points(std::vector<G1Point> {
+    auto gg = G1Points(std::vector<G1Point>{
         G1Point::MapToG1("g1"),
         G1Point::MapToG1("g2"),
         G1Point::MapToG1("g3"),
-        G1Point::MapToG1("g4")
-    });
-    auto hh = G1Points(std::vector<G1Point> {
+        G1Point::MapToG1("g4")});
+    auto hh = G1Points(std::vector<G1Point>{
         G1Point::MapToG1("h1"),
         G1Point::MapToG1("h2"),
         G1Point::MapToG1("h3"),
-        G1Point::MapToG1("h4")
-    });
+        G1Point::MapToG1("h4")});
 
     auto v = h * gamma + g * upsilon;
 
@@ -550,11 +525,10 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof)
         auto testCaseBool = i != 0;
         auto res = RangeProof(
             n, v, gamma,
-            g, h, 
+            g, h,
             gg, hh,
             al,
-            testCaseBool
-        );
+            testCaseBool);
         BOOST_CHECK(res == true);
-    }   
+    }
 }

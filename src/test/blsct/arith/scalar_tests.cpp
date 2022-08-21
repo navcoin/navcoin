@@ -14,8 +14,7 @@
 #define SCALAR_CURVE_ORDER_MINUS_1(x) Scalar x("73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000000", 16)
 #define SCALAR_INT64_MIN(x) Scalar x("52435875175126190479447740508185965837690552500527637822594435327901726408705", 10);
 
-struct BlsctArithScalarTests 
-{
+struct BlsctArithScalarTests {
     BlsctArithScalarTests()
     { 
         MclInitializer::Init();
@@ -357,7 +356,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_shift_left)
 {
     Scalar base(0b1);
     int64_t exp = 1;
-    for(unsigned int i=0; i<64; ++i) {
+    for (unsigned int i = 0; i < 64; ++i) {
         Scalar a = base << i;
         BOOST_CHECK_EQUAL(a.GetInt64(), exp);
         exp <<= 1;
@@ -431,17 +430,19 @@ BOOST_AUTO_TEST_CASE(test_scalar_cube)
 BOOST_AUTO_TEST_CASE(test_scalar_pow)
 {
     struct TestCase {
-        int64_t a; int64_t b; int64_t c;
+        int64_t a;
+        int64_t b;
+        int64_t c;
     };
-    std::vector test_cases {
-        TestCase {2, 0, 1},
-        TestCase {2, 1, 2},
-        TestCase {2, 2, 4},
-        TestCase {2, 3, 8},
-        TestCase {3, 5, 243},
-        TestCase {195, 7, 10721172396796875},
+    std::vector test_cases{
+        TestCase{2, 0, 1},
+        TestCase{2, 1, 2},
+        TestCase{2, 2, 4},
+        TestCase{2, 3, 8},
+        TestCase{3, 5, 243},
+        TestCase{195, 7, 10721172396796875},
     };
-    for (auto tc: test_cases) {
+    for (auto tc : test_cases) {
         Scalar a(tc.a);
         Scalar b(tc.b);
         Scalar c(tc.c);
@@ -456,10 +457,10 @@ BOOST_AUTO_TEST_CASE(test_scalar_pow)
 
 BOOST_AUTO_TEST_CASE(test_scalar_rand)
 {
-    std::vector<bool> tf {true, false};
-    for (auto exclude_zero: tf) {
+    std::vector<bool> tf{true, false};
+    for (auto exclude_zero : tf) {
         unsigned int num_tries = 1000000;
-        unsigned int num_dups = 0; 
+        unsigned int num_dups = 0;
         auto x = Scalar::Rand();
 
         for (size_t i = 0; i < num_tries; ++i) {
@@ -467,7 +468,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_rand)
             if (exclude_zero && y == 0) BOOST_FAIL("expected non-zero");
             if (x == y) ++num_dups;
         }
-        auto dup_ratio = num_dups / (float) num_tries;
+        auto dup_ratio = num_dups / (float)num_tries;
         BOOST_CHECK(dup_ratio < 0.000001);
     }
 }
@@ -483,7 +484,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_getint64)
     {
         Scalar base(0b1);
         int64_t exp = 1;
-        for (uint8_t i=0; i<64; ++i) {
+        for (uint8_t i = 0; i < 64; ++i) {
             Scalar a = base << i;
             BOOST_CHECK_EQUAL(a.GetInt64(), exp);
             exp <<= 1;
@@ -577,8 +578,39 @@ BOOST_AUTO_TEST_CASE(test_scalar_setvch)
     }
     {
         // setting curveOrder - 1 should succeed
-        std::vector<uint8_t> vec {
-            115, 237, 167, 83, 41, 157, 125, 72, 51, 57, 216, 8, 9, 161, 216, 5, 83, 189, 164, 2, 255, 254, 91, 254, 255, 255, 255, 255, 0, 0, 0, 0,
+        std::vector<uint8_t> vec{
+            115,
+            237,
+            167,
+            83,
+            41,
+            157,
+            125,
+            72,
+            51,
+            57,
+            216,
+            8,
+            9,
+            161,
+            216,
+            5,
+            83,
+            189,
+            164,
+            2,
+            255,
+            254,
+            91,
+            254,
+            255,
+            255,
+            255,
+            255,
+            0,
+            0,
+            0,
+            0,
         };
         Scalar a;
         a.SetVch(vec);
@@ -587,8 +619,39 @@ BOOST_AUTO_TEST_CASE(test_scalar_setvch)
     }    
     {
         // setting curveOrder should suceed, but Scalar should get the modulo value
-        std::vector<uint8_t> vec {
-            115, 237, 167, 83, 41, 157, 125, 72, 51, 57, 216, 8, 9, 161, 216, 5, 83, 189, 164, 2, 255, 254, 91, 254, 255, 255, 255, 255, 0, 0, 0, 1,
+        std::vector<uint8_t> vec{
+            115,
+            237,
+            167,
+            83,
+            41,
+            157,
+            125,
+            72,
+            51,
+            57,
+            216,
+            8,
+            9,
+            161,
+            216,
+            5,
+            83,
+            189,
+            164,
+            2,
+            255,
+            254,
+            91,
+            254,
+            255,
+            255,
+            255,
+            255,
+            0,
+            0,
+            0,
+            1,
         };
         Scalar a;
         BOOST_CHECK_EQUAL(a.GetString(), "0");
@@ -641,7 +704,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_get_and_setvch)
 
 BOOST_AUTO_TEST_CASE(test_scalar_setpow2)
 {
-    for (size_t i=0; i<10; ++i) {
+    for (size_t i = 0; i < 10; ++i) {
         Scalar a;
         a.SetPow2(i);
         BOOST_CHECK_EQUAL(a.GetInt64(), std::pow(2, i));
@@ -691,10 +754,38 @@ BOOST_AUTO_TEST_CASE(test_scalar_get_bits)
 {
     // n is group order r minus 1
     std::vector<uint8_t> n_vec{
-        0x73, 0xed, 0xa7, 0x53, 0x29, 0x9d, 0x7d, 0x48, 0x33, 0x39, 
-        0xd8, 0x08, 0x09, 0xa1, 0xd8, 0x05, 0x53, 0xbd, 0xa4, 0x02, 
-        0xff, 0xfe, 0x5b, 0xfe, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 
-        0x00, 0x00,
+        0x73,
+        0xed,
+        0xa7,
+        0x53,
+        0x29,
+        0x9d,
+        0x7d,
+        0x48,
+        0x33,
+        0x39,
+        0xd8,
+        0x08,
+        0x09,
+        0xa1,
+        0xd8,
+        0x05,
+        0x53,
+        0xbd,
+        0xa4,
+        0x02,
+        0xff,
+        0xfe,
+        0x5b,
+        0xfe,
+        0xff,
+        0xff,
+        0xff,
+        0xff,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
     };
     std::string n_hex("73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000000");
     std::string n_bin("111001111101101101001110101001100101001100111010111110101001000001100110011100111011000000010000000100110100001110110000000010101010011101111011010010000000010111111111111111001011011111111101111111111111111111111111111111100000000000000000000000000000000");
@@ -734,17 +825,17 @@ BOOST_AUTO_TEST_CASE(test_scalar_get_bit)
         auto v = a.GetVch();
 
         // 5th byte from the last is 255
-        for (size_t i=0; i<8; ++i) {
-            BOOST_CHECK_EQUAL(a.GetBit(4 * 8 + i), true); 
+        for (size_t i = 0; i < 8; ++i) {
+            BOOST_CHECK_EQUAL(a.GetBit(4 * 8 + i), true);
         }
 
         // 9th byte from the last is 254
-        for (size_t i=0; i<8; ++i) {
+        for (size_t i = 0; i < 8; ++i) {
             BOOST_CHECK_EQUAL(a.GetBit(8 * 8 + i), i != 0);
         }
 
         // 13th byte from the last is 2
-        for (size_t i=0; i<8; ++i) {
+        for (size_t i = 0; i < 8; ++i) {
             BOOST_CHECK_EQUAL(a.GetBit(12 * 8 + i), i == 1);
         }
 

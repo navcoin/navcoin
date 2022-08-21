@@ -8,8 +8,8 @@
 #include <stddef.h>
 #include <string>
 
-#include <bls/bls.h>
 #include <bls/bls384_256.h> // must include this before bls/bls.h
+#include <bls/bls.h>
 #include <boost/thread/lock_guard.hpp>
 #include <boost/thread/mutex.hpp>
 

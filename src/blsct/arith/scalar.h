@@ -14,12 +14,12 @@
 #include <string>
 #include <vector>
 
-#include <bls/bls384_256.h>  // must include this before bls/bls.h
+#include <bls/bls384_256.h> // must include this before bls/bls.h
 #include <bls/bls.h>
 #include <blsct/arith/mcl_initializer.h>
 #include <hash.h>
-#include <uint256.h>
 #include <serialize.h>
+#include <uint256.h>
 #include <version.h>
 
 #define CHECK_AND_ASSERT_THROW_MES(expr, message) do {if(!(expr)) throw std::runtime_error(message);} while(0)
