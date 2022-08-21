@@ -9,23 +9,24 @@
 #ifndef NAVCOIN_BLSCT_ARITH_ELEMENTS_H
 #define NAVCOIN_BLSCT_ARITH_ELEMENTS_H
 
-#include <vector>
 #include <cstddef>
 #include <stdexcept>
+#include <vector>
 
-#include <blsct/arith/scalar.h>
 #include <blsct/arith/g1point.h>
+#include <blsct/arith/scalar.h>
 
 /**
  * Designed to expect below instantiations only:
  * - Elements<G1Point>
  * - Elements<Scalar>
  */
-template<typename T> 
-class Elements {
+template <typename T>
+class Elements
+{
 public:
     Elements<T>() {}
-    Elements<T>(const std::vector<T>& vec): m_vec(vec) {}
+    Elements<T>(const std::vector<T>& vec) : m_vec(vec) {}
 
     T Sum() const;
     T operator[](int index) const;
@@ -45,7 +46,7 @@ public:
      * [p1, p2] * [a1, ba] = [p1*a1, p2*a2]
      */
     Elements<T> operator*(const Elements<Scalar>& other) const;
-    
+
     /**
      * Scalars x Scalar
      * [s1, s2] * t = [s1*t, s2*t] 

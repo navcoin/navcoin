@@ -11,8 +11,8 @@
 
 #include <bls/bls384_256.h>
 #include <bls/bls.h>
-#include <boost/thread/mutex.hpp>
 #include <boost/thread/lock_guard.hpp>
+#include <boost/thread/mutex.hpp>
 
 class MclInitializer
 {
@@ -20,7 +20,7 @@ public:
     static void Init();
 
 private:
-    inline static boost::mutex init_mutex;
+    inline static boost::mutex m_init_mutex;
 };
 
 #endif // NAVCOIN_BLSCT_ARITH_MCL_INITIALIZER_H

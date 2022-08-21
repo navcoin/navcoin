@@ -6,11 +6,11 @@
 #include <blsct/arith/g1point.h>
 #include <blsct/arith/scalar.h>
 
-template<typename T> 
+template <typename T>
 T Elements<T>::Sum() const
 {
     T ret;
-    for (T s: m_vec) {
+    for (T s : m_vec) {
         ret = ret + s;
     }
     return ret;
@@ -18,7 +18,7 @@ T Elements<T>::Sum() const
 template Scalar Elements<Scalar>::Sum() const;
 template G1Point Elements<G1Point>::Sum() const;
 
-template<typename T> 
+template <typename T>
 T Elements<T>::operator[](int index) const
 {
     return m_vec[index];
@@ -26,7 +26,7 @@ T Elements<T>::operator[](int index) const
 template Scalar Elements<Scalar>::operator[](int) const;
 template G1Point Elements<G1Point>::operator[](int) const;
 
-template<typename T> 
+template <typename T>
 size_t Elements<T>::Size() const
 {
     return m_vec.size();
@@ -34,7 +34,7 @@ size_t Elements<T>::Size() const
 template size_t Elements<Scalar>::Size() const;
 template size_t Elements<G1Point>::Size() const;
 
-template<typename T> 
+template <typename T>
 void Elements<T>::Add(const T x)
 {
     m_vec.push_back(x);
@@ -42,7 +42,7 @@ void Elements<T>::Add(const T x)
 template void Elements<Scalar>::Add(const Scalar);
 template void Elements<G1Point>::Add(const G1Point);
 
-template<typename T> 
+template <typename T>
 inline void Elements<T>::ConfirmSizesMatch(const size_t& other_size) const
 {
     if (m_vec.size() != other_size) {
@@ -52,7 +52,7 @@ inline void Elements<T>::ConfirmSizesMatch(const size_t& other_size) const
 template void Elements<Scalar>::ConfirmSizesMatch(const size_t&) const;
 template void Elements<G1Point>::ConfirmSizesMatch(const size_t&) const;
 
-template<typename T> 
+template <typename T>
 Elements<T> Elements<T>::FirstNPow(const size_t& n, const Scalar& k)
 {
     if constexpr (std::is_same_v<T, Scalar>) {
@@ -69,26 +69,26 @@ Elements<T> Elements<T>::FirstNPow(const size_t& n, const Scalar& k)
 }
 template Elements<Scalar> Elements<Scalar>::FirstNPow(const size_t&, const Scalar&);
 
-template<typename T> 
+template <typename T>
 Elements<T> Elements<T>::RepeatN(const size_t& n, const T& k)
 {
     Elements<T> ret;
     for (size_t i = 0; i < n; ++i) {
-        ret.m_vec.push_back(k);    
+        ret.m_vec.push_back(k);
     }
     return ret;
 }
 template Elements<Scalar> Elements<Scalar>::RepeatN(const size_t&, const Scalar&);
 template Elements<G1Point> Elements<G1Point>::RepeatN(const size_t&, const G1Point&);
 
-template<typename T> 
+template <typename T>
 Elements<T> Elements<T>::RandVec(const size_t& n, const bool exclude_zero)
 {
     if constexpr (std::is_same_v<T, Scalar>) {
         Elements<Scalar> ret;
         for (size_t i = 0; i < n; ++i) {
             auto x = Scalar::Rand(exclude_zero);
-            ret.m_vec.push_back(x);    
+            ret.m_vec.push_back(x);
         }
         return ret;
     } else {
@@ -96,8 +96,8 @@ Elements<T> Elements<T>::RandVec(const size_t& n, const bool exclude_zero)
     }
 }
 template Elements<Scalar> Elements<Scalar>::RandVec(const size_t&, const bool);
-    
-template<typename T> 
+
+template <typename T>
 Elements<T> Elements<T>::operator*(const Elements<Scalar>& other) const
 {
     ConfirmSizesMatch(other.Size());
@@ -115,7 +115,7 @@ Elements<T> Elements<T>::operator*(const Elements<Scalar>& other) const
             ret.m_vec.push_back(m_vec[i] * other[i]);
         }
         return ret;
-    
+
     } else {
         throw std::runtime_error("Now implemented");
     }
@@ -123,7 +123,7 @@ Elements<T> Elements<T>::operator*(const Elements<Scalar>& other) const
 template Elements<Scalar> Elements<Scalar>::operator*(const Elements<Scalar>& other) const;
 template Elements<G1Point> Elements<G1Point>::operator*(const Elements<Scalar>& other) const;
 
-template<typename T> 
+template <typename T>
 Elements<T> Elements<T>::operator*(const Scalar& s) const
 {
     if constexpr (std::is_same_v<T, Scalar>) {
@@ -147,7 +147,7 @@ Elements<T> Elements<T>::operator*(const Scalar& s) const
 template Elements<Scalar> Elements<Scalar>::operator*(const Scalar&) const;
 template Elements<G1Point> Elements<G1Point>::operator*(const Scalar& s) const;
 
-template<typename T> 
+template <typename T>
 Elements<T> Elements<T>::operator+(const Elements<T>& other) const
 {
     ConfirmSizesMatch(other.Size());
@@ -161,7 +161,7 @@ Elements<T> Elements<T>::operator+(const Elements<T>& other) const
 template Elements<Scalar> Elements<Scalar>::operator+(const Elements<Scalar>& other) const;
 template Elements<G1Point> Elements<G1Point>::operator+(const Elements<G1Point>& other) const;
 
-template<typename T> 
+template <typename T>
 Elements<T> Elements<T>::operator-(const Elements<T>& other) const
 {
     ConfirmSizesMatch(other.Size());
@@ -175,8 +175,8 @@ Elements<T> Elements<T>::operator-(const Elements<T>& other) const
 template Elements<Scalar> Elements<Scalar>::operator-(const Elements<Scalar>& other) const;
 template Elements<G1Point> Elements<G1Point>::operator-(const Elements<G1Point>& other) const;
 
-template<typename T> 
-bool Elements<T>::operator==(const Elements<T>& other) const 
+template <typename T>
+bool Elements<T>::operator==(const Elements<T>& other) const
 {
     if (m_vec.size() != other.Size()) {
         return false;
@@ -191,7 +191,7 @@ bool Elements<T>::operator==(const Elements<T>& other) const
 template bool Elements<Scalar>::operator==(const Elements<Scalar>& other) const;
 template bool Elements<G1Point>::operator==(const Elements<G1Point>& other) const;
 
-template<typename T> 
+template <typename T>
 bool Elements<T>::operator!=(const Elements<T>& other) const
 {
     return !operator==(other);
@@ -199,7 +199,7 @@ bool Elements<T>::operator!=(const Elements<T>& other) const
 template bool Elements<Scalar>::operator!=(const Elements<Scalar>& other) const;
 template bool Elements<G1Point>::operator!=(const Elements<G1Point>& other) const;
 
-template<typename T> 
+template <typename T>
 Elements<T> Elements<T>::From(const size_t from_index) const
 {
     if (from_index >= Size()) {
@@ -215,7 +215,7 @@ Elements<T> Elements<T>::From(const size_t from_index) const
 template Elements<Scalar> Elements<Scalar>::From(const size_t from_index) const;
 template Elements<G1Point> Elements<G1Point>::From(const size_t from_index) const;
 
-template<typename T> 
+template <typename T>
 Elements<T> Elements<T>::To(const size_t to_index) const
 {
     if (to_index > Size()) {

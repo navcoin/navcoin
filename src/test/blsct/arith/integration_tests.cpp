@@ -13,9 +13,8 @@
 #include <set>
 #include <streams.h>
 
-struct IntegrationTests 
-{
-    IntegrationTests() 
+struct IntegrationTests {
+    IntegrationTests()
     {
         MclInitializer::Init();
         G1Point::Init();
@@ -90,17 +89,17 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_66_67_excl_h_prime)
     });
     auto h = G1Point::MapToG1("h");
 
-    Scalars aL(std::vector<Scalar> {
+    Scalars al(std::vector<Scalar> {
         Scalar {1}, 
         Scalar {1}
     });
-    auto sL = Scalars::RandVec(n);
-    auto ll = aL - (ones * z) + (sL * x);
+    auto sl = Scalars::RandVec(n);
+    auto ll = al - (ones * z) + (sl * x);
 
     auto hmu_ggl = (h * mu) + (gg * ll).Sum();
 
-    auto A = h * alpha + (gg * aL).Sum();
-    auto S = h * rho + (gg * sL).Sum();
+    auto A = h * alpha + (gg * al).Sum();
+    auto S = h * rho + (gg * sl).Sum();
     auto P = A + (S * x) + (gg * z.Negate()).Sum();
 
     BOOST_CHECK(P == hmu_ggl);
@@ -111,13 +110,13 @@ BOOST_AUTO_TEST_CASE(test_integration_rebasing_base_point)
     auto n = 2;
 
     Scalar one(1);
-    auto oneN = Scalars::RepeatN(n, one);
+    auto one_n = Scalars::RepeatN(n, one);
     Scalar two(n); 
-    auto twoN = Scalars::FirstNPow(n, two);
+    auto two_n = Scalars::FirstNPow(n, two);
 
     auto y = Scalar::Rand(true);
     auto z = Scalar::Rand(true);
-    auto yN = Scalars::FirstNPow(n, y);
+    auto y_n = Scalars::FirstNPow(n, y);
     auto hh = G1Points(std::vector<G1Point> {
         G1Point::MapToG1("h1"),
         G1Point::MapToG1("h2")
@@ -139,9 +138,9 @@ BOOST_AUTO_TEST_CASE(test_integration_rebasing_base_point)
             hh[0],
             hh[1] * y.Invert()
         });
-        auto yPowsInv = Scalars::FirstNPow(n, y.Invert());
-        auto lhs = hhp * (yN * z + twoN * z.Square());
-        auto rhs = hh * (oneN * z + twoN * z.Square() * yPowsInv);
+        auto y_pows_inv = Scalars::FirstNPow(n, y.Invert());
+        auto lhs = hhp * (y_n * z + two_n * z.Square());
+        auto rhs = hh * (one_n * z + two_n * z.Square() * y_pows_inv);
         BOOST_CHECK(lhs == rhs);
     }
 }
@@ -151,35 +150,35 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_66_67_only_h_prime)
     auto n = 2;
 
     Scalar two(2); 
-    auto twoN = Scalars::FirstNPow(n, two);
+    auto two_n = Scalars::FirstNPow(n, two);
     Scalar one(1);
-    auto oneN = Scalars::RepeatN(n, one);
+    auto one_n = Scalars::RepeatN(n, one);
 
     auto x = Scalar::Rand(true);
     auto y = Scalar::Rand(true);
     auto z = Scalar::Rand(true);
-    auto yN = Scalars::FirstNPow(n, y);
+    auto y_n = Scalars::FirstNPow(n, y);
 
-    Scalars aR(std::vector<Scalar> {
+    Scalars ar(std::vector<Scalar> {
         Scalar {1}, 
         Scalar {1}
     });
-    auto sR = Scalars::RandVec(n);
-    auto zs = oneN * z; 
+    auto sr = Scalars::RandVec(n);
+    auto zs = one_n * z; 
     auto hh = G1Points(std::vector<G1Point> {
         G1Point::MapToG1("h1"),
         G1Point::MapToG1("h2")
     });
-    auto A = hh * aR;
-    auto S = hh * sR;
+    auto a = hh * ar;
+    auto s = hh * sr;
 
     auto hhp = hh * Scalars::FirstNPow(n, y.Invert());
 
-    auto P = A + S * x + hhp * (yN * z + twoN * z.Square());
-    auto rr = yN * (aR + zs + sR * x) + (twoN * z.Square()); 
+    auto p = a + s * x + hhp * (y_n * z + two_n * z.Square());
+    auto rr = y_n * (ar + zs + sr * x) + (two_n * z.Square()); 
     auto hhprr = hhp * rr;
 
-    BOOST_CHECK(P == hhprr);
+    BOOST_CHECK(p == hhprr);
 }
 
 BOOST_AUTO_TEST_CASE(test_integration_range_proof_65_h_part_only)
@@ -189,15 +188,15 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_65_h_part_only)
     auto tau1 = Scalar::Rand(true);
     auto tau2 = Scalar::Rand(true);
 
-    // rhs
+    // RHS
     auto h = G1Point::MapToG1("h");
     auto V = h * gamma;
     auto z = Scalar::Rand(true);
-    auto T1 = h * tau1; 
-    auto T2 = h * tau2; 
-    auto rhs =  V * z.Square() + T1 * x + T2 * x.Square();
+    auto t1 = h * tau1; 
+    auto t2 = h * tau2; 
+    auto rhs =  V * z.Square() + t1 * x + t2 * x.Square();
     
-    // lhs
+    // LHS
     auto tauX = tau2 * x.Square() + tau1 * x + z.Square() * gamma;
     auto lhs = h * tauX;
 
@@ -214,39 +213,39 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_65_g_part_only_excl_ts)
 
     Scalar one(1);
     Scalar two(2);
-    auto oneN = Scalars::FirstNPow(n, one);
-    auto twoN = Scalars::FirstNPow(n, two);
-    auto yN = Scalars::FirstNPow(n, y);
+    auto one_n = Scalars::FirstNPow(n, one);
+    auto two_n = Scalars::FirstNPow(n, two);
+    auto y_n = Scalars::FirstNPow(n, y);
 
-    Scalars aL(std::vector<Scalar> {
+    Scalars al(std::vector<Scalar> {
         Scalar {0}, 
         Scalar {1}
     });
-    auto aR = aL - oneN;
-    auto sL = Scalars::RandVec(n);
-    auto sR = Scalars::RandVec(n);
+    auto ar = al - one_n;
+    auto sl = Scalars::RandVec(n);
+    auto sr = Scalars::RandVec(n);
 
-    auto l = aL - oneN * z;  // (39)
-    auto r = yN * (aR + oneN * z) + twoN * z.Square();  // (39)
-    auto tHat = (l * r).Sum();
+    auto l = al - one_n * z;  // (39)
+    auto r = y_n * (ar + one_n * z) + two_n * z.Square();  // (39)
+    auto t_hat = (l * r).Sum();
 
-    auto l0 = aL - oneN * z;
-    auto r0 = yN * (aR + oneN * z) + twoN * z.Square();
-    auto lrEquiv = (l0 * r0).Sum();
-    BOOST_CHECK(tHat == lrEquiv);
+    auto l0 = al - one_n * z;
+    auto r0 = y_n * (ar + one_n * z) + two_n * z.Square();
+    auto lr_equiv = (l0 * r0).Sum();
+    BOOST_CHECK(t_hat == lr_equiv);
 
     auto g = G1Point::MapToG1("g");
     
-    auto V = g * upsilon;
-    auto deltaYz = 
-        ((z - z.Square()) * (oneN * yN).Sum())
-        - (z.Cube() * (oneN * twoN).Sum());
+    auto v = g * upsilon;
+    auto delta_yz = 
+        ((z - z.Square()) * (one_n * y_n).Sum())
+        - (z.Cube() * (one_n * two_n).Sum());
 
-    // lhs
-    auto lhs = g * tHat;
+    // LHS
+    auto lhs = g * t_hat;
 
-    // rhs
-    auto rhs = V * z.Square() + g * deltaYz;
+    // RHS
+    auto rhs = v * z.Square() + g * delta_yz;
 
     BOOST_CHECK(lhs == rhs);
 }
@@ -261,23 +260,23 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_65_g_part_ts_only)
 
     Scalar one(1);
     Scalar two(2);
-    auto oneN = Scalars::FirstNPow(n, one);
-    auto twoN = Scalars::FirstNPow(n, two);
-    auto yN = Scalars::FirstNPow(n, y);
+    auto one_n = Scalars::FirstNPow(n, one);
+    auto two_n = Scalars::FirstNPow(n, two);
+    auto y_n = Scalars::FirstNPow(n, y);
 
-    Scalars aL(std::vector<Scalar> {
+    Scalars al(std::vector<Scalar> {
         Scalar {0}, 
         Scalar {1}
     });
-    auto aR = aL - oneN;
-    auto sL = Scalars::RandVec(n);
-    auto sR = Scalars::RandVec(n);
+    auto ar = al - one_n;
+    auto sl = Scalars::RandVec(n);
+    auto sr = Scalars::RandVec(n);
 
-    auto l1 = sL;
-    auto r0 = yN * (aR + oneN * z) + twoN * z.Square();
-    auto r1 = yN * sR;
+    auto l1 = sl;
+    auto r0 = y_n * (ar + one_n * z) + two_n * z.Square();
+    auto r1 = y_n * sr;
 
-    auto tHat = (l1 * r0).Sum() * x + (l1 * r1).Sum() * x.Square();
+    auto t_hat = (l1 * r0).Sum() * x + (l1 * r1).Sum() * x.Square();
 
     // t(x) = <l0, r0> + <l1, r0> * x + <l1, r1> * x^2
     auto t1 = (l1 * r0).Sum();
@@ -285,14 +284,14 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_65_g_part_ts_only)
 
     auto g = G1Point::MapToG1("g");
     
-    auto T1 = g * t1; 
-    auto T2 = g * t2; 
+    auto cap_t1 = g * t1; 
+    auto cap_t2 = g * t2; 
 
-    // lhs
-    auto lhs = g * tHat;
+    // LHS
+    auto lhs = g * t_hat;
 
-    // rhs
-    auto rhs = T1 * x + T2 * x.Square();
+    // RHS
+    auto rhs = cap_t1 * x + cap_t2 * x.Square();
 
     BOOST_CHECK(lhs == rhs);
 }
@@ -308,84 +307,84 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_65_g_part_only)
 
     Scalar one(1);
     Scalar two(2);
-    auto oneN = Scalars::FirstNPow(n, one);
-    auto twoN = Scalars::FirstNPow(n, two);
-    auto yN = Scalars::FirstNPow(n, y);
+    auto one_n = Scalars::FirstNPow(n, one);
+    auto two_n = Scalars::FirstNPow(n, two);
+    auto y_n = Scalars::FirstNPow(n, y);
 
-    Scalars aL(std::vector<Scalar> {
+    Scalars al(std::vector<Scalar> {
         Scalar {0}, 
         Scalar {1}
     });
-    auto aR = aL - oneN;
-    auto sL = Scalars::RandVec(n);
-    auto sR = Scalars::RandVec(n);
+    auto ar = al - one_n;
+    auto sl = Scalars::RandVec(n);
+    auto sr = Scalars::RandVec(n);
 
-    auto l0 = (aL - oneN * z);
-    auto l1 = sL;
-    auto r0 = yN * (aR + oneN * z) + twoN * z.Square();
-    auto r1 = yN * sR;
+    auto l0 = (al - one_n * z);
+    auto l1 = sl;
+    auto r0 = y_n * (ar + one_n * z) + two_n * z.Square();
+    auto r1 = y_n * sr;
 
-    // lhs
+    // LHS
 
-    // tHat = <l,r> = t(x) = <l0, r0> + <l1, r0> * x + <l1, r1> * x^2
+    // t_hat = <l,r> = t(x) = <l0, r0> + <l1, r0> * x + <l1, r1> * x^2
     auto t0 = (l0 * r0).Sum();
     auto t1 = (l1 * r0).Sum();
     auto t2 = (l1 * r1).Sum();
-    auto tHat = t0 + t1 * x + t2 * x.Square();
+    auto t_hat = t0 + t1 * x + t2 * x.Square();
 
     auto g = G1Point::MapToG1("g");
     
-    auto lhs = g * tHat;
+    auto lhs = g * t_hat;
 
-    // rhs
-    auto T1 = g * t1; 
-    auto T2 = g * t2; 
+    // RHS
+    auto cap_t1 = g * t1; 
+    auto cap_t2 = g * t2; 
 
-    auto V = g * upsilon;
-    auto deltaYz = 
-        ((z - z.Square()) * (oneN * yN).Sum())
-        - (z.Cube() * (oneN * twoN).Sum());
+    auto v = g * upsilon;
+    auto delta_yz = 
+        ((z - z.Square()) * (one_n * y_n).Sum())
+        - (z.Cube() * (one_n * two_n).Sum());
 
-    auto rhs = V * z.Square() + g * deltaYz + T1 * x + T2 * x.Square();
+    auto rhs = v * z.Square() + g * delta_yz + cap_t1 * x + cap_t2 * x.Square();
 
     BOOST_CHECK(lhs == rhs);
 }
 
-// prover and verifier know:
+// Prover and verifier know:
 // g, h, u, P
 //
-// for a given P, prover proves that it has vectors a, b s.t. 
+// For a given P, prover proves that it has vectors a, b s.t. 
 // P = g^a h^b u^<a,b>
 bool InnerProductArgument(
     const size_t& n,
     const G1Points& gg, const G1Points& hh, 
-    const G1Point& u, const G1Point& P,
+    const G1Point& u, const G1Point& p,
     const Scalars& a, const Scalars& b
 )
 {
     if (n == 1) {
         auto c = (a * b).Sum();
-        return P == (gg * a).Sum() + (hh * b).Sum() + u * c;
+        return p == (gg * a).Sum() + (hh * b).Sum() + u * c;
     } else {
         auto np = n / 2;
 
-        auto cL = (a.To(np) * b.From(np)).Sum();
-        auto cR = (a.From(np) * b.To(np)).Sum();
+        auto cl = (a.To(np) * b.From(np)).Sum();
+        auto cr = (a.From(np) * b.To(np)).Sum();
 
-        auto L = (gg.From(np) * a.To(np)).Sum() + (hh.To(np) * b.From(np)).Sum() + u * cL;
-        auto R = (gg.To(np) * a.From(np)).Sum() + (hh.From(np) * b.To(np)).Sum() + u * cR;
+        auto l = (gg.From(np) * a.To(np)).Sum() + (hh.To(np) * b.From(np)).Sum() + u * cl;
+        auto r = (gg.To(np) * a.From(np)).Sum() + (hh.From(np) * b.To(np)).Sum() + u * cr;
 
         auto x = Scalar::Rand(true);
 
         auto ggp = (gg.To(np) * x.Invert()) + (gg.From(np) * x);
         auto hhp = (hh.To(np) * x) + (hh.From(np) * x.Invert());
 
-        auto Pp = L * x.Square() + P + (R * x.Square().Invert());
+        auto pp = l * x.Square() + p + (r * x.Square().Invert());
 
         auto ap = a.To(np) * x + a.From(np) * x.Invert();
         auto bp = b.To(np) * x.Invert() + b.From(np) * x;
 
-        return InnerProductArgument(np, ggp, hhp, u, Pp, ap, bp);
+        return InnerProductArgument(np, ggp, hhp, u, pp, ap, bp);
     }
 }
 
@@ -407,12 +406,12 @@ BOOST_AUTO_TEST_CASE(test_integration_inner_product_argument)
     Scalars a(std::vector<Scalar> { Scalar {2}, Scalar {3} });
     Scalars b(std::vector<Scalar> { Scalar {5}, Scalar {7} });
 
-    auto P = (gg * a).Sum() + (hh * b).Sum() + u * (a * b).Sum();
+    auto p = (gg * a).Sum() + (hh * b).Sum() + u * (a * b).Sum();
 
     auto res = InnerProductArgument(
         n,
         gg, hh, 
-        u, P,
+        u, p,
         a, b
     );
     BOOST_CHECK_EQUAL(res, true);
@@ -422,113 +421,110 @@ bool RangeProof(
     size_t n, G1Point V, Scalar gamma,
     G1Point g, G1Point h, 
     G1Points gg, G1Points hh,
-    Scalars aL,
-    bool useInnerProductArgument
+    Scalars al,
+    bool use_inner_product_argument
 )
 {
-    // on input upsilon and gamma, prover computes
+    // On input upsilon and gamma, prover computes
     Scalar one(1);
     Scalar two(2);
-    auto oneN = Scalars::FirstNPow(n, one);
-    auto twoN = Scalars::FirstNPow(n, two);
+    auto one_n = Scalars::FirstNPow(n, one);
+    auto two_n = Scalars::FirstNPow(n, two);
 
-    auto aR = aL - oneN;
+    auto ar = al - one_n;
     auto alpha = Scalar::Rand();
-    auto A = (h * alpha) + (gg * aL).Sum() + (hh * aR).Sum();
+    auto a = (h * alpha) + (gg * al).Sum() + (hh * ar).Sum();
 
-    auto sL = Scalars::RandVec(n);
-    auto sR = Scalars::RandVec(n);
+    auto sl = Scalars::RandVec(n);
+    auto sr = Scalars::RandVec(n);
     auto rho = Scalar::Rand();
-    auto S = (h * rho) + (gg * sL).Sum() + (hh * sR).Sum();
+    auto s = (h * rho) + (gg * sl).Sum() + (hh * sr).Sum();
 
-    // prover sends A,S to verifier
+    // Prover sends a,s to verifier
 
-    // verifier selects challenge points y,z and send to prover
+    // Verifier selects challenge points y,z and send to prover
     auto y = Scalar::Rand(true);
     auto z = Scalar::Rand(true);
 
-    // define vector ploynomials l(x), r(x) and t(x)
+    // Define vector ploynomials l(x), r(x) and t(x)
     // t(x) = <l(x),r(x)> = <l0, r0> + (<l1, r0> + <l0, r1>) * x + <l1, r1> * x^2
-    auto yN = Scalars::FirstNPow(n, y);  
-    auto l0 = aL - oneN * z;
-    auto l1 = sL;
-    auto r0 = yN * (aR + oneN * z) + twoN * z.Square();
-    auto r1 = yN * sR;
+    auto y_n = Scalars::FirstNPow(n, y);  
+    auto l0 = al - one_n * z;
+    auto l1 = sl;
+    auto r0 = y_n * (ar + one_n * z) + two_n * z.Square();
+    auto r1 = y_n * sr;
 
     auto t0 = (l0 * r0).Sum();
     auto t1 = (l1 * r0).Sum() + (l0 * r1).Sum();
     auto t2 = (l1 * r1).Sum();
 
-    // prover computes
+    // Prover computes
     auto tau1 = Scalar::Rand(true);
     auto tau2 = Scalar::Rand(true);
-    auto T1 = g * t1 + h * tau1;
-    auto T2 = g * t2 + h * tau2;
+    auto cap_t1 = g * t1 + h * tau1;
+    auto cap_t2 = g * t2 + h * tau2;
 
-    // prover sends T1,T2 to verifier
+    // Prover sends cap_t1,cal_t2 to verifier
 
-    // verifier select random challenge x and send to prover
+    // Verifier select random challenge x and send to prover
     auto x = Scalar::Rand(true);
 
-    // prover computes
+    // Prover computes
 
-    // tHat = <l,r> = t(x)
-    auto tHat = t0 + t1 * x + t2 * x.Square();
-    auto tauX = tau2 * x.Square() + tau1 * x + z.Square() * gamma;
+    // t_hat = <l,r> = t(x)
+    auto t_hat = t0 + t1 * x + t2 * x.Square();
+    auto tau_x = tau2 * x.Square() + tau1 * x + z.Square() * gamma;
     auto mu = alpha + rho * x;
 
-    // prover sends l,r,tHat,tauX,mu to verifier
+    // Prover sends l,r,t_hat,tau_x,mu to verifier
 
     // (64)
     auto hhp = hh * Scalars::FirstNPow(n, y.Invert());
     
     // (65)
-    auto deltaYz = 
-        ((z - z.Square()) * (oneN * yN).Sum())
-        - (z.Cube() * (oneN * twoN).Sum());
+    auto delta_yz = 
+        ((z - z.Square()) * (one_n * y_n).Sum())
+        - (z.Cube() * (one_n * two_n).Sum());
 
-    auto lhs_65 = g * tHat + h * tauX;
-    auto rhs_65 = V * z.Square() + g * deltaYz + T1 * x + T2 * x.Square();
+    auto lhs_65 = g * t_hat + h * tau_x;
+    auto rhs_65 = V * z.Square() + g * delta_yz + cap_t1 * x + cap_t2 * x.Square();
     if (lhs_65 != rhs_65) return false;
     
     // (66), (67)
-    auto l = (aL - oneN * z) + sL * x;
-    auto r = yN * (aR + oneN * z + sR * x) + twoN * z.Square();
+    auto l = (al - one_n * z) + sl * x;
+    auto r = y_n * (ar + one_n * z + sr * x) + two_n * z.Square();
 
-    auto P = 
-        A 
-        + (S * x) 
-        - (gg * (oneN * z)).Sum() 
-        + (hhp * (yN * z + twoN * z.Square())).Sum();
+    auto p = 
+        a 
+        + (s * x) 
+        - (gg * (one_n * z)).Sum() 
+        + (hhp * (y_n * z + two_n * z.Square())).Sum();
 
-    if (useInnerProductArgument) 
-    {
+    if (use_inner_product_argument) {
         auto u = G1Point::Rand();
-        auto Pp = P + h * mu.Negate() + u * (l * r).Sum();
-        return InnerProductArgument(n, gg, hhp, u, Pp, l, r);
-    } 
-    else 
-    {
+        auto pp = p + h * mu.Negate() + u * (l * r).Sum();
+        return InnerProductArgument(n, gg, hhp, u, pp, l, r);
+    } else {
         auto rhs_66_67 = h * mu + (gg * l).Sum() + (hhp * r).Sum();
-        if (P != rhs_66_67) return false;
+        if (p != rhs_66_67) return false;
 
         // (68)
         auto rhs_68 = (l * r).Sum();
 
-        return tHat == rhs_68;
+        return t_hat == rhs_68;
     }
 }
 
 BOOST_AUTO_TEST_CASE(test_integration_range_proof)
 {
     auto gamma = Scalar::Rand();
-    Scalars aL(std::vector<Scalar> {
+    Scalars al(std::vector<Scalar> {
         Scalar {1}, 
         Scalar {0},
         Scalar {0},
         Scalar {1}
     });
-    size_t n = aL.Size();
+    size_t n = al.Size();
     Scalar upsilon(9);
 
     auto g = G1Point::MapToG1("g");
@@ -547,19 +543,17 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof)
         G1Point::MapToG1("h4")
     });
 
-    auto V = h * gamma + g * upsilon;
+    auto v = h * gamma + g * upsilon;
 
-    for(auto i = 0; i < 2; ++i)
-    {
+    for (auto i = 0; i < 2; ++i) {
         auto testCaseBool = i != 0;
         auto res = RangeProof(
-            n, V, gamma,
+            n, v, gamma,
             g, h, 
             gg, hh,
-            aL,
+            al,
             testCaseBool
         );
         BOOST_CHECK(res == true);
-
     }   
 }

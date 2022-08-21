@@ -5,8 +5,14 @@
 #ifndef NAVCOIN_BLSCT_ARITH_G1POINT_H
 #define NAVCOIN_BLSCT_ARITH_G1POINT_H
 
+#include <stddef.h>
+#include <string>
+
 #include <bls/bls384_256.h>
 #include <bls/bls.h>
+#include <boost/thread/lock_guard.hpp>
+#include <boost/thread/mutex.hpp>
+
 #include <blsct/arith/mcl_initializer.h>
 #include <blsct/arith/scalar.h>
 #include <hash.h>
@@ -14,18 +20,12 @@
 #include <uint256.h>
 #include <version.h>
 
-#include <stddef.h>
-#include <string>
-
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/lock_guard.hpp>
-
 enum class Endianness {
     Big,
     Little
 };
 
-class G1Point 
+class G1Point
 {
 public:
     static constexpr int WIDTH = 384 / 8;
@@ -49,8 +49,8 @@ public:
     static G1Point MapToG1(const std::vector<uint8_t>& vec, const Endianness e = Endianness::Little);
     static G1Point MapToG1(const std::string& s, const Endianness e = Endianness::Little);
     static G1Point HashAndMap(const std::vector<uint8_t>& vec);
-    static G1Point MulVec(const std::vector<G1Point>& gVec, const std::vector<Scalar>& sVec);
-    static G1Point MulVec(const std::vector<mclBnG1>& gVec, const std::vector<mclBnFr>& sVec);
+    static G1Point MulVec(const std::vector<G1Point>& g_vec, const std::vector<Scalar>& s_vec);
+    static G1Point MulVec(const std::vector<mclBnG1>& g_vec, const std::vector<mclBnFr>& s_vec);
     static G1Point Rand();
 
     bool operator==(const G1Point& b) const;
@@ -61,20 +61,17 @@ public:
     std::vector<uint8_t> GetVch() const;
     void SetVch(const std::vector<uint8_t>& b);
 
-    std::string GetString(const int& ioMode = 16) const;
+    std::string GetString(const int& radix = 16) const;
 
-    unsigned int GetSerializeSize() const
-    {
-        return ::GetSerializeSize(GetVch());
-    }
+    unsigned int GetSerializeSize() const;
 
-    template<typename Stream>
+    template <typename Stream>
     void Serialize(Stream& s) const
     {
         ::Serialize(s, GetVch());
     }
 
-    template<typename Stream>
+    template <typename Stream>
     void Unserialize(Stream& s)
     {
         std::vector<uint8_t> vch;
@@ -82,11 +79,11 @@ public:
         SetVch(vch);
     }
 
-    mclBnG1 p;
+    mclBnG1 m_p;
 
 private:
-    static mclBnG1 G;  // using mclBnG1 instead of G1Point to get around chiken-and-egg issue 
-    static boost::mutex init_mutex;
+    static mclBnG1 m_g; // Using mclBnG1 instead of G1Point to get around chiken-and-egg issue
+    static boost::mutex m_init_mutex;
 };
 
 #endif // NAVCOIN_BLSCT_ARITH_G1POINT_H

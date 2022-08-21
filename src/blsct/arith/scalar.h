@@ -9,100 +9,97 @@
 #ifndef NAVCOIN_BLSCT_ARITH_SCALAR_H
 #define NAVCOIN_BLSCT_ARITH_SCALAR_H
 
+#include <functional>
+#include <stddef.h>
+#include <string>
+#include <vector>
+
 #include <bls/bls384_256.h>
 #include <bls/bls.h>
 #include <blsct/arith/mcl_initializer.h>
-
 #include <hash.h>
 #include <uint256.h>
 #include <serialize.h>
 #include <version.h>
 
-#include <functional>
-#include <stddef.h>
-#include <string>
-#include <vector>
-#include <iostream> // TODO drop this. only for debugging
-
 #define CHECK_AND_ASSERT_THROW_MES(expr, message) do {if(!(expr)) throw std::runtime_error(message);} while(0)
 
 class Scalar {
-    public:
-        static constexpr int WIDTH = 256 / 8;
+public:
+    static constexpr int WIDTH = 256 / 8;
 
-        Scalar(const int64_t& n = 0);
-        Scalar(const std::vector<uint8_t> &v);
-        Scalar(const Scalar& n);
-        Scalar(const mclBnFr& nFr);
-        Scalar(const uint256& n);
-        Scalar(const std::string& s, int ioMode);
+    Scalar(const int64_t& n = 0);
+    Scalar(const std::vector<uint8_t> &v);
+    Scalar(const Scalar& n);
+    Scalar(const mclBnFr& n_fr);
+    Scalar(const uint256& n);
+    Scalar(const std::string& s, int radix);
 
-        static void Init();
+    static void Init();
 
-        Scalar ApplyBitwiseOp(const Scalar& a, const Scalar&b, 
-            std::function<uint8_t(uint8_t, uint8_t)> op) const;
+    Scalar ApplyBitwiseOp(const Scalar& a, const Scalar&b, 
+        std::function<uint8_t(uint8_t, uint8_t)> op) const;
 
-        void operator=(const uint64_t& n);
+    void operator=(const uint64_t& n);
 
-        Scalar operator+(const Scalar &b) const;
-        Scalar operator-(const Scalar &b) const;
-        Scalar operator*(const Scalar &b) const;
-        Scalar operator/(const Scalar &b) const;
-        Scalar operator|(const Scalar &b) const;
-        Scalar operator^(const Scalar &b) const;
-        Scalar operator&(const Scalar &b) const;
-        Scalar operator~() const;
-        Scalar operator<<(unsigned int shift) const;
-        Scalar operator>>(unsigned int shift) const;
+    Scalar operator+(const Scalar &b) const;
+    Scalar operator-(const Scalar &b) const;
+    Scalar operator*(const Scalar &b) const;
+    Scalar operator/(const Scalar &b) const;
+    Scalar operator|(const Scalar &b) const;
+    Scalar operator^(const Scalar &b) const;
+    Scalar operator&(const Scalar &b) const;
+    Scalar operator~() const;
+    Scalar operator<<(unsigned int shift) const;
+    Scalar operator>>(unsigned int shift) const;
 
-        bool operator==(const Scalar &b) const;
-        bool operator==(const int &b) const;
-        bool operator!=(const Scalar &b) const;
-        bool operator!=(const int &b) const;
+    bool operator==(const Scalar &b) const;
+    bool operator==(const int &b) const;
+    bool operator!=(const Scalar &b) const;
+    bool operator!=(const int &b) const;
 
-        Scalar Invert() const;
-        Scalar Negate() const;
-        Scalar Square() const;
-        Scalar Cube() const;
-        Scalar Pow(const Scalar& n) const;
+    Scalar Invert() const;
+    Scalar Negate() const;
+    Scalar Square() const;
+    Scalar Cube() const;
+    Scalar Pow(const Scalar& n) const;
 
-        static Scalar Rand(bool excludeZero = false);
+    static Scalar Rand(bool exclude_zero = false);
 
-        int64_t GetInt64() const;
+    int64_t GetInt64() const;
 
-        std::vector<uint8_t> GetVch() const;
-        void SetVch(const std::vector<uint8_t>& v);
+    std::vector<uint8_t> GetVch() const;
+    void SetVch(const std::vector<uint8_t>& v);
 
-        // sets 2^n to the instance
-        void SetPow2(int n);
+    /** 
+     * Sets 2^n to the instance
+     */
+    void SetPow2(int n);
 
-        uint256 Hash(const int& n) const;
+    uint256 Hash(const int& n) const;
 
-        std::string GetString(const int& r = 16) const;
+    std::string GetString(const int8_t radix = 16) const;
 
-        bool GetBit(uint8_t n) const;
-        std::vector<bool> GetBits() const;
+    bool GetBit(uint8_t n) const;
+    std::vector<bool> GetBits() const;
 
-        unsigned int GetSerializeSize() const
-        {
-            return ::GetSerializeSize(GetVch());
-        }
+    unsigned int GetSerializeSize() const;
 
-        template<typename Stream>
-            void Serialize(Stream& s) const
-            {
-                ::Serialize(s, GetVch());
-            }
+    template<typename Stream>
+    void Serialize(Stream& s) const
+    {
+        ::Serialize(s, GetVch());
+    }
 
-        template<typename Stream>
-            void Unserialize(Stream& s)
-            {
-                std::vector<uint8_t> vch;
-                ::Unserialize(s, vch);
-                SetVch(vch);
-            }
+    template<typename Stream>
+    void Unserialize(Stream& s)
+    {
+        std::vector<uint8_t> vch;
+        ::Unserialize(s, vch);
+        SetVch(vch);
+    }
 
-        mclBnFr fr;
+    mclBnFr m_fr;
 };
 
 #endif // NAVCOIN_BLSCT_ARITH_SCALAR_H

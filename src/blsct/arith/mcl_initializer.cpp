@@ -6,12 +6,11 @@
 
 void MclInitializer::Init()
 {
-    boost::lock_guard<boost::mutex> lock(MclInitializer::init_mutex);
+    boost::lock_guard<boost::mutex> lock(MclInitializer::m_init_mutex);
     static bool is_initialized = false;
     if (is_initialized) return;
 
-    if (blsInit(MCL_BLS12_381, MCLBN_COMPILED_TIME_VAR) != 0)
-    {
+    if (blsInit(MCL_BLS12_381, MCLBN_COMPILED_TIME_VAR) != 0) {
         throw std::runtime_error("blsInit failed");
     }
     mclBn_setETHserialization(1);
