@@ -15,7 +15,7 @@
 
 struct BlsctArithElementsTests {
     BlsctArithElementsTests()
-    {
+    { 
         G1Point::Init();
     }
 };
@@ -24,26 +24,26 @@ BOOST_TEST_GLOBAL_FIXTURE(BlsctArithElementsTests);
 
 BOOST_AUTO_TEST_CASE(test_elements_constructors)
 {
-    Scalars ss(std::vector<Scalar>{Scalar{1}, Scalar{2}});
+    Scalars ss(std::vector<Scalar> { Scalar{1}, Scalar{2} });
     auto g = G1Point::GetBasePoint();
     BOOST_CHECK(ss.Size() == 2);
     BOOST_CHECK(ss[0].GetInt64() == 1);
     BOOST_CHECK(ss[1].GetInt64() == 2);
 
-    G1Points g1s(std::vector<G1Point>{g, g + g});
+    G1Points g1s(std::vector<G1Point> { g, g + g });
     BOOST_CHECK(g1s.Size() == 2);
 }
 
 BOOST_AUTO_TEST_CASE(test_elements_sum)
 {
     {
-        Scalars ss(std::vector<Scalar>{Scalar{1}, Scalar{2}});
+        Scalars ss(std::vector<Scalar> { Scalar{1}, Scalar{2} });
         auto sum = ss.Sum();
         BOOST_CHECK_EQUAL(sum.GetInt64(), 3);
     }
     {
         auto g = G1Point::GetBasePoint();
-        G1Points g1s(std::vector<G1Point>{g, g + g});
+        G1Points g1s(std::vector<G1Point> { g, g + g });
         auto sum = g1s.Sum();
         BOOST_CHECK(sum == (g * 3));
     }
@@ -70,25 +70,25 @@ BOOST_AUTO_TEST_CASE(test_elements_add)
 BOOST_AUTO_TEST_CASE(test_elements_confirm_sizes_match)
 {
     {
-        Scalars s1(std::vector<Scalar>{Scalar{1}});
-        Scalars s2(std::vector<Scalar>{Scalar{1}, Scalar{2}});
+        Scalars s1(std::vector<Scalar> { Scalar{1} });
+        Scalars s2(std::vector<Scalar>{ Scalar{1}, Scalar{2} });
         BOOST_CHECK_THROW(s1.ConfirmSizesMatch(s2.Size()), std::runtime_error);
     }
     {
-        Scalars s1(std::vector<Scalar>{Scalar{2}, Scalar{3}});
-        Scalars s2(std::vector<Scalar>{Scalar{1}, Scalar{2}});
+        Scalars s1(std::vector<Scalar> { Scalar{2}, Scalar{3} });
+        Scalars s2(std::vector<Scalar>{ Scalar{1}, Scalar{2} });
         BOOST_CHECK_NO_THROW(s1.ConfirmSizesMatch(s2.Size()));
     }
     {
         auto g = G1Point::GetBasePoint();
-        G1Points gg(std::vector<G1Point>{g, g + g});
-        G1Points hh(std::vector<G1Point>{g});
+        G1Points gg(std::vector<G1Point> { g, g + g });
+        G1Points hh(std::vector<G1Point>{ g });
         BOOST_CHECK_THROW(gg.ConfirmSizesMatch(hh.Size()), std::runtime_error);
     }
     {
         auto g = G1Point::GetBasePoint();
-        G1Points gg(std::vector<G1Point>{g, g + g});
-        G1Points hh(std::vector<G1Point>{g, g * 3});
+        G1Points gg(std::vector<G1Point> { g, g + g });
+        G1Points hh(std::vector<G1Point>{ g, g * 3 });
         BOOST_CHECK_NO_THROW(gg.ConfirmSizesMatch(hh.Size()));
     }
 }
@@ -97,24 +97,24 @@ BOOST_AUTO_TEST_CASE(test_elements_operator_mul_scalars)
 {
     // G1Points ^ Scalars -> G1Points
     {
-        Scalars ss(std::vector<Scalar>{Scalar{2}, Scalar{3}});
+        Scalars ss(std::vector<Scalar> { Scalar{2}, Scalar{3} });
         auto g = G1Point::GetBasePoint();
-        G1Points gg(std::vector<G1Point>{g, g + g});
+        G1Points gg(std::vector<G1Point> { g, g + g });
         auto hh = gg * ss;
 
         auto h1 = g * Scalar(2);
         auto h2 = (g + g) * Scalar(3);
-        G1Points ii(std::vector<G1Point>{h1, h2});
+        G1Points ii(std::vector<G1Point> { h1, h2 });
 
         BOOST_CHECK(hh == ii);
     }
     // Scalars ^ Scalars -> Scalars
     {
-        Scalars ss(std::vector<Scalar>{Scalar{2}, Scalar{3}});
-        Scalars tt(std::vector<Scalar>{Scalar{3}, Scalar{4}});
+        Scalars ss(std::vector<Scalar> { Scalar{2}, Scalar{3} });
+        Scalars tt(std::vector<Scalar>{ Scalar{3}, Scalar{4} });
         auto uu = ss * tt;
 
-        Scalars vv(std::vector<Scalar>{Scalar{6}, Scalar{12}});
+        Scalars vv(std::vector<Scalar> { Scalar{6}, Scalar{12} });
 
         BOOST_CHECK(uu == vv);
     }
@@ -124,7 +124,7 @@ BOOST_AUTO_TEST_CASE(test_elements_operator_mul_scalar)
 {
     // Scalars * Scalar -> Scalars
     {
-        Scalars ss(std::vector<Scalar>{Scalar{2}, Scalar{3}});
+        Scalars ss(std::vector<Scalar> { Scalar{2}, Scalar{3} });
         Scalar z(5);
         auto r1 = ss * z;
 
@@ -136,7 +136,7 @@ BOOST_AUTO_TEST_CASE(test_elements_operator_mul_scalar)
     // G1Points * Scalar -> G1Points
     {
         auto g = G1Point::GetBasePoint();
-        G1Points gg(std::vector<G1Point>{g, g + g});
+        G1Points gg(std::vector<G1Point> { g, g + g });
         Scalar z(3);
         auto r1 = gg * z;
 
@@ -150,20 +150,20 @@ BOOST_AUTO_TEST_CASE(test_elements_operator_mul_scalar)
 BOOST_AUTO_TEST_CASE(test_elements_operator_add)
 {
     {
-        Scalars ss(std::vector<Scalar>{Scalar{2}, Scalar{3}});
-        Scalars tt(std::vector<Scalar>{Scalar{3}, Scalar{4}});
+        Scalars ss(std::vector<Scalar> { Scalar{2}, Scalar{3} });
+        Scalars tt(std::vector<Scalar>{ Scalar{3}, Scalar{4} });
         auto uu = ss + tt;
 
-        Scalars vv(std::vector<Scalar>{Scalar{5}, Scalar{7}});
+        Scalars vv(std::vector<Scalar> { Scalar{5}, Scalar{7} });
         BOOST_CHECK(uu == vv);
     }
     {
         auto g = G1Point::GetBasePoint();
-        G1Points gg(std::vector<G1Point>{g, g + g});
-        G1Points hh(std::vector<G1Point>{g + g, g});
+        G1Points gg(std::vector<G1Point> { g, g + g });
+        G1Points hh(std::vector<G1Point>{ g + g, g });
         auto ii = gg + hh;
 
-        G1Points jj(std::vector<G1Point>{g + g + g, g + g + g});
+        G1Points jj(std::vector<G1Point> { g + g + g, g + g + g });
         BOOST_CHECK(ii == jj);
     }
 }
@@ -171,20 +171,20 @@ BOOST_AUTO_TEST_CASE(test_elements_operator_add)
 BOOST_AUTO_TEST_CASE(test_elements_operator_sub)
 {
     {
-        Scalars ss(std::vector<Scalar>{Scalar{7}, Scalar{6}});
-        Scalars tt(std::vector<Scalar>{Scalar{3}, Scalar{4}});
+        Scalars ss(std::vector<Scalar> { Scalar{7}, Scalar{6} });
+        Scalars tt(std::vector<Scalar> { Scalar{3}, Scalar{4} });
         auto uu = ss - tt;
 
-        Scalars vv(std::vector<Scalar>{Scalar{4}, Scalar{2}});
+        Scalars vv(std::vector<Scalar> { Scalar{4}, Scalar{2} });
         BOOST_CHECK(uu == vv);
     }
     {
         auto g = G1Point::GetBasePoint();
-        G1Points gg(std::vector<G1Point>{g + g + g, g + g + g + g});
-        G1Points hh(std::vector<G1Point>{g, g});
+        G1Points gg(std::vector<G1Point> { g + g + g, g + g + g + g });
+        G1Points hh(std::vector<G1Point> { g, g });
         auto ii = gg - hh;
 
-        G1Points jj(std::vector<G1Point>{g + g, g + g + g});
+        G1Points jj(std::vector<G1Point> { g + g, g + g + g });
         BOOST_CHECK(ii == jj);
     }
 }
@@ -192,15 +192,15 @@ BOOST_AUTO_TEST_CASE(test_elements_operator_sub)
 BOOST_AUTO_TEST_CASE(test_elements_operator_eq)
 {
     {
-        Scalars ss(std::vector<Scalar>{Scalar{2}, Scalar{3}});
-        Scalars tt(std::vector<Scalar>{Scalar{2}, Scalar{3}});
+        Scalars ss(std::vector<Scalar> { Scalar{2}, Scalar{3} });
+        Scalars tt(std::vector<Scalar> { Scalar{2}, Scalar{3} });
         auto b = ss == tt;
         BOOST_CHECK(b);
     }
     {
         auto g = G1Point::GetBasePoint();
-        G1Points gg(std::vector<G1Point>{g, g + g});
-        G1Points hh(std::vector<G1Point>{g, g + g});
+        G1Points gg(std::vector<G1Point> { g, g + g });
+        G1Points hh(std::vector<G1Point> { g, g + g });
         auto b = gg == hh;
         BOOST_CHECK(b);
     }
@@ -209,14 +209,14 @@ BOOST_AUTO_TEST_CASE(test_elements_operator_eq)
 BOOST_AUTO_TEST_CASE(test_elements_operator_ne)
 {
     {
-        Scalars ss(std::vector<Scalar>{Scalar{2}, Scalar{3}});
-        Scalars tt(std::vector<Scalar>{Scalar{1}, Scalar{3}});
+        Scalars ss(std::vector<Scalar> { Scalar{2}, Scalar{3} });
+        Scalars tt(std::vector<Scalar> { Scalar{1}, Scalar{3} });
         auto b = ss != tt;
         BOOST_CHECK(b);
     }
     {
         auto g = G1Point::GetBasePoint();
-        G1Points gg(std::vector<G1Point>{g, g + g});
+        G1Points gg(std::vector<G1Point> { g, g + g });
         G1Points hh(std::vector<G1Point>{g * 10, g + g});
         auto b = gg != hh;
         BOOST_CHECK(b);
@@ -225,19 +225,19 @@ BOOST_AUTO_TEST_CASE(test_elements_operator_ne)
 
 BOOST_AUTO_TEST_CASE(test_elements_from)
 {
-    Scalars ss(std::vector<Scalar>{Scalar{1}, Scalar{2}, Scalar{3}});
+    Scalars ss(std::vector<Scalar> { Scalar{1}, Scalar{2}, Scalar{3} });
     {
         auto tt = ss.From(0);
         BOOST_CHECK(ss == tt);
     }
     {
         auto tt = ss.From(1);
-        Scalars uu(std::vector<Scalar>{Scalar{2}, Scalar{3}});
+        Scalars uu(std::vector<Scalar> { Scalar{2}, Scalar{3} });
         BOOST_CHECK(tt == uu);
     }
     {
         auto tt = ss.From(2);
-        Scalars uu(std::vector<Scalar>{Scalar{3}});
+        Scalars uu(std::vector<Scalar> { Scalar{3} });
         BOOST_CHECK(tt == uu);
     }
     {
@@ -245,19 +245,19 @@ BOOST_AUTO_TEST_CASE(test_elements_from)
     }
 
     auto g = G1Point::GetBasePoint();
-    G1Points gg(std::vector<G1Point>{g, g + g, g + g + g});
+    G1Points gg(std::vector<G1Point> { g, g + g, g + g + g });
     {
         auto hh = gg.From(0);
         BOOST_CHECK(gg == hh);
     }
     {
         auto hh = gg.From(1);
-        G1Points ii(std::vector<G1Point>{g + g, g + g + g});
+        G1Points ii(std::vector<G1Point> { g + g, g + g + g });
         BOOST_CHECK(hh == ii);
     }
     {
         auto hh = gg.From(2);
-        G1Points ii(std::vector<G1Point>{g + g + g});
+        G1Points ii(std::vector<G1Point> { g + g + g });
         BOOST_CHECK(hh == ii);
     }
     {
@@ -283,7 +283,7 @@ BOOST_AUTO_TEST_CASE(test_elements_first_n_pow)
         auto pows = Scalars::FirstNPow(3, k);
         auto invPows = Scalars::FirstNPow(3, k.Invert());
         auto r = pows * invPows;
-        Scalar one(1);
+        Scalar one(1); 
         BOOST_CHECK(r[0] == one);
         BOOST_CHECK(r[1] == one);
         BOOST_CHECK(r[2] == one);
@@ -308,19 +308,19 @@ BOOST_AUTO_TEST_CASE(test_elements_rand_vec)
 
 BOOST_AUTO_TEST_CASE(test_elements_to)
 {
-    Scalars ss(std::vector<Scalar>{Scalar{1}, Scalar{2}, Scalar{3}});
+    Scalars ss(std::vector<Scalar> { Scalar{1}, Scalar{2}, Scalar{3} });
     {
         auto tt = ss.To(0);
         BOOST_CHECK(tt.Size() == 0);
     }
     {
         auto tt = ss.To(1);
-        Scalars uu(std::vector<Scalar>{Scalar{1}});
+        Scalars uu(std::vector<Scalar> { Scalar{1} });
         BOOST_CHECK(tt == uu);
     }
     {
         auto tt = ss.To(2);
-        Scalars uu(std::vector<Scalar>{Scalar{1}, Scalar{2}});
+        Scalars uu(std::vector<Scalar> { Scalar{1}, Scalar{2} });
         BOOST_CHECK(tt == uu);
     }
     {
@@ -332,24 +332,24 @@ BOOST_AUTO_TEST_CASE(test_elements_to)
     }
 
     auto g = G1Point::GetBasePoint();
-    G1Points gg(std::vector<G1Point>{g, g + g, g + g + g});
+    G1Points gg(std::vector<G1Point> { g, g + g, g + g + g });
     {
         auto hh = gg.To(0);
         BOOST_CHECK(hh.Size() == 0);
     }
     {
         auto hh = gg.To(1);
-        G1Points ii(std::vector<G1Point>{g});
+        G1Points ii(std::vector<G1Point> { g });
         BOOST_CHECK(hh == ii);
     }
     {
         auto hh = gg.To(2);
-        G1Points ii(std::vector<G1Point>{g, g + g});
+        G1Points ii(std::vector<G1Point> { g, g + g });
         BOOST_CHECK(hh == ii);
     }
     {
         auto hh = gg.To(3);
-        G1Points ii(std::vector<G1Point>{g, g + g, g + g + g});
+        G1Points ii(std::vector<G1Point> { g, g + g, g + g+ g });
         BOOST_CHECK(hh == ii);
     }
     {
