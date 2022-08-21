@@ -22,6 +22,8 @@ struct G1PointTests {
 
 BOOST_TEST_GLOBAL_FIXTURE(G1PointTests);
 
+BOOST_AUTO_TEST_SUITE(g1point_tests)
+
 BOOST_AUTO_TEST_CASE(test_g1point_constructors)
 {
     // Default
@@ -118,7 +120,7 @@ BOOST_AUTO_TEST_CASE(test_g1point_get_base_point)
 
 BOOST_AUTO_TEST_CASE(test_g1point_map_to_g1)
 {
-    // Differnt numbers should be mapped to different points 
+    // Differnt numbers should be mapped to different points
     std::set<std::string> xs;
     const size_t num_xs = 1000;
     for (size_t i=0; i<num_xs; ++i) {
@@ -131,11 +133,54 @@ BOOST_AUTO_TEST_CASE(test_g1point_map_to_g1)
 
     // Just check if MapToG1 accepts a large number
     std::vector<uint8_t> num_48_byte{
-        0x73, 0xed, 0xa7, 0x53, 0x29, 0x9d, 0x7d, 0x48, 0x33, 0x39, 
-        0xd8, 0x08, 0x09, 0xa1, 0xd8, 0x05, 0x53, 0xbd, 0xa4, 0x02, 
-        0xff, 0xfe, 0x5b, 0xfe, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 
-        0xd8, 0x08, 0x09, 0xa1, 0xd8, 0x05, 0x53, 0xbd, 0xa4, 0x02, 
-        0xff, 0xfe, 0x5b, 0xfe, 0xff, 0xff, 0xff, 0xff, 
+        0x73,
+        0xed,
+        0xa7,
+        0x53,
+        0x29,
+        0x9d,
+        0x7d,
+        0x48,
+        0x33,
+        0x39,
+        0xd8,
+        0x08,
+        0x09,
+        0xa1,
+        0xd8,
+        0x05,
+        0x53,
+        0xbd,
+        0xa4,
+        0x02,
+        0xff,
+        0xfe,
+        0x5b,
+        0xfe,
+        0xff,
+        0xff,
+        0xff,
+        0xff,
+        0x00,
+        0x00,
+        0xd8,
+        0x08,
+        0x09,
+        0xa1,
+        0xd8,
+        0x05,
+        0x53,
+        0xbd,
+        0xa4,
+        0x02,
+        0xff,
+        0xfe,
+        0x5b,
+        0xfe,
+        0xff,
+        0xff,
+        0xff,
+        0xff,
     };
     G1Point::MapToG1(num_48_byte);
 
@@ -147,11 +192,54 @@ BOOST_AUTO_TEST_CASE(test_g1point_map_to_g1)
 BOOST_AUTO_TEST_CASE(test_g1point_hash_and_map)
 {
     std::vector<uint8_t> vec{
-        0x73, 0xed, 0xa7, 0x53, 0x29, 0x9d, 0x7d, 0x48, 0x33, 0x39, 
-        0xd8, 0x08, 0x09, 0xa1, 0xd8, 0x05, 0x53, 0xbd, 0xa4, 0x02, 
-        0xff, 0xfe, 0x5b, 0xfe, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 
-        0xd8, 0x08, 0x09, 0xa1, 0xd8, 0x05, 0x53, 0xbd, 0xa4, 0x02, 
-        0xff, 0xfe, 0x5b, 0xfe, 0xff, 0xff, 0xff, 0xff, 
+        0x73,
+        0xed,
+        0xa7,
+        0x53,
+        0x29,
+        0x9d,
+        0x7d,
+        0x48,
+        0x33,
+        0x39,
+        0xd8,
+        0x08,
+        0x09,
+        0xa1,
+        0xd8,
+        0x05,
+        0x53,
+        0xbd,
+        0xa4,
+        0x02,
+        0xff,
+        0xfe,
+        0x5b,
+        0xfe,
+        0xff,
+        0xff,
+        0xff,
+        0xff,
+        0x00,
+        0x00,
+        0xd8,
+        0x08,
+        0x09,
+        0xa1,
+        0xd8,
+        0x05,
+        0x53,
+        0xbd,
+        0xa4,
+        0x02,
+        0xff,
+        0xfe,
+        0x5b,
+        0xfe,
+        0xff,
+        0xff,
+        0xff,
+        0xff,
     };
 
     // Use separate hash function to hash vec
@@ -167,7 +255,7 @@ BOOST_AUTO_TEST_CASE(test_g1point_hash_and_map)
     std::vector<uint8_t> hashedVec(buf, buf + ser_size);
     // mclBpFp_serialize serializes its value in big-endian
 
-    // Then get g1 point from the hash 
+    // Then get g1 point from the hash
     auto p = G1Point::MapToG1(hashedVec, Endianness::Big);
 
     // Next, directly get g1 point from the vec, using integrated hash function
@@ -214,9 +302,9 @@ BOOST_AUTO_TEST_CASE(test_g1point_mulvec_mcl)
 BOOST_AUTO_TEST_CASE(test_g1point_rand)
 {
     unsigned int num_tries = 1000;
-    unsigned int num_dups = 0; 
+    unsigned int num_dups = 0;
     auto x = G1Point::Rand();
-    for (size_t i=0; i<num_tries; ++i) {
+    for (size_t i = 0; i < num_tries; ++i) {
         auto y = G1Point::Rand();
         if (x == y) ++num_dups;
     }

@@ -13,7 +13,7 @@
 #include <set>
 #include <streams.h>
 
-struct IntegrationTests {
+struct ArithIntegrationTests {
     IntegrationTests()
     {
         MclInitializer::Init();
@@ -21,7 +21,9 @@ struct IntegrationTests {
     }
 };
 
-BOOST_TEST_GLOBAL_FIXTURE(IntegrationTests);
+BOOST_TEST_GLOBAL_FIXTURE(ArithIntegrationTests);
+
+BOOST_AUTO_TEST_SUITE(arith_integration_tests)
 
 BOOST_AUTO_TEST_CASE(test_integration_invert_zero)
 {

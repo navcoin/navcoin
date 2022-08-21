@@ -29,7 +29,7 @@ public:
     static constexpr int WIDTH = 256 / 8;
 
     Scalar(const int64_t& n = 0);
-    Scalar(const std::vector<uint8_t> &v);
+    Scalar(const std::vector<uint8_t>& v);
     Scalar(const Scalar& n);
     Scalar(const mclBnFr& n_fr);
     Scalar(const uint256& n);
@@ -37,26 +37,26 @@ public:
 
     static void Init();
 
-    Scalar ApplyBitwiseOp(const Scalar& a, const Scalar&b, 
-        std::function<uint8_t(uint8_t, uint8_t)> op) const;
+    Scalar ApplyBitwiseOp(const Scalar& a, const Scalar& b,
+                          std::function<uint8_t(uint8_t, uint8_t)> op) const;
 
     void operator=(const uint64_t& n);
 
-    Scalar operator+(const Scalar &b) const;
-    Scalar operator-(const Scalar &b) const;
-    Scalar operator*(const Scalar &b) const;
-    Scalar operator/(const Scalar &b) const;
-    Scalar operator|(const Scalar &b) const;
-    Scalar operator^(const Scalar &b) const;
-    Scalar operator&(const Scalar &b) const;
+    Scalar operator+(const Scalar& b) const;
+    Scalar operator-(const Scalar& b) const;
+    Scalar operator*(const Scalar& b) const;
+    Scalar operator/(const Scalar& b) const;
+    Scalar operator|(const Scalar& b) const;
+    Scalar operator^(const Scalar& b) const;
+    Scalar operator&(const Scalar& b) const;
     Scalar operator~() const;
     Scalar operator<<(unsigned int shift) const;
     Scalar operator>>(unsigned int shift) const;
 
-    bool operator==(const Scalar &b) const;
-    bool operator==(const int &b) const;
-    bool operator!=(const Scalar &b) const;
-    bool operator!=(const int &b) const;
+    bool operator==(const Scalar& b) const;
+    bool operator==(const int& b) const;
+    bool operator!=(const Scalar& b) const;
+    bool operator!=(const int& b) const;
 
     Scalar Invert() const;
     Scalar Negate() const;
@@ -85,13 +85,13 @@ public:
 
     unsigned int GetSerializeSize() const;
 
-    template<typename Stream>
+    template <typename Stream>
     void Serialize(Stream& s) const
     {
         ::Serialize(s, GetVch());
     }
 
-    template<typename Stream>
+    template <typename Stream>
     void Unserialize(Stream& s)
     {
         std::vector<uint8_t> vch;

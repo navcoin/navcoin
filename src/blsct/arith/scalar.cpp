@@ -78,8 +78,8 @@ Scalar Scalar::ApplyBitwiseOp(const Scalar& a, const Scalar& b,
     auto a_vec = a.GetVch();
     auto b_vec = b.GetVch();
 
-    // If sizes are the same, bVec becomes longer and aVec becomes shorter 
-    auto& longer = a_vec.size() > b_vec.size() ? a_vec : b_vec; 
+    // If sizes are the same, bVec becomes longer and aVec becomes shorter
+    auto& longer = a_vec.size() > b_vec.size() ? a_vec : b_vec;
     auto& shorter = b_vec.size() < a_vec.size() ? b_vec : a_vec;
 
     std::vector<uint8_t> c_vec(longer.size());
@@ -94,7 +94,7 @@ Scalar Scalar::ApplyBitwiseOp(const Scalar& a, const Scalar& b,
     for (size_t i = shorter.size(); i < longer.size(); i++) {
         c_vec[i] = op(longer[i], 0);
     }
-     
+
     ret.SetVch(c_vec);
 
     return ret;
@@ -120,7 +120,7 @@ Scalar Scalar::operator&(const Scalar &b) const
 
 Scalar Scalar::operator~() const
 {
-    // Getting complement of lower 8 bytes only since when 32-byte buffer is fully complemented, 
+    // Getting complement of lower 8 bytes only since when 32-byte buffer is fully complemented,
     // mclBrFr_deserialize returns undesired result
     int64_t n_complement_scalar = ~GetInt64();
     Scalar ret(n_complement_scalar);
@@ -154,7 +154,7 @@ Scalar Scalar::operator>>(unsigned int shift) const
 
 void Scalar::operator=(const uint64_t& n)
 {
-    mclBnFr_setInt(&m_fr, (mclInt) n);
+    mclBnFr_setInt(&m_fr, (mclInt)n);
 }
 
 bool Scalar::operator==(const int &b) const
@@ -215,7 +215,7 @@ Scalar Scalar::Pow(const Scalar& n) const
     bit_val = m_fr;
     auto bits = n.GetBits();
 
-    for(auto it = bits.rbegin(); it != bits.rend(); ++it) {
+    for (auto it = bits.rbegin(); it != bits.rend(); ++it) {
         Scalar s(bit_val);
         if (*it) {
             mclBnFr_mul(&temp.m_fr, &temp.m_fr, &bit_val);
@@ -229,7 +229,7 @@ Scalar Scalar::Rand(bool exclude_zero)
 {
     Scalar temp;
 
-    while(true) {
+    while (true) {
         if (mclBnFr_setByCSPRNG(&temp.m_fr) != 0) {
             throw std::runtime_error(std::string("Failed to generate random number"));
         }
@@ -297,7 +297,7 @@ std::vector<bool> Scalar::GetBits() const
 {
     auto bitStr = GetString(2);
     std::vector<bool> vec;
-    for(auto& c: bitStr) {
+    for (auto& c : bitStr) {
         vec.push_back(c == '0' ? 0 : 1);
     }
     return vec;

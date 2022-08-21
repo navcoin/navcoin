@@ -141,8 +141,8 @@ G1Point G1Point::MulVec(const std::vector<G1Point>& g_vec, const std::vector<Sca
 
     const size_t vec_count = g_vec.size();
 
-    std::vector<mclBnG1> vec_g1 (vec_count);
-    std::vector<mclBnFr> vec_fr (vec_count);
+    std::vector<mclBnG1> vec_g1(vec_count);
+    std::vector<mclBnFr> vec_fr(vec_count);
 
     for (size_t i = 0; i < vec_count; ++i) {
         vec_g1[i] = g_vec[i].m_p;
@@ -177,8 +177,8 @@ bool G1Point::operator!=(const G1Point& b) const
 
 G1Point G1Point::Rand()
 {
-   auto g = GetBasePoint();
-   return g * Scalar::Rand();
+    auto g = GetBasePoint();
+    return g * Scalar::Rand();
 }
 
 bool G1Point::IsUnity() const

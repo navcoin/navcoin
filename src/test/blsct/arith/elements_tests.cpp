@@ -22,6 +22,8 @@ struct ElementsTests {
 
 BOOST_TEST_GLOBAL_FIXTURE(ElementsTests);
 
+BOOST_AUTO_TEST_SUITE(elements_tests)
+
 BOOST_AUTO_TEST_CASE(test_elements_constructors)
 {
     Scalars ss(std::vector<Scalar> { Scalar{1}, Scalar{2} });

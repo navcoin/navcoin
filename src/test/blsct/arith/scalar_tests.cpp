@@ -23,6 +23,8 @@ struct ScalarTests {
 
 BOOST_TEST_GLOBAL_FIXTURE(ScalarTests);
 
+BOOST_AUTO_TEST_SUITE(scalar_tests)
+
 BOOST_AUTO_TEST_CASE(test_scalar_constructors)
 {
     // input vector modulo curve order r should be set to Scalar
