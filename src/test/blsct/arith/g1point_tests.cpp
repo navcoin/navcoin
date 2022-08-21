@@ -13,7 +13,8 @@
 #include <set>
 #include <streams.h>
 
-struct G1PointTests {
+struct G1PointTests 
+{
     G1PointTests() 
     { 
         G1Point::Init();
@@ -109,8 +110,7 @@ BOOST_AUTO_TEST_CASE(test_g1point_get_base_point)
 {
     auto G = G1Point::GetBasePoint();
     char gAct[1024];
-    if (mclBnG1_getStr(gAct, sizeof(gAct), &G.p, 10) == 0)
-    {
+    if (mclBnG1_getStr(gAct, sizeof(gAct), &G.p, 10) == 0) {
         BOOST_FAIL("Failed to get string representation of G");
     }
     const char* gExp = "1 3685416753713387016781088315183077757961620795782546409894578378688607592378376318836054947676345821548104185464507 1339506544944476473020471379941921221584933875938349620426543736416511423956333506472724655353366534992391756441569";
@@ -221,8 +221,7 @@ BOOST_AUTO_TEST_CASE(test_g1point_rand)
     unsigned int numTries = 1000;
     unsigned int numDups = 0; 
     auto x = G1Point::Rand();
-    for(size_t i=0; i<numTries; ++i)
-    {
+    for(size_t i=0; i<numTries; ++i) {
         auto y = G1Point::Rand();
         if (x == y) ++numDups;
     }

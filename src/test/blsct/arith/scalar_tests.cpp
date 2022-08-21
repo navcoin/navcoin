@@ -14,7 +14,8 @@
 #define SCALAR_CURVE_ORDER_MINUS_1(x) Scalar x("73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000000", 16)
 #define SCALAR_INT64_MIN(x) Scalar x("52435875175126190479447740508185965837690552500527637822594435327901726408705", 10);
 
-struct ScalarTests {
+struct ScalarTests 
+{
     ScalarTests() 
     { 
         MclInitializer::Init();
@@ -27,21 +28,21 @@ BOOST_AUTO_TEST_CASE(test_scalar_constructors)
 {
     // input vector modulo curve order r should be set to Scalar
 
-    std::vector<uint8_t> oneZerosBe{
+    std::vector<uint8_t> oneZerosBe {
         0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
         0x00, 0x00,
     };
     // input of curve order r - 1 should remain the same in Scalar
-    std::vector<uint8_t> orderRMinus1Be{
+    std::vector<uint8_t> orderRMinus1Be {
         0x73, 0xed, 0xa7, 0x53, 0x29, 0x9d, 0x7d, 0x48, 0x33, 0x39, 
         0xd8, 0x08, 0x09, 0xa1, 0xd8, 0x05, 0x53, 0xbd, 0xa4, 0x02, 
         0xff, 0xfe, 0x5b, 0xfe, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 
         0x00, 0x00,
     };
     // input of curve order r should become zero in Scalar
-    std::vector<uint8_t> orderRBe{
+    std::vector<uint8_t> orderRBe {
         0x73, 0xed, 0xa7, 0x53, 0x29, 0x9d, 0x7d, 0x48, 0x33, 0x39, 
         0xd8, 0x08, 0x09, 0xa1, 0xd8, 0x05, 0x53, 0xbd, 0xa4, 0x02, 
         0xff, 0xfe, 0x5b, 0xfe, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 
@@ -272,8 +273,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_shift_left)
 {
     Scalar base(0b1);
     int64_t exp = 1;
-    for(unsigned int i=0; i<64; ++i)
-    {
+    for(unsigned int i=0; i<64; ++i) {
         Scalar a = base << i;
         BOOST_CHECK_EQUAL(a.GetInt64(), exp);
         exp <<= 1;
@@ -361,8 +361,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_pow)
         TestCase {3, 5, 243},
         TestCase {195, 7, 10721172396796875},
     };
-    for(auto tc : testCases)
-    {
+    for(auto tc : testCases) {
         Scalar a(tc.a);
         Scalar b(tc.b);
         Scalar c(tc.c);
@@ -378,13 +377,11 @@ BOOST_AUTO_TEST_CASE(test_scalar_pow)
 BOOST_AUTO_TEST_CASE(test_scalar_rand)
 {
     std::vector<bool> tf {true, false};
-    for(auto excludeZero: tf)
-    {
+    for(auto excludeZero: tf) {
         unsigned int numTries = 1000000;
         unsigned int numDups = 0; 
         auto x = Scalar::Rand();
-        for(size_t i=0; i<numTries; ++i)
-        {
+        for(size_t i=0; i<numTries; ++i) {
             auto y = Scalar::Rand(excludeZero);
             if (excludeZero && y == 0) BOOST_FAIL("expected non-zero");
             if (x == y) ++numDups;
@@ -405,8 +402,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_getint64)
     {
         Scalar base(0b1);
         int64_t exp = 1;
-        for(unsigned int i=0; i<64; ++i)
-        {
+        for(unsigned int i=0; i<64; ++i) {
             Scalar a = base << i;
             BOOST_CHECK_EQUAL(a.GetInt64(), exp);
             exp <<= 1;
@@ -416,8 +412,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_getint64)
 
 BOOST_AUTO_TEST_CASE(test_scalar_getvch)
 {
-    std::vector<uint8_t> vec
-    {
+    std::vector<uint8_t> vec {
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
         10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
         20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
@@ -431,8 +426,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_getvch)
 BOOST_AUTO_TEST_CASE(test_scalar_setvch)
 {
     {
-        std::vector<uint8_t> vec
-        {
+        std::vector<uint8_t> vec {
             0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
             10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
             20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
@@ -446,8 +440,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_setvch)
     }
     {
         // setting curveOrder - 1 should succeed
-        std::vector<uint8_t> vec 
-        {
+        std::vector<uint8_t> vec {
             115, 237, 167, 83, 41, 157, 125, 72, 51, 57, 216, 8, 9, 161, 216, 5, 83, 189, 164, 2, 255, 254, 91, 254, 255, 255, 255, 255, 0, 0, 0, 0,
         };
         Scalar a;
@@ -457,8 +450,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_setvch)
     }    
     {
         // setting curveOrder should suceed, but Scalar should get the modulo value
-        std::vector<uint8_t> vec 
-        {
+        std::vector<uint8_t> vec {
             115, 237, 167, 83, 41, 157, 125, 72, 51, 57, 216, 8, 9, 161, 216, 5, 83, 189, 164, 2, 255, 254, 91, 254, 255, 255, 255, 255, 0, 0, 0, 1,
         };
         Scalar a;
@@ -468,8 +460,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_setvch)
 
 BOOST_AUTO_TEST_CASE(test_scalar_get_and_setvch)
 {
-    std::vector<uint8_t> vec
-    {
+    std::vector<uint8_t> vec {
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
         10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
         20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
@@ -485,8 +476,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_get_and_setvch)
 
 BOOST_AUTO_TEST_CASE(test_scalar_setpow2)
 {
-    for(size_t i=0; i<10; ++i) 
-    {
+    for (size_t i=0; i<10; ++i) {
         Scalar a;
         a.SetPow2(i);
         BOOST_CHECK_EQUAL(a.GetInt64(), std::pow(2, i));
@@ -551,8 +541,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_get_bits)
     auto bs = s.GetBits();
 
     BOOST_CHECK(bs.size() == exp.size());
-    for(size_t i = 0; i < bs.size(); ++i)
-    {
+    for (size_t i = 0; i < bs.size(); ++i) {
         auto expC = exp[i];
         auto actC = bs[i] == true ? '1' : '0';
         BOOST_CHECK(expC == actC);
@@ -580,25 +569,24 @@ BOOST_AUTO_TEST_CASE(test_scalar_get_bit)
         auto v = a.GetVch();
 
         // 5th byte from the last is 255
-        for(size_t i=0; i<8; ++i)
-        {
+        for (size_t i=0; i<8; ++i) {
             BOOST_CHECK_EQUAL(a.GetBit(4 * 8 + i), true); 
         }
+
         // 9th byte from the last is 254
-        for(size_t i=0; i<8; ++i)
-        {
+        for (size_t i=0; i<8; ++i) {
             BOOST_CHECK_EQUAL(a.GetBit(8 * 8 + i), i != 0); 
         }
+
         // 13th byte from the last is 2
-        for(size_t i=0; i<8; ++i)
-        {
+        for (size_t i=0; i<8; ++i) {
             BOOST_CHECK_EQUAL(a.GetBit(12 * 8 + i), i == 1); 
         }
+
         // 32nd byte from the last is 115
         // 115 = 0b01110011 and rightmost bit is index 0
         std::vector<bool> bits115 = {true, true, false, false, true, true, true, false};
-        for(size_t i=0; i<8; ++i)
-        {
+        for (size_t i=0; i<8; ++i) {
             BOOST_CHECK_EQUAL(a.GetBit(31 * 8 + i), bits115[i]); 
         }
     }

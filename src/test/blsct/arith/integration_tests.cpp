@@ -13,7 +13,8 @@
 #include <set>
 #include <streams.h>
 
-struct IntegrationTests {
+struct IntegrationTests 
+{
     IntegrationTests() 
     {
         MclInitializer::Init();
@@ -362,13 +363,10 @@ bool InnerProductArgument(
     const Scalars& a, const Scalars& b
 )
 {
-    if (n == 1)
-    {
+    if (n == 1) {
         auto c = (a * b).Sum();
         return P == (gg * a).Sum() + (hh * b).Sum() + u * c;
-    }
-    else
-    {
+    } else {
         auto np = n / 2;
 
         auto cL = (a.To(np) * b.From(np)).Sum();
