@@ -13,8 +13,8 @@
 #include <stdexcept>
 #include <vector>
 
-#include <blsct/arith/g1point.h>
 #include <blsct/arith/scalar.h>
+#include <blsct/arith/g1point.h>
 
 /**
  * Designed to expect below instantiations only:

@@ -13,16 +13,15 @@
 #include <set>
 #include <streams.h>
 
-struct ElementsTests {
-    ElementsTests()
+struct BlsctArithElementsTests 
+{
+    BlsctArithElementsTests()
     { 
         G1Point::Init();
     }
 };
 
-BOOST_TEST_GLOBAL_FIXTURE(ElementsTests);
-
-BOOST_AUTO_TEST_SUITE(elements_tests)
+BOOST_TEST_GLOBAL_FIXTURE(BlsctArithElementsTests);
 
 BOOST_AUTO_TEST_CASE(test_elements_constructors)
 {

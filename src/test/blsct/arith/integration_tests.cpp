@@ -13,17 +13,16 @@
 #include <set>
 #include <streams.h>
 
-struct ArithIntegrationTests {
-    IntegrationTests()
+struct BlsctArithIntegrationTests 
+{
+    BlsctArithIntegrationTests()
     {
         MclInitializer::Init();
         G1Point::Init();
     }
 };
 
-BOOST_TEST_GLOBAL_FIXTURE(ArithIntegrationTests);
-
-BOOST_AUTO_TEST_SUITE(arith_integration_tests)
+BOOST_TEST_GLOBAL_FIXTURE(BlsctArithIntegrationTests);
 
 BOOST_AUTO_TEST_CASE(test_integration_invert_zero)
 {

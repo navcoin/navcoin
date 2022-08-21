@@ -14,7 +14,7 @@
 #include <string>
 #include <vector>
 
-#include <bls/bls384_256.h>
+#include <bls/bls384_256.h>  // must include this before bls/bls.h
 #include <bls/bls.h>
 #include <blsct/arith/mcl_initializer.h>
 #include <hash.h>

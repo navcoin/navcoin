@@ -14,16 +14,15 @@
 #define SCALAR_CURVE_ORDER_MINUS_1(x) Scalar x("73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000000", 16)
 #define SCALAR_INT64_MIN(x) Scalar x("52435875175126190479447740508185965837690552500527637822594435327901726408705", 10);
 
-struct ScalarTests {
-    ScalarTests()
+struct BlsctArithScalarTests 
+{
+    BlsctArithScalarTests()
     { 
         MclInitializer::Init();
     }
 };
 
-BOOST_TEST_GLOBAL_FIXTURE(ScalarTests);
-
-BOOST_AUTO_TEST_SUITE(scalar_tests)
+BOOST_TEST_GLOBAL_FIXTURE(BlsctArithScalarTests);
 
 BOOST_AUTO_TEST_CASE(test_scalar_constructors)
 {
