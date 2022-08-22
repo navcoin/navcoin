@@ -64,7 +64,7 @@ Elements<T> Elements<T>::FirstNPow(const size_t& n, const Scalar& k)
         }
         return ret;
     } else {
-        throw std::runtime_error("Now implemented");
+        throw std::runtime_error("Not implemented");
     }
 }
 template Elements<Scalar> Elements<Scalar>::FirstNPow(const size_t&, const Scalar&);
@@ -92,7 +92,7 @@ Elements<T> Elements<T>::RandVec(const size_t& n, const bool exclude_zero)
         }
         return ret;
     } else {
-        throw std::runtime_error("Now implemented");
+        throw std::runtime_error("Not implemented");
     }
 }
 template Elements<Scalar> Elements<Scalar>::RandVec(const size_t&, const bool);
@@ -117,7 +117,7 @@ Elements<T> Elements<T>::operator*(const Elements<Scalar>& other) const
         return ret;
 
     } else {
-        throw std::runtime_error("Now implemented");
+        throw std::runtime_error("Not implemented");
     }
 }
 template Elements<Scalar> Elements<Scalar>::operator*(const Elements<Scalar>& other) const;
@@ -141,7 +141,7 @@ Elements<T> Elements<T>::operator*(const Scalar& s) const
         return ret;
 
     } else {
-        throw std::runtime_error("Now implemented");
+        throw std::runtime_error("Not implemented");
     }
 }
 template Elements<Scalar> Elements<Scalar>::operator*(const Scalar&) const;
