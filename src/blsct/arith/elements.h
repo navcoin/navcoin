@@ -44,7 +44,7 @@ public:
     /**
      * Scalars x Scalars
      * [a1, a2] * [b1, b2] = [a1*b1, a2*b2]
-     * 
+     *
      * G1Points x Scalars
      * [p1, p2] * [a1, ba] = [p1*a1, p2*a2]
      */
@@ -52,20 +52,20 @@ public:
 
     /**
      * Scalars x Scalar
-     * [s1, s2] * t = [s1*t, s2*t] 
-     * 
+     * [s1, s2] * t = [s1*t, s2*t]
+     *
      * G1Points x Scalar
-     * [p1, p2] ^ s = [p1*s, p2*s] 
+     * [p1, p2] ^ s = [p1*s, p2*s]
      */
     Elements<T> operator*(const Scalar& s) const;
 
     /**
-     * [p1, p2] + [q1, q2] = [p1+q1, p2+q2] 
+     * [p1, p2] + [q1, q2] = [p1+q1, p2+q2]
      */
     Elements<T> operator+(const Elements<T>& other) const;
 
     /**
-     * [p1, p2] - [q1, q2] = [p1-q1, p2-q2] 
+     * [p1, p2] - [q1, q2] = [p1-q1, p2-q2]
      */
     Elements<T> operator-(const Elements<T>& other) const;
 
@@ -74,18 +74,18 @@ public:
     bool operator!=(const Elements<T>& other) const;
 
     /**
-     * MulVec is equivalent of (Elements<G1Point> * Elements<Scalar>).Sum(), 
+     * MulVec is equivalent of (Elements<G1Point> * Elements<Scalar>).Sum(),
      * but faster than that due to direct use of mcl library
      */
     G1Point MulVec(const Elements<Scalar>& scalars) const;
 
     /**
-     * Returns elements slice [fromIndex, vec.size()) 
+     * Returns elements slice [fromIndex, vec.size())
      */
     Elements<T> From(const size_t from_index) const;
 
     /**
-     * Returns elements slice [0, toIndex) 
+     * Returns elements slice [0, toIndex)
      */
     Elements<T> To(const size_t to_index) const;
 
