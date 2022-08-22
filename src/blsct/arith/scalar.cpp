@@ -71,7 +71,7 @@ Scalar Scalar::operator/(const Scalar &b) const
     return ret;
 }
 
-Scalar Scalar::ApplyBitwiseOp(const Scalar& a, const Scalar& b, 
+Scalar Scalar::ApplyBitwiseOp(const Scalar& a, const Scalar& b,
     std::function<uint8_t(uint8_t, uint8_t)> op) const
 {
     Scalar ret;
@@ -133,7 +133,7 @@ Scalar Scalar::operator<<(unsigned int shift) const
     mclBnFr next;
     mclBnFr prev = m_fr;
     for (size_t i = 0; i < shift; ++i) {
-        mclBnFr_add(&next, &prev, &prev);    
+        mclBnFr_add(&next, &prev, &prev);
         prev = next;
     }
     Scalar ret(prev);
@@ -141,7 +141,7 @@ Scalar Scalar::operator<<(unsigned int shift) const
     return ret;
 }
 
-/** 
+/**
  * Assumes that fr contains a number within int64_t range
  */
 Scalar Scalar::operator>>(unsigned int shift) const
@@ -303,15 +303,15 @@ std::vector<bool> Scalar::GetBits() const
     return vec;
 }
 
-/** 
+/**
  * Since GetVch returns 32-byte vector, maximum bit index is 8 * 32 - 1 = 255
  */
-bool Scalar::GetBit(uint8_t n) const 
+bool Scalar::GetBit(uint8_t n) const
 {
     std::vector<uint8_t> vch = GetVch();
     assert(vch.size() == 32);
 
-    const uint8_t vchIdx = 31 - n / 8;  // vch is little-endian 
+    const uint8_t vchIdx = 31 - n / 8;  // vch is little-endian
     const uint8_t bitIdx = n % 8;
     const uint8_t mask = 1 << bitIdx;
     const bool bit = (vch[vchIdx] & mask) != 0;

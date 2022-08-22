@@ -15,7 +15,7 @@
 
 struct BlsctArithElementsTests {
     BlsctArithElementsTests()
-    { 
+    {
         G1Point::Init();
     }
 };
@@ -283,7 +283,7 @@ BOOST_AUTO_TEST_CASE(test_elements_first_n_pow)
         auto pows = Scalars::FirstNPow(3, k);
         auto invPows = Scalars::FirstNPow(3, k.Invert());
         auto r = pows * invPows;
-        Scalar one(1); 
+        Scalar one(1);
         BOOST_CHECK(r[0] == one);
         BOOST_CHECK(r[1] == one);
         BOOST_CHECK(r[2] == one);

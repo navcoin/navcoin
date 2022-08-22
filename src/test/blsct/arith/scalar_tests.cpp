@@ -16,7 +16,7 @@
 
 struct BlsctArithScalarTests {
     BlsctArithScalarTests()
-    { 
+    {
         MclInitializer::Init();
     }
 };
@@ -178,7 +178,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_constructors)
         BOOST_CHECK_EQUAL(a.GetInt64(), ui);
     }
 
-    // TODO test negative input and possibly make the fixes 
+    // TODO test negative input and possibly make the fixes
 }
 
 BOOST_AUTO_TEST_CASE(test_scalar_add)
@@ -338,7 +338,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_bitwise_and)
 }
 
 BOOST_AUTO_TEST_CASE(test_scalar_bitwise_compl)
-{  
+{
     // ~ operator doesn't work w/ very large number such as ~1 i.e.
     // 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe
     // which is 1 inverted in 32-byte buffer
@@ -347,7 +347,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_bitwise_compl)
     Scalar a(n);
     auto act = (~a).GetString(16);
 
-    // ~INT64MAX is -9223372036854775808 which equals below in Fr 
+    // ~INT64MAX is -9223372036854775808 which equals below in Fr
     std::string exp = "73eda753299d7d483339d80809a1d80553bda402fffe5bfe7fffffff00000001";
     BOOST_CHECK(act == exp);
 }
@@ -754,9 +754,9 @@ BOOST_AUTO_TEST_CASE(test_scalar_get_bits)
 {
     // n is group order r minus 1
     std::vector<uint8_t> n_vec{
-        0x73, 0xed, 0xa7, 0x53, 0x29, 0x9d, 0x7d, 0x48, 0x33, 0x39, 
-        0xd8, 0x08, 0x09, 0xa1, 0xd8, 0x05, 0x53, 0xbd, 0xa4, 0x02, 
-        0xff, 0xfe, 0x5b, 0xfe, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 
+        0x73, 0xed, 0xa7, 0x53, 0x29, 0x9d, 0x7d, 0x48, 0x33, 0x39,
+        0xd8, 0x08, 0x09, 0xa1, 0xd8, 0x05, 0x53, 0xbd, 0xa4, 0x02,
+        0xff, 0xfe, 0x5b, 0xfe, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00,
         0x00, 0x00,
     };
     std::string n_hex("73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000000");
@@ -790,7 +790,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_get_bit)
         BOOST_CHECK_EQUAL(a.GetBit(6), false);
         BOOST_CHECK_EQUAL(a.GetBit(7), false);
         BOOST_CHECK_EQUAL(a.GetBit(8), true); // 2nd byte
-        BOOST_CHECK_EQUAL(a.GetBit(9), false); 
+        BOOST_CHECK_EQUAL(a.GetBit(9), false);
     }
     {
         SCALAR_CURVE_ORDER_MINUS_1(a);
@@ -798,7 +798,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_get_bit)
 
         // 5th byte from the last is 255
         for (size_t i=0; i<8; ++i) {
-            BOOST_CHECK_EQUAL(a.GetBit(4 * 8 + i), true); 
+            BOOST_CHECK_EQUAL(a.GetBit(4 * 8 + i), true);
         }
 
         // 9th byte from the last is 254

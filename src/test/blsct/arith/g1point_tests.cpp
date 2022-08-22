@@ -13,10 +13,10 @@
 #include <set>
 #include <streams.h>
 
-struct BlsctArithG1PointTests 
+struct BlsctArithG1PointTests
 {
     BlsctArithG1PointTests()
-    { 
+    {
         G1Point::Init();
     }
 };
@@ -313,7 +313,7 @@ BOOST_AUTO_TEST_CASE(test_g1point_get_set_vch)
 
     G1Point q;
     BOOST_CHECK(p != q);
-    
+
     q.SetVch(vec);
     BOOST_CHECK(p == q);
 }
@@ -342,7 +342,7 @@ BOOST_AUTO_TEST_CASE(test_g1point_serialize_unserialize)
 
     G1Point q;
     BOOST_CHECK(p != q);
-    
+
     q.Unserialize(st);
     BOOST_CHECK(p == q);
 }

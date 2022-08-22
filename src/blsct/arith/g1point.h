@@ -51,7 +51,7 @@ public:
     static G1Point HashAndMap(const std::vector<uint8_t>& vec);
 
     /**
-     * Multiply G1Points by Scalars element by element and then get the sum of all resulting points 
+     * Multiply G1Points by Scalars element by element and then get the sum of all resulting points
      * [g_1*s_1, g_2*s_2, ..., g_n*s_n].Sum()
      */
     static G1Point MulVec(const std::vector<mclBnG1>& g_vec, const std::vector<mclBnFr>& s_vec);

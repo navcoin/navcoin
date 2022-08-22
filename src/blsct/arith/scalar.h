@@ -71,7 +71,7 @@ public:
     std::vector<uint8_t> GetVch() const;
     void SetVch(const std::vector<uint8_t>& v);
 
-    /** 
+    /**
      * Sets 2^n to the instance
      */
     void SetPow2(int n);

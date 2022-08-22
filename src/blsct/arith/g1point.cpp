@@ -58,7 +58,7 @@ void G1Point::Init()
     is_initialized = true;
 }
 
-void G1Point::operator=(const mclBnG1& q) 
+void G1Point::operator=(const mclBnG1& q)
 {
     m_p = q;
 }

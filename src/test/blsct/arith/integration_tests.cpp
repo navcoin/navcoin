@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE(test_integration_offset_by_negation)
 
         auto r1 = basis - z;
         auto r2 = basis + z.Negate();
-        
+
         BOOST_CHECK(r1 == r2);
     }
     {
@@ -64,12 +64,12 @@ BOOST_AUTO_TEST_CASE(test_integration_offset_by_negation)
 
         auto r1 = g * (basis - z);
         auto r2 = g * (basis + z.Negate());
-        
+
         BOOST_CHECK(r1 == r2);
     }
 }
 
-// (66), (67) of the range proof excluding (h') part  
+// (66), (67) of the range proof excluding (h') part
 BOOST_AUTO_TEST_CASE(test_integration_range_proof_66_67_excl_h_prime)
 {
     auto n = 2;
@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_66_67_excl_h_prime)
     auto h = G1Point::MapToG1("h");
 
     Scalars al(std::vector<Scalar> {
-        Scalar {1}, 
+        Scalar {1},
         Scalar {1}
     });
     auto sl = Scalars::RandVec(n);
@@ -109,7 +109,7 @@ BOOST_AUTO_TEST_CASE(test_integration_rebasing_base_point)
 
     Scalar one(1);
     auto one_n = Scalars::RepeatN(n, one);
-    Scalar two(n); 
+    Scalar two(n);
     auto two_n = Scalars::FirstNPow(n, two);
 
     auto y = Scalar::Rand(true);
@@ -147,7 +147,7 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_66_67_only_h_prime)
 {
     auto n = 2;
 
-    Scalar two(2); 
+    Scalar two(2);
     auto two_n = Scalars::FirstNPow(n, two);
     Scalar one(1);
     auto one_n = Scalars::RepeatN(n, one);
@@ -171,7 +171,7 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_66_67_only_h_prime)
     auto hhp = hh * Scalars::FirstNPow(n, y.Invert());
 
     auto p = a + s * x + hhp * (y_n * z + two_n * z.Square());
-    auto rr = y_n * (ar + zs + sr * x) + (two_n * z.Square()); 
+    auto rr = y_n * (ar + zs + sr * x) + (two_n * z.Square());
     auto hhprr = hhp * rr;
 
     BOOST_CHECK(p == hhprr);
@@ -188,10 +188,10 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_65_h_part_only)
     auto h = G1Point::MapToG1("h");
     auto v = h * gamma;
     auto z = Scalar::Rand(true);
-    auto t1 = h * tau1; 
-    auto t2 = h * tau2; 
+    auto t1 = h * tau1;
+    auto t2 = h * tau2;
     auto rhs =  v * z.Square() + t1 * x + t2 * x.Square();
-    
+
     // LHS
     auto tauX = tau2 * x.Square() + tau1 * x + z.Square() * gamma;
     auto lhs = h * tauX;
@@ -230,9 +230,9 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_65_g_part_only_excl_ts)
     BOOST_CHECK(t_hat == lr_equiv);
 
     auto g = G1Point::MapToG1("g");
-    
+
     auto v = g * upsilon;
-    auto delta_yz = 
+    auto delta_yz =
         ((z - z.Square()) * (one_n * y_n).Sum())
         - (z.Cube() * (one_n * two_n).Sum());
 
@@ -260,7 +260,7 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_65_g_part_ts_only)
     auto y_n = Scalars::FirstNPow(n, y);
 
     Scalars al(std::vector<Scalar> {
-        Scalar {0}, 
+        Scalar {0},
         Scalar {1}
     });
     auto ar = al - one_n;
@@ -278,9 +278,9 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_65_g_part_ts_only)
     auto t2 = (l1 * r1).Sum();
 
     auto g = G1Point::MapToG1("g");
-    
-    auto cap_t1 = g * t1; 
-    auto cap_t2 = g * t2; 
+
+    auto cap_t1 = g * t1;
+    auto cap_t2 = g * t2;
 
     // LHS
     auto lhs = g * t_hat;
@@ -307,7 +307,7 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_65_g_part_only)
     auto y_n = Scalars::FirstNPow(n, y);
 
     Scalars al(std::vector<Scalar> {
-        Scalar {0}, 
+        Scalar {0},
         Scalar {1}
     });
     auto ar = al - one_n;
@@ -328,15 +328,15 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_65_g_part_only)
     auto t_hat = t0 + t1 * x + t2 * x.Square();
 
     auto g = G1Point::MapToG1("g");
-    
+
     auto lhs = g * t_hat;
 
     // RHS
-    auto cap_t1 = g * t1; 
+    auto cap_t1 = g * t1;
     auto cap_t2 = g * t2;
 
     auto v = g * upsilon;
-    auto delta_yz = 
+    auto delta_yz =
         ((z - z.Square()) * (one_n * y_n).Sum())
         - (z.Cube() * (one_n * two_n).Sum());
 
@@ -348,11 +348,11 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_65_g_part_only)
 // Prover and verifier know:
 // g, h, u, P
 //
-// For a given P, prover proves that it has vectors a, b s.t. 
+// For a given P, prover proves that it has vectors a, b s.t.
 // P = g^a h^b u^<a,b>
 bool InnerProductArgument(
     const size_t& n,
-    const G1Points& gg, const G1Points& hh, 
+    const G1Points& gg, const G1Points& hh,
     const G1Point& u, const G1Point& p,
     const Scalars& a, const Scalars& b
 )
@@ -403,7 +403,7 @@ BOOST_AUTO_TEST_CASE(test_integration_inner_product_argument)
 
     auto res = InnerProductArgument(
         n,
-        gg, hh, 
+        gg, hh,
         u, p,
         a, b
     );
@@ -412,7 +412,7 @@ BOOST_AUTO_TEST_CASE(test_integration_inner_product_argument)
 
 bool RangeProof(
     size_t n, G1Point V, Scalar gamma,
-    G1Point g, G1Point h, 
+    G1Point g, G1Point h,
     G1Points gg, G1Points hh,
     Scalars al,
     bool use_inner_product_argument
@@ -441,7 +441,7 @@ bool RangeProof(
 
     // Define vector ploynomials l(x), r(x) and t(x)
     // t(x) = <l(x),r(x)> = <l0, r0> + (<l1, r0> + <l0, r1>) * x + <l1, r1> * x^2
-    auto y_n = Scalars::FirstNPow(n, y);  
+    auto y_n = Scalars::FirstNPow(n, y);
     auto l0 = al - one_n * z;
     auto l1 = sl;
     auto r0 = y_n * (ar + one_n * z) + two_n * z.Square();
@@ -473,16 +473,16 @@ bool RangeProof(
 
     // (64)
     auto hhp = hh * Scalars::FirstNPow(n, y.Invert());
-    
+
     // (65)
-    auto delta_yz = 
+    auto delta_yz =
         ((z - z.Square()) * (one_n * y_n).Sum())
         - (z.Cube() * (one_n * two_n).Sum());
 
     auto lhs_65 = g * t_hat + h * tau_x;
     auto rhs_65 = V * z.Square() + g * delta_yz + cap_t1 * x + cap_t2 * x.Square();
     if (lhs_65 != rhs_65) return false;
-    
+
     // (66), (67)
     auto l = (al - one_n * z) + sl * x;
     auto r = y_n * (ar + one_n * z + sr * x) + two_n * z.Square();
@@ -509,7 +509,7 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof)
 {
     auto gamma = Scalar::Rand();
     Scalars al(std::vector<Scalar> {
-        Scalar {1}, 
+        Scalar {1},
         Scalar {0},
         Scalar {0},
         Scalar {1}
@@ -539,7 +539,7 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof)
         auto testCaseBool = i != 0;
         auto res = RangeProof(
             n, v, gamma,
-            g, h, 
+            g, h,
             gg, hh,
             al,
             testCaseBool
