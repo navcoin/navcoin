@@ -13,6 +13,9 @@
 #include <stdexcept>
 #include <vector>
 
+#include <bls/bls384_256.h> // must include this before bls/bls.h
+#include <bls/bls.h>
+
 #include <blsct/arith/g1point.h>
 #include <blsct/arith/scalar.h>
 
@@ -69,6 +72,12 @@ public:
     bool operator==(const Elements<T>& other) const;
 
     bool operator!=(const Elements<T>& other) const;
+
+    /**
+     * MulVec is equivalent of (Elements<G1Point> * Elements<Scalar>).Sum(), 
+     * but faster than that due to direct use of mcl library
+     */
+    G1Point MulVec(const Elements<Scalar>& scalars) const;
 
     /**
      * Returns elements slice [fromIndex, vec.size()) 

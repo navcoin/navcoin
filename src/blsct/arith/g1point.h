@@ -49,8 +49,13 @@ public:
     static G1Point MapToG1(const std::vector<uint8_t>& vec, const Endianness e = Endianness::Little);
     static G1Point MapToG1(const std::string& s, const Endianness e = Endianness::Little);
     static G1Point HashAndMap(const std::vector<uint8_t>& vec);
-    static G1Point MulVec(const std::vector<G1Point>& g_vec, const std::vector<Scalar>& s_vec);
+
+    /**
+     * Multiply G1Points by Scalars element by element and then get the sum of all resulting points 
+     * [g_1*s_1, g_2*s_2, ..., g_n*s_n].Sum()
+     */
     static G1Point MulVec(const std::vector<mclBnG1>& g_vec, const std::vector<mclBnFr>& s_vec);
+
     static G1Point Rand();
 
     bool operator==(const G1Point& b) const;

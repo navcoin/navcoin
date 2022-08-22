@@ -356,3 +356,19 @@ BOOST_AUTO_TEST_CASE(test_elements_to)
         BOOST_CHECK_THROW(gg.To(4), std::runtime_error);
     }
 }
+
+BOOST_AUTO_TEST_CASE(test_elements_mulvec_elements)
+{
+    auto p1 = G1Point::GetBasePoint();
+    auto p2 = p1.Double();
+    G1Points ps(std::vector<G1Point> { p1, p2 });
+
+    Scalar s1(2), s2(3);
+    Scalars ss(std::vector<Scalar> { s1, s2 });
+
+    // p should be G^2 + (G+G)^3 = G^8
+    auto p = ps.MulVec(ss);
+    auto q = G1Point::GetBasePoint() * 8;
+
+    BOOST_CHECK(p == q);
+}

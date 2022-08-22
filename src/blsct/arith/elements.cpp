@@ -182,11 +182,10 @@ bool Elements<T>::operator==(const Elements<T>& other) const
         return false;
     }
 
-    bool ret = true;
     for (size_t i = 0; i < m_vec.size(); ++i) {
-        ret = ret && (m_vec[i] == other[i]);
+        if (m_vec[i] != other[i]) return false;
     }
-    return ret;
+    return true;
 }
 template bool Elements<Scalar>::operator==(const Elements<Scalar>& other) const;
 template bool Elements<G1Point>::operator==(const Elements<G1Point>& other) const;
@@ -230,3 +229,29 @@ Elements<T> Elements<T>::To(const size_t to_index) const
 }
 template Elements<Scalar> Elements<Scalar>::To(const size_t to_index) const;
 template Elements<G1Point> Elements<G1Point>::To(const size_t to_index) const;
+
+template <typename T>
+G1Point Elements<T>::MulVec(const Elements<Scalar>& scalars) const
+{
+    if constexpr (std::is_same_v<T, G1Point>) {
+        ConfirmSizesMatch(scalars.Size());
+
+        const size_t vec_count = m_vec.size();
+
+        std::vector<mclBnG1> vec_g1(vec_count);
+        std::vector<mclBnFr> vec_fr(vec_count);
+
+        for (size_t i = 0; i < vec_count; ++i) {
+            vec_g1[i] = m_vec[i].m_p;
+            vec_fr[i] = scalars[i].m_fr;
+        }
+
+        G1Point ret;
+        mclBnG1_mulVec(&ret.m_p, vec_g1.data(), vec_fr.data(), vec_count);
+        return ret;
+
+    } else {
+        throw std::runtime_error("Not implemented");
+    }
+}
+template G1Point Elements<G1Point>::MulVec(const Elements<Scalar>&) const;

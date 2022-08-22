@@ -262,22 +262,6 @@ BOOST_AUTO_TEST_CASE(test_g1point_hash_and_map)
     BOOST_CHECK(p == q);
 }
 
-BOOST_AUTO_TEST_CASE(test_g1point_mulvec_scalar_g1point)
-{
-    auto p1 = G1Point::GetBasePoint();
-    auto p2 = p1.Double();
-    std::vector<G1Point> ps{p1, p2};
-
-    Scalar s1(2), s2(3);
-    std::vector<Scalar> ss { s1, s2 };
-
-    // p should be G^2 + (G+G)^3 = G^8
-    auto p = G1Point::MulVec(ps, ss);
-    auto q = G1Point::GetBasePoint() * 8;
-
-    BOOST_CHECK(p == q);
-}
-
 BOOST_AUTO_TEST_CASE(test_g1point_mulvec_mcl)
 {
     auto base_point = G1Point::GetBasePoint();

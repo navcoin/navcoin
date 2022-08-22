@@ -133,29 +133,10 @@ G1Point G1Point::HashAndMap(const std::vector<uint8_t>& vec)
     return temp;
 }
 
-G1Point G1Point::MulVec(const std::vector<G1Point>& g_vec, const std::vector<Scalar>& s_vec)
-{
-    if (g_vec.size() != s_vec.size()) {
-        throw std::runtime_error("G1Point::mulVec(): gVec and sVec size must be equal");
-    }
-
-    const size_t vec_count = g_vec.size();
-
-    std::vector<mclBnG1> vec_g1(vec_count);
-    std::vector<mclBnFr> vec_fr(vec_count);
-
-    for (size_t i = 0; i < vec_count; ++i) {
-        vec_g1[i] = g_vec[i].m_p;
-        vec_fr[i] = s_vec[i].m_fr;
-    }
-
-    return G1Point::MulVec(vec_g1, vec_fr);
-}
-
 G1Point G1Point::MulVec(const std::vector<mclBnG1>& g_vec, const std::vector<mclBnFr>& s_vec)
 {
     if (g_vec.size() != s_vec.size()) {
-        throw std::runtime_error("G1Point::mulVec(): gVec and sVec size must be equal");
+        throw std::runtime_error("G1Point::MulVec(): sizes of g_vec and s_vec must be equial");
     }
 
     G1Point ret;
