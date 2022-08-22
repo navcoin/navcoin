@@ -123,7 +123,9 @@ BOOST_AUTO_TEST_CASE(test_g1point_map_to_g1)
     std::set<std::string> xs;
     const size_t num_xs = 1000;
     for (size_t i = 0; i < num_xs; ++i) {
-        auto s = std::to_string(i);
+        std::stringstream ss;
+        ss << i;
+        std::string s = ss.str();
         std::vector<unsigned char> v(s.begin(), s.end());
         auto p = G1Point::MapToG1(v);
         xs.insert(p.GetString());
