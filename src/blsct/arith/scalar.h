@@ -30,7 +30,6 @@ public:
 
     Scalar(const int64_t& n = 0);
     Scalar(const std::vector<uint8_t>& v);
-    Scalar(const Scalar& n);
     Scalar(const mclBnFr& n_fr);
     Scalar(const uint256& n);
     Scalar(const std::string& s, int radix);

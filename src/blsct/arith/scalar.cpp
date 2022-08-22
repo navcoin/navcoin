@@ -14,11 +14,6 @@ Scalar::Scalar(const std::vector<uint8_t> &v)
     Scalar::SetVch(v);
 }
 
-Scalar::Scalar(const Scalar& n)
-{
-    m_fr = n.m_fr;
-}
-
 Scalar::Scalar(const mclBnFr& nFr)
 {
     m_fr = nFr;
