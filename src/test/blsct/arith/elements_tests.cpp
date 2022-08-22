@@ -55,14 +55,14 @@ BOOST_AUTO_TEST_CASE(test_elements_add)
         Scalars ss;
         Scalar x(1);
         ss.Add(x);
-        BOOST_CHECK_EQUAL(ss.Size(), 1);
-        BOOST_CHECK_EQUAL(ss[0].GetInt64(), 1);
+        BOOST_CHECK(ss.Size() == 1);
+        BOOST_CHECK(ss[0].GetInt64() == 1);
     }
     {
         G1Points g1s;
         auto g = G1Point::GetBasePoint();
         g1s.Add(g);
-        BOOST_CHECK_EQUAL(g1s.Size(), 1);
+        BOOST_CHECK(g1s.Size() == 1);
         BOOST_CHECK(g1s[0] == g);
     }
 }

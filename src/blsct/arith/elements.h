@@ -89,7 +89,6 @@ public:
      */
     Elements<T> To(const size_t to_index) const;
 
-private:
     std::vector<T> m_vec;
 };
 
