@@ -137,7 +137,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_constructors)
     {
         uint256 ui(one_zeros_be);
         Scalar a(ui);
-        // Scalar::GetString drops preceeding 0s
+        // Scalar::GetString drops preceding 0s
         BOOST_CHECK_EQUAL(a.GetString(), "100000000000000000000000000000000000000000000000000000000000000");
     }
     {
@@ -450,7 +450,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_pow)
         BOOST_CHECK(c == d);
     }
 
-    // this is to check if calclation finishes within a reasonable amount of time
+    // this is to check if calculation finishes within a reasonable amount of time
     Scalar y(1);
     y.Invert().Pow(y.Invert());
 }
@@ -618,7 +618,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_setvch)
         BOOST_CHECK(a == b);
     }
     {
-        // setting curveOrder should suceed, but Scalar should get the modulo value
+        // setting curveOrder should succeed, but Scalar should get the modulo value
         std::vector<uint8_t> vec{
             115,
             237,

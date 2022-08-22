@@ -119,7 +119,7 @@ BOOST_AUTO_TEST_CASE(test_g1point_get_base_point)
 
 BOOST_AUTO_TEST_CASE(test_g1point_map_to_g1)
 {
-    // Differnt numbers should be mapped to different points
+    // Different numbers should be mapped to different points
     std::set<std::string> xs;
     const size_t num_xs = 1000;
     for (size_t i = 0; i < num_xs; ++i) {
