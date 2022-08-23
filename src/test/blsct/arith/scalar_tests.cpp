@@ -396,6 +396,12 @@ BOOST_AUTO_TEST_CASE(test_scalar_invert)
     BOOST_CHECK(a == c);
 }
 
+BOOST_AUTO_TEST_CASE(test_scalar_invert_zero)
+{
+    Scalar a(0);
+    BOOST_CHECK_THROW(a.Invert(), std::runtime_error);
+}
+
 BOOST_AUTO_TEST_CASE(test_scalar_negate)
 {
     Scalar a(6);

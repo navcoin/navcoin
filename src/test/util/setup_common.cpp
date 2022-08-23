@@ -445,8 +445,7 @@ CBlock getBlock13b8a()
     return block;
 }
 
-MclTestingSetup::MclTestingSetup(const std::string& chainName, const std::vector<const char*>& extra_args)
-    : BasicTestingSetup(chainName, extra_args)
+MclTestingSetup::MclTestingSetup()
 {
     MclInitializer::Init();
     G1Point::Init();
