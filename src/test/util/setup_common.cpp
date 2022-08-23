@@ -6,8 +6,6 @@
 
 #include <addrman.h>
 #include <banman.h>
-#include <blsct/arith/g1point.h>
-#include <blsct/arith/mcl_initializer.h>
 #include <chainparams.h>
 #include <consensus/consensus.h>
 #include <consensus/params.h>
