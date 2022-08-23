@@ -32,13 +32,12 @@ public:
 
     G1Point();
     G1Point(const std::vector<uint8_t>& v);
-    G1Point(const G1Point& n);
     G1Point(const uint256& b);
     G1Point(const mclBnG1& p);
 
     static void Init();
 
-    void operator=(const mclBnG1& p);
+    G1Point operator=(const mclBnG1& p);
     G1Point operator+(const G1Point& b) const;
     G1Point operator-(const G1Point& b) const;
     G1Point operator*(const Scalar& b) const;

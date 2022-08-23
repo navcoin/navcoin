@@ -18,11 +18,6 @@ G1Point::G1Point(const std::vector<uint8_t>& v)
     G1Point::SetVch(v);
 }
 
-G1Point::G1Point(const G1Point& n)
-{
-    m_p = n.m_p;
-}
-
 G1Point::G1Point(const mclBnG1& q)
 {
     m_p = q;
@@ -58,9 +53,10 @@ void G1Point::Init()
     is_initialized = true;
 }
 
-void G1Point::operator=(const mclBnG1& q)
+G1Point G1Point::operator=(const mclBnG1& q)
 {
     m_p = q;
+    return *this;
 }
 
 G1Point G1Point::operator+(const G1Point& b) const
