@@ -288,6 +288,15 @@ BOOST_AUTO_TEST_CASE(test_elements_first_n_pow)
         BOOST_CHECK(r[1] == one);
         BOOST_CHECK(r[2] == one);
     }
+    {
+        Scalar one(1);
+        for(size_t i=0; i<100; ++i) {
+            Scalar k(i);
+            auto pows = Scalars::FirstNPow(1, k);
+            BOOST_CHECK(pows.Size() == 1);
+            BOOST_CHECK(pows[0] == one);
+        }
+    }
 }
 
 BOOST_AUTO_TEST_CASE(test_elements_repeat_n)

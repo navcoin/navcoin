@@ -23,13 +23,6 @@ struct BlsctArithIntegrationTests {
 
 BOOST_TEST_GLOBAL_FIXTURE(BlsctArithIntegrationTests);
 
-BOOST_AUTO_TEST_CASE(test_integration_invert_zero)
-{
-    auto x = Scalar::Rand(true);
-    Scalar zero(0);
-    BOOST_CHECK(x.Pow(zero) == x.Pow(zero.Invert()));
-}
-
 // gg^z == gg^(ones * z)
 BOOST_AUTO_TEST_CASE(test_integration_gg_ones_times_z)
 {
