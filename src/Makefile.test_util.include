@@ -23,6 +23,8 @@ TEST_UTIL_H = \
 libtest_util_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(MINIUPNPC_CPPFLAGS) $(NATPMP_CPPFLAGS) $(EVENT_CFLAGS) $(EVENT_PTHREADS_CFLAGS)
 libtest_util_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libtest_util_a_SOURCES = \
+  test/blsct/arith/g1point.cpp \
+  test/blsct/arith/mcl_initializer.cpp \
   test/util/blockfilter.cpp \
   test/util/logging.cpp \
   test/util/mining.cpp \
