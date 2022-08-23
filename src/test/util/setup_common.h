@@ -251,4 +251,11 @@ private:
     const std::string m_reason;
 };
 
+/**
+ * Initializes external mcl library
+ */
+struct MclTestingSetup : public BasicTestingSetup {
+    explicit MclTestingSetup(const std::string& chainName = CBaseChainParams::MAIN, const std::vector<const char*>& extra_args = {});
+};
+
 #endif // BITCOIN_TEST_UTIL_SETUP_COMMON_H
