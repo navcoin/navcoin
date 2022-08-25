@@ -95,6 +95,9 @@ G1Point G1Point::GetBasePoint()
 
 G1Point G1Point::MapToG1(const std::vector<uint8_t>& vec, const Endianness e)
 {
+    if (vec.size() == 0) {
+        throw std::runtime_error("G1Point::MapToG1(): input vector is empty");
+    }
     G1Point temp;
     mclBnFp v;
     if (e == Endianness::Little) {
