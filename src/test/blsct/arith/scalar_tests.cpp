@@ -14,14 +14,7 @@
 #define SCALAR_CURVE_ORDER_MINUS_1(x) Scalar x("73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000000", 16)
 #define SCALAR_INT64_MIN(x) Scalar x("52435875175126190479447740508185965837690552500527637822594435327901726408705", 10);
 
-struct BlsctArithScalarTests {
-    BlsctArithScalarTests()
-    {
-        MclInitializer::Init();
-    }
-};
-
-BOOST_TEST_GLOBAL_FIXTURE(BlsctArithScalarTests);
+BOOST_FIXTURE_TEST_SUITE(scalar_tests, MclTestingSetup)
 
 BOOST_AUTO_TEST_CASE(test_scalar_constructors)
 {
@@ -401,6 +394,12 @@ BOOST_AUTO_TEST_CASE(test_scalar_invert)
     Scalar b = a.Invert();
     Scalar c = b.Invert();
     BOOST_CHECK(a == c);
+}
+
+BOOST_AUTO_TEST_CASE(test_scalar_invert_zero)
+{
+    Scalar a(0);
+    BOOST_CHECK_THROW(a.Invert(), std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(test_scalar_negate)
@@ -819,3 +818,5 @@ BOOST_AUTO_TEST_CASE(test_scalar_get_bit)
         }
     }
 }
+
+BOOST_AUTO_TEST_SUITE_END()

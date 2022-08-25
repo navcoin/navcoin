@@ -13,15 +13,7 @@
 #include <set>
 #include <streams.h>
 
-struct BlsctArithG1PointTests
-{
-    BlsctArithG1PointTests()
-    {
-        G1Point::Init();
-    }
-};
-
-BOOST_TEST_GLOBAL_FIXTURE(BlsctArithG1PointTests);
+BOOST_FIXTURE_TEST_SUITE(g1point_tests, MclTestingSetup)
 
 BOOST_AUTO_TEST_CASE(test_g1point_constructors)
 {
@@ -346,3 +338,5 @@ BOOST_AUTO_TEST_CASE(test_g1point_serialize_unserialize)
     q.Unserialize(st);
     BOOST_CHECK(p == q);
 }
+
+BOOST_AUTO_TEST_SUITE_END()

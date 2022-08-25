@@ -13,15 +13,7 @@
 #include <set>
 #include <streams.h>
 
-struct BlsctArithIntegrationTests {
-    BlsctArithIntegrationTests()
-    {
-        MclInitializer::Init();
-        G1Point::Init();
-    }
-};
-
-BOOST_TEST_GLOBAL_FIXTURE(BlsctArithIntegrationTests);
+BOOST_FIXTURE_TEST_SUITE(bls_arith_integration_tests, MclTestingSetup)
 
 // gg^z == gg^(ones * z)
 BOOST_AUTO_TEST_CASE(test_integration_gg_ones_times_z)
@@ -540,3 +532,5 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof)
         BOOST_CHECK(res == true);
     }
 }
+
+BOOST_AUTO_TEST_SUITE_END()

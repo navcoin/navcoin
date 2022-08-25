@@ -176,6 +176,9 @@ bool Scalar::operator!=(const Scalar &b) const
 
 Scalar Scalar::Invert() const
 {
+    if (mclBnFr_isZero(&m_fr) == 1) {
+        throw std::runtime_error("Inverse of zero is undefined");
+    }
     Scalar temp;
     mclBnFr_inv(&temp.m_fr, &m_fr);
     return temp;

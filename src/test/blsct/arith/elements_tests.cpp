@@ -13,14 +13,7 @@
 #include <set>
 #include <streams.h>
 
-struct BlsctArithElementsTests {
-    BlsctArithElementsTests()
-    {
-        G1Point::Init();
-    }
-};
-
-BOOST_TEST_GLOBAL_FIXTURE(BlsctArithElementsTests);
+BOOST_FIXTURE_TEST_SUITE(elements_tests, MclTestingSetup)
 
 BOOST_AUTO_TEST_CASE(test_elements_constructors)
 {
@@ -381,3 +374,5 @@ BOOST_AUTO_TEST_CASE(test_elements_mulvec_elements)
 
     BOOST_CHECK(p == q);
 }
+
+BOOST_AUTO_TEST_SUITE_END()
