@@ -1,11 +1,11 @@
 GCC_VER=$(shell $(PRE)$(CC) -dumpversion)
-UNAME_S=$(shell uname -s)
+UNAME_S?=$(shell uname -s)
 ARCH?=$(shell uname -m)
 NASM_ELF_OPT=-felf64
-ifeq ($(UNAME_S),Linux)
+ifneq ($(findstring $(UNAME_S),linux/Linux),)
   OS=Linux
 endif
-ifeq ($(findstring MINGW64,$(UNAME_S)),MINGW64)
+ifneq ($(findstring $(UNAME_S),mingw32/mingw64/MINGW32/MINGW64,windows),)
   OS=mingw64
   CFLAGS+=-D__USE_MINGW_ANSI_STDIO=1
   NASM_ELF_OPT=-fwin64
@@ -13,7 +13,7 @@ endif
 ifeq ($(findstring CYGWIN,$(UNAME_S)),CYGWIN)
   OS=cygwin
 endif
-ifeq ($(UNAME_S),Darwin)
+ifneq ($(findstring $(UNAME_S),darwin/Darwin),)
   ifeq ($(ARCH),x86_64)
     OS=mac
   else
@@ -74,7 +74,7 @@ ifeq ($(ARCH),s390x)
 endif
 
 CP=cp -f
-AR=ar r
+AR?=ar
 MKDIR=mkdir -p
 RM=rm -rf
 
