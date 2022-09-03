@@ -76,7 +76,7 @@ $(LIBSECP256K1): $(wildcard secp256k1/src/*.h) $(wildcard secp256k1/src/*.c) $(w
 
 $(LIBBLS):
 	$(AM_V_at) \
-		UNAME_S='$(TARGET_OS)' \
+		UNAME_S='$(firstword $(subst -, ,$(host_os)))' \
 		ARCH='$(firstword $(subst -, ,$(host)))' \
 		CC='$(CC)' \
 		CXX='$(CXX)' \
@@ -90,8 +90,7 @@ $(LIBBLS):
 
 $(LIBMCL):
 	$(AM_V_at) \
-		MCL_USE_LLVM=0 \
-		UNAME_S='$(TARGET_OS)' \
+		UNAME_S='$(firstword $(subst -, ,$(host_os)))' \
 		ARCH='$(firstword $(subst -, ,$(host)))' \
 		CC='$(CC)' \
 		CXX='$(CXX)' \
