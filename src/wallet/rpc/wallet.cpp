@@ -13,6 +13,7 @@
 #include <wallet/rpc/wallet.h>
 #include <wallet/rpc/util.h>
 #include <wallet/wallet.h>
+#include <wallet/mnemonic.h>
 
 #include <optional>
 
@@ -374,6 +375,33 @@ static RPCHelpMan createwallet()
         throw JSONRPCError(RPC_WALLET_ERROR, "Compiled without external signing support (required for external signing)");
 #endif
     }
+#if 0
+    if (!request.params[8].isNull()) {
+        bool hasMnemonic, hasLanguage;
+        std::string language("english");
+
+        ////
+        if (flags & WALLET_FLAG_DESCRIPTORS) {
+            throw JSONRPCError(RPC_WALLET_ERROR, "Mnemonic import requires legacy wallet.");
+        }
+
+        hasMnemonic = !request.params[8].isNull();
+        hasLanguage = !request.params[9].isNull();
+        word_list words;
+        dictionary lexicon;
+
+        if (hasLanguage) {
+            language = request.params[9].get_str().c_str();
+        }
+        lexicon = string_to_lexicon(language);
+
+        /// Mnemonic that has been passed on, is it valid?
+        if (!validate_mnemonic(words, lexicon)) {
+            throw JSONRPCError(RPC_WALLET_ERROR, "Mnemonic is not valid for the given language.");
+        }
+
+    }
+#endif
 
 #ifndef USE_BDB
     if (!(flags & WALLET_FLAG_DESCRIPTORS)) {
@@ -721,6 +749,7 @@ RPCHelpMan dumpprivkey();
 RPCHelpMan importprivkey();
 RPCHelpMan importaddress();
 RPCHelpMan importpubkey();
+RPCHelpMan dumpmnemonic();
 RPCHelpMan dumpwallet();
 RPCHelpMan importwallet();
 RPCHelpMan importprunedfunds();
@@ -786,6 +815,7 @@ Span<const CRPCCommand> GetWalletRPCCommands()
         {"wallet", &createwallet},
         {"wallet", &restorewallet},
         {"wallet", &dumpprivkey},
+        {"wallet", &dumpmnemonic},
         {"wallet", &dumpwallet},
         {"wallet", &encryptwallet},
         {"wallet", &getaddressesbylabel},

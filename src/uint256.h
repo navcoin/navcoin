@@ -106,6 +106,8 @@ public:
     {
         s.read(MakeWritableByteSpan(m_data));
     }
+    
+    friend class uint512;
 };
 
 /** 160-bit opaque blob.
@@ -130,6 +132,24 @@ public:
     explicit uint256(const std::vector<unsigned char>& vch) : base_blob<256>(vch) {}
     static const uint256 ZERO;
     static const uint256 ONE;
+};
+
+/** 512-bit opaque blob.
+ */
+class uint512 : public base_blob<512> {
+public:
+    uint512() {}
+    uint512(const base_blob<512>& b) : base_blob<512>(b) {}
+    explicit uint512(const std::vector<unsigned char>& vch) : base_blob<512>(vch) {}
+
+    uint256 trim256() const
+    {
+        uint256 ret;
+        for (unsigned int i = 0; i < uint256::WIDTH; i++){
+            ret.m_data[i] = m_data[i];
+        }
+        return ret;
+    }
 };
 
 /* uint256 from const char *.

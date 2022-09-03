@@ -28,8 +28,8 @@ template <typename T>
 class Elements
 {
 public:
-    Elements<T>() {}
-    Elements<T>(const std::vector<T>& vec) : m_vec(vec) {}
+    Elements() {}
+    Elements(const std::vector<T>& vec) : m_vec(vec) {}
 
     T Sum() const;
     T operator[](int index) const;
