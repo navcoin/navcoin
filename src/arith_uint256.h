@@ -6,13 +6,17 @@
 #ifndef BITCOIN_ARITH_UINT256_H
 #define BITCOIN_ARITH_UINT256_H
 
+#include <algorithm>
+#include <cassert>
 #include <cstring>
 #include <limits>
 #include <stdexcept>
 #include <stdint.h>
 #include <string>
+#include <vector>
 
 class uint256;
+class uint512;
 
 class uint_error : public std::runtime_error {
 public:
@@ -280,5 +284,18 @@ uint256 ArithToUint256(const arith_uint256 &);
 arith_uint256 UintToArith256(const uint256 &);
 
 extern template class base_uint<256>;
+
+
+/** 512-bit unsigned big integer. */
+class arith_uint512 : public base_uint<512> {
+public:
+    arith_uint512() {}
+    arith_uint512(const base_uint<512>& b) : base_uint<512>(b) {}
+    arith_uint512(uint64_t b) : base_uint<512>(b) {}
+    explicit arith_uint512(const std::string& str) : base_uint<512>(str) {}
+
+};
+
+extern template class base_uint<512>;
 
 #endif // BITCOIN_ARITH_UINT256_H

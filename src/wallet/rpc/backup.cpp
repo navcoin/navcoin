@@ -18,6 +18,7 @@
 #include <util/system.h>
 #include <util/time.h>
 #include <util/translation.h>
+#include <wallet/mnemonic.h>
 #include <wallet/rpc/util.h>
 #include <wallet/wallet.h>
 
@@ -829,6 +830,111 @@ RPCHelpMan dumpwallet()
     reply.pushKV("filename", filepath.u8string());
 
     return reply;
+},
+    };
+}
+
+RPCHelpMan dumpmnemonic()
+{
+    return RPCHelpMan{"dumpmnemonic",
+                "\nReveals the mnemonic for the current master private key.\n"
+                "\nRequires a legacy wallet.\n"
+                "\nSupported languages:\n"
+                "\n - english, spanish, italian, japanese, french, russian, czech, ukrainian, simplified chinese, traditional chinese.\n",
+                {
+                    {"language", RPCArg::Type::STR, RPCArg::Optional::OMITTED, "The language for generating the mnemonic (english is default)"},
+                },
+                RPCResult{
+                    RPCResult::Type::OBJ, "", "",
+                    {
+                        {RPCResult::Type::STR, "mnemonic", "The requested mnemonic."},
+                    }
+                },
+                RPCExamples{
+                    HelpExampleCli("dumpmnemonic", "\"\"")
+                    + HelpExampleRpc("dumpmnemonic", "\"\"")
+                },
+        [&](const RPCHelpMan& self, const JSONRPCRequest& request) -> UniValue
+{
+    const std::shared_ptr<const CWallet> pwallet = GetWalletForJSONRPCRequest(request);
+    if (!pwallet) return NullUniValue;
+
+    const CWallet& wallet = *pwallet;
+    const ScriptPubKeyMan* spk_man = nullptr;
+
+    LOCK(wallet.cs_wallet);
+
+    EnsureWalletIsUnlocked(wallet);
+    EnsureLegacyScriptPubKeyMan((CWallet&)wallet, true);
+
+    if (!pwallet->IsHDEnabled())
+        throw JSONRPCError(RPC_WALLET_ERROR, "Wallet is not a HD wallet.");
+
+    std::string language;
+
+    if (request.params.size() == 1)
+        language = request.params[0].get_str();
+    else
+        language = "english";
+
+    for (const auto& spk_man_ : pwallet->GetActiveScriptPubKeyMans()) {
+        if (spk_man_->HavePrivateKeys()) {
+            spk_man = spk_man_;
+            break;
+        }
+    }
+
+    if (!spk_man)
+        throw JSONRPCError(RPC_WALLET_ERROR, "Could not obtain spk_man.");
+
+    // Now we have the spk_man but this is a virtual object, we need to get the real one.
+    // There's two cases, if ID is ONE, then the LegacySPKMan, otherwise dealing with the
+    // DescriptorSPKMan.
+    // If the ID is ZERO, then there is no SPKMan in which case the wallet might be empty.
+    //
+    // The other ID's result in an error as we have no implementation for it. This might
+    // happen in the future, in which case an entry can be added here for the new SPKMan.
+    //
+   
+    uint256 id = spk_man->GetID();
+ 
+    if (id == uint256::ONE) {
+        const LegacyScriptPubKeyMan* keyman = static_cast<const LegacyScriptPubKeyMan*>(spk_man);
+
+        // LegacySPKMan provides the private master key.
+        CHECK_NONFATAL(keyman->IsHDEnabled());
+
+        CKey seed;
+        CKeyID seed_id = keyman->GetHDChain().seed_id;
+
+        if (!seed_id.IsNull())
+        {
+            if (keyman->GetKey(seed_id, seed)) {
+                std::vector<unsigned char> keyData;
+                for (auto& byte : seed) {
+                    keyData.push_back(byte);
+                }
+
+                CMnemonic mnemonic(keyData, language);
+                auto words = mnemonic.Words();
+                auto sentence = CMnemonic::words_to_sentence(words);
+
+                UniValue reply(UniValue::VOBJ);
+                reply.pushKV("mnemonic", sentence);
+
+                return reply;
+            }
+            // Could not get key, continue to error.
+        }
+        // Could not get seed, continue to error.
+    } else if (id == uint256::ZERO) {
+
+        // Unknown SPKMan provides the private master key.
+        throw JSONRPCError(RPC_WALLET_ERROR, "Could not understand spk_man.");
+    }
+
+    throw JSONRPCError(RPC_WALLET_ERROR, "Unable to retrieve HD master private key");
+    return NullUniValue;
 },
     };
 }

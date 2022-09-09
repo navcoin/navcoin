@@ -36,7 +36,6 @@ EXPECTED_BOOST_INCLUDES = ["boost/date_time/posix_time/posix_time.hpp",
                            "boost/thread/lock_guard.hpp",
                            "boost/thread/mutex.hpp"]
 
-
 def get_toplevel():
     return check_output(["git", "rev-parse", "--show-toplevel"], universal_newlines=True, encoding="utf8").rstrip("\n")
 
