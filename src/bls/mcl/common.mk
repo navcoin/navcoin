@@ -55,15 +55,15 @@ ifneq ($(findstring $(ARCH),x86/i386/i686),)
   BIT_OPT=-m32
   #LOW_ASM_SRC=src/asm/low_x86.asm
 endif
-ifneq ($(findstring $(ARCH),armv7l/armv6l),)
+ifneq ($(findstring $(ARCH),arm,armv7l/armv6l),)
   CPU=arm
   BIT=32
   #LOW_ASM_SRC=src/asm/low_arm.s
-endif
-#ifeq ($(ARCH),aarch64)
-ifneq ($(findstring $(ARCH),aarch64/arm64),)
-  CPU=aarch64
-  BIT=64
+else
+    ifneq ($(findstring $(ARCH),aarch64/arm64),)
+      CPU=aarch64
+      BIT=64
+    endif
 endif
 ifeq ($(findstring $(OS),mac/mac-m1/mingw64/openbsd),)
   LDFLAGS+=-lrt
@@ -142,4 +142,3 @@ endif
 LDFLAGS+=$(GMP_LIB) $(BIT_OPT) $(LDFLAGS_USER)
 
 CFLAGS+=-fPIC
-
