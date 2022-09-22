@@ -98,7 +98,7 @@ ifeq ($(OS),mac-m1)
   ASM_SRC=src/base64.ll
   ASM_OBJ=$(OBJ_DIR)/base64.o
 endif
-BINT_SUF?=-$(OS)-$(CPU)
+BINT_SUF?=-$(CPU)
 MCL_BINT_ASM?=1
 MCL_BINT_ASM_X64?=1
 ASM_MODE?=s
@@ -352,7 +352,7 @@ $(OBJ_DIR)/%.o: %.c
 	$(PRE)$(CC) $(CFLAGS) -c $< -o $@ -MMD -MP -MF $(@:.o=.d)
 
 $(OBJ_DIR)/%.o: src/asm/%.s
-	$(PRE)$(AS) $(ASFLAGS) -c $< -o $@
+	$(PRE)$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJ_DIR)/%.o: src/asm/%.asm
 	nasm $(NASM_ELF_OPT) -o $@ $<
