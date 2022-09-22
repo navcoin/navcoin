@@ -89,6 +89,7 @@ $(LIBBLS):
 
 $(LIBMCL):
 	$(AM_V_at) \
+		MCL_USE_LLVM=0 \
 		UNAME_S='$(firstword $(subst -, ,$(host_os)))' \
 		ARCH='$(firstword $(subst -, ,$(host)))' \
 		CC='$(CC)' \
