@@ -17,7 +17,6 @@ persistent_worker_template: &PERSISTENT_WORKER_TEMPLATE
   persistent_worker: {}  # https://cirrus-ci.org/guide/persistent-workers/
 
 base_template: &BASE_TEMPLATE
-  << : *FILTER_TEMPLATE
   merge_base_script:
     # Unconditionally install git (used in fingerprint_script) and set the
     # default git author name (used in verify-commits.py)
@@ -90,7 +89,6 @@ task:
 
 task:
   name: "Win64 native [vs2022]"
-  << : *FILTER_TEMPLATE
   windows_container:
     cpu: 6
     memory: 12G
