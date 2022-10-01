@@ -323,7 +323,8 @@ int cmpN(const T *px, const T *py, size_t n)
 	for (size_t i = 0; i < n; i++) {
 		const T x = px[n - 1 - i];
 		const T y = py[n - 1 - i];
-		if (x != y) return x > y ? 1 : -1;
+		if (x != y)
+			return x > y ? 1 : -1;
 	}
 	return 0;
 }
