@@ -5,7 +5,7 @@
 #include <blsct/arith/g1point.h>
 #include <numeric>
 
-mclBnG1 G1Point::m_g{};
+mclBnG1 G1Point::m_g = G1Point();
 boost::mutex G1Point::m_init_mutex;
 
 G1Point::G1Point()
