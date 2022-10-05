@@ -79,7 +79,7 @@ $(LIBBLS):
 		ARCH='$(firstword $(subst -, ,$(HOST)))' \
 		CC='$(CC)' \
 		CXX='$(CXX)' \
-		CFLAGS='$(CFLAGS)' \
+		CFLAGS='-pipe -O2 -fsanitize=memory -fsanitize-memory-track-origins=2 -fno-omit-frame-pointer -g -O1 -fno-optimize-sibling-calls' \
 		LDFLAGS='$(LDFLAGS)' \
 		ARFLAGS='$(ARFLAGS)' \
 		AR='$(AR)' \
@@ -93,7 +93,7 @@ $(LIBMCL):
 		ARCH='$(firstword $(subst -, ,$(HOST)))' \
 		CC='$(CC)' \
 		CXX='$(CXX)' \
-		CFLAGS='$(CFLAGS)' \
+		CFLAGS='-pipe -O2 -fsanitize=memory -fsanitize-memory-track-origins=2 -fno-omit-frame-pointer -g -O1 -fno-optimize-sibling-calls' \
 		LDFLAGS='$(LDFLAGS)' \
 		ARFLAGS='$(ARFLAGS)' \
 		AR='$(AR)' \
