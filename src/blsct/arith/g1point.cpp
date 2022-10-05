@@ -4,9 +4,9 @@
 
 #include <blsct/arith/g1point.h>
 #include <numeric>
+#include <iostream>
 
 mclBnG1 G1Point::m_g;
-mclBnG1_clear(&G1Point::m_g);
 boost::mutex G1Point::m_init_mutex;
 
 G1Point::G1Point()
@@ -52,6 +52,7 @@ void G1Point::Init()
     }
     G1Point::m_g = g;
     is_initialized = true;
+    std::cout << "G1Point initialized\n";
 }
 
 G1Point G1Point::operator=(const mclBnG1& q)
