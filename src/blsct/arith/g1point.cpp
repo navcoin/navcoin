@@ -6,7 +6,7 @@
 #include <numeric>
 #include <iostream>
 
-mclBnG1 G1Point::m_g;
+std::vector<uint8_t> G1Point::m_g;
 boost::mutex G1Point::m_init_mutex;
 
 G1Point::G1Point()
@@ -47,10 +47,16 @@ void G1Point::Init()
     MclInitializer::Init();
     mclBnG1 g;
     const char* serialized_g = "1 3685416753713387016781088315183077757961620795782546409894578378688607592378376318836054947676345821548104185464507 1339506544944476473020471379941921221584933875938349620426543736416511423956333506472724655353366534992391756441569";
+
     if (mclBnG1_setStr(&g, serialized_g, strlen(serialized_g), 10) == -1) {
         throw std::runtime_error("G1Point::Init(): mclBnG1_setStr failed");
     }
-    G1Point::m_g = g;
+    
+    G1Point::m_g.resize(WIDTH);
+    if (mclBnG1_serialize(&G1Point::m_g[0], WIDTH, &g) == 0) {
+        throw std::runtime_error("G1Point::GetVch(): mclBnG1_serialize failed");
+    }
+    
     is_initialized = true;
     std::cout << "G1Point initialized\n";
 }
