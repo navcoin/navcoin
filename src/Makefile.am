@@ -81,7 +81,7 @@ $(LIBBLS):
 		CC='$(CC)' \
 		CXX='$(CXX)' \
 		CFLAGS='$(CXXFLAGS)' \
-		LDFLAGS='$(CXXFLAGS)' \
+		LDFLAGS='$(LDFLAGS)' \
 		ARFLAGS='$(ARFLAGS)' \
 		AR='$(AR)' \
 		RANLIB='$(RANLIB)' \
@@ -96,7 +96,7 @@ $(LIBMCL):
 		CC='$(CC)' \
 		CXX='$(CXX)' \
 		CFLAGS='$(CXXFLAGS)' \
-		LDFLAGS='$(CXXFLAGS)' \
+		LDFLAGS='$(LDFLAGS)' \
 		ARFLAGS='$(ARFLAGS)' \
 		AR='$(AR)' \
 		RANLIB='$(RANLIB)' \
