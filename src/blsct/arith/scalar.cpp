@@ -33,11 +33,6 @@ Scalar::Scalar(const std::string& s, int radix)
     }
 }
 
-void Scalar::Init()
-{
-    MclInitializer::Init();
-}
-
 Scalar Scalar::operator+(const Scalar &b) const
 {
     Scalar ret;
