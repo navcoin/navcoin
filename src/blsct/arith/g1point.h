@@ -13,6 +13,7 @@
 #include <boost/thread/lock_guard.hpp>
 #include <boost/thread/mutex.hpp>
 
+#include <blsct/arith/mcl_initializer.h>
 #include <blsct/arith/scalar.h>
 #include <hash.h>
 #include <serialize.h>

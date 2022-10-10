@@ -160,6 +160,7 @@ BITCOIN_CORE_H = \
   blockfilter.h \
   blsct/arith/elements.h \
   blsct/arith/g1point.h \
+  blsct/arith/mcl_initializer.h \
   blsct/arith/scalar.h \
   blsct/keys.h \
   chain.h \
@@ -396,6 +397,7 @@ libbitcoin_node_a_SOURCES = \
   blockfilter.cpp \
   blsct/arith/elements.cpp \
   blsct/arith/g1point.cpp \
+  blsct/arith/mcl_initializer.cpp \
   blsct/arith/scalar.cpp \
   blsct/keys.cpp \
   chain.cpp \
@@ -928,6 +930,7 @@ libbitcoinkernel_la_SOURCES = \
   blockfilter.cpp \
   blsct/arith/elements.cpp \
   blsct/arith/g1point.cpp \
+  blsct/arith/mcl_initializer.cpp \
   blsct/arith/scalar.cpp \
   blsct/keys.cpp \
   chain.cpp \

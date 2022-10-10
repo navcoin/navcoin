@@ -6,6 +6,7 @@
 #define BITCOIN_TEST_UTIL_SETUP_COMMON_H
 
 #include <blsct/arith/g1point.h>
+#include <blsct/arith/mcl_initializer.h>
 #include <chainparamsbase.h>
 #include <fs.h>
 #include <key.h>
@@ -250,6 +251,13 @@ public:
 
 private:
     const std::string m_reason;
+};
+
+/**
+ * Setup that initializes external mcl library
+ */
+struct MclTestingSetup {
+    MclTestingSetup();
 };
 
 #endif // BITCOIN_TEST_UTIL_SETUP_COMMON_H

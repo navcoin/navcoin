@@ -7,12 +7,13 @@
 #include <algorithm>
 #include <blsct/arith/elements.h>
 #include <blsct/arith/g1point.h>
+#include <blsct/arith/mcl_initializer.h>
 #include <blsct/arith/scalar.h>
 #include <boost/test/unit_test.hpp>
 #include <set>
 #include <streams.h>
 
-BOOST_AUTO_TEST_SUITE(bls_arith_integration_tests)
+BOOST_FIXTURE_TEST_SUITE(bls_arith_integration_tests, MclTestingSetup)
 
 // gg^z == gg^(ones * z)
 BOOST_AUTO_TEST_CASE(test_integration_gg_ones_times_z)

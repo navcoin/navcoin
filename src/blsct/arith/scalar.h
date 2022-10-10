@@ -16,6 +16,7 @@
 
 #include <bls/bls384_256.h> // must include this before bls/bls.h
 #include <bls/bls.h>
+#include <blsct/arith/mcl_initializer.h>
 #include <hash.h>
 #include <serialize.h>
 #include <uint256.h>
@@ -32,6 +33,8 @@ public:
     Scalar(const mclBnFr& n_fr);
     Scalar(const uint256& n);
     Scalar(const std::string& s, int radix);
+
+    static void Init();
 
     Scalar ApplyBitwiseOp(const Scalar& a, const Scalar& b,
                           std::function<uint8_t(uint8_t, uint8_t)> op) const;

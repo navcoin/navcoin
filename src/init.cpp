@@ -100,9 +100,6 @@
 
 #include <boost/signals2/signal.hpp>
 
-#include <bls/bls384_256.h> // must include this before bls/bls.h
-#include <bls/bls.h>
-
 #if ENABLE_ZMQ
 #include <zmq/zmqabstractnotifier.h>
 #include <zmq/zmqnotificationinterface.h>
@@ -1112,12 +1109,6 @@ bool AppInitMain(NodeContext& node, interfaces::BlockAndHeaderTipInfo* tip_info)
         // Detailed error printed inside StartLogging().
         return false;
     }
-
-    LogPrintf("Initializing bls\n");
-    if (blsInit(MCL_BLS12_381, MCLBN_COMPILED_TIME_VAR) != 0) {
-        throw std::runtime_error("blsInit failed");
-    }
-    mclBn_setETHserialization(1);
 
     LogPrintf("Using at most %i automatic connections (%i file descriptors available)\n", nMaxConnections, nFD);
 
