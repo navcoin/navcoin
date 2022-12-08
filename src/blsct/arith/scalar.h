@@ -27,44 +27,41 @@ class Scalar {
 public:
     static constexpr int WIDTH = 256 / 8;
 
-    Scalar(const int64_t& n = 0);
-    Scalar(const std::vector<uint8_t>& v);
-    Scalar(const V& n_fr);
-    Scalar(const uint256& n);
-    Scalar(const std::string& s, int radix);
+    Scalar<T,V>(const int64_t& n = 0);
+    Scalar<T,V>(const std::vector<uint8_t>& v);
+    Scalar<T,V>(const V& n_fr);
+    Scalar<T,V>(const uint256& n);
+    Scalar<T,V>(const std::string& s, int radix);
 
     static void Init();
 
-    Scalar ApplyBitwiseOp(const Scalar& a, const Scalar& b,
-                          std::function<uint8_t(uint8_t, uint8_t)> op) const;
-
     void operator=(const uint64_t& n);
 
-    Scalar operator+(const Scalar& b) const;
-    Scalar operator-(const Scalar& b) const;
-    Scalar operator*(const Scalar& b) const;
-    Scalar operator/(const Scalar& b) const;
-    Scalar operator|(const Scalar& b) const;
-    Scalar operator^(const Scalar& b) const;
-    Scalar operator&(const Scalar& b) const;
-    Scalar operator~() const;
-    Scalar operator<<(unsigned int shift) const;
-    Scalar operator>>(unsigned int shift) const;
+    Scalar<T,V> operator+(const Scalar<T,V>& b) const;
+    Scalar<T,V> operator-(const Scalar<T,V>& b) const;
+    Scalar<T,V> operator*(const Scalar<T,V>& b) const;
+    Scalar<T,V> operator/(const Scalar<T,V>& b) const;
+    Scalar<T,V> operator|(const Scalar<T,V>& b) const;
+    Scalar<T,V> operator^(const Scalar<T,V>& b) const;
+    Scalar<T,V> operator&(const Scalar<T,V>& b) const;
+    Scalar<T,V> operator~() const;
+    Scalar<T,V> operator<<(unsigned int shift) const;
+    Scalar<T,V> operator>>(unsigned int shift) const;
 
-    bool operator==(const Scalar& b) const;
+    bool operator==(const Scalar<T,V>& b) const;
     bool operator==(const int& b) const;
-    bool operator!=(const Scalar& b) const;
+    bool operator!=(const Scalar<T,V>& b) const;
     bool operator!=(const int& b) const;
 
     bool IsValid() const;
 
-    Scalar Invert() const;
-    Scalar Negate() const;
-    Scalar Square() const;
-    Scalar Cube() const;
-    Scalar Pow(const Scalar& n) const;
+    Scalar<T,V> Invert() const;
+    Scalar<T,V> Negate() const;
+    Scalar<T,V> Square() const;
+    Scalar<T,V> Cube() const;
+    Scalar<T,V> Pow(const Scalar& n) const;
 
-    static Scalar Rand(bool exclude_zero = false);
+    static Scalar<T,V> Rand(bool exclude_zero = false);
 
     int64_t GetInt64() const;
 
