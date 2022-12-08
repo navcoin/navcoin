@@ -7,7 +7,7 @@
 template <typename T, typename V>
 Scalar<T,V>::Scalar(const int64_t& n)
 {
-    static_case<T*>(this)->Constructor(const int64_t& n);
+    static_case<T*>(this)->Constructor(n);
 }
 
 template <typename T, typename V>
