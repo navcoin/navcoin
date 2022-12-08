@@ -16,56 +16,55 @@
 
 #include <bls/bls384_256.h> // must include this before bls/bls.h
 #include <bls/bls.h>
-#include <blsct/arith/mcl_initializer.h>
+#include <blsct/arith/mcl/mcl_initializer.h>
+#include <blsct/arith/scalar.h>
 #include <hash.h>
 #include <serialize.h>
 #include <uint256.h>
 #include <version.h>
 
-#define CHECK_AND_ASSERT_THROW_MES(expr, message) do {if(!(expr)) throw std::runtime_error(message);} while(0)
-
-class Scalar {
+class MclScalar : public Scalar<MclScalar,mclBnFr> {
 public:
     static constexpr int WIDTH = 256 / 8;
 
-    Scalar(const int64_t& n = 0);
-    Scalar(const std::vector<uint8_t>& v);
-    Scalar(const mclBnFr& n_fr);
-    Scalar(const uint256& n);
-    Scalar(const std::string& s, int radix);
+    MclScalar(const int64_t& n = 0);
+    MclScalar(const std::vector<uint8_t>& v);
+    MclScalar(const mclBnFr& n_fr);
+    MclScalar(const uint256& n);
+    MclScalar(const std::string& s, int radix);
 
     static void Init();
 
-    Scalar ApplyBitwiseOp(const Scalar& a, const Scalar& b,
-                          std::function<uint8_t(uint8_t, uint8_t)> op) const;
+    MclScalar ApplyBitwiseOp(const MclScalar& a, const MclScalar& b,
+                             std::function<uint8_t(uint8_t, uint8_t)> op) const;
 
     void operator=(const uint64_t& n);
 
-    Scalar operator+(const Scalar& b) const;
-    Scalar operator-(const Scalar& b) const;
-    Scalar operator*(const Scalar& b) const;
-    Scalar operator/(const Scalar& b) const;
-    Scalar operator|(const Scalar& b) const;
-    Scalar operator^(const Scalar& b) const;
-    Scalar operator&(const Scalar& b) const;
-    Scalar operator~() const;
-    Scalar operator<<(unsigned int shift) const;
-    Scalar operator>>(unsigned int shift) const;
+    MclScalar operator+(const MclScalar& b) const;
+    MclScalar operator-(const MclScalar& b) const;
+    MclScalar operator*(const MclScalar& b) const;
+    MclScalar operator/(const MclScalar& b) const;
+    MclScalar operator|(const MclScalar& b) const;
+    MclScalar operator^(const MclScalar& b) const;
+    MclScalar operator&(const MclScalar& b) const;
+    MclScalar operator~() const;
+    MclScalar operator<<(unsigned int shift) const;
+    MclScalar operator>>(unsigned int shift) const;
 
-    bool operator==(const Scalar& b) const;
+    bool operator==(const MclScalar& b) const;
     bool operator==(const int& b) const;
-    bool operator!=(const Scalar& b) const;
+    bool operator!=(const MclScalar& b) const;
     bool operator!=(const int& b) const;
 
     bool IsValid() const;
 
-    Scalar Invert() const;
-    Scalar Negate() const;
-    Scalar Square() const;
-    Scalar Cube() const;
-    Scalar Pow(const Scalar& n) const;
+    MclScalar Invert() const;
+    MclScalar Negate() const;
+    MclScalar Square() const;
+    MclScalar Cube() const;
+    MclScalar Pow(const MclScalar& n) const;
 
-    static Scalar Rand(bool exclude_zero = false);
+    static MclScalar Rand(bool exclude_zero = false);
 
     int64_t GetInt64() const;
 
