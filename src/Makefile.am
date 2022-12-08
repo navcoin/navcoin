@@ -156,9 +156,10 @@ BITCOIN_CORE_H = \
   bech32.h \
   blockencodings.h \
   blockfilter.h \
-  blsct/arith/elements.h \
-  blsct/arith/g1point.h \
-  blsct/arith/mcl_initializer.h \
+  blsct/arith/mcl/elements.h \
+  blsct/arith/mcl/mcl_g1point.h \
+  blsct/arith/mcl/mcl_initializer.h \
+  blsct/arith/mcl/mcl_scalar.h \
   blsct/arith/scalar.h \
   blsct/keys.h \
   chain.h \
@@ -921,9 +922,10 @@ libbitcoinkernel_la_SOURCES = \
   kernel/bitcoinkernel.cpp \
   arith_uint256.cpp \
   blockfilter.cpp \
-  blsct/arith/elements.cpp \
-  blsct/arith/g1point.cpp \
-  blsct/arith/mcl_initializer.cpp \
+  blsct/arith/mcl/elements.cpp \
+  blsct/arith/mcl/mcl_g1point.cpp \
+  blsct/arith/mcl/mcl_initializer.cpp \
+  blsct/arith/mcl/mcl_scalar.cpp \
   blsct/arith/scalar.cpp \
   blsct/keys.cpp \
   chain.cpp \

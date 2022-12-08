@@ -6,8 +6,8 @@
 // inspired by https://github.com/b-g-goodell/research-lab/blob/master/source-code/StringCT-java/src/how/monero/hodl/bulletproof/Bulletproof.java
 // and https://github.com/monero-project/monero/blob/master/src/ringct/bulletproofs.cc
 
-#ifndef NAVCOIN_BLSCT_ARITH_SCALAR_H
-#define NAVCOIN_BLSCT_ARITH_SCALAR_H
+#ifndef NAVCOIN_BLSCT_ARITH_MCL_MCL_SCALAR_H
+#define NAVCOIN_BLSCT_ARITH_MCL_MCL_SCALAR_H
 
 #include <functional>
 #include <stddef.h>
@@ -16,20 +16,21 @@
 
 #include <bls/bls384_256.h> // must include this before bls/bls.h
 #include <bls/bls.h>
+#include <blsct/arith/mcl_initializer.h>
 #include <hash.h>
 #include <serialize.h>
 #include <uint256.h>
 #include <version.h>
 
-// T = MclScalar, V = mclBnFr
-template <typename T, typename V>
+#define CHECK_AND_ASSERT_THROW_MES(expr, message) do {if(!(expr)) throw std::runtime_error(message);} while(0)
+
 class Scalar {
 public:
     static constexpr int WIDTH = 256 / 8;
 
     Scalar(const int64_t& n = 0);
     Scalar(const std::vector<uint8_t>& v);
-    Scalar(const V& n_fr);
+    Scalar(const mclBnFr& n_fr);
     Scalar(const uint256& n);
     Scalar(const std::string& s, int radix);
 
@@ -99,7 +100,7 @@ public:
         SetVch(vch);
     }
 
-    V m_value;
+    mclBnFr m_fr;
 };
 
-#endif // NAVCOIN_BLSCT_ARITH_SCALAR_H
+#endif // NAVCOIN_BLSCT_ARITH_MCL_MCL_SCALAR_H

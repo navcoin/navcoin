@@ -4,40 +4,38 @@
 
 #include <blsct/arith/scalar.h>
 
-template <typename T, typename V>
-Scalar<T,V>::Scalar(const int64_t& n)
+Scalar::Scalar(const int64_t& n)
 {
-    static_case<T*>(this)->Constructor(const int64_t& n);
+    mclBnFr_setInt(&m_fr, n);
 }
 
-template <typename T, typename V>
-Scalar<T,V>::Scalar(const std::vector<uint8_t> &vec)
+Scalar::Scalar(const std::vector<uint8_t> &v)
 {
-    static_case<T*>(this)->Constructor(vec);
+    Scalar::SetVch(v);
 }
 
-template <typename T, typename V>
-Scalar::Scalar(const V& v)
+Scalar::Scalar(const mclBnFr& nFr)
 {
-    static_case<T*>(this)->Constructor(v);
+    m_fr = nFr;
 }
 
-template <typename T, typename V>
 Scalar::Scalar(const uint256& n)
 {
-    static_case<T*>(this)->Constructor(n);
+    // uint256 deserialization is big-endian
+    mclBnFr_setBigEndianMod(&m_fr, n.data(), 32);
 }
 
-template <typename T, typename V>
 Scalar::Scalar(const std::string& s, int radix)
 {
-    static_case<T*>(this)->Constructor(s, radix);
+    auto r = mclBnFr_setStr(&m_fr, s.c_str(), s.length(), radix);
+    if (r == -1) {
+        throw std::runtime_error(std::string("Failed to instantiate Scalar from '") + s);
+    }
 }
 
-template <typename T, typename V>
-void Scalar<T,V>::Init()
+void Scalar::Init()
 {
-    T::Init();
+    MclInitializer::Init();
 }
 
 Scalar Scalar::operator+(const Scalar &b) const
