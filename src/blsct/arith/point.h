@@ -13,7 +13,6 @@
 #include <boost/thread/lock_guard.hpp>
 #include <boost/thread/mutex.hpp>
 
-#include <blsct/arith/mcl_initializer.h>
 #include <blsct/arith/scalar.h>
 #include <hash.h>
 #include <serialize.h>
@@ -25,15 +24,16 @@ enum class Endianness {
     Little
 };
 
-class G1Point
+template<typename P>
+class Point<P>
 {
 public:
     static constexpr int WIDTH = 384 / 8;
 
-    G1Point();
-    G1Point(const std::vector<uint8_t>& v);
-    G1Point(const uint256& b);
-    G1Point(const mclBnG1& p);
+    Point();
+    Point(const std::vector<uint8_t>& v);
+    Point(const uint256& b);
+    Point(const mclBnG1& p);
 
     static void Init();
 

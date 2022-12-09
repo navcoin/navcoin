@@ -16,7 +16,7 @@
 #include <bls/bls384_256.h> // must include this before bls/bls.h
 #include <bls/bls.h>
 
-#include <blsct/arith/g1point.h>
+#include <blsct/arith/point.h>
 #include <blsct/arith/scalar.h>
 
 /**

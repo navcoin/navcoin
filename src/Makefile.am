@@ -156,10 +156,10 @@ BITCOIN_CORE_H = \
   bech32.h \
   blockencodings.h \
   blockfilter.h \
-  blsct/arith/mcl/elements.h \
-  blsct/arith/mcl/mcl_g1point.h \
   blsct/arith/mcl/mcl_initializer.h \
   blsct/arith/mcl/mcl_scalar.h \
+  blsct/arith/elements.h \
+  blsct/arith/point.h \
   blsct/arith/scalar.h \
   blsct/keys.h \
   chain.h \
@@ -392,10 +392,10 @@ libbitcoin_node_a_SOURCES = \
   banman.cpp \
   blockencodings.cpp \
   blockfilter.cpp \
-  blsct/arith/elements.cpp \
-  blsct/arith/g1point.cpp \
+  blsct/arith/mcl/mcl_elements.cpp \
+  blsct/arith/mcl/mcl_g1point.cpp \
   blsct/arith/mcl_initializer.cpp \
-  blsct/arith/scalar.cpp \
+  blsct/arith/mcl/mcl_scalar.cpp \
   blsct/keys.cpp \
   chain.cpp \
   consensus/tx_verify.cpp \
