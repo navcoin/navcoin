@@ -22,46 +22,46 @@
 #include <version.h>
 
 // T = MclScalar, V = mclBnFr
-template <typename T, typename V>
+template <typename V>
 class Scalar {
 public:
     static constexpr int WIDTH = 256 / 8;
 
-    Scalar<T,V>(const int64_t& n = 0);
-    Scalar<T,V>(const std::vector<uint8_t>& v);
-    Scalar<T,V>(const V& n_fr);
-    Scalar<T,V>(const uint256& n);
-    Scalar<T,V>(const std::string& s, int radix);
+    Scalar<V>(const int64_t& n = 0);
+    Scalar<V>(const std::vector<uint8_t>& v);
+    Scalar<V>(const V& n_fr);
+    Scalar<V>(const uint256& n);
+    Scalar<V>(const std::string& s, int radix);
 
     static void Init();
 
     void operator=(const uint64_t& n);
 
-    Scalar<T,V> operator+(const Scalar<T,V>& b) const;
-    Scalar<T,V> operator-(const Scalar<T,V>& b) const;
-    Scalar<T,V> operator*(const Scalar<T,V>& b) const;
-    Scalar<T,V> operator/(const Scalar<T,V>& b) const;
-    Scalar<T,V> operator|(const Scalar<T,V>& b) const;
-    Scalar<T,V> operator^(const Scalar<T,V>& b) const;
-    Scalar<T,V> operator&(const Scalar<T,V>& b) const;
-    Scalar<T,V> operator~() const;
-    Scalar<T,V> operator<<(unsigned int shift) const;
-    Scalar<T,V> operator>>(unsigned int shift) const;
+    Scalar<V> operator+(const Scalar<V>& rhs) const;
+    Scalar<V> operator-(const Scalar<V>& rhs) const;
+    Scalar<V> operator*(const Scalar<V>& rhs) const;
+    Scalar<V> operator/(const Scalar<V>& rhs) const;
+    Scalar<V> operator|(const Scalar<V>& rhs) const;
+    Scalar<V> operator^(const Scalar<V>& rhs) const;
+    Scalar<V> operator&(const Scalar<V>& rhs) const;
+    Scalar<V> operator~() const;
+    Scalar<V> operator<<(unsigned int shift) const;
+    Scalar<V> operator>>(unsigned int shift) const;
 
-    bool operator==(const Scalar<T,V>& b) const;
-    bool operator==(const int& b) const;
-    bool operator!=(const Scalar<T,V>& b) const;
-    bool operator!=(const int& b) const;
+    bool operator==(const Scalar<V>& rhs) const;
+    bool operator==(const int& rhs) const;
+    bool operator!=(const Scalar<V>& rhs) const;
+    bool operator!=(const int& rhs) const;
 
     bool IsValid() const;
 
-    Scalar<T,V> Invert() const;
-    Scalar<T,V> Negate() const;
-    Scalar<T,V> Square() const;
-    Scalar<T,V> Cube() const;
-    Scalar<T,V> Pow(const Scalar& n) const;
+    Scalar<V> Invert() const;
+    Scalar<V> Negate() const;
+    Scalar<V> Square() const;
+    Scalar<V> Cube() const;
+    Scalar<V> Pow(const Scalar<V>& n) const;
 
-    static Scalar<T,V> Rand(bool exclude_zero = false);
+    static Scalar<V> Rand(bool exclude_zero = false);
 
     int64_t GetInt64() const;
 

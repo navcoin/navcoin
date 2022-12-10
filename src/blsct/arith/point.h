@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NAVCOIN_BLSCT_ARITH_G1POINT_H
-#define NAVCOIN_BLSCT_ARITH_G1POINT_H
+#ifndef NAVCOIN_BLSCT_ARITH_POINT_H
+#define NAVCOIN_BLSCT_ARITH_POINT_H
 
 #include <stddef.h>
 #include <string>
@@ -24,47 +24,50 @@ enum class Endianness {
     Little
 };
 
-template<typename P>
-class Point<P>
+template <typename P>
+class Point
 {
 public:
     static constexpr int WIDTH = 384 / 8;
 
-    Point();
-    Point(const std::vector<uint8_t>& v);
-    Point(const uint256& b);
-    Point(const mclBnG1& p);
+    Point<P>();
+    Point<P>(const std::vector<uint8_t>& v);
+    Point<P>(const uint256& b);
+    Point<P>(const P& p);
 
     static void Init();
 
-    G1Point operator=(const mclBnG1& p);
-    G1Point operator+(const G1Point& b) const;
-    G1Point operator-(const G1Point& b) const;
-    G1Point operator*(const Scalar& b) const;
+    Point<P> operator=(const P& rhs);
+    Point<P> operator+(const Point<P>& rhs) const;
+    Point<P> operator-(const Point<P>& rhs) const;
 
-    G1Point Double() const;
+    template <typename V>
+    Point<P> operator*(const Scalar<V>& rhs) const;
 
-    static G1Point GetBasePoint();
-    static G1Point MapToG1(const std::vector<uint8_t>& vec, const Endianness e = Endianness::Little);
-    static G1Point MapToG1(const std::string& s, const Endianness e = Endianness::Little);
-    static G1Point HashAndMap(const std::vector<uint8_t>& vec);
+    bool operator==(const Point<P>& rhs) const;
+    bool operator!=(const Point<P>& rhs) const;
+
+    Point<P> Double() const;
+
+    static Point<P> GetBasePoint();
+    static Point<P> MapToG1(const std::vector<uint8_t>& vec, const Endianness e = Endianness::Little);
+    static Point<P> MapToG1(const std::string& s, const Endianness e = Endianness::Little);
+    static Point<P> HashAndMap(const std::vector<uint8_t>& vec);
 
     /**
-     * Multiply G1Points by Scalars element by element and then get the sum of all resulting points
+     * Multiply Point<P>s by Scalars element by element and then get the sum of all resulting points
      * [g_1*s_1, g_2*s_2, ..., g_n*s_n].Sum()
      */
-    static G1Point MulVec(const std::vector<mclBnG1>& g_vec, const std::vector<mclBnFr>& s_vec);
+    template <typename V>
+    static Point<P> MulVec(const std::vector<P>& g_vec, const std::vector<V>& s_vec);
 
-    static G1Point Rand();
-
-    bool operator==(const G1Point& b) const;
-    bool operator!=(const G1Point& b) const;
+    static Point<P> Rand();
 
     bool IsValid() const;
     bool IsUnity() const;
 
     std::vector<uint8_t> GetVch() const;
-    void SetVch(const std::vector<uint8_t>& b);
+    void SetVch(const std::vector<uint8_t>& vec);
 
     std::string GetString(const int& radix = 16) const;
 
@@ -84,11 +87,11 @@ public:
         SetVch(vch);
     }
 
-    mclBnG1 m_p;
+    P m_p;
 
 private:
-    static mclBnG1 m_g; // Using mclBnG1 instead of G1Point to get around chiken-and-egg issue
+    static P m_g; // Using P instead of Point<P> to get around chiken-and-egg issue
     static boost::mutex m_init_mutex;
 };
 
-#endif // NAVCOIN_BLSCT_ARITH_G1POINT_H
+#endif // NAVCOIN_BLSCT_ARITH_POINT_H
