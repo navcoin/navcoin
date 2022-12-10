@@ -2,30 +2,30 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <blsct/arith/mcl/mcl_scalar.h>
+#include <blsct/arith/her/her_scalar.h>
 
-MclScalar::MclScalar(const int64_t& n)
+HerScalar::HerScalar(const int64_t& n)
 {
     mclBnFr_setInt(&m_fr, n);
 }
 
-MclScalar::MclScalar(const std::vector<uint8_t> &v)
+HerScalar::HerScalar(const std::vector<uint8_t> &v)
 {
-    MclScalar::SetVch(v);
+    HerScalar::SetVch(v);
 }
 
-MclScalar::MclScalar(const mclBnFr& nFr)
+HerScalar::HerScalar(const mclBnFr& nFr)
 {
     m_fr = nFr;
 }
 
-MclScalar::MclScalar(const uint256& n)
+HerScalar::HerScalar(const uint256& n)
 {
     // uint256 deserialization is big-endian
     mclBnFr_setBigEndianMod(&m_fr, n.data(), 32);
 }
 
-MclScalar::MclScalar(const std::string& s, int radix)
+HerScalar::HerScalar(const std::string& s, int radix)
 {
     auto r = mclBnFr_setStr(&m_fr, s.c_str(), s.length(), radix);
     if (r == -1) {
@@ -33,43 +33,43 @@ MclScalar::MclScalar(const std::string& s, int radix)
     }
 }
 
-void MclScalar::Init()
+void HerScalar::Init()
 {
     MclInitializer::Init();
 }
 
-MclScalar MclScalar::operator+(const MclScalar &b) const
+HerScalar HerScalar::operator+(const HerScalar &b) const
 {
-    MclScalar ret;
+    HerScalar ret;
     mclBnFr_add(&ret.m_fr, &m_fr, &b.m_fr);
     return ret;
 }
 
-MclScalar MclScalar::operator-(const MclScalar &b) const
+HerScalar HerScalar::operator-(const HerScalar &b) const
 {
-    MclScalar ret;
+    HerScalar ret;
     mclBnFr_sub(&ret.m_fr, &m_fr, &b.m_fr);
     return ret;
 }
 
-MclScalar MclScalar::operator*(const MclScalar &b) const
+HerScalar HerScalar::operator*(const HerScalar &b) const
 {
-    MclScalar ret;
+    HerScalar ret;
     mclBnFr_mul(&ret.m_fr, &m_fr, &b.m_fr);
     return ret;
 }
 
-MclScalar MclScalar::operator/(const MclScalar &b) const
+HerScalar HerScalar::operator/(const HerScalar &b) const
 {
-    MclScalar ret;
+    HerScalar ret;
     mclBnFr_div(&ret.m_fr, &m_fr, &b.m_fr);
     return ret;
 }
 
-MclScalar MclScalar::ApplyBitwiseOp(const MclScalar& a, const MclScalar& b,
+HerScalar HerScalar::ApplyBitwiseOp(const HerScalar& a, const HerScalar& b,
     std::function<uint8_t(uint8_t, uint8_t)> op) const
 {
-    MclScalar ret;
+    HerScalar ret;
     auto a_vec = a.GetVch();
     auto b_vec = b.GetVch();
 
@@ -95,35 +95,35 @@ MclScalar MclScalar::ApplyBitwiseOp(const MclScalar& a, const MclScalar& b,
     return ret;
 }
 
-MclScalar MclScalar::operator|(const MclScalar &b) const
+HerScalar HerScalar::operator|(const HerScalar &b) const
 {
     auto op = [](uint8_t a, uint8_t b) -> uint8_t { return a | b; };
     return ApplyBitwiseOp(*this, b, op);
 }
 
-MclScalar MclScalar::operator^(const MclScalar &b) const
+HerScalar HerScalar::operator^(const HerScalar &b) const
 {
     auto op = [](uint8_t a, uint8_t b) -> uint8_t { return a ^ b; };
     return ApplyBitwiseOp(*this, b, op);
 }
 
-MclScalar MclScalar::operator&(const MclScalar &b) const
+HerScalar HerScalar::operator&(const HerScalar &b) const
 {
     auto op = [](uint8_t a, uint8_t b) -> uint8_t { return a & b; };
     return ApplyBitwiseOp(*this, b, op);
 }
 
-MclScalar MclScalar::operator~() const
+HerScalar HerScalar::operator~() const
 {
     // Getting complement of lower 8 bytes only since when 32-byte buffer is fully complemented,
     // mclBrFr_deserialize returns undesired result
     int64_t n_complement_scalar = ~GetInt64();
-    MclScalar ret(n_complement_scalar);
+    HerScalar ret(n_complement_scalar);
 
     return ret;
 }
 
-MclScalar MclScalar::operator<<(unsigned int shift) const
+HerScalar HerScalar::operator<<(unsigned int shift) const
 {
     mclBnFr next;
     mclBnFr prev = m_fr;
@@ -131,7 +131,7 @@ MclScalar MclScalar::operator<<(unsigned int shift) const
         mclBnFr_add(&next, &prev, &prev);
         prev = next;
     }
-    MclScalar ret(prev);
+    HerScalar ret(prev);
 
     return ret;
 }
@@ -139,87 +139,87 @@ MclScalar MclScalar::operator<<(unsigned int shift) const
 /**
  * Assumes that fr contains a number within int64_t range
  */
-MclScalar MclScalar::operator>>(unsigned int shift) const
+HerScalar HerScalar::operator>>(unsigned int shift) const
 {
     int64_t n = GetInt64();
-    MclScalar ret(n >> shift);
+    HerScalar ret(n >> shift);
 
     return ret;
 }
 
-void MclScalar::operator=(const uint64_t& n)
+void HerScalar::operator=(const uint64_t& n)
 {
     mclBnFr_setInt(&m_fr, (mclInt)n);
 }
 
-bool MclScalar::operator==(const int &b) const
+bool HerScalar::operator==(const int &b) const
 {
-    MclScalar temp;
+    HerScalar temp;
     temp = b;
     return mclBnFr_isEqual(&m_fr, &temp.m_fr);
 }
 
-bool MclScalar::operator==(const MclScalar &b) const
+bool HerScalar::operator==(const HerScalar &b) const
 {
     return mclBnFr_isEqual(&m_fr, &b.m_fr);
 }
 
-bool MclScalar::operator!=(const int &b) const
+bool HerScalar::operator!=(const int &b) const
 {
     return !operator==(b);
 }
 
-bool MclScalar::operator!=(const MclScalar &b) const
+bool HerScalar::operator!=(const HerScalar &b) const
 {
     return !operator==(b);
 }
 
-bool MclScalar::IsValid() const
+bool HerScalar::IsValid() const
 {
     return mclBnFr_isValid(&m_fr) == 1;
 }
 
-MclScalar MclScalar::Invert() const
+HerScalar HerScalar::Invert() const
 {
     if (mclBnFr_isZero(&m_fr) == 1) {
         throw std::runtime_error("Inverse of zero is undefined");
     }
-    MclScalar temp;
+    HerScalar temp;
     mclBnFr_inv(&temp.m_fr, &m_fr);
     return temp;
 }
 
-MclScalar MclScalar::Negate() const
+HerScalar HerScalar::Negate() const
 {
-    MclScalar temp;
+    HerScalar temp;
     mclBnFr_neg(&temp.m_fr, &m_fr);
     return temp;
 }
 
-MclScalar MclScalar::Square() const
+HerScalar HerScalar::Square() const
 {
-    MclScalar temp;
+    HerScalar temp;
     mclBnFr_sqr(&temp.m_fr, &m_fr);
     return temp;
 }
 
-MclScalar MclScalar::Cube() const
+HerScalar HerScalar::Cube() const
 {
-    MclScalar temp(m_fr);
+    HerScalar temp(m_fr);
     temp = temp * temp.Square();
     return temp;
 }
 
-MclScalar MclScalar::Pow(const MclScalar& n) const
+HerScalar HerScalar::Pow(const HerScalar& n) const
 {
     // A variant of double-and-add method
-    MclScalar temp(1);
+    HerScalar temp(1);
     mclBnFr bit_val;
     bit_val = m_fr;
     auto bits = n.GetBits();
 
     for (auto it = bits.rbegin(); it != bits.rend(); ++it) {
-        MclScalar s(bit_val);
+        HerScalar s(bit_val);
         if (*it) {
             mclBnFr_mul(&temp.m_fr, &temp.m_fr, &bit_val);
         }
@@ -228,9 +228,9 @@ MclScalar MclScalar::Pow(const MclScalar& n) const
     return temp;
 }
 
-MclScalar MclScalar::Rand(bool exclude_zero)
+HerScalar HerScalar::Rand(bool exclude_zero)
 {
-    MclScalar temp;
+    HerScalar temp;
 
     while (true) {
         if (mclBnFr_setByCSPRNG(&temp.m_fr) != 0) {
@@ -241,7 +241,7 @@ MclScalar MclScalar::Rand(bool exclude_zero)
     return temp;
 }
 
-int64_t MclScalar::GetInt64() const
+int64_t HerScalar::GetInt64() const
 {
     int64_t ret = 0;
     std::vector<uint8_t> vch = GetVch();
@@ -251,7 +251,7 @@ int64_t MclScalar::GetInt64() const
     return ret;
 }
 
-std::vector<uint8_t> MclScalar::GetVch() const
+std::vector<uint8_t> HerScalar::GetVch() const
 {
     std::vector<uint8_t> b(WIDTH);
     if (mclBnFr_serialize(&b[0], WIDTH, &m_fr) == 0) {
@@ -260,16 +260,16 @@ std::vector<uint8_t> MclScalar::GetVch() const
     return b;
 }
 
-void MclScalar::SetVch(const std::vector<uint8_t> &v)
+void HerScalar::SetVch(const std::vector<uint8_t> &v)
 {
     if (mclBnFr_setBigEndianMod(&m_fr, &v[0], v.size()) == -1) {
         throw std::runtime_error(std::string("Failed to setBigEndianMod vector"));
     }
 }
 
-void MclScalar::SetPow2(int n)
+void HerScalar::SetPow2(int n)
 {
-    MclScalar temp = 1;
+    HerScalar temp = 1;
     while (n != 0) {
         temp = temp * 2;
         --n;
@@ -278,7 +278,7 @@ void MclScalar::SetPow2(int n)
     m_fr = temp.m_fr;
 }
 
-uint256 MclScalar::Hash(const int& n) const
+uint256 HerScalar::Hash(const int& n) const
 {
     CHashWriter hasher(0,0);
     hasher << *this;
@@ -286,7 +286,7 @@ uint256 MclScalar::Hash(const int& n) const
     return hasher.GetHash();
 }
 
-std::string MclScalar::GetString(const int8_t radix) const
+std::string HerScalar::GetString(const int8_t radix) const
 {
     char str[1024];
 
@@ -296,7 +296,7 @@ std::string MclScalar::GetString(const int8_t radix) const
     return std::string(str);
 }
 
-std::vector<bool> MclScalar::GetBits() const
+std::vector<bool> HerScalar::GetBits() const
 {
     auto bitStr = GetString(2);
     std::vector<bool> vec;
@@ -309,7 +309,7 @@ std::vector<bool> MclScalar::GetBits() const
 /**
  * Since GetVch returns 32-byte vector, maximum bit index is 8 * 32 - 1 = 255
  */
-bool MclScalar::GetBit(uint8_t n) const
+bool HerScalar::GetBit(uint8_t n) const
 {
     std::vector<uint8_t> vch = GetVch();
     assert(vch.size() == 32);
@@ -322,7 +322,7 @@ bool MclScalar::GetBit(uint8_t n) const
     return bit;
 }
 
-unsigned int MclScalar::GetSerializeSize() const
+unsigned int HerScalar::GetSerializeSize() const
 {
     return ::GetSerializeSize(GetVch());
 }

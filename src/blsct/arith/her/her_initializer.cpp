@@ -2,11 +2,11 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <blsct/arith/mcl_initializer.h>
+#include <blsct/arith/her/her_initializer.h>
 
-void MclInitializer::Init()
+void HerInitializer::Init()
 {
-    boost::lock_guard<boost::mutex> lock(MclInitializer::m_init_mutex);
+    boost::lock_guard<boost::mutex> lock(HerInitializer::m_init_mutex);
     static bool is_initialized = false;
     if (is_initialized) return;
 

@@ -9,59 +9,49 @@
 #ifndef NAVCOIN_BLSCT_ARITH_SCALAR_H
 #define NAVCOIN_BLSCT_ARITH_SCALAR_H
 
-#include <functional>
-#include <stddef.h>
 #include <string>
 #include <vector>
 
-#include <bls/bls384_256.h> // must include this before bls/bls.h
-#include <bls/bls.h>
-#include <hash.h>
-#include <serialize.h>
-#include <uint256.h>
-#include <version.h>
-
-// T = MclScalar, V = mclBnFr
-template <typename V>
+template <typename T>
 class Scalar {
 public:
     static constexpr int WIDTH = 256 / 8;
 
-    Scalar<V>(const int64_t& n = 0);
-    Scalar<V>(const std::vector<uint8_t>& v);
-    Scalar<V>(const V& n_fr);
-    Scalar<V>(const uint256& n);
-    Scalar<V>(const std::string& s, int radix);
+    Scalar<T>(const int64_t& n = 0);
+    Scalar<T>(const std::vector<uint8_t>& v);
+    Scalar<T>(const T& n_fr);
+    Scalar<T>(const uint256& n);
+    Scalar<T>(const std::string& s, int radix);
 
     static void Init();
 
     void operator=(const uint64_t& n);
 
-    Scalar<V> operator+(const Scalar<V>& rhs) const;
-    Scalar<V> operator-(const Scalar<V>& rhs) const;
-    Scalar<V> operator*(const Scalar<V>& rhs) const;
-    Scalar<V> operator/(const Scalar<V>& rhs) const;
-    Scalar<V> operator|(const Scalar<V>& rhs) const;
-    Scalar<V> operator^(const Scalar<V>& rhs) const;
-    Scalar<V> operator&(const Scalar<V>& rhs) const;
-    Scalar<V> operator~() const;
-    Scalar<V> operator<<(unsigned int shift) const;
-    Scalar<V> operator>>(unsigned int shift) const;
+    Scalar<T> operator+(const Scalar<T>& rhs) const;
+    Scalar<T> operator-(const Scalar<T>& rhs) const;
+    Scalar<T> operator*(const Scalar<T>& rhs) const;
+    Scalar<T> operator/(const Scalar<T>& rhs) const;
+    Scalar<T> operator|(const Scalar<T>& rhs) const;
+    Scalar<T> operator^(const Scalar<T>& rhs) const;
+    Scalar<T> operator&(const Scalar<T>& rhs) const;
+    Scalar<T> operator~() const;
+    Scalar<T> operator<<(unsigned int shift) const;
+    Scalar<T> operator>>(unsigned int shift) const;
 
-    bool operator==(const Scalar<V>& rhs) const;
+    bool operator==(const Scalar<T>& rhs) const;
     bool operator==(const int& rhs) const;
-    bool operator!=(const Scalar<V>& rhs) const;
+    bool operator!=(const Scalar<T>& rhs) const;
     bool operator!=(const int& rhs) const;
 
     bool IsValid() const;
 
-    Scalar<V> Invert() const;
-    Scalar<V> Negate() const;
-    Scalar<V> Square() const;
-    Scalar<V> Cube() const;
-    Scalar<V> Pow(const Scalar<V>& n) const;
+    Scalar<T> Invert() const;
+    Scalar<T> Negate() const;
+    Scalar<T> Square() const;
+    Scalar<T> Cube() const;
+    Scalar<T> Pow(const Scalar<T>& n) const;
 
-    static Scalar<V> Rand(bool exclude_zero = false);
+    static Scalar<T> Rand(bool exclude_zero = false);
 
     int64_t GetInt64() const;
 
@@ -95,8 +85,6 @@ public:
         ::Unserialize(s, vch);
         SetVch(vch);
     }
-
-    V m_value;
 };
 
 #endif // NAVCOIN_BLSCT_ARITH_SCALAR_H

@@ -8,60 +8,66 @@
 #include <stddef.h>
 #include <string>
 
-#include <bls/bls384_256.h> // must include this before bls/bls.h
-#include <bls/bls.h>
-#include <boost/thread/lock_guard.hpp>
-#include <boost/thread/mutex.hpp>
+// #include <bls/bls384_256.h> // must include this before bls/bls.h
+// #include <bls/bls.h>
+// #include <boost/thread/lock_guard.hpp>
+// #include <boost/thread/mutex.hpp>
 
-#include <blsct/arith/scalar.h>
-#include <hash.h>
-#include <serialize.h>
-#include <uint256.h>
-#include <version.h>
+// #include <blsct/arith/scalar.h>
+// #include <hash.h>
+// #include <serialize.h>
+// #include <uint256.h>
+// #include <version.h>
 
 enum class Endianness {
     Big,
     Little
 };
 
-template <typename P>
+template <typename T>
 class Point
 {
 public:
     static constexpr int WIDTH = 384 / 8;
 
-    Point<P>();
-    Point<P>(const std::vector<uint8_t>& v);
-    Point<P>(const uint256& b);
-    Point<P>(const P& p);
+    Point<T>();
+    Point<T>(const std::vector<uint8_t>& v);
+    Point<T>(const uint256& b);
+    Point<T>(const P& p);
 
     static void Init();
 
-    Point<P> operator=(const P& rhs);
-    Point<P> operator+(const Point<P>& rhs) const;
-    Point<P> operator-(const Point<P>& rhs) const;
+    template <typename T>
+    template <typename P>
+    Point<T> operator=(const P& rhs);
 
+    Point<T> operator+(const Point<T>& rhs) const;
+    Point<T> operator-(const Point<T>& rhs) const;
+
+    template <typename T>
     template <typename V>
-    Point<P> operator*(const Scalar<V>& rhs) const;
+    Point<T> operator*(const Scalar<V>& rhs) const;
 
-    bool operator==(const Point<P>& rhs) const;
-    bool operator!=(const Point<P>& rhs) const;
+    bool operator==(const Point<T>& rhs) const;
+    bool operator!=(const Point<T>& rhs) const;
 
-    Point<P> Double() const;
+    Point<T> Double() const;
 
-    static Point<P> GetBasePoint();
-    static Point<P> MapToG1(const std::vector<uint8_t>& vec, const Endianness e = Endianness::Little);
-    static Point<P> MapToG1(const std::string& s, const Endianness e = Endianness::Little);
-    static Point<P> HashAndMap(const std::vector<uint8_t>& vec);
+    static Point<T> GetBasePoint();
+    static Point<T> MapToG1(const std::vector<uint8_t>& vec, const Endianness e = Endianness::Little);
+    static Point<T> MapToG1(const std::string& s, const Endianness e = Endianness::Little);
+    static Point<T> HashAndMap(const std::vector<uint8_t>& vec);
 
     /**
-     * Multiply Point<P>s by Scalars element by element and then get the sum of all resulting points
+     * Multiply Point<T>s by Scalars element by element and then get the sum of all resulting points
      * [g_1*s_1, g_2*s_2, ..., g_n*s_n].Sum()
      */
+    template <typename T>
+    template <typename P>
     template <typename V>
-    static Point<P> MulVec(const std::vector<P>& g_vec, const std::vector<V>& s_vec);
+    static Point<T> MulVec(const std::vector<P>& g_vec, const std::vector<V>& s_vec);
 
-    static Point<P> Rand();
+    static Point<T> Rand();
 
     bool IsValid() const;
     bool IsUnity() const;
@@ -86,12 +92,6 @@ public:
         ::Unserialize(s, vch);
         SetVch(vch);
     }
-
-    P m_p;
-
-private:
-    static P m_g; // Using P instead of Point<P> to get around chiken-and-egg issue
-    static boost::mutex m_init_mutex;
 };
 
 #endif // NAVCOIN_BLSCT_ARITH_POINT_H
