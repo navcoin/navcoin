@@ -28,8 +28,6 @@ template <typename T>
 class Point
 {
 public:
-    static constexpr int WIDTH = 384 / 8;
-
     Point<T>();
     Point<T>(const std::vector<uint8_t>& v);
     Point<T>(const uint256& b);

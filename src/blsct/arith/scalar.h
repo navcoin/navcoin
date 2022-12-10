@@ -15,8 +15,6 @@
 template <typename T>
 class Scalar {
 public:
-    static constexpr int WIDTH = 256 / 8;
-
     Scalar<T>(const int64_t& n = 0);
     Scalar<T>(const std::vector<uint8_t>& v);
     Scalar<T>(const T& n_fr);

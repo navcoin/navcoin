@@ -13,6 +13,8 @@
 #include <stdexcept>
 #include <vector>
 
+#include <blsct/arith/scalar.h>
+
 /**
  * Designed to expect below instantiations only:
  * - Elements<G1Point>
@@ -30,7 +32,10 @@ public:
     void Add(const T x);
 
     void ConfirmSizesMatch(const size_t& other_size) const;
-    static Elements<T> FirstNPow(const size_t& n, const Scalar& k);
+
+    template <typename V>
+    static Elements<T> FirstNPow(const size_t& n, const Scalar<V>& k);
+
     static Elements<T> RepeatN(const size_t& n, const T& k);
     static Elements<T> RandVec(const size_t& n, const bool exclude_zero = false);
 
@@ -43,7 +48,9 @@ public:
      * G1Points x Scalars
      * [p1, p2] * [a1, ba] = [p1*a1, p2*a2]
      */
-    Elements<T> operator*(const Elements<Scalar>& rhs) const;
+    template <typename T>
+    template <typename V>
+    Elements<T> operator*(const Elements<Scalar<V>>& rhs) const;
 
     /**
      * Scalars x Scalar
@@ -52,7 +59,9 @@ public:
      * G1Points x Scalar
      * [p1, p2] ^ s = [p1*s, p2*s]
      */
-    Elements<T> operator*(const Scalar& rhs) const;
+    template <typename T>
+    template <typename V>
+    Elements<T> operator*(const Scalar<V>& rhs) const;
 
     /**
      * [p1, p2] + [q1, q2] = [p1+q1, p2+q2]
@@ -73,8 +82,9 @@ public:
      * but faster than that due to direct use of mcl library
      */
     template <typename T>
+    template <typename P>
     template <typename V>
-    G1Point MulVec(const Elements<Scalar<V>>& scalars) const;
+    Point<P> MulVec(const Elements<Scalar<V>>& scalars) const;
 
     /**
      * Returns elements slice [fromIndex, vec.size())
@@ -86,11 +96,5 @@ public:
      */
     Elements<T> To(const size_t to_index) const;
 };
-
-template <typename T>
-using Scalars = Elements<Scalar<T>>;
-
-template <typename T>
-using G1Points = Elements<Point<T>>;
 
 #endif // NAVCOIN_BLSCT_ARITH_ELEMENTS_H
