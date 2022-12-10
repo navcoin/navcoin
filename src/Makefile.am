@@ -399,7 +399,7 @@ libbitcoin_node_a_SOURCES = \
   blsct/arith/her/her_initializer.cpp \
   blsct/arith/her/her_scalar.cpp \
   blsct/arith/elements.cpp \
-  blsct/arith/g1point.cpp \
+  blsct/arith/point.cpp \
   blsct/arith/scalar.cpp \
   blsct/keys.cpp \
   chain.cpp \
@@ -927,10 +927,12 @@ libbitcoinkernel_la_SOURCES = \
   kernel/bitcoinkernel.cpp \
   arith_uint256.cpp \
   blockfilter.cpp \
-  blsct/arith/mcl/elements.cpp \
-  blsct/arith/mcl/mcl_g1point.cpp \
-  blsct/arith/mcl/mcl_initializer.cpp \
-  blsct/arith/mcl/mcl_scalar.cpp \
+  blsct/arith/her/her_elements.cpp \
+  blsct/arith/her/her_g1point.cpp \
+  blsct/arith/her/her_initializer.cpp \
+  blsct/arith/her/her_scalar.cpp \
+  blsct/arith/elements.cpp \
+  blsct/arith/point.cpp \
   blsct/arith/scalar.cpp \
   blsct/keys.cpp \
   chain.cpp \
