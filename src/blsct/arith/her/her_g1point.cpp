@@ -3,15 +3,15 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <blsct/arith/point.h>
+#include <blsct/arith/her/her_initializer.h>
+#include <blsct/arith/her/her_scalar.h>
 #include <blsct/arith/her/her_g1point.h>
-#include <blsct/arith/point.h>
 
 #include <numeric>
 #include <hash.h>
 #include <serialize.h>
 #include <uint256.h>
 #include <version.h>
-
 
 HerG1Point::HerG1Point()
 {
@@ -58,30 +58,30 @@ void HerG1Point::Init()
     is_initialized = true;
 }
 
-HerG1Point HerG1Point::operator=(const mclBnG1& q)
+HerG1Point HerG1Point::operator=(const mclBnG1& rhs)
 {
-    m_p = q;
+    m_p = rhs;
     return *this;
 }
 
-HerG1Point HerG1Point::operator+(const HerG1Point& b) const
+HerG1Point HerG1Point::operator+(const HerG1Point& rhs) const
 {
     HerG1Point ret;
-    mclBnG1_add(&ret.m_p, &m_p, &b.m_p);
+    mclBnG1_add(&ret.m_p, &m_p, &rhs.m_p);
     return ret;
 }
 
-HerG1Point HerG1Point::operator-(const HerG1Point& b) const
+HerG1Point HerG1Point::operator-(const HerG1Point& rhs) const
 {
     HerG1Point ret;
-    mclBnG1_sub(&ret.m_p, &m_p, &b.m_p);
+    mclBnG1_sub(&ret.m_p, &m_p, &rhs.m_p);
     return ret;
 }
 
-HerG1Point HerG1Point::operator*(const Scalar& b) const
+HerG1Point HerG1Point::operator*(const HerScalar& rhs) const
 {
     HerG1Point ret;
-    mclBnG1_mul(&ret.m_p, &m_p, &b.m_fr);
+    mclBnG1_mul(&ret.m_p, &m_p, &rhs.m_fr);
     return ret;
 }
 
@@ -150,20 +150,20 @@ HerG1Point HerG1Point::MulVec(const std::vector<mclBnG1>& g_vec, const std::vect
     return ret;
 }
 
-bool HerG1Point::operator==(const HerG1Point& b) const
+bool HerG1Point::operator==(const HerG1Point& rhs) const
 {
-    return mclBnG1_isEqual(&m_p, &b.m_p);
+    return mclBnG1_isEqual(&m_p, &rhs.m_p);
 }
 
-bool HerG1Point::operator!=(const HerG1Point& b) const
+bool HerG1Point::operator!=(const HerG1Point& rhs) const
 {
-    return !operator==(b);
+    return !operator==(rhs);
 }
 
 HerG1Point HerG1Point::Rand()
 {
     auto g = GetBasePoint();
-    return g * Scalar::Rand();
+    return g * HerScalar::Rand();
 }
 
 bool HerG1Point::IsValid() const
@@ -204,4 +204,18 @@ std::string HerG1Point::GetString(const int& radix) const
 unsigned int HerG1Point::GetSerializeSize() const
 {
     return ::GetSerializeSize(GetVch());
+}
+
+template <typename Stream>
+void HerG1Point::Serialize(Stream& s) const
+{
+    ::Serialize(s, GetVch());
+}
+
+template <typename Stream>
+void HerG1Point::Unserialize(Stream& s)
+{
+    std::vector<uint8_t> vch;
+    ::Unserialize(s, vch);
+    SetVch(vch);
 }

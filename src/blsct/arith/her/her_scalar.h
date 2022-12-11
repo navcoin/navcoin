@@ -92,18 +92,10 @@ public:
     unsigned int GetSerializeSize() const;
 
     template <typename Stream>
-    void Serialize(Stream& s) const
-    {
-        ::Serialize(s, GetVch());
-    }
+    void Serialize(Stream& s) const;
 
     template <typename Stream>
-    void Unserialize(Stream& s)
-    {
-        std::vector<uint8_t> vch;
-        ::Unserialize(s, vch);
-        SetVch(vch);
-    }
+    void Unserialize(Stream& s);
 
     mclBnFr m_fr;
 };

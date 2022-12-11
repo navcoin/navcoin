@@ -9,8 +9,10 @@ EXTRA_LIBRARIES += \
 
 TEST_UTIL_H = \
     test/util/blockfilter.h \
-    blsct/arith/g1point.h \
-    blsct/arith/mcl_initializer.h \
+    blsct/arith/her/her_g1point.h \
+    blsct/arith/her/her_scalar.h \
+    blsct/arith/her/her_initializer.h \
+    blsct/arith/point.h \
     blsct/arith/scalar.h \
     blsct/keys.h \
     test/util/chainstate.h \
@@ -28,8 +30,10 @@ libtest_util_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(MINIUPNPC_CPPFLAG
 libtest_util_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libtest_util_a_LIBADD = $(LIBBLS) $(LIBMCL)
 libtest_util_a_SOURCES = \
-  blsct/arith/g1point.cpp \
-  blsct/arith/mcl_initializer.cpp \
+  blsct/arith/her/her_g1point.cpp \
+  blsct/arith/her/her_scalar.cpp \
+  blsct/arith/her/her_initializer.cpp \
+  blsct/arith/point.cpp \
   blsct/arith/scalar.cpp \
   blsct/keys.cpp \
   test/util/blockfilter.cpp \

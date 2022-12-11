@@ -6,13 +6,14 @@
 
 namespace blsct {
 
-PublicKey PublicKey::Aggregate(std::vector<PublicKey> vPk)
+template <typename P>
+PublicKey<P> PublicKey<P>::Aggregate(std::vector<PublicKey<P>> vPk)
 {
-    auto retPoint = G1Point();
+    auto retPoint = Point<P>();
     bool isZero = true;
 
     for (auto& pk : vPk) {
-        G1Point pkG1;
+        Point<P> pkG1;
 
         bool success = pk.GetG1Point(pkG1);
         if (!success)
@@ -25,63 +26,72 @@ PublicKey PublicKey::Aggregate(std::vector<PublicKey> vPk)
     return PublicKey(retPoint);
 }
 
-uint256 PublicKey::GetHash() const
+template <typename P>
+uint256 PublicKey<P>::GetHash() const
 {
     CHashWriter ss(SER_GETHASH, 0);
     ss << data;
     return ss.GetHash();
 }
 
-CKeyID PublicKey::GetID() const
+template <typename P>
+CKeyID PublicKey<P>::GetID() const
 {
     return CKeyID(Hash160(data));
 }
 
-bool PublicKey::GetG1Point(G1Point& ret) const
+template <typename P>
+bool PublicKey<P>::GetG1Point(Point<P>& ret) const
 {
     try {
-        ret = G1Point(data);
+        ret = Point<P>(data);
     } catch (...) {
         return false;
     }
     return true;
 }
 
-std::string PublicKey::ToString() const
+template <typename P>
+std::string PublicKey<P>::ToString() const
 {
     return HexStr(GetVch());
 };
 
-bool PublicKey::operator==(const PublicKey& rhs) const
+template <typename P>
+bool PublicKey<P>::operator==(const PublicKey<P>& rhs) const
 {
     return GetVch() == rhs.GetVch();
 }
 
-bool PublicKey::IsValid() const
+template <typename P>
+bool PublicKey<P>::IsValid() const
 {
     if (data.size() == 0) return false;
 
-    G1Point g1;
+    Point<P> g1;
 
     if (!GetG1Point(g1)) return false;
 
     return g1.IsValid();
 }
 
-std::vector<unsigned char> PublicKey::GetVch() const
+template <typename P>
+std::vector<unsigned char> PublicKey<P>::GetVch() const
 {
     return data;
 }
 
-CKeyID DoublePublicKey::GetID() const
+template <typename P>
+CKeyID DoublePublicKey<P>::GetID() const
 {
     return CKeyID(Hash160(GetVch()));
 }
 
-bool DoublePublicKey::GetViewKey(G1Point& ret) const
+template <typename P>
+bool DoublePublicKey<P>::GetViewKey(Point<P>& ret) const
 {
     try {
-        ret = G1Point(vk.GetVch());
+        ret = Point<P>(vk.GetVch());
     } catch (...) {
         return false;
     }
@@ -89,10 +99,11 @@ bool DoublePublicKey::GetViewKey(G1Point& ret) const
     return true;
 }
 
-bool DoublePublicKey::GetSpendKey(G1Point& ret) const
+template <typename P>
+bool DoublePublicKey<P>::GetSpendKey(Point<P>& ret) const
 {
     try {
-        ret = G1Point(sk.GetVch());
+        ret = Point<P>(sk.GetVch());
     } catch (...) {
         return false;
     }
@@ -100,27 +111,32 @@ bool DoublePublicKey::GetSpendKey(G1Point& ret) const
     return true;
 }
 
-bool DoublePublicKey::operator==(const DoublePublicKey& rhs) const
+template <typename P>
+bool DoublePublicKey<P>::operator==(const DoublePublicKey& rhs) const
 {
     return vk == rhs.vk && sk == rhs.sk;
 }
 
-bool DoublePublicKey::IsValid() const
+template <typename P>
+bool DoublePublicKey<P>::IsValid() const
 {
     return vk.IsValid() && sk.IsValid();
 }
 
-std::vector<unsigned char> DoublePublicKey::GetVkVch() const
+template <typename P>
+std::vector<unsigned char> DoublePublicKey<P>::GetVkVch() const
 {
     return vk.GetVch();
 }
 
-std::vector<unsigned char> DoublePublicKey::GetSkVch() const
+template <typename P>
+std::vector<unsigned char> DoublePublicKey<P>::GetSkVch() const
 {
     return sk.GetVch();
 }
 
-std::vector<unsigned char> DoublePublicKey::GetVch() const
+template <typename P>
+std::vector<unsigned char> DoublePublicKey<P>::GetVch() const
 {
     auto ret = vk.GetVch();
     auto toAppend = sk.GetVch();
@@ -130,33 +146,41 @@ std::vector<unsigned char> DoublePublicKey::GetVch() const
     return ret;
 }
 
-bool PrivateKey::operator==(const PrivateKey& rhs) const
+template <typename P>
+bool PrivateKey<P>::operator==(const PrivateKey<P>& rhs) const
 {
     return k == rhs.k;
 }
 
-G1Point PrivateKey::GetG1Point() const
+template <typename P>
+template <typename V>
+Point<P> PrivateKey<P>::GetG1Point() const
 {
-    return G1Point::GetBasePoint() * Scalar(std::vector<unsigned char>(k.begin(), k.end()));
+    return Point<P>::GetBasePoint() * Scalar<V>(std::vector<unsigned char>(k.begin(), k.end()));
 }
 
-PublicKey PrivateKey::GetPublicKey() const
+template <typename P>
+PublicKey<P> PrivateKey<P>::GetPublicKey() const
 {
     return PublicKey(GetG1Point());
 }
 
-Scalar PrivateKey::GetScalar() const
+template <typename P>
+template <typename V>
+Scalar<V> PrivateKey<P>::GetScalar() const
 {
-    return Scalar(std::vector<unsigned char>(k.begin(), k.end()));
+    return Scalar<V>(std::vector<unsigned char>(k.begin(), k.end()));
 }
 
-bool PrivateKey::IsValid() const
+template <typename P>
+bool PrivateKey<P>::IsValid() const
 {
     if (k.size() == 0) return false;
     return GetScalar().IsValid();
 }
 
-void PrivateKey::SetToZero()
+template <typename P>
+void PrivateKey<P>::SetToZero()
 {
     k.clear();
 }

@@ -36,6 +36,7 @@ void Point<T>::Init()
 }
 
 template <typename T>
+template <typename P>
 Point<T> Point<T>::operator=(const P& rhs)
 {
     return static_cast<T*>(this)->operator=(rhs);
@@ -72,12 +73,6 @@ bool Point<T>::operator!=(const Point<T>& rhs) const
     return static_cast<T*>(this)->operator!=(rhs);
 }
 
-template <typename T> Point<T> Point<T>::operator-(const Point<T>& rhs) const
-{
-    return static_cast<T*>(this)->operator-(rhs);
-}
-
-
 template <typename T>
 Point<T> Point<T>::Double() const
 {
@@ -91,13 +86,13 @@ Point<T> Point<T>::GetBasePoint()
 }
 
 template <typename T>
-Point<T> Point<T>::MapToG1(const std::vector<uint8_t>& vec, const Endianness e = Endianness::Little)
+Point<T> Point<T>::MapToG1(const std::vector<uint8_t>& vec, const Endianness e)
 {
     return Point<T>::MapToG1(vec, e);
 }
 
 template <typename T>
-Point<T> Point<T>::MapToG1(const std::string& s, const Endianness e = Endianness::Little)
+Point<T> Point<T>::MapToG1(const std::string& s, const Endianness e)
 {
     return Point<T>::MapToG1(s, e);
 }
@@ -109,8 +104,7 @@ Point<T> Point<T>::HashAndMap(const std::vector<uint8_t>& vec)
 }
 
 template <typename T>
-template <typename P>
-template <typename V>
+template <typename P, typename V>
 Point<T> Point<T>::MulVec(const std::vector<P>& g_vec, const std::vector<V>& s_vec)
 {
     return Point<T>::MulVec(g_vec, s_vec);
@@ -119,7 +113,7 @@ Point<T> Point<T>::MulVec(const std::vector<P>& g_vec, const std::vector<V>& s_v
 template <typename T>
 Point<T> Point<T>::Rand()
 {
-    return Point<T>::Range();
+    return Point<T>::Rand();
 }
 
 template <typename T>
@@ -147,7 +141,7 @@ void Point<T>::SetVch(const std::vector<uint8_t>& vec)
 }
 
 template <typename T>
-std::string Point<T>::GetString(const int& radix = 16) const
+std::string Point<T>::GetString(const int& radix) const
 {
     return static_cast<T*>(this)->GetString(radix);
 }
@@ -155,7 +149,7 @@ std::string Point<T>::GetString(const int& radix = 16) const
 template <typename T>
 unsigned int Point<T>::GetSerializeSize() const
 {
-    return static_cast<T*>(this)->GetSerializedSize(radix);
+    return static_cast<T*>(this)->GetSerializedSize();
 }
 
 template <typename T>

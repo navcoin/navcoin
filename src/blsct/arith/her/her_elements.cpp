@@ -9,8 +9,9 @@
 #include <blsct/arith/scalar.h>
 
 #include <blsct/arith/elements.h>
-#include <blsct/arith/g1point.h>
+#include <blsct/arith/point.h>
 #include <blsct/arith/scalar.h>
+#include <blsct/arith/her/her_elements.h>
 
 template <typename T>
 T HerElements<T>::Sum() const
@@ -78,7 +79,7 @@ template HerElements<HerScalar> HerElements<HerScalar>::FirstNPow(const size_t&,
 template <typename T>
 HerElements<T> HerElements<T>::RepeatN(const size_t& n, const T& k)
 {
-    Elements<T> ret;
+    HerElements<T> ret;
     for (size_t i = 0; i < n; ++i) {
         ret.m_vec.push_back(k);
     }
@@ -90,8 +91,8 @@ template HerElements<HerG1Point> HerElements<HerG1Point>::RepeatN(const size_t&,
 template <typename T>
 HerElements<T> HerElements<T>::RandVec(const size_t& n, const bool exclude_zero)
 {
-    if constexpr (std::is_same_v<T, Scalar>) {
-        Elements<HerScalar> ret;
+    if constexpr (std::is_same_v<T, HerScalar>) {
+        HerElements<HerScalar> ret;
         for (size_t i = 0; i < n; ++i) {
             auto x = HerScalar::Rand(exclude_zero);
             ret.m_vec.push_back(x);
@@ -126,8 +127,8 @@ HerElements<T> HerElements<T>::operator*(const HerElements<HerScalar>& other) co
         throw std::runtime_error("Not implemented");
     }
 }
-template HerElements<HerScalar> HerElements<HerScalar>::operator*(const Elements<HerScalar>& other) const;
-template HerElements<HerG1Point> HerElements<HerG1Point>::operator*(const Elements<HerScalar>& other) const;
+template HerElements<HerScalar> HerElements<HerScalar>::operator*(const HerElements<HerScalar>& other) const;
+template HerElements<HerG1Point> HerElements<HerG1Point>::operator*(const HerElements<HerScalar>& other) const;
 
 template <typename T>
 HerElements<T> HerElements<T>::operator*(const HerScalar& s) const
@@ -158,7 +159,7 @@ HerElements<T> HerElements<T>::operator+(const HerElements<T>& other) const
 {
     ConfirmSizesMatch(other.Size());
 
-    Elements<T> ret;
+    HerElements<T> ret;
     for (size_t i = 0; i < m_vec.size(); ++i) {
         ret.m_vec.push_back(m_vec[i] + other.m_vec[i]);
     }
@@ -172,7 +173,7 @@ HerElements<T> HerElements<T>::operator-(const HerElements<T>& other) const
 {
     ConfirmSizesMatch(other.Size());
 
-    Elements<T> ret;
+    HerElements<T> ret;
     for (size_t i = 0; i < m_vec.size(); ++i) {
         ret.m_vec.push_back(m_vec[i] - other.m_vec[i]);
     }
@@ -193,16 +194,16 @@ bool HerElements<T>::operator==(const HerElements<T>& other) const
     }
     return true;
 }
-template bool HerElements<HerScalar>::operator==(const Elements<HerScalar>& other) const;
-template bool HerElements<HerG1Point>::operator==(const Elements<HerG1Point>& other) const;
+template bool HerElements<HerScalar>::operator==(const HerElements<HerScalar>& other) const;
+template bool HerElements<HerG1Point>::operator==(const HerElements<HerG1Point>& other) const;
 
 template <typename T>
 bool HerElements<T>::operator!=(const HerElements<T>& other) const
 {
     return !operator==(other);
 }
-template bool HerElements<HerScalar>::operator!=(const Elements<HerScalar>& other) const;
-template bool HerElements<HerG1Point>::operator!=(const Elements<HerG1Point>& other) const;
+template bool HerElements<HerScalar>::operator!=(const HerElements<HerScalar>& other) const;
+template bool HerElements<HerG1Point>::operator!=(const HerElements<HerG1Point>& other) const;
 
 template <typename T>
 HerElements<T> HerElements<T>::From(const size_t from_index) const
@@ -211,7 +212,7 @@ HerElements<T> HerElements<T>::From(const size_t from_index) const
         throw std::runtime_error("from index out of range");
     }
 
-    Elements<T> ret;
+    HerElements<T> ret;
     for (size_t i = from_index; i < m_vec.size(); ++i) {
         ret.m_vec.push_back(m_vec[i]);
     }
@@ -227,7 +228,7 @@ HerElements<T> HerElements<T>::To(const size_t to_index) const
         throw std::runtime_error("to index out of range");
     }
 
-    Elements<T> ret;
+    HerElements<T> ret;
     for (size_t i = 0; i < to_index; ++i) {
         ret.m_vec.push_back(m_vec[i]);
     }
@@ -237,9 +238,9 @@ template HerElements<HerScalar> HerElements<HerScalar>::To(const size_t to_index
 template HerElements<HerG1Point> HerElements<HerG1Point>::To(const size_t to_index) const;
 
 template <typename T>
-HerG1Point HerElements<T>::MulVec(const Elements<HerScalar>& scalars) const
+HerG1Point HerElements<T>::MulVec(const HerElements<HerScalar>& scalars) const
 {
-    if constexpr (std::is_same_v<T, G1Point>) {
+    if constexpr (std::is_same_v<T, HerG1Point>) {
         ConfirmSizesMatch(scalars.Size());
 
         const size_t vec_count = m_vec.size();
@@ -252,7 +253,7 @@ HerG1Point HerElements<T>::MulVec(const Elements<HerScalar>& scalars) const
             vec_fr[i] = scalars[i].m_fr;
         }
 
-        G1Point ret;
+        HerG1Point ret;
         mclBnG1_mulVec(&ret.m_p, vec_g1.data(), vec_fr.data(), vec_count);
         return ret;
 
@@ -260,4 +261,4 @@ HerG1Point HerElements<T>::MulVec(const Elements<HerScalar>& scalars) const
         throw std::runtime_error("Not implemented");
     }
 }
-template HerG1Point HerElements<HerG1Point>::MulVec(const Elements<HerScalar>&) const;
+template HerG1Point HerElements<HerG1Point>::MulVec(const HerElements<HerScalar>&) const;

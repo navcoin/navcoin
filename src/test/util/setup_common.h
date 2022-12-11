@@ -5,8 +5,8 @@
 #ifndef BITCOIN_TEST_UTIL_SETUP_COMMON_H
 #define BITCOIN_TEST_UTIL_SETUP_COMMON_H
 
-#include <blsct/arith/g1point.h>
-#include <blsct/arith/mcl_initializer.h>
+#include <blsct/arith/her/her_g1point.h>
+#include <blsct/arith/her/her_initializer.h>
 #include <chainparamsbase.h>
 #include <fs.h>
 #include <key.h>
@@ -256,8 +256,8 @@ private:
 /**
  * Setup that initializes external mcl library
  */
-struct MclTestingSetup {
-    MclTestingSetup();
+struct HerTestingSetup {
+    HerTestingSetup();
 };
 
 #endif // BITCOIN_TEST_UTIL_SETUP_COMMON_H

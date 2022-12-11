@@ -28,11 +28,11 @@ suppress memory sanitizer that detects false positives in mcl library
  * - Elements<HerScalar>
  */
 template <typename T>
-class HerElements : public Elements<HerElements>
+class HerElements : public Elements<HerElements<T>>
 {
 public:
-    HerElements<T>() {}
-    HerElements<T>(const std::vector<T>& vec) : m_vec(vec) {}
+    HerElements() {}
+    HerElements(const std::vector<T>& vec) : m_vec(vec) {}
 
     T Sum() const;
     T operator[](int index) const;
@@ -48,7 +48,7 @@ public:
      * Scalars x Scalars
      * [a1, a2] * [b1, b2] = [a1*b1, a2*b2]
      *
-     * G1Points x Scalars
+     * HerG1Points x Scalars
      * [p1, p2] * [a1, ba] = [p1*a1, p2*a2]
      */
     HerElements<T> operator*(const HerElements<HerScalar>& other) const;
@@ -57,7 +57,7 @@ public:
      * Scalars x Scalar
      * [s1, s2] * t = [s1*t, s2*t]
      *
-     * G1Points x Scalar
+     * HerG1Points x Scalar
      * [p1, p2] ^ s = [p1*s, p2*s]
      */
     HerElements<T> operator*(const HerScalar& s) const;
@@ -65,24 +65,22 @@ public:
     /**
      * [p1, p2] + [q1, q2] = [p1+q1, p2+q2]
      */
-    Elements<T> operator+(const Elements<T>& other) const;
+    HerElements<T> operator+(const HerElements<T>& other) const;
 
     /**
      * [p1, p2] - [q1, q2] = [p1-q1, p2-q2]
      */
-    Elements<T> operator-(const Elements<T>& other) const;
+    HerElements<T> operator-(const HerElements<T>& other) const;
 
-    bool operator==(const Elements<T>& other) const;
+    bool operator==(const HerElements<T>& other) const;
 
-    bool operator!=(const Elements<T>& other) const;
+    bool operator!=(const HerElements<T>& other) const;
 
     /**
      * MulVec is equivalent of (Elements<HerG1Point> * Elements<HerScalar>).Sum(),
      * but faster than that due to direct use of mcl library
      */
-    template <typename T>
-    template <typename V>
-    HerG1Point MulVec(const Elements<HerScalar>& scalars) const;
+    HerG1Point MulVec(const HerElements<HerScalar>& scalars) const;
 
     /**
      * Returns elements slice [fromIndex, vec.size())
@@ -97,10 +95,7 @@ public:
     std::vector<T> m_vec;
 };
 
-template <typename V>
-using Scalars = Elements<HerScalar>;
-
-template <typename P>
-using Points = Elements<HerG1Point>;
+using HerScalars = HerElements<HerScalar>;
+using HerG1Points = HerElements<HerG1Point>;
 
 #endif // NAVCOIN_BLSCT_ARITH_HER_HER_ELEMENTS_H

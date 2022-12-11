@@ -11,13 +11,10 @@
 
 #include <bls/bls384_256.h> // must include this before bls/bls.h
 #include <bls/bls.h>
+#include <blsct/arith/point.h>
+#include <blsct/arith/her/her_scalar.h>
 #include <boost/thread/lock_guard.hpp>
 #include <boost/thread/mutex.hpp>
-
-enum class Endianness {
-    Big,
-    Little
-};
 
 /*
 Using `Her` prefix instead of `Mcl` because `fun:*mcl*` wildcard is used to
@@ -32,16 +29,14 @@ public:
     HerG1Point();
     HerG1Point(const std::vector<uint8_t>& v);
     HerG1Point(const uint256& b);
-    HerG1Point(const P& p);
+    HerG1Point(const mclBnG1& p);
 
     static void Init();
 
-    HerG1Point operator=(const P& rhs);
+    HerG1Point operator=(const mclBnG1& rhs);
     HerG1Point operator+(const HerG1Point& rhs) const;
     HerG1Point operator-(const HerG1Point& rhs) const;
-
-    template <typename V>
-    HerG1Point operator*(const Scalar<V>& rhs) const;
+    HerG1Point operator*(const HerScalar& rhs) const;
 
     bool operator==(const HerG1Point& rhs) const;
     bool operator!=(const HerG1Point& rhs) const;
@@ -57,9 +52,7 @@ public:
      * Multiply HerG1Points by Scalars element by element and then get the sum of all resulting points
      * [g_1*s_1, g_2*s_2, ..., g_n*s_n].Sum()
      */
-    template <typename P>
-    template <typename V>
-    static HerG1Point MulVec(const std::vector<P>& g_vec, const std::vector<V>& s_vec);
+    static HerG1Point MulVec(const std::vector<mclBnG1>& g_vec, const std::vector<mclBnFr>& s_vec);
 
     static HerG1Point Rand();
 
@@ -74,18 +67,10 @@ public:
     unsigned int GetSerializeSize() const;
 
     template <typename Stream>
-    void Serialize(Stream& s) const
-    {
-        ::Serialize(s, GetVch());
-    }
+    void Serialize(Stream& s) const;
 
     template <typename Stream>
-    void Unserialize(Stream& s)
-    {
-        std::vector<uint8_t> vch;
-        ::Unserialize(s, vch);
-        SetVch(vch);
-    }
+    void Unserialize(Stream& s);
 
     mclBnG1 m_p;
 

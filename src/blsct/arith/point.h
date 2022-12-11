@@ -13,10 +13,10 @@
 // #include <boost/thread/lock_guard.hpp>
 // #include <boost/thread/mutex.hpp>
 
-// #include <blsct/arith/scalar.h>
+ #include <blsct/arith/scalar.h>
 // #include <hash.h>
-// #include <serialize.h>
-// #include <uint256.h>
+#include <serialize.h>
+#include <uint256.h>
 // #include <version.h>
 
 enum class Endianness {
@@ -28,21 +28,21 @@ template <typename T>
 class Point
 {
 public:
-    Point<T>();
-    Point<T>(const std::vector<uint8_t>& v);
-    Point<T>(const uint256& b);
-    Point<T>(const P& p);
+    Point();
+    Point(const std::vector<uint8_t>& v);
+    Point(const uint256& b);
+
+    template <typename P>
+    Point(const P& p);
 
     static void Init();
 
-    template <typename T>
     template <typename P>
     Point<T> operator=(const P& rhs);
 
     Point<T> operator+(const Point<T>& rhs) const;
     Point<T> operator-(const Point<T>& rhs) const;
 
-    template <typename T>
     template <typename V>
     Point<T> operator*(const Scalar<V>& rhs) const;
 
@@ -60,9 +60,7 @@ public:
      * Multiply Point<T>s by Scalars element by element and then get the sum of all resulting points
      * [g_1*s_1, g_2*s_2, ..., g_n*s_n].Sum()
      */
-    template <typename T>
-    template <typename P>
-    template <typename V>
+    template <typename P, typename V>
     static Point<T> MulVec(const std::vector<P>& g_vec, const std::vector<V>& s_vec);
 
     static Point<T> Rand();
@@ -78,18 +76,10 @@ public:
     unsigned int GetSerializeSize() const;
 
     template <typename Stream>
-    void Serialize(Stream& s) const
-    {
-        ::Serialize(s, GetVch());
-    }
+    void Serialize(Stream& s) const;
 
     template <typename Stream>
-    void Unserialize(Stream& s)
-    {
-        std::vector<uint8_t> vch;
-        ::Unserialize(s, vch);
-        SetVch(vch);
-    }
+    void Unserialize(Stream& s);
 };
 
 #endif // NAVCOIN_BLSCT_ARITH_POINT_H

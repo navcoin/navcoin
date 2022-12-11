@@ -35,27 +35,27 @@ void Elements<T>::Add(const T x)
 }
 
 template <typename T>
-void Elements<T>ConfirmSizesMatch(const size_t& other_size) const
+void Elements<T>::ConfirmSizesMatch(const size_t& other_size) const
 {
     static_cast<T*>(this)->ConfirmSizesMatch(other_size);
 }
 
 template <typename T>
-Elements<T> Elements<T>FirstNPow(const size_t& n, const Scalar& k)
+Elements<T> Elements<T>::FirstNPow(const size_t& n, const Scalar<T>& k)
 {
-    return static_cast<T*>(this)->FirstNPow(n, k);
+    return Elements<T>::FirstNPow(n, k);
 }
 
 template <typename T>
-Elements<T> Elements<T>RepeatN(const size_t& n, const T& k)
+Elements<T> Elements<T>::RepeatN(const size_t& n, const T& k)
 {
-    return static_cast<T*>(this)->RepeatN(n, k);
+    return Elements<T>::RepeatN(n, k);
 }
 
 template <typename T>
-Elements<T> Elements<T>RandVec(const size_t& n, const bool exclude_zero = false)
+Elements<T> Elements<T>::RandVec(const size_t& n, const bool exclude_zero)
 {
-    return static_cast<T*>(this)->RandVec(n, exclude_zero);
+    return Elements<T>::RandVec(n, exclude_zero);
 }
 
 template <typename T>
@@ -65,13 +65,15 @@ T Elements<T>::operator[](int index) const
 }
 
 template <typename T>
-Elements<T> Elements<T>::operator*(const Elements<Scalar>& rhs) const
+template <typename V>
+Elements<T> Elements<T>::operator*(const Elements<Scalar<V>>& rhs) const
 {
     return static_cast<T*>(this)->operator*(rhs);
 }
 
 template <typename T>
-Elements<T> Elements<T>::operator*(const Scalar& rhs) const
+template <typename V>
+Elements<T> Elements<T>::operator*(const Scalar<V>& rhs) const
 {
     return static_cast<T*>(this)->operator*(rhs);
 }
@@ -101,17 +103,19 @@ bool Elements<T>::operator!=(const Elements<T>& rhs) const
 }
 
 template <typename T>
-template <typename V>
-G1Point Elements<T>::MulVec(const Elements<Scalar<V>>& scalars) const
+template <typename P, typename V>
+Point<P> Elements<T>::MulVec(const Elements<Scalar<V>>& scalars) const
 {
     return static_cast<T*>(this)->MulVec(scalars);
 }
 
+template <typename T>
 Elements<T> Elements<T>::From(const size_t from_index) const
 {
     return static_cast<T*>(this)->MulVec(from_index);
 }
 
+template <typename T>
 Elements<T> Elements<T>::To(const size_t to_index) const
 {
     return static_cast<T*>(this)->MulVec(to_index);

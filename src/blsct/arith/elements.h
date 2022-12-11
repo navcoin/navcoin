@@ -14,18 +14,19 @@
 #include <vector>
 
 #include <blsct/arith/scalar.h>
+#include <blsct/arith/point.h>
 
 /**
  * Designed to expect below instantiations only:
- * - Elements<G1Point>
+ * - Elements<Point>
  * - Elements<Scalar>
  */
 template <typename T>
 class Elements
 {
 public:
-    Elements<T>() {}
-    Elements<T>(const std::vector<T>& vec) : m_vec(vec) {}
+    Elements();
+    Elements(const std::vector<T>& vec);
 
     T Sum() const;
     size_t Size() const;
@@ -33,9 +34,7 @@ public:
 
     void ConfirmSizesMatch(const size_t& other_size) const;
 
-    template <typename V>
-    static Elements<T> FirstNPow(const size_t& n, const Scalar<V>& k);
-
+    static Elements<T> FirstNPow(const size_t& n, const Scalar<T>& k);
     static Elements<T> RepeatN(const size_t& n, const T& k);
     static Elements<T> RandVec(const size_t& n, const bool exclude_zero = false);
 
@@ -48,7 +47,6 @@ public:
      * G1Points x Scalars
      * [p1, p2] * [a1, ba] = [p1*a1, p2*a2]
      */
-    template <typename T>
     template <typename V>
     Elements<T> operator*(const Elements<Scalar<V>>& rhs) const;
 
@@ -59,7 +57,6 @@ public:
      * G1Points x Scalar
      * [p1, p2] ^ s = [p1*s, p2*s]
      */
-    template <typename T>
     template <typename V>
     Elements<T> operator*(const Scalar<V>& rhs) const;
 
@@ -81,9 +78,7 @@ public:
      * MulVec is equivalent of (Elements<G1Point> * Elements<Scalar>).Sum(),
      * but faster than that due to direct use of mcl library
      */
-    template <typename T>
-    template <typename P>
-    template <typename V>
+    template <typename P, typename V>
     Point<P> MulVec(const Elements<Scalar<V>>& scalars) const;
 
     /**

@@ -35,7 +35,7 @@ HerScalar::HerScalar(const std::string& s, int radix)
 
 void HerScalar::Init()
 {
-    MclInitializer::Init();
+    HerInitializer::Init();
 }
 
 HerScalar HerScalar::operator+(const HerScalar &b) const

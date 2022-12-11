@@ -11,15 +11,19 @@
 
 #include <string>
 #include <vector>
+#include <serialize.h>
+#include <uint256.h>
 
 template <typename T>
 class Scalar {
 public:
-    Scalar<T>(const int64_t& n = 0);
-    Scalar<T>(const std::vector<uint8_t>& v);
-    Scalar<T>(const T& n_fr);
-    Scalar<T>(const uint256& n);
-    Scalar<T>(const std::string& s, int radix);
+    Scalar(const int64_t& n = 0);
+    Scalar(const std::vector<uint8_t>& vec);
+    Scalar(const uint256& n);
+    Scalar(const std::string& s, int radix);
+
+    template <typename V>
+    Scalar<T>(const V& v);
 
     static void Init();
 

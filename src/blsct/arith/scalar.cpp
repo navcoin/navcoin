@@ -23,12 +23,6 @@ Scalar<T>::Scalar(const std::vector<uint8_t> &vec)
 }
 
 template <typename T>
-Scalar<T>::Scalar(const V& v)
-{
-    static_cast<T*>(this)->Constructor(v);
-}
-
-template <typename T>
 Scalar<T>::Scalar(const uint256& n)
 {
     static_cast<T*>(this)->Constructor(n);
@@ -41,61 +35,68 @@ Scalar<T>::Scalar(const std::string& s, int radix)
 }
 
 template <typename T>
+template <typename V>
+Scalar<T>::Scalar(const V& v)
+{
+    static_cast<T*>(this)->Constructor(v);
+}
+
+template <typename T>
 void Scalar<T>::Init()
 {
     T::Init();
 }
 
 template <typename T>
-Scalar<V> Scalar<T>::operator+(const Scalar<V> &rhs) const
+Scalar<T> Scalar<T>::operator+(const Scalar<T> &rhs) const
 {
     return static_cast<T*>(this)->operator+(rhs);
 }
 
 template <typename T>
-Scalar<V> Scalar<T>::operator-(const Scalar<V> &rhs) const
+Scalar<T> Scalar<T>::operator-(const Scalar<T> &rhs) const
 {
     return static_cast<T*>(this)->operator-(rhs);
 }
 
 template <typename T>
-Scalar<V> Scalar<T>::operator*(const Scalar<V> &rhs) const
+Scalar<T> Scalar<T>::operator*(const Scalar<T> &rhs) const
 {
     return static_cast<T*>(this)->operator*(rhs);
 }
 
 template <typename T>
-Scalar<V> Scalar<T>::operator/(const Scalar<V> &rhs) const
+Scalar<T> Scalar<T>::operator/(const Scalar<T> &rhs) const
 {
     return static_cast<T*>(this)->operator/(rhs);
 }
 
 template <typename T>
-Scalar<V> Scalar<T>::operator|(const Scalar<V> &rhs) const
+Scalar<T> Scalar<T>::operator|(const Scalar<T> &rhs) const
 {
     return static_cast<T*>(this)->operator|(rhs);
 }
 
 template <typename T>
-Scalar<V> Scalar<T>::operator^(const Scalar<V> &rhs) const
+Scalar<T> Scalar<T>::operator^(const Scalar<T> &rhs) const
 {
     return static_cast<T*>(this)->operator^(rhs);
 }
 
 template <typename T>
-Scalar<V> Scalar<T>::operator&(const Scalar<V> &rhs) const
+Scalar<T> Scalar<T>::operator&(const Scalar<T> &rhs) const
 {
     return static_cast<T*>(this)->operator&(rhs);
 }
 
 template <typename T>
-Scalar<V> Scalar<T>::operator~() const
+Scalar<T> Scalar<T>::operator~() const
 {
     return static_cast<T*>(this)->operator~();
 }
 
 template <typename T>
-Scalar<V> Scalar<T>::operator<<(unsigned int shift) const
+Scalar<T> Scalar<T>::operator<<(unsigned int shift) const
 {
     return static_cast<T*>(this)->operator<<(shift);
 }
@@ -104,7 +105,7 @@ Scalar<V> Scalar<T>::operator<<(unsigned int shift) const
  * Assumes that fr contains a number within int64_t range
  */
 template <typename T>
-Scalar<V> Scalar<T>::operator>>(unsigned int shift) const
+Scalar<T> Scalar<T>::operator>>(unsigned int shift) const
 {
     return static_cast<T*>(this)->operator>>(shift);
 }
@@ -122,7 +123,7 @@ bool Scalar<T>::operator==(const int &rhs) const
 }
 
 template <typename T>
-bool Scalar<T>::operator==(const Scalar<V> &rhs) const
+bool Scalar<T>::operator==(const Scalar<T> &rhs) const
 {
     return static_cast<T*>(this)->operator==(rhs);
 }
@@ -134,7 +135,7 @@ bool Scalar<T>::operator!=(const int &rhs) const
 }
 
 template <typename T>
-bool Scalar<T>::operator!=(const Scalar<V> &rhs) const
+bool Scalar<T>::operator!=(const Scalar<T> &rhs) const
 {
     return static_cast<T*>(this)->operator!=(rhs);
 }
@@ -146,39 +147,39 @@ bool Scalar<T>::IsValid() const
 }
 
 template <typename T>
-Scalar<V> Scalar<T>::Invert() const
+Scalar<T> Scalar<T>::Invert() const
 {
     return static_cast<T*>(this)->Invert();
 }
 
 template <typename T>
-Scalar<V> Scalar<T>::Negate() const
+Scalar<T> Scalar<T>::Negate() const
 {
     return static_cast<T*>(this)->Negate();
 }
 
 template <typename T>
-Scalar<V> Scalar<T>::Square() const
+Scalar<T> Scalar<T>::Square() const
 {
     return static_cast<T*>(this)->Square();
 }
 
 template <typename T>
-Scalar<V> Scalar<T>::Cube() const
+Scalar<T> Scalar<T>::Cube() const
 {
     return static_cast<T*>(this)->Cube();
 }
 
 template <typename T>
-Scalar<V> Scalar<T>::Pow(const Scalar& n) const
+Scalar<T> Scalar<T>::Pow(const Scalar& n) const
 {
     return static_cast<T*>(this)->Pow(n);
 }
 
 template <typename T>
-Scalar<V> Scalar<T>::Rand(bool exclude_zero)
+Scalar<T> Scalar<T>::Rand(bool exclude_zero)
 {
-    return static_cast<T*>(this)->Rand(exclude_zero);
+    return Scalar<T>::Rand(exclude_zero);
 }
 
 template <typename T>
