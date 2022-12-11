@@ -68,7 +68,7 @@ HerG1Point HerG1Point::operator=(const mclBnG1& rhs)
     return *this;
 }
 
-Point<HerG1Point> HerG1Point::operator+(const Point<HerG1Point>& rhs) const
+HerG1Point HerG1Point::operator+(const HerG1Point& rhs) const
 {
     HerG1Point ret;
     mclBnG1_add(&ret.m_p, &m_p, &rhs.m_p);

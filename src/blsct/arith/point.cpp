@@ -21,97 +21,97 @@ template void Point<HerG1Point>::Init();
 
 template <typename T>
 template <typename P>
-Point<T> Point<T>::operator=(const P& rhs)
+T Point<T>::operator=(const P& rhs)
 {
     return static_cast<T*>(this)->operator=(rhs);
 }
-template Point<HerG1Point> Point<HerG1Point>::operator=(const mclBnG1& rhs);
+template HerG1Point Point<HerG1Point>::operator=(const mclBnG1& rhs);
 
 template <typename T>
-Point<T> Point<T>::operator+(const Point<T>& rhs) const
+T Point<T>::operator+(const T& rhs) const
 {
     return static_cast<const T*>(this)->operator+(rhs);
 }
-template Point<HerG1Point> Point<HerG1Point>::operator+(const Point<HerG1Point>& rhs) const;
+template HerG1Point Point<HerG1Point>::operator+(const HerG1Point& rhs) const;
 
 template <typename T>
-Point<T> Point<T>::operator-(const Point<T>& rhs) const
+T Point<T>::operator-(const T& rhs) const
 {
     return static_cast<const T*>(this)->operator-(rhs);
 }
-template Point<HerG1Point> Point<HerG1Point>::operator-(const Point<HerG1Point>& rhs) const;
+template HerG1Point Point<HerG1Point>::operator-(const HerG1Point& rhs) const;
 
 template <typename T>
 template <typename S>
-Point<T> Point<T>::operator*(const S& rhs) const
+T Point<T>::operator*(const S& rhs) const
 {
     return static_cast<const T*>(this)->operator*(rhs);
 }
-template Point<HerG1Point> Point<HerG1Point>::operator*(const Point<HerScalar>& rhs) const;
+template HerG1Point Point<HerG1Point>::operator*(const HerScalar& rhs) const;
 
 template <typename T>
-bool Point<T>::operator==(const Point<T>& rhs) const
+bool Point<T>::operator==(const T& rhs) const
 {
     return static_cast<const T*>(this)->operator==(rhs);
 }
-template bool Point<HerG1Point>::operator==(const Point<HerG1Point>& rhs) const;
+template bool Point<HerG1Point>::operator==(const HerG1Point& rhs) const;
 
 template <typename T>
-bool Point<T>::operator!=(const Point<T>& rhs) const
+bool Point<T>::operator!=(const T& rhs) const
 {
     return static_cast<const T*>(this)->operator!=(rhs);
 }
-template bool Point<HerG1Point>::operator!=(const Point<HerG1Point>& rhs) const;
+template bool Point<HerG1Point>::operator!=(const HerG1Point& rhs) const;
 
 template <typename T>
-Point<T> Point<T>::Double() const
+T Point<T>::Double() const
 {
     return static_cast<const T*>(this)->Double();
 }
-template Point<HerG1Point> Point<HerG1Point>::Double() const;
+template HerG1Point Point<HerG1Point>::Double() const;
 
 template <typename T>
-Point<T> Point<T>::GetBasePoint()
+T Point<T>::GetBasePoint()
 {
     return T::GetBasePoint();
 }
-template Point<HerG1Point> Point<HerG1Point>::GetBasePoint();
+template HerG1Point Point<HerG1Point>::GetBasePoint();
 
 template <typename T>
-Point<T> Point<T>::MapToG1(const std::vector<uint8_t>& vec, const Endianness e)
+T Point<T>::MapToG1(const std::vector<uint8_t>& vec, const Endianness e)
 {
     return T::MapToG1(vec, e);
 }
-template Point<HerG1Point> Point<HerG1Point>::MapToG1(const std::vector<uint8_t>& vec, const Endianness e);
+template HerG1Point Point<HerG1Point>::MapToG1(const std::vector<uint8_t>& vec, const Endianness e);
 
 template <typename T>
-Point<T> Point<T>::MapToG1(const std::string& s, const Endianness e)
+T Point<T>::MapToG1(const std::string& s, const Endianness e)
 {
     return T::MapToG1(s, e);
 }
-template Point<HerG1Point> Point<HerG1Point>::MapToG1(const std::string& s, const Endianness e);
+template HerG1Point Point<HerG1Point>::MapToG1(const std::string& s, const Endianness e);
 
 template <typename T>
-Point<T> Point<T>::HashAndMap(const std::vector<uint8_t>& vec)
+T Point<T>::HashAndMap(const std::vector<uint8_t>& vec)
 {
     return T::HashAndMap(vec);
 }
-template Point<HerG1Point> Point<HerG1Point>::HashAndMap(const std::vector<uint8_t>& vec);
+template HerG1Point Point<HerG1Point>::HashAndMap(const std::vector<uint8_t>& vec);
 
 template <typename T>
 template <typename P, typename V>
-Point<T> Point<T>::MulVec(const std::vector<P>& g_vec, const std::vector<V>& s_vec)
+T Point<T>::MulVec(const std::vector<P>& g_vec, const std::vector<V>& s_vec)
 {
     return T::MulVec(g_vec, s_vec);
 }
-template Point<HerG1Point> Point<HerG1Point>::MulVec(const std::vector<mclBnG1>& g_vec, const std::vector<mclBnFr>& s_vec);
+template HerG1Point Point<HerG1Point>::MulVec(const std::vector<mclBnG1>& g_vec, const std::vector<mclBnFr>& s_vec);
 
 template <typename T>
-Point<T> Point<T>::Rand()
+T Point<T>::Rand()
 {
     return T::Rand();
 }
-template Point<HerG1Point> Point<HerG1Point>::Rand();
+template HerG1Point Point<HerG1Point>::Rand();
 
 template <typename T>
 bool Point<T>::IsValid() const

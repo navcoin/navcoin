@@ -33,32 +33,32 @@ public:
     static void Init();
 
     template <typename P>
-    Point<T> operator=(const P& rhs);
+    T operator=(const P& rhs);
 
-    Point<T> operator+(const Point<T>& rhs) const;
-    Point<T> operator-(const Point<T>& rhs) const;
+    T operator+(const T& rhs) const;
+    T operator-(const T& rhs) const;
 
     template <typename S>
-    Point<T> operator*(const S& rhs) const;
+    T operator*(const S& rhs) const;
 
-    bool operator==(const Point<T>& rhs) const;
-    bool operator!=(const Point<T>& rhs) const;
+    bool operator==(const T& rhs) const;
+    bool operator!=(const T& rhs) const;
 
-    Point<T> Double() const;
+    T Double() const;
 
-    static Point<T> GetBasePoint();
-    static Point<T> MapToG1(const std::vector<uint8_t>& vec, const Endianness e = Endianness::Little);
-    static Point<T> MapToG1(const std::string& s, const Endianness e = Endianness::Little);
-    static Point<T> HashAndMap(const std::vector<uint8_t>& vec);
+    static T GetBasePoint();
+    static T MapToG1(const std::vector<uint8_t>& vec, const Endianness e = Endianness::Little);
+    static T MapToG1(const std::string& s, const Endianness e = Endianness::Little);
+    static T HashAndMap(const std::vector<uint8_t>& vec);
 
     /**
      * Multiply Point<T>s by Scalars element by element and then get the sum of all resulting points
      * [g_1*s_1, g_2*s_2, ..., g_n*s_n].Sum()
      */
     template <typename P, typename V>
-    static Point<T> MulVec(const std::vector<P>& g_vec, const std::vector<V>& s_vec);
+    static T MulVec(const std::vector<P>& g_vec, const std::vector<V>& s_vec);
 
-    static Point<T> Rand();
+    static T Rand();
 
     bool IsValid() const;
     bool IsUnity() const;

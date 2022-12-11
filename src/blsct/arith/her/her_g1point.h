@@ -34,7 +34,7 @@ public:
     static void Init();
 
     HerG1Point operator=(const mclBnG1& rhs);
-    Point<HerG1Point> operator+(const Point<HerG1Point>& rhs) const;
+    HerG1Point operator+(const HerG1Point& rhs) const;
     HerG1Point operator-(const HerG1Point& rhs) const;
     HerG1Point operator*(const HerScalar& rhs) const;
 
