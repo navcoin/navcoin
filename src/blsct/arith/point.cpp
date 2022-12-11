@@ -3,31 +3,13 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <blsct/arith/point.h>
+#include <blsct/arith/her/her_g1point.h>
 
 template <typename T>
 Point<T>::Point()
 {
-    static_cast<T*>(this)->Constructor();
 }
-
-template <typename T>
-Point<T>::Point(const std::vector<uint8_t>& v)
-{
-    static_cast<T*>(this)->Constructor(v);
-}
-
-template <typename T>
-Point<T>::Point(const uint256& b)
-{
-    static_cast<T*>(this)->Constructor(b);
-}
-
-template <typename T>
-template <typename P>
-Point<T>::Point(const P& p)
-{
-    static_cast<T*>(this)->Constructor(p);
-}
+template Point<HerG1Point>::Point();
 
 template <typename T>
 void Point<T>::Init()

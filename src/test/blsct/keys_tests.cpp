@@ -105,7 +105,7 @@ BOOST_AUTO_TEST_CASE(blsct_keys)
 
     // Private Key
     blsct::PrivateKey<HerG1Point> invalidPrivateKey;
-    BOOST_CHECK(!invalidPrivateKey.IsValid());
+    BOOST_CHECK(!invalidPrivateKey.IsValid<HerScalar>());
 
     std::vector<unsigned char> vectorKey = {
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
@@ -113,12 +113,12 @@ BOOST_AUTO_TEST_CASE(blsct_keys)
 
     Scalar<HerScalar> vectorFromScalar = vectorKey;
     blsct::PrivateKey<HerG1Point> privateKeyFromVector(vectorFromScalar);
-    BOOST_CHECK(privateKeyFromVector.IsValid());
+    BOOST_CHECK(privateKeyFromVector.IsValid<HerScalar>());
     BOOST_CHECK(privateKeyFromVector.GetScalar<HerScalar>().GetVch() == vectorKey);
 
     Scalar<HerScalar> scalarFromVector(vectorKey);
     blsct::PrivateKey<HerG1Point> privateKeyFromScalar(scalarFromVector);
-    BOOST_CHECK(privateKeyFromScalar.IsValid());
+    BOOST_CHECK(privateKeyFromScalar.IsValid<HerScalar>());
     BOOST_CHECK(privateKeyFromScalar.GetScalar<HerScalar>().GetVch() == vectorKey);
 
     // G(a+b) == Ga + Gb

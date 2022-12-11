@@ -2,16 +2,20 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <blsct/arith/point.h>
 #include <blsct/arith/her/her_initializer.h>
-#include <blsct/arith/her/her_scalar.h>
 #include <blsct/arith/her/her_g1point.h>
+#include <blsct/arith/her/her_scalar.h>
+#include <blsct/arith/point.h>
 
-#include <numeric>
 #include <hash.h>
+#include <numeric>
 #include <serialize.h>
+#include <streams.h>
 #include <uint256.h>
 #include <version.h>
+
+mclBnG1 HerG1Point::m_g;
+boost::mutex HerG1Point::m_init_mutex;
 
 HerG1Point::HerG1Point()
 {
@@ -211,6 +215,7 @@ void HerG1Point::Serialize(Stream& s) const
 {
     ::Serialize(s, GetVch());
 }
+template void HerG1Point::Serialize(CDataStream& s) const;
 
 template <typename Stream>
 void HerG1Point::Unserialize(Stream& s)
@@ -219,3 +224,4 @@ void HerG1Point::Unserialize(Stream& s)
     ::Unserialize(s, vch);
     SetVch(vch);
 }
+template void HerG1Point::Unserialize(CDataStream& s);

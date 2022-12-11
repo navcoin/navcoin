@@ -117,6 +117,7 @@ public:
     template <typename V>
     Scalar<V> GetScalar() const;
 
+    template <typename V>
     bool IsValid() const;
 
     void SetToZero();

@@ -326,3 +326,17 @@ unsigned int HerScalar::GetSerializeSize() const
 {
     return ::GetSerializeSize(GetVch());
 }
+
+template <typename Stream>
+void HerScalar::Serialize(Stream& s) const
+{
+    ::Serialize(s, GetVch());
+}
+
+template <typename Stream>
+void HerScalar::Unserialize(Stream& s)
+{
+    std::vector<uint8_t> vch;
+    ::Unserialize(s, vch);
+    SetVch(vch);
+}

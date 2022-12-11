@@ -3,6 +3,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <blsct/arith/scalar.h>
+#include <blsct/arith/her/her_scalar.h>
 
 //#include <stddef.h>
 // #include <hash.h>
@@ -11,35 +12,10 @@
 // #include <version.h>
 
 template <typename T>
-Scalar<T>::Scalar(const int64_t& n)
+Scalar<T>::Scalar()
 {
-    static_cast<T*>(this)->Constructor(n);
 }
-
-template <typename T>
-Scalar<T>::Scalar(const std::vector<uint8_t> &vec)
-{
-    static_cast<T*>(this)->Constructor(vec);
-}
-
-template <typename T>
-Scalar<T>::Scalar(const uint256& n)
-{
-    static_cast<T*>(this)->Constructor(n);
-}
-
-template <typename T>
-Scalar<T>::Scalar(const std::string& s, int radix)
-{
-    static_cast<T*>(this)->Constructor(s, radix);
-}
-
-template <typename T>
-template <typename V>
-Scalar<T>::Scalar(const V& v)
-{
-    static_cast<T*>(this)->Constructor(v);
-}
+template Scalar<HerScalar>::Scalar();
 
 template <typename T>
 void Scalar<T>::Init()

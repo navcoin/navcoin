@@ -5,7 +5,7 @@
 #include <test/util/setup_common.h>
 
 #include <algorithm>
-#include <blsct/arith/her/her_elements.h>
+#include <blsct/arith/elements.h>
 #include <boost/test/unit_test.hpp>
 #include <set>
 #include <streams.h>
@@ -16,13 +16,13 @@ BOOST_FIXTURE_TEST_SUITE(bls_arith_integration_tests, HerTestingSetup)
 BOOST_AUTO_TEST_CASE(test_integration_gg_ones_times_z)
 {
     auto z = HerScalar::Rand(true);
-    auto gg = HerG1Points(std::vector<HerG1Point>{
+    auto gg = Points<HerG1Point>(std::vector<HerG1Point>{
         HerG1Point::MapToG1("g1"),
         HerG1Point::MapToG1("g2")});
     auto r1 = gg * z;
 
     HerScalar one(1);
-    auto ones = HerScalars::RepeatN(gg.Size(), one);
+    auto ones = Scalars<HerScalar>::RepeatN(gg.Size(), one);
     auto r2 = gg * (ones * z);
 
     BOOST_CHECK(r1 == r2);
@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_66_67_excl_h_prime)
 {
     auto n = 2;
     HerScalar one(1);
-    auto ones = HerScalars::RepeatN(n, one);
+    auto ones = Scalars<HerScalar>::RepeatN(n, one);
     auto z = HerScalar::Rand(true);
 
     auto alpha = HerScalar::Rand(true);
@@ -64,16 +64,16 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_66_67_excl_h_prime)
     auto x = HerScalar::Rand(true);
     auto mu = alpha + rho * x;
 
-    auto gg = HerG1Points(std::vector<HerG1Point>{
+    auto gg = Points<HerG1Point>(std::vector<HerG1Point>{
         HerG1Point::MapToG1("g1"),
         HerG1Point::MapToG1("g2")});
     auto h = HerG1Point::MapToG1("h");
 
-    HerScalars al(std::vector<HerScalar> {
+    Scalars<HerScalar> al(std::vector<HerScalar> {
         HerScalar {1},
         HerScalar {1}
     });
-    auto sl = HerScalars::RandVec(n);
+    auto sl = Scalars<HerScalar>::RandVec(n);
     auto ll = al - (ones * z) + (sl * x);
 
     auto hmu_ggl = (h * mu) + (gg * ll).Sum();
@@ -90,14 +90,14 @@ BOOST_AUTO_TEST_CASE(test_integration_rebasing_base_point)
     auto n = 2;
 
     HerScalar one(1);
-    auto one_n = HerScalars::RepeatN(n, one);
+    auto one_n = Scalars<HerScalar>::RepeatN(n, one);
     HerScalar two(n);
-    auto two_n = HerScalars::FirstNPow(n, two);
+    auto two_n = Scalars<HerScalar>::FirstNPow(n, two);
 
     auto y = HerScalar::Rand(true);
     auto z = HerScalar::Rand(true);
-    auto y_n = HerScalars::FirstNPow(n, y);
-    auto hh = HerG1Points(std::vector<HerG1Point> {
+    auto y_n = Scalars<HerScalar>::FirstNPow(n, y);
+    auto hh = Points<HerG1Point>(std::vector<HerG1Point> {
         HerG1Point::MapToG1("h1"),
         HerG1Point::MapToG1("h2")
     });
@@ -114,11 +114,11 @@ BOOST_AUTO_TEST_CASE(test_integration_rebasing_base_point)
         BOOST_CHECK(lhs == rhs);
     }
     {
-        auto hhp = HerG1Points(std::vector<HerG1Point> {
+        auto hhp = Points<HerG1Point>(std::vector<HerG1Point> {
             hh[0],
             hh[1] * y.Invert()
         });
-        auto y_pows_inv = HerScalars::FirstNPow(n, y.Invert());
+        auto y_pows_inv = Scalars<HerScalar>::FirstNPow(n, y.Invert());
         auto lhs = hhp * (y_n * z + two_n * z.Square());
         auto rhs = hh * (one_n * z + two_n * z.Square() * y_pows_inv);
         BOOST_CHECK(lhs == rhs);
@@ -130,27 +130,27 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_66_67_only_h_prime)
     auto n = 2;
 
     HerScalar two(2);
-    auto two_n = HerScalars::FirstNPow(n, two);
+    auto two_n = Scalars<HerScalar>::FirstNPow(n, two);
     HerScalar one(1);
-    auto one_n = HerScalars::RepeatN(n, one);
+    auto one_n = Scalars<HerScalar>::RepeatN(n, one);
 
     auto x = HerScalar::Rand(true);
     auto y = HerScalar::Rand(true);
     auto z = HerScalar::Rand(true);
-    auto y_n = HerScalars::FirstNPow(n, y);
+    auto y_n = Scalars<HerScalar>::FirstNPow(n, y);
 
-    HerScalars ar(std::vector<HerScalar>{
+    Scalars<HerScalar> ar(std::vector<HerScalar>{
         HerScalar{1},
         HerScalar{1}});
-    auto sr = HerScalars::RandVec(n);
+    auto sr = Scalars<HerScalar>::RandVec(n);
     auto zs = one_n * z;
-    auto hh = HerG1Points(std::vector<HerG1Point>{
+    auto hh = Points<HerG1Point>(std::vector<HerG1Point>{
         HerG1Point::MapToG1("h1"),
         HerG1Point::MapToG1("h2")});
     auto a = hh * ar;
     auto s = hh * sr;
 
-    auto hhp = hh * HerScalars::FirstNPow(n, y.Invert());
+    auto hhp = hh * Scalars<HerScalar>::FirstNPow(n, y.Invert());
 
     auto p = a + s * x + hhp * (y_n * z + two_n * z.Square());
     auto rr = y_n * (ar + zs + sr * x) + (two_n * z.Square());
@@ -191,16 +191,16 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_65_g_part_only_excl_ts)
 
     HerScalar one(1);
     HerScalar two(2);
-    auto one_n = HerScalars::FirstNPow(n, one);
-    auto two_n = HerScalars::FirstNPow(n, two);
-    auto y_n = HerScalars::FirstNPow(n, y);
+    auto one_n = Scalars<HerScalar>::FirstNPow(n, one);
+    auto two_n = Scalars<HerScalar>::FirstNPow(n, two);
+    auto y_n = Scalars<HerScalar>::FirstNPow(n, y);
 
-    HerScalars al(std::vector<HerScalar>{
+    Scalars<HerScalar> al(std::vector<HerScalar>{
         HerScalar{0},
         HerScalar{1}});
     auto ar = al - one_n;
-    auto sl = HerScalars::RandVec(n);
-    auto sr = HerScalars::RandVec(n);
+    auto sl = Scalars<HerScalar>::RandVec(n);
+    auto sr = Scalars<HerScalar>::RandVec(n);
 
     auto l = al - one_n * z;  // (39)
     auto r = y_n * (ar + one_n * z) + two_n * z.Square(); // (39)
@@ -237,17 +237,17 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_65_g_part_ts_only)
 
     HerScalar one(1);
     HerScalar two(2);
-    auto one_n = HerScalars::FirstNPow(n, one);
-    auto two_n = HerScalars::FirstNPow(n, two);
-    auto y_n = HerScalars::FirstNPow(n, y);
+    auto one_n = Scalars<HerScalar>::FirstNPow(n, one);
+    auto two_n = Scalars<HerScalar>::FirstNPow(n, two);
+    auto y_n = Scalars<HerScalar>::FirstNPow(n, y);
 
-    HerScalars al(std::vector<HerScalar> {
+    Scalars<HerScalar> al(std::vector<HerScalar> {
         HerScalar {0},
         HerScalar {1}
     });
     auto ar = al - one_n;
-    auto sl = HerScalars::RandVec(n);
-    auto sr = HerScalars::RandVec(n);
+    auto sl = Scalars<HerScalar>::RandVec(n);
+    auto sr = Scalars<HerScalar>::RandVec(n);
 
     const auto &l1 = sl;
     auto r0 = y_n * (ar + one_n * z) + two_n * z.Square();
@@ -284,17 +284,17 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_65_g_part_only)
 
     HerScalar one(1);
     HerScalar two(2);
-    auto one_n = HerScalars::FirstNPow(n, one);
-    auto two_n = HerScalars::FirstNPow(n, two);
-    auto y_n = HerScalars::FirstNPow(n, y);
+    auto one_n = Scalars<HerScalar>::FirstNPow(n, one);
+    auto two_n = Scalars<HerScalar>::FirstNPow(n, two);
+    auto y_n = Scalars<HerScalar>::FirstNPow(n, y);
 
-    HerScalars al(std::vector<HerScalar> {
+    Scalars<HerScalar> al(std::vector<HerScalar> {
         HerScalar {0},
         HerScalar {1}
     });
     auto ar = al - one_n;
-    auto sl = HerScalars::RandVec(n);
-    auto sr = HerScalars::RandVec(n);
+    auto sl = Scalars<HerScalar>::RandVec(n);
+    auto sr = Scalars<HerScalar>::RandVec(n);
 
     auto l0 = (al - one_n * z);
     const auto &l1 = sl;
@@ -334,9 +334,9 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_65_g_part_only)
 // P = g^a h^b u^<a,b>
 bool InnerProductArgument(
     const size_t& n,
-    const HerG1Points& gg, const HerG1Points& hh,
+    const Points<HerG1Point>& gg, const Points<HerG1Point>& hh,
     const HerG1Point& u, const HerG1Point& p,
-    const HerScalars& a, const HerScalars& b
+    const Scalars<HerScalar>& a, const Scalars<HerScalar>& b
 )
 {
     if (n == 1) {
@@ -369,17 +369,17 @@ BOOST_AUTO_TEST_CASE(test_integration_inner_product_argument)
 {
     auto n = 2;
 
-    auto gg = HerG1Points(std::vector{
+    auto gg = Points<HerG1Point>(std::vector{
         HerG1Point::MapToG1("g1"),
         HerG1Point::MapToG1("g2")});
-    auto hh = HerG1Points(std::vector{
+    auto hh = Points<HerG1Point>(std::vector{
         HerG1Point::MapToG1("h1"),
         HerG1Point::MapToG1("h2")});
     auto u = HerG1Point::MapToG1("u");
 
     // a, b are HerScalar vectors
-    HerScalars a(std::vector<HerScalar> { HerScalar {2}, HerScalar {3} });
-    HerScalars b(std::vector<HerScalar> { HerScalar {5}, HerScalar {7} });
+    Scalars<HerScalar> a(std::vector<HerScalar> { HerScalar {2}, HerScalar {3} });
+    Scalars<HerScalar> b(std::vector<HerScalar> { HerScalar {5}, HerScalar {7} });
 
     auto p = (gg * a).Sum() + (hh * b).Sum() + u * (a * b).Sum();
 
@@ -395,23 +395,23 @@ BOOST_AUTO_TEST_CASE(test_integration_inner_product_argument)
 bool RangeProof(
     size_t n, HerG1Point V, HerScalar gamma,
     HerG1Point g, HerG1Point h,
-    HerG1Points gg, HerG1Points hh,
-    HerScalars al,
+    Points<HerG1Point> gg, Points<HerG1Point> hh,
+    Scalars<HerScalar> al,
     bool use_inner_product_argument
 )
 {
     // On input upsilon and gamma, prover computes
     HerScalar one(1);
     HerScalar two(2);
-    auto one_n = HerScalars::FirstNPow(n, one);
-    auto two_n = HerScalars::FirstNPow(n, two);
+    auto one_n = Scalars<HerScalar>::FirstNPow(n, one);
+    auto two_n = Scalars<HerScalar>::FirstNPow(n, two);
 
     auto ar = al - one_n;
     auto alpha = HerScalar::Rand();
     auto a = (h * alpha) + (gg * al).Sum() + (hh * ar).Sum();
 
-    auto sl = HerScalars::RandVec(n);
-    auto sr = HerScalars::RandVec(n);
+    auto sl = Scalars<HerScalar>::RandVec(n);
+    auto sr = Scalars<HerScalar>::RandVec(n);
     auto rho = HerScalar::Rand();
     auto s = (h * rho) + (gg * sl).Sum() + (hh * sr).Sum();
 
@@ -423,7 +423,7 @@ bool RangeProof(
 
     // Define vector ploynomials l(x), r(x) and t(x)
     // t(x) = <l(x),r(x)> = <l0, r0> + (<l1, r0> + <l0, r1>) * x + <l1, r1> * x^2
-    auto y_n = HerScalars::FirstNPow(n, y);
+    auto y_n = Scalars<HerScalar>::FirstNPow(n, y);
     auto l0 = al - one_n * z;
     const auto &l1 = sl;
     auto r0 = y_n * (ar + one_n * z) + two_n * z.Square();
@@ -454,7 +454,7 @@ bool RangeProof(
     // Prover sends l,r,t_hat,tau_x,mu to verifier
 
     // (64)
-    auto hhp = hh * HerScalars::FirstNPow(n, y.Invert());
+    auto hhp = hh * Scalars<HerScalar>::FirstNPow(n, y.Invert());
 
     // (65)
     auto delta_yz =
@@ -490,7 +490,7 @@ bool RangeProof(
 BOOST_AUTO_TEST_CASE(test_integration_range_proof)
 {
     auto gamma = HerScalar::Rand();
-    HerScalars al(std::vector<HerScalar> {
+    Scalars<HerScalar> al(std::vector<HerScalar> {
         HerScalar {1},
         HerScalar {0},
         HerScalar {0},
@@ -502,13 +502,13 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof)
     auto g = HerG1Point::MapToG1("g");
     auto h = HerG1Point::MapToG1("h");
 
-    auto gg = HerG1Points(std::vector<HerG1Point> {
+    auto gg = Points<HerG1Point>(std::vector<HerG1Point> {
         HerG1Point::MapToG1("g1"),
         HerG1Point::MapToG1("g2"),
         HerG1Point::MapToG1("g3"),
         HerG1Point::MapToG1("g4")
     });
-    auto hh = HerG1Points(std::vector<HerG1Point> {
+    auto hh = Points<HerG1Point>(std::vector<HerG1Point> {
         HerG1Point::MapToG1("h1"),
         HerG1Point::MapToG1("h2"),
         HerG1Point::MapToG1("h3"),

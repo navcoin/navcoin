@@ -29,11 +29,6 @@ class Point
 {
 public:
     Point();
-    Point(const std::vector<uint8_t>& v);
-    Point(const uint256& b);
-
-    template <typename P>
-    Point(const P& p);
 
     static void Init();
 

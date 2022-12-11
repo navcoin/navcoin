@@ -49,7 +49,7 @@ public:
     static HerG1Point HashAndMap(const std::vector<uint8_t>& vec);
 
     /**
-     * Multiply HerG1Points by Scalars element by element and then get the sum of all resulting points
+     * Multiply Points by Scalars element by element and then get the sum of all resulting points
      * [g_1*s_1, g_2*s_2, ..., g_n*s_n].Sum()
      */
     static HerG1Point MulVec(const std::vector<mclBnG1>& g_vec, const std::vector<mclBnFr>& s_vec);
