@@ -110,7 +110,7 @@ public:
     bool operator==(const PrivateKey<P>& rhs) const;
 
     template <typename V>
-    Point<P> GetG1Point() const;
+    P GetG1Point() const;
 
     PublicKey<P> GetPublicKey() const;
 

@@ -172,11 +172,11 @@ template bool PrivateKey<HerG1Point>::operator==(const PrivateKey<HerG1Point>& r
 
 template <typename P>
 template <typename V>
-Point<P> PrivateKey<P>::GetG1Point() const
+P PrivateKey<P>::GetG1Point() const
 {
     return Point<P>::GetBasePoint() * Scalar<V>(std::vector<unsigned char>(k.begin(), k.end()));
 }
-template Point<HerG1Point> PrivateKey<HerG1Point>::GetG1Point<HerScalar>() const;
+template HerG1Point PrivateKey<HerG1Point>::GetG1Point<HerScalar>() const;
 
 template <typename P>
 PublicKey<P> PrivateKey<P>::GetPublicKey() const

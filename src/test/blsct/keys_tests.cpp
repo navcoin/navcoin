@@ -123,9 +123,9 @@ BOOST_AUTO_TEST_CASE(blsct_keys)
 
     // G(a+b) == Ga + Gb
     blsct::PrivateKey<HerG1Point> privateKeyFromAddition(privateKeyFromScalar.GetScalar<HerScalar>() +
-                                             privateKeyFromVector.GetScalar<HerScalar>());
+                                                         privateKeyFromVector.GetScalar<HerScalar>());
     blsct::PublicKey<HerG1Point> publicKeyFromAddition(privateKeyFromScalar.GetG1Point<HerG1Point>() +
-                                           privateKeyFromVector.GetG1Point<HerG1Point>());
+                                                       privateKeyFromVector.GetG1Point<HerG1Point>());
     BOOST_CHECK(privateKeyFromAddition.GetPublicKey() == publicKeyFromAddition);
 
     std::vector<blsct::PublicKey<HerG1Point>> vecKeys = {privateKeyFromScalar.GetPublicKey(), privateKeyFromVector.GetPublicKey()};

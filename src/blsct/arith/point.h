@@ -38,8 +38,8 @@ public:
     Point<T> operator+(const Point<T>& rhs) const;
     Point<T> operator-(const Point<T>& rhs) const;
 
-    template <typename V>
-    Point<T> operator*(const Scalar<V>& rhs) const;
+    template <typename S>
+    Point<T> operator*(const S& rhs) const;
 
     bool operator==(const Point<T>& rhs) const;
     bool operator!=(const Point<T>& rhs) const;
