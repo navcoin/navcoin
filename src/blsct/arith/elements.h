@@ -17,9 +17,9 @@
 #include <blsct/arith/point.h>
 
 /**
- * Designed to expect below instantiations only:
- * - Elements<Point>
- * - Elements<Scalar>
+ * Expects below instantiations only:
+ * - Elements<Point<>>
+ * - Elements<Scalar<>>
  */
 template <typename T>
 class Elements
@@ -76,7 +76,8 @@ public:
 
     /**
      * MulVec is equivalent of (Elements<G1Point> * Elements<Scalar>).Sum(),
-     * but faster than that due to direct use of mcl library
+     * but faster than that due to direct use of mcl library.
+     * Only works with Her arith classes.
      */
     template <typename S>
     T MulVec(const Elements<S>& scalars) const;

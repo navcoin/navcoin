@@ -101,9 +101,9 @@ template <typename T>
 Elements<T> Elements<T>::RandVec(const size_t& n, const bool exclude_zero)
 {
     if constexpr (std::is_same_v<T, HerScalar>) {
-        Elements<HerScalar> ret;
+        Elements<T> ret;
         for (size_t i = 0; i < n; ++i) {
-            auto x = HerScalar::Rand(exclude_zero);
+            auto x = T::Rand(exclude_zero);
             ret.m_vec.push_back(x);
         }
         return ret;
@@ -240,7 +240,7 @@ T Elements<T>::MulVec(const Elements<S>& scalars) const
         vec_fr[i] = scalars[i].m_fr;
     }
 
-    HerG1Point ret;
+    T ret;
     mclBnG1_mulVec(&ret.m_p, vec_g1.data(), vec_fr.data(), vec_count);
     return ret;
 }
