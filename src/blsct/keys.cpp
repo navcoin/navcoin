@@ -10,11 +10,11 @@ namespace blsct {
 template <typename P>
 PublicKey<P> PublicKey<P>::Aggregate(std::vector<PublicKey<P>> vPk)
 {
-    auto retPoint = Point<P>();
+    auto retPoint = P();
     bool isZero = true;
 
     for (auto& pk : vPk) {
-        Point<P> pkG1;
+        P pkG1;
 
         bool success = pk.GetG1Point(pkG1);
         if (!success)
@@ -45,7 +45,7 @@ CKeyID PublicKey<P>::GetID() const
 template CKeyID PublicKey<HerG1Point>::GetID() const;
 
 template <typename P>
-bool PublicKey<P>::GetG1Point(Point<P>& ret) const
+bool PublicKey<P>::GetG1Point(P& ret) const
 {
     try {
         ret = P(data);
@@ -54,7 +54,7 @@ bool PublicKey<P>::GetG1Point(Point<P>& ret) const
     }
     return true;
 }
-template bool PublicKey<HerG1Point>::GetG1Point(Point<HerG1Point>& ret) const;
+template bool PublicKey<HerG1Point>::GetG1Point(HerG1Point& ret) const;
 
 template <typename P>
 std::string PublicKey<P>::ToString() const
@@ -75,7 +75,7 @@ bool PublicKey<P>::IsValid() const
 {
     if (data.size() == 0) return false;
 
-    Point<P> g1;
+    P g1;
 
     if (!GetG1Point(g1)) return false;
 
@@ -98,7 +98,7 @@ CKeyID DoublePublicKey<P>::GetID() const
 template CKeyID DoublePublicKey<HerG1Point>::GetID() const;
 
 template <typename P>
-bool DoublePublicKey<P>::GetViewKey(Point<P>& ret) const
+bool DoublePublicKey<P>::GetViewKey(P& ret) const
 {
     try {
         ret = P(vk.GetVch());
@@ -108,10 +108,10 @@ bool DoublePublicKey<P>::GetViewKey(Point<P>& ret) const
 
     return true;
 }
-template bool DoublePublicKey<HerG1Point>::GetViewKey(Point<HerG1Point>& ret) const;
+template bool DoublePublicKey<HerG1Point>::GetViewKey(HerG1Point& ret) const;
 
 template <typename P>
-bool DoublePublicKey<P>::GetSpendKey(Point<P>& ret) const
+bool DoublePublicKey<P>::GetSpendKey(P& ret) const
 {
     try {
         ret = P(sk.GetVch());
@@ -121,7 +121,7 @@ bool DoublePublicKey<P>::GetSpendKey(Point<P>& ret) const
 
     return true;
 }
-template bool DoublePublicKey<HerG1Point>::GetSpendKey(Point<HerG1Point>& ret) const;
+template bool DoublePublicKey<HerG1Point>::GetSpendKey(HerG1Point& ret) const;
 
 template <typename P>
 bool DoublePublicKey<P>::operator==(const DoublePublicKey& rhs) const
@@ -171,10 +171,10 @@ bool PrivateKey<P>::operator==(const PrivateKey<P>& rhs) const
 template bool PrivateKey<HerG1Point>::operator==(const PrivateKey<HerG1Point>& rhs) const;
 
 template <typename P>
-template <typename V>
+template <typename S>
 P PrivateKey<P>::GetG1Point() const
 {
-    return Point<P>::GetBasePoint() * Scalar<V>(std::vector<unsigned char>(k.begin(), k.end()));
+    return Point<P>::GetBasePoint() * S(std::vector<unsigned char>(k.begin(), k.end()));
 }
 template HerG1Point PrivateKey<HerG1Point>::GetG1Point<HerScalar>() const;
 
@@ -186,19 +186,19 @@ PublicKey<P> PrivateKey<P>::GetPublicKey() const
 template PublicKey<HerG1Point> PrivateKey<HerG1Point>::GetPublicKey() const;
 
 template <typename P>
-template <typename V>
-Scalar<V> PrivateKey<P>::GetScalar() const
+template <typename S>
+S PrivateKey<P>::GetScalar() const
 {
-    return Scalar<V>(std::vector<unsigned char>(k.begin(), k.end()));
+    return S(std::vector<unsigned char>(k.begin(), k.end()));
 }
-template Scalar<HerScalar> PrivateKey<HerG1Point>::GetScalar() const;
+template HerScalar PrivateKey<HerG1Point>::GetScalar() const;
 
 template <typename P>
-template <typename V>
+template <typename S>
 bool PrivateKey<P>::IsValid() const
 {
     if (k.size() == 0) return false;
-    return GetScalar<V>().IsValid();
+    return GetScalar<S>().IsValid();
 }
 template bool PrivateKey<HerG1Point>::IsValid<HerScalar>() const;
 

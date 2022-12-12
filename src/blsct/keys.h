@@ -29,7 +29,7 @@ public:
     static constexpr size_t SIZE = 48;
 
     PublicKey() { data.clear(); }
-    PublicKey(const Point<P>& pk) : data(pk.GetVch()) {}
+    PublicKey(const P& pk) : data(pk.GetVch()) {}
     PublicKey(const std::vector<unsigned char>& pk) : data(pk) {}
 
     SERIALIZE_METHODS(PublicKey<P>, obj) { READWRITE(obj.data); }
@@ -45,7 +45,7 @@ public:
 
     bool IsValid() const;
 
-    bool GetG1Point(Point<P>& ret) const;
+    bool GetG1Point(P& ret) const;
     std::vector<unsigned char> GetVch() const;
 };
 
@@ -60,7 +60,7 @@ public:
     static constexpr size_t SIZE = 48 * 2;
 
     DoublePublicKey() {}
-    DoublePublicKey(const Point<P>& vk_, const Point<P>& sk_) : vk(vk_.GetVch()), sk(sk_.GetVch()) {}
+    DoublePublicKey(const P& vk_, const P& sk_) : vk(vk_.GetVch()), sk(sk_.GetVch()) {}
     DoublePublicKey(const std::vector<unsigned char>& vk_, const std::vector<unsigned char>& sk_) : vk(vk_), sk(sk_) {}
 
     SERIALIZE_METHODS(DoublePublicKey<P>, obj) { READWRITE(obj.vk.GetVch(), obj.sk.GetVch()); }
@@ -68,8 +68,8 @@ public:
     uint256 GetHash() const;
     CKeyID GetID() const;
 
-    bool GetViewKey(Point<P>& ret) const;
-    bool GetSpendKey(Point<P>& ret) const;
+    bool GetViewKey(P& ret) const;
+    bool GetSpendKey(P& ret) const;
 
     bool operator==(const DoublePublicKey<P>& rhs) const;
 
@@ -91,8 +91,8 @@ public:
 
     PrivateKey() { k.clear(); }
 
-    template <typename V>
-    PrivateKey(Scalar<V> k_)
+    template <typename S>
+    PrivateKey(S k_)
     {
         k.resize(PrivateKey<P>::SIZE);
         std::vector<unsigned char> v = k_.GetVch();
@@ -109,13 +109,13 @@ public:
 
     bool operator==(const PrivateKey<P>& rhs) const;
 
-    template <typename V>
+    template <typename S>
     P GetG1Point() const;
 
     PublicKey<P> GetPublicKey() const;
 
-    template <typename V>
-    Scalar<V> GetScalar() const;
+    template <typename S>
+    S GetScalar() const;
 
     template <typename V>
     bool IsValid() const;

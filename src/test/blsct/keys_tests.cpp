@@ -111,12 +111,12 @@ BOOST_AUTO_TEST_CASE(blsct_keys)
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
         16, 17, 1, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31};
 
-    Scalar<HerScalar> vectorFromScalar = vectorKey;
+    HerScalar vectorFromScalar = vectorKey;
     blsct::PrivateKey<HerG1Point> privateKeyFromVector(vectorFromScalar);
     BOOST_CHECK(privateKeyFromVector.IsValid<HerScalar>());
     BOOST_CHECK(privateKeyFromVector.GetScalar<HerScalar>().GetVch() == vectorKey);
 
-    Scalar<HerScalar> scalarFromVector(vectorKey);
+    HerScalar scalarFromVector(vectorKey);
     blsct::PrivateKey<HerG1Point> privateKeyFromScalar(scalarFromVector);
     BOOST_CHECK(privateKeyFromScalar.IsValid<HerScalar>());
     BOOST_CHECK(privateKeyFromScalar.GetScalar<HerScalar>().GetVch() == vectorKey);
@@ -124,8 +124,8 @@ BOOST_AUTO_TEST_CASE(blsct_keys)
     // G(a+b) == Ga + Gb
     blsct::PrivateKey<HerG1Point> privateKeyFromAddition(privateKeyFromScalar.GetScalar<HerScalar>() +
                                                          privateKeyFromVector.GetScalar<HerScalar>());
-    blsct::PublicKey<HerG1Point> publicKeyFromAddition(privateKeyFromScalar.GetG1Point<HerG1Point>() +
-                                                       privateKeyFromVector.GetG1Point<HerG1Point>());
+    blsct::PublicKey<HerG1Point> publicKeyFromAddition(privateKeyFromScalar.GetG1Point<HerScalar>() +
+                                                       privateKeyFromVector.GetG1Point<HerScalar>());
     BOOST_CHECK(privateKeyFromAddition.GetPublicKey() == publicKeyFromAddition);
 
     std::vector<blsct::PublicKey<HerG1Point>> vecKeys = {privateKeyFromScalar.GetPublicKey(), privateKeyFromVector.GetPublicKey()};
