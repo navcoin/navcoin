@@ -2,9 +2,9 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <blsct/arith/g1point.h>
-#include <blsct/arith/range_proof/config.h>
-#include <blsct/arith/range_proof/generators.h>
+#include <blsct/arith/point.h>
+#include <blsct/range_proof/config.h>
+#include <blsct/range_proof/generators.h>
 #include <ctokens/tokenid.h>
 #include <util/strencodings.h>
 #include <tinyformat.h>

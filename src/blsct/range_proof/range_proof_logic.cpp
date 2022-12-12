@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <blsct/arith/range_proof/lazy_g1point.h>
-#include <blsct/arith/range_proof/range_proof_logic.h>
+#include <blsct/range_proof/lazy_g1point.h>
+#include <blsct/range_proof/range_proof_logic.h>
 #include <tinyformat.h>
 
 Scalar* RangeProofLogic::m_one = nullptr;

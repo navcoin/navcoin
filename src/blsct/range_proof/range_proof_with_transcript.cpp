@@ -2,9 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <blsct/arith/range_proof/config.h>
-// #include <blsct/arith/range_proof/range_proof_logic.h>
-#include <blsct/arith/range_proof/range_proof_with_transcript.h>
+#include <blsct/range_proof/config.h>
+#include <blsct/range_proof/range_proof_with_transcript.h>
 
 RangeProofWithTranscript RangeProofWithTranscript::Build(const RangeProof& proof) {
     // build transcript from proof in the same way it was built in Prove function

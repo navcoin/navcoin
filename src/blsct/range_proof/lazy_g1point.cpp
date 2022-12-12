@@ -2,7 +2,7 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <blsct/arith/range_proof/lazy_g1point.h>
+#include <blsct/range_proof/lazy_g1point.h>
 
 LazyG1Points::LazyG1Points(const G1Points& bases, const Scalars& exps) {
     if (bases.Size() != exps.Size()) {
