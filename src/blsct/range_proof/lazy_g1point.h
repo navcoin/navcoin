@@ -20,10 +20,10 @@ template <typename P, typename V>
 struct LazyG1Points {
 public:
     LazyG1Points() {}
-    LazyG1Points(const Points& bases, const Scalars& exps);
+    LazyG1Points(const Points<P>& bases, const Scalars<V>& exps);
 
     void Add(const LazyG1Point<P,V>& point);
-    G1Point Sum() const;
+    Point<P> Sum() const;
 
     LazyG1Points<P,V> operator+(const LazyG1Points<P,V>& rhs) const;
     LazyG1Points<P,V> operator+(const LazyG1Point<P,V>& rhs) const;

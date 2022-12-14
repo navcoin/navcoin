@@ -160,6 +160,7 @@ BITCOIN_CORE_H = \
   blsct/arith/her/her_initializer.h \
   blsct/arith/her/her_scalar.h \
   blsct/arith/elements.h \
+  blsct/arith/initializer.h \
   blsct/arith/point.h \
   blsct/arith/scalar.h \
   blsct/keys.h \
@@ -404,6 +405,7 @@ libbitcoin_node_a_SOURCES = \
   blsct/arith/her/her_initializer.cpp \
   blsct/arith/her/her_scalar.cpp \
   blsct/arith/elements.cpp \
+  blsct/arith/initializer.cpp \
   blsct/arith/point.cpp \
   blsct/arith/scalar.cpp \
   blsct/keys.cpp \

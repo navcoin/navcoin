@@ -14,43 +14,44 @@
 #include <serialize.h>
 #include <uint256.h>
 
-template <typename T>
+template <typename S>
 class Scalar {
 public:
     Scalar();
 
-    template <typename V>
-    Scalar<T>(const V& v);
+    // template <typename SV>
+    // Scalar<S>(const SV& v);
 
     static void Init();
 
     void operator=(const uint64_t& n);
 
-    Scalar<T> operator+(const Scalar<T>& rhs) const;
-    Scalar<T> operator-(const Scalar<T>& rhs) const;
-    Scalar<T> operator*(const Scalar<T>& rhs) const;
-    Scalar<T> operator/(const Scalar<T>& rhs) const;
-    Scalar<T> operator|(const Scalar<T>& rhs) const;
-    Scalar<T> operator^(const Scalar<T>& rhs) const;
-    Scalar<T> operator&(const Scalar<T>& rhs) const;
-    Scalar<T> operator~() const;
-    Scalar<T> operator<<(unsigned int shift) const;
-    Scalar<T> operator>>(unsigned int shift) const;
+    Scalar<S> operator+(const Scalar<S>& rhs) const;
+    Scalar<S> operator-(const Scalar<S>& rhs) const;
+    Scalar<S> operator*(const Scalar<S>& rhs) const;
+    Scalar<S> operator/(const Scalar<S>& rhs) const;
+    Scalar<S> operator|(const Scalar<S>& rhs) const;
+    Scalar<S> operator^(const Scalar<S>& rhs) const;
+    Scalar<S> operator&(const Scalar<S>& rhs) const;
+    Scalar<S> operator~() const;
+    Scalar<S> operator<<(unsigned int shift) const;
+    Scalar<S> operator>>(unsigned int shift) const;
 
-    bool operator==(const Scalar<T>& rhs) const;
+    bool operator==(const Scalar<S>& rhs) const;
     bool operator==(const int& rhs) const;
-    bool operator!=(const Scalar<T>& rhs) const;
+    bool operator!=(const Scalar<S>& rhs) const;
     bool operator!=(const int& rhs) const;
 
+    SV Underlying() const;
     bool IsValid() const;
 
-    Scalar<T> Invert() const;
-    Scalar<T> Negate() const;
-    Scalar<T> Square() const;
-    Scalar<T> Cube() const;
-    Scalar<T> Pow(const Scalar<T>& n) const;
+    Scalar<S> Invert() const;
+    Scalar<S> Negate() const;
+    Scalar<S> Square() const;
+    Scalar<S> Cube() const;
+    Scalar<S> Pow(const Scalar<S>& n) const;
 
-    static Scalar<T> Rand(bool exclude_zero = false);
+    static Scalar<S> Rand(bool exclude_zero = false);
 
     int64_t GetInt64() const;
 

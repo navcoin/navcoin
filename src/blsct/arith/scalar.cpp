@@ -11,208 +11,208 @@
 // #include <uint256.h>
 // #include <version.h>
 
-template <typename T>
-Scalar<T>::Scalar()
+template <typename S>
+Scalar<S>::Scalar()
 {
 }
 template Scalar<HerScalar>::Scalar();
 
-template <typename T>
-void Scalar<T>::Init()
+template <typename S>
+void Scalar<S>::Init()
 {
     T::Init();
 }
 
-template <typename T>
-Scalar<T> Scalar<T>::operator+(const Scalar<T> &rhs) const
+template <typename S>
+Scalar<S> Scalar<S>::operator+(const Scalar<S> &rhs) const
 {
-    return static_cast<T*>(this)->operator+(rhs);
+    return static_cast<S*>(this)->operator+(rhs);
 }
 
-template <typename T>
-Scalar<T> Scalar<T>::operator-(const Scalar<T> &rhs) const
+template <typename S>
+Scalar<S> Scalar<S>::operator-(const Scalar<S> &rhs) const
 {
-    return static_cast<T*>(this)->operator-(rhs);
+    return static_cast<S*>(this)->operator-(rhs);
 }
 
-template <typename T>
-Scalar<T> Scalar<T>::operator*(const Scalar<T> &rhs) const
+template <typename S>
+Scalar<S> Scalar<S>::operator*(const Scalar<S> &rhs) const
 {
-    return static_cast<T*>(this)->operator*(rhs);
+    return static_cast<S*>(this)->operator*(rhs);
 }
 
-template <typename T>
-Scalar<T> Scalar<T>::operator/(const Scalar<T> &rhs) const
+template <typename S>
+Scalar<S> Scalar<S>::operator/(const Scalar<S> &rhs) const
 {
-    return static_cast<T*>(this)->operator/(rhs);
+    return static_cast<S*>(this)->operator/(rhs);
 }
 
-template <typename T>
-Scalar<T> Scalar<T>::operator|(const Scalar<T> &rhs) const
+template <typename S>
+Scalar<S> Scalar<S>::operator|(const Scalar<S> &rhs) const
 {
-    return static_cast<T*>(this)->operator|(rhs);
+    return static_cast<S*>(this)->operator|(rhs);
 }
 
-template <typename T>
-Scalar<T> Scalar<T>::operator^(const Scalar<T> &rhs) const
+template <typename S>
+Scalar<S> Scalar<S>::operator^(const Scalar<S> &rhs) const
 {
-    return static_cast<T*>(this)->operator^(rhs);
+    return static_cast<S*>(this)->operator^(rhs);
 }
 
-template <typename T>
-Scalar<T> Scalar<T>::operator&(const Scalar<T> &rhs) const
+template <typename S>
+Scalar<S> Scalar<S>::operator&(const Scalar<S> &rhs) const
 {
-    return static_cast<T*>(this)->operator&(rhs);
+    return static_cast<S*>(this)->operator&(rhs);
 }
 
-template <typename T>
-Scalar<T> Scalar<T>::operator~() const
+template <typename S>
+Scalar<S> Scalar<S>::operator~() const
 {
-    return static_cast<T*>(this)->operator~();
+    return static_cast<S*>(this)->operator~();
 }
 
-template <typename T>
-Scalar<T> Scalar<T>::operator<<(unsigned int shift) const
+template <typename S>
+Scalar<S> Scalar<S>::operator<<(unsigned int shift) const
 {
-    return static_cast<T*>(this)->operator<<(shift);
+    return static_cast<S*>(this)->operator<<(shift);
 }
 
 /**
  * Assumes that fr contains a number within int64_t range
  */
-template <typename T>
-Scalar<T> Scalar<T>::operator>>(unsigned int shift) const
+template <typename S>
+Scalar<S> Scalar<S>::operator>>(unsigned int shift) const
 {
-    return static_cast<T*>(this)->operator>>(shift);
+    return static_cast<S*>(this)->operator>>(shift);
 }
 
-template <typename T>
-void Scalar<T>::operator=(const uint64_t& rhs)
+template <typename S>
+void Scalar<S>::operator=(const uint64_t& rhs)
 {
-    return static_cast<T*>(this)->operator=(rhs);
+    return static_cast<S*>(this)->operator=(rhs);
 }
 
-template <typename T>
-bool Scalar<T>::operator==(const int &rhs) const
+template <typename S>
+bool Scalar<S>::operator==(const int &rhs) const
 {
-    return static_cast<T*>(this)->operator==(rhs);
+    return static_cast<S*>(this)->operator==(rhs);
 }
 
-template <typename T>
-bool Scalar<T>::operator==(const Scalar<T> &rhs) const
+template <typename S>
+bool Scalar<S>::operator==(const Scalar<S> &rhs) const
 {
-    return static_cast<T*>(this)->operator==(rhs);
+    return static_cast<S*>(this)->operator==(rhs);
 }
 
-template <typename T>
-bool Scalar<T>::operator!=(const int &rhs) const
+template <typename S>
+bool Scalar<S>::operator!=(const int &rhs) const
 {
-    return static_cast<T*>(this)->operator!=(rhs);
+    return static_cast<S*>(this)->operator!=(rhs);
 }
 
-template <typename T>
-bool Scalar<T>::operator!=(const Scalar<T> &rhs) const
+template <typename S>
+bool Scalar<S>::operator!=(const Scalar<S> &rhs) const
 {
-    return static_cast<T*>(this)->operator!=(rhs);
+    return static_cast<S*>(this)->operator!=(rhs);
 }
 
-template <typename T>
-bool Scalar<T>::IsValid() const
+template <typename S>
+bool Scalar<S>::IsValid() const
 {
-    return static_cast<T*>(this)->IsValid();
+    return static_cast<S*>(this)->IsValid();
 }
 
-template <typename T>
-Scalar<T> Scalar<T>::Invert() const
+template <typename S>
+Scalar<S> Scalar<S>::Invert() const
 {
-    return static_cast<T*>(this)->Invert();
+    return static_cast<S*>(this)->Invert();
 }
 
-template <typename T>
-Scalar<T> Scalar<T>::Negate() const
+template <typename S>
+Scalar<S> Scalar<S>::Negate() const
 {
-    return static_cast<T*>(this)->Negate();
+    return static_cast<S*>(this)->Negate();
 }
 
-template <typename T>
-Scalar<T> Scalar<T>::Square() const
+template <typename S>
+Scalar<S> Scalar<S>::Square() const
 {
-    return static_cast<T*>(this)->Square();
+    return static_cast<S*>(this)->Square();
 }
 
-template <typename T>
-Scalar<T> Scalar<T>::Cube() const
+template <typename S>
+Scalar<S> Scalar<S>::Cube() const
 {
-    return static_cast<T*>(this)->Cube();
+    return static_cast<S*>(this)->Cube();
 }
 
-template <typename T>
-Scalar<T> Scalar<T>::Pow(const Scalar& n) const
+template <typename S>
+Scalar<S> Scalar<S>::Pow(const Scalar& n) const
 {
-    return static_cast<T*>(this)->Pow(n);
+    return static_cast<S*>(this)->Pow(n);
 }
 
-template <typename T>
-Scalar<T> Scalar<T>::Rand(bool exclude_zero)
+template <typename S>
+Scalar<S> Scalar<S>::Rand(bool exclude_zero)
 {
-    return Scalar<T>::Rand(exclude_zero);
+    return Scalar<S>::Rand(exclude_zero);
 }
 
-template <typename T>
-int64_t Scalar<T>::GetInt64() const
+template <typename S>
+int64_t Scalar<S>::GetInt64() const
 {
-    return static_cast<T*>(this)->GetInt64();
+    return static_cast<S*>(this)->GetInt64();
 }
 
-template <typename T>
-std::vector<uint8_t> Scalar<T>::GetVch() const
+template <typename S>
+std::vector<uint8_t> Scalar<S>::GetVch() const
 {
-    return static_cast<T*>(this)->GetVch();
+    return static_cast<S*>(this)->GetVch();
 }
 
-template <typename T>
-void Scalar<T>::SetVch(const std::vector<uint8_t> &v)
+template <typename S>
+void Scalar<S>::SetVch(const std::vector<uint8_t> &v)
 {
-    static_cast<T*>(this)->SetVch(v);
+    static_cast<S*>(this)->SetVch(v);
 }
 
-template <typename T>
-void Scalar<T>::SetPow2(int n)
+template <typename S>
+void Scalar<S>::SetPow2(int n)
 {
-    static_cast<T*>(this)->SetPow2(n);
+    static_cast<S*>(this)->SetPow2(n);
 }
 
-template <typename T>
-uint256 Scalar<T>::Hash(const int& n) const
+template <typename S>
+uint256 Scalar<S>::Hash(const int& n) const
 {
-    return static_cast<T*>(this)->Hash(n);
+    return static_cast<S*>(this)->Hash(n);
 }
 
-template <typename T>
-std::string Scalar<T>::GetString(const int8_t radix) const
+template <typename S>
+std::string Scalar<S>::GetString(const int8_t radix) const
 {
-    return static_cast<T*>(this)->GetString(radix);
+    return static_cast<S*>(this)->GetString(radix);
 }
 
-template <typename T>
-std::vector<bool> Scalar<T>::GetBits() const
+template <typename S>
+std::vector<bool> Scalar<S>::GetBits() const
 {
-    return static_cast<T*>(this)->GetBits();
+    return static_cast<S*>(this)->GetBits();
 }
 
 /**
  * Since GetVch returns 32-byte vector, maximum bit index is 8 * 32 - 1 = 255
  */
-template <typename T>
-bool Scalar<T>::GetBit(uint8_t n) const
+template <typename S>
+bool Scalar<S>::GetBit(uint8_t n) const
 {
-    return static_cast<T*>(this)->GetBit(n);
+    return static_cast<S*>(this)->GetBit(n);
 }
 
-template <typename T>
-unsigned int Scalar<T>::GetSerializeSize() const
+template <typename S>
+unsigned int Scalar<S>::GetSerializeSize() const
 {
-    return static_cast<T*>(this)->GetSerializeSize(
-        static_cast<T*>(this)->GetVch()
+    return static_cast<S*>(this)->GetSerializeSize(
+        static_cast<S*>(this)->GetVch()
     );
 }

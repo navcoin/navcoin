@@ -3,8 +3,11 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <blsct/range_proof/lazy_g1point.h>
+#include <bls/bls384_256.h> // must include this before bls/bls.h
+#include <bls/bls.h>
 
-LazyG1Points::LazyG1Points(const G1Points& bases, const Scalars& exps) {
+template <typename P, typename V>
+LazyG1Points<P,V>::LazyG1Points(const Points<P>& bases, const Scalars<V>& exps) {
     if (bases.Size() != exps.Size()) {
         throw std::runtime_error("number of bases and exps don't match");
     }
@@ -13,26 +16,30 @@ LazyG1Points::LazyG1Points(const G1Points& bases, const Scalars& exps) {
     }
 }
 
-void LazyG1Points::Add(const LazyG1Point& point) {
+template <typename P, typename V>
+void LazyG1Points<P,V>::Add(const LazyG1Point<P,V>& point) {
     points.push_back(point);
 }
 
-G1Point LazyG1Points::Sum() const {
-    std::vector<mclBnG1> bases;
-    std::vector<mclBnFr> exps;
+template <typename P, typename V>
+Point<P> LazyG1Points<P,V>::Sum() const {
+    std::vector<P> bases;
+    std::vector<V> exps;
 
     for (auto point: points) {
         bases.push_back(point.m_base);
         exps.push_back(point.m_exp);
     }
-    G1Point p;
+    Point<P> p;
     mclBnG1_mulVec(&p.m_p, bases.data(), exps.data(), points.size());
     return p;
 }
+template Point<mclBnG1> LazyG1Points<mclBnG1,mclBnFr>::Sum() const;
 
-LazyG1Points LazyG1Points::operator+(const LazyG1Points& rhs) const {
-    std::vector<G1Point> bases;
-    std::vector<Scalar> exps;
+template <typename P, typename V>
+LazyG1Points<P,V> LazyG1Points<P,V>::operator+(const LazyG1Points<P,V>& rhs) const {
+    std::vector<Point<P>> bases;
+    std::vector<Scalar<V>> exps;
 
     for (auto p: points) {
         bases.push_back(p.m_base);
@@ -43,12 +50,13 @@ LazyG1Points LazyG1Points::operator+(const LazyG1Points& rhs) const {
         exps.push_back(p.m_exp);
     }
 
-    return LazyG1Points(bases, exps);
+    return LazyG1Points<P,V>(bases, exps);
 }
 
-LazyG1Points LazyG1Points::operator+(const LazyG1Point& rhs) const {
-    std::vector<G1Point> bases;
-    std::vector<Scalar> exps;
+template <typename P, typename V>
+LazyG1Points<P,V> LazyG1Points<P,V>::operator+(const LazyG1Point<P,V>& rhs) const {
+    std::vector<Point<P>> bases;
+    std::vector<Scalar<V>> exps;
 
     for (auto p: points) {
         bases.push_back(p.m_base);
@@ -57,5 +65,5 @@ LazyG1Points LazyG1Points::operator+(const LazyG1Point& rhs) const {
     bases.push_back(rhs.m_base);
     exps.push_back(rhs.m_exp);
 
-    return LazyG1Points(bases, exps);
+    return LazyG1Points<P,V>(bases, exps);
 }

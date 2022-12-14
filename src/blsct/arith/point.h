@@ -1,4 +1,4 @@
-// Copyright (c) 2022 The Navcoin developers
+// Copyright (c) 2022 Phe Navcoin developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -24,7 +24,7 @@ enum class Endianness {
     Little
 };
 
-template <typename T>
+template <typename P>
 class Point
 {
 public:
@@ -32,33 +32,35 @@ public:
 
     static void Init();
 
-    template <typename P>
-    T operator=(const P& rhs);
+    template <typename PV>
+    P operator=(const PV& rhs);
 
-    T operator+(const T& rhs) const;
-    T operator-(const T& rhs) const;
+    P operator+(const P& rhs) const;
+    P operator-(const P& rhs) const;
 
     template <typename S>
-    T operator*(const S& rhs) const;
+    P operator*(const S& rhs) const;
 
-    bool operator==(const T& rhs) const;
-    bool operator!=(const T& rhs) const;
+    bool operator==(const P& rhs) const;
+    bool operator!=(const P& rhs) const;
 
-    T Double() const;
+    template <typename PV>
+    PV Underlying() const;
+    P Double() const;
 
-    static T GetBasePoint();
-    static T MapToG1(const std::vector<uint8_t>& vec, const Endianness e = Endianness::Little);
-    static T MapToG1(const std::string& s, const Endianness e = Endianness::Little);
-    static T HashAndMap(const std::vector<uint8_t>& vec);
+    static P GetBasePoint();
+    static P MapToG1(const std::vector<uint8_t>& vec, const Endianness e = Endianness::Little);
+    static P MapToG1(const std::string& s, const Endianness e = Endianness::Little);
+    static P HashAndMap(const std::vector<uint8_t>& vec);
 
     /**
      * Multiply Point<T>s by Scalars element by element and then get the sum of all resulting points
      * [g_1*s_1, g_2*s_2, ..., g_n*s_n].Sum()
      */
-    template <typename P, typename V>
-    static T MulVec(const std::vector<P>& g_vec, const std::vector<V>& s_vec);
+    template <typename PV, typename SV>
+    static P MulVec(const std::vector<PV>& g_vec, const std::vector<SV>& s_vec);
 
-    static T Rand();
+    static P Rand();
 
     bool IsValid() const;
     bool IsUnity() const;

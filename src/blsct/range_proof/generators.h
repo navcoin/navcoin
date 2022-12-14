@@ -14,21 +14,21 @@
 #include <blsct/range_proof/config.h>
 #include <ctokens/tokenid.h>
 
-template <typename P>
+template <typename PV>
 struct Generators {
 public:
     Generators(
-        Point<P>& H, Point<P>& G, Points& Gi, Points& Hi
+        Point<PV>& H, Point<PV>& G, Points<PV>& Gi, Points<PV>& Hi
     ): H{H}, G{G}, Gi{Gi}, Hi{Hi} {}
-    G1Points GetGiSubset(const size_t& size) const;
-    G1Points GetHiSubset(const size_t& size) const;
+    Points<PV> GetGiSubset(const size_t& size) const;
+    Points<PV> GetHiSubset(const size_t& size) const;
 
-    std::reference_wrapper<G1Point> H;
-    G1Point G;
+    std::reference_wrapper<Point<PV>> H;
+    Point<PV> G;
 
 private:
-    std::reference_wrapper<G1Points> Gi;
-    std::reference_wrapper<G1Points> Hi;
+    std::reference_wrapper<Points<PV>> Gi;
+    std::reference_wrapper<Points<PV>> Hi;
 };
 
 /**
@@ -55,27 +55,27 @@ private:
  * the public key whose private key is Sum(randomness). That will be
  * used later for signature verification.
  */
-templae <typename P>
+template <typename PV>
 class GeneratorsFactory
 {
 public:
     GeneratorsFactory();
-    Generators<P> GetInstance(const TokenId& token_id);
+    Generators<PV> GetInstance(const TokenId& token_id);
 
 private:
-    Point<P> DeriveGenerator(
-        const Point<P>& p,
+    Point<PV> DeriveGenerator(
+        const Point<PV>& p,
         const size_t index,
         const TokenId& token_id
     );
 
     // G generators are cached
-    inline static std::map<const TokenId, const Point<P>> m_G_cache;
+    inline static std::map<const TokenId, const Point<PV>> m_G_cache;
 
     // made optional to initialize values lazily after mcl initialization
-    inline static std::optional<Point<P>> m_H;
-    inline static std::optional<Points> m_Gi;
-    inline static std::optional<Points> m_Hi;
+    inline static std::optional<Point<PV>> m_H;
+    inline static std::optional<Points<PV>> m_Gi;
+    inline static std::optional<Points<PV>> m_Hi;
 
     inline static boost::mutex m_init_mutex;
     inline static bool m_is_initialized = false;

@@ -18,8 +18,8 @@
 
 /**
  * Expects below instantiations only:
- * - Elements<Point<>>
- * - Elements<Scalar<>>
+ * - Elements<Point<P>>
+ * - Elements<Scalar<V>>
  */
 template <typename T>
 class Elements
@@ -95,10 +95,10 @@ public:
     std::vector<T> m_vec;
 };
 
-template <typename T>
-using Scalars = Elements<T>;
+template <typename SV>
+using Scalars = Elements<Scalar<SV>>;
 
-template <typename T>
-using Points = Elements<T>;
+template <typename PV>
+using Points = Elements<Point<PV>>;
 
 #endif // NAVCOIN_BLSCT_ARITH_ELEMENTS_H
