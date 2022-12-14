@@ -2,21 +2,22 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NAVCOIN_BLSCT_ARITH_RANGE_PROOF_PROOF_WITH_TRANSCRIPT_H
-#define NAVCOIN_BLSCT_ARITH_RANGE_PROOF_PROOF_WITH_TRANSCRIPT_H
+#ifndef NAVCOIN_BLSCT_RANGE_PROOF_PROOF_WITH_TRANSCRIPT_H
+#define NAVCOIN_BLSCT_RANGE_PROOF_PROOF_WITH_TRANSCRIPT_H
 
 #include <blsct/arith/elements.h>
 #include <blsct/range_proof/range_proof.h>
 
+template <typename P, typename V>
 class RangeProofWithTranscript
 {
 public:
     RangeProofWithTranscript(
-        const RangeProof& proof,
-        const Scalar& x,
-        const Scalar& y,
-        const Scalar& z,
-        const Scalar& cx_factor,
+        const RangeProof<P,V>& proof,
+        const Scalar<V>& x,
+        const Scalar<V>& y,
+        const Scalar<V>& z,
+        const Scalar<V>& cx_factor,
         const Scalars& xs,
         const Scalars& inv_xs,
         const size_t& num_input_values_power_2,
@@ -26,23 +27,23 @@ public:
         num_input_values_power_2(num_input_values_power_2),
         concat_input_values_in_bits(concat_input_values_in_bits) {}
 
-    static RangeProofWithTranscript Build(const RangeProof& proof);
+    static RangeProofWithTranscript<P,V> Build(const RangeProof<P,V>& proof);
 
     static size_t RecoverNumRounds(const size_t& num_input_values);
 
-    const RangeProof proof;
+    const RangeProof<P,V> proof;
 
     // transcript
-    const Scalar x;  // x used in the main prove procedure
-    const Scalar y;
-    const Scalar z;
-    const Scalar cx_factor;  // factor multiplied to cL and cR in inner product argument
+    const Scalar<V> x;  // x used in the main prove procedure
+    const Scalar<V> y;
+    const Scalar<V> z;
+    const Scalar<V> cx_factor;  // factor multiplied to cL and cR in inner product argument
     const Scalars xs;      // x used in inner product argument
     const Scalars inv_xs;  // x^-1 used in inner product argument
-    const Scalar inv_y;
+    const Scalar<V> inv_y;
 
     const size_t num_input_values_power_2;  // M in old impl
     const size_t concat_input_values_in_bits;  // MN is old impl
 };
 
-#endif // NAVCOIN_BLSCT_ARITH_RANGE_PROOF_PROOF_WITH_TRANSCRIPT_H
+#endif // NAVCOIN_BLSCT_RANGE_PROOF_PROOF_WITH_TRANSCRIPT_H

@@ -2,22 +2,23 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef NAVCOIN_BLSCT_ARITH_RANGE_PROOF_GENERATORS_H
-#define NAVCOIN_BLSCT_ARITH_RANGE_PROOF_GENERATORS_H
+#ifndef NAVCOIN_BLSCT_RANGE_PROOF_GENERATORS_H
+#define NAVCOIN_BLSCT_RANGE_PROOF_GENERATORS_H
 
 #include <boost/thread/lock_guard.hpp>
 #include <boost/thread/mutex.hpp>
 
 #include <blsct/arith/elements.h>
-#include <blsct/arith/g1point.h>
-#include <blsct/arith/range_proof/config.h>
+#include <blsct/arith/point.h>
 #include <blsct/arith/scalar.h>
+#include <blsct/range_proof/config.h>
 #include <ctokens/tokenid.h>
 
+template <typename P>
 struct Generators {
 public:
     Generators(
-        G1Point& H, G1Point& G, G1Points& Gi, G1Points& Hi
+        Point<P>& H, Point<P>& G, Points& Gi, Points& Hi
     ): H{H}, G{G}, Gi{Gi}, Hi{Hi} {}
     G1Points GetGiSubset(const size_t& size) const;
     G1Points GetHiSubset(const size_t& size) const;
@@ -54,29 +55,30 @@ private:
  * the public key whose private key is Sum(randomness). That will be
  * used later for signature verification.
  */
+templae <typename P>
 class GeneratorsFactory
 {
 public:
     GeneratorsFactory();
-    Generators GetInstance(const TokenId& token_id);
+    Generators<P> GetInstance(const TokenId& token_id);
 
 private:
-    G1Point DeriveGenerator(
-        const G1Point& p,
+    Point<P> DeriveGenerator(
+        const Point<P>& p,
         const size_t index,
         const TokenId& token_id
     );
 
     // G generators are cached
-    inline static std::map<const TokenId, const G1Point> m_G_cache;
+    inline static std::map<const TokenId, const Point<P>> m_G_cache;
 
     // made optional to initialize values lazily after mcl initialization
-    inline static std::optional<G1Point> m_H;
-    inline static std::optional<G1Points> m_Gi;
-    inline static std::optional<G1Points> m_Hi;
+    inline static std::optional<Point<P>> m_H;
+    inline static std::optional<Points> m_Gi;
+    inline static std::optional<Points> m_Hi;
 
     inline static boost::mutex m_init_mutex;
     inline static bool m_is_initialized = false;
 };
 
-#endif // NAVCOIN_BLSCT_ARITH_RANGE_PROOF_GENERATORS_H
+#endif // NAVCOIN_BLSCT_RANGE_PROOF_GENERATORS_H

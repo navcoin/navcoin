@@ -5,7 +5,8 @@
 #include <blsct/range_proof/config.h>
 #include <blsct/range_proof/range_proof_with_transcript.h>
 
-RangeProofWithTranscript RangeProofWithTranscript::Build(const RangeProof& proof) {
+template <typename P, typename V>
+RangeProofWithTranscript<P,V> RangeProofWithTranscript<P,V>::Build(const RangeProof<P,V>& proof) {
     // build transcript from proof in the same way it was built in Prove function
     CHashWriter transcript_gen(0,0);
 
@@ -24,14 +25,14 @@ RangeProofWithTranscript RangeProofWithTranscript::Build(const RangeProof& proof
     transcript_gen << proof.T1;
     transcript_gen << proof.T2;
 
-    Scalar x = transcript_gen.GetHash();
+    Scalar<V> x = transcript_gen.GetHash();
     transcript_gen << x;
 
     transcript_gen << proof.tau_x;
     transcript_gen << proof.mu;
     transcript_gen << proof.t_hat;
 
-    Scalar cx_factor = transcript_gen.GetHash();
+    Scalar<V> cx_factor = transcript_gen.GetHash();
 
     auto num_rounds = RangeProofWithTranscript::RecoverNumRounds(proof.Vs.Size());
 
@@ -41,7 +42,7 @@ RangeProofWithTranscript RangeProofWithTranscript::Build(const RangeProof& proof
     for (size_t i = 0; i < num_rounds; ++i) {
         transcript_gen << proof.Ls[i];
         transcript_gen << proof.Rs[i];
-        Scalar x(transcript_gen.GetHash());
+        Scalar<V> x(transcript_gen.GetHash());
         xs.Add(x);
         inv_xs.Add(x.Invert());
     }
@@ -62,7 +63,8 @@ RangeProofWithTranscript RangeProofWithTranscript::Build(const RangeProof& proof
     );
 }
 
-size_t RangeProofWithTranscript::RecoverNumRounds(const size_t& num_input_values)
+template <typename P, typename V>
+size_t RangeProofWithTranscript<P,V>::RecoverNumRounds(const size_t& num_input_values)
 {
     auto num_input_values_pow2 =
         Config::GetFirstPowerOf2GreaterOrEqTo(num_input_values);

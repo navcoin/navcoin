@@ -412,7 +412,6 @@ libbitcoin_node_a_SOURCES = \
   blsct/range_proof/lazy_g1point.cpp \
   blsct/range_proof/range_proof_logic.cpp \
   blsct/range_proof/range_proof_with_transcript.cpp \
-  blsct/range_proof/range_proof.cpp \
   chain.cpp \
   consensus/tx_verify.cpp \
   dbwrapper.cpp \
