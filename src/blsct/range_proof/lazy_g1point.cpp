@@ -23,16 +23,20 @@ void LazyG1Points<P,V>::Add(const LazyG1Point<P,V>& point) {
 
 template <typename P, typename V>
 Point<P> LazyG1Points<P,V>::Sum() const {
-    std::vector<P> bases;
-    std::vector<V> exps;
+    if constexpr (std::is_same_v<T, HerScalar>) {
+        std::vector<P> bases;
+        std::vector<V> exps;
 
-    for (auto point: points) {
-        bases.push_back(point.m_base);
-        exps.push_back(point.m_exp);
+        for (auto point: points) {
+            bases.push_back(point.m_base);
+            exps.push_back(point.m_exp);
+        }
+        Point<P> p;
+        mclBnG1_mulVec(&p.m_p, bases.data(), exps.data(), points.size());
+        return p;
+    } else {
+        throw std::runtime_error("Not implemented");
     }
-    Point<P> p;
-    mclBnG1_mulVec(&p.m_p, bases.data(), exps.data(), points.size());
-    return p;
 }
 template Point<mclBnG1> LazyG1Points<mclBnG1,mclBnFr>::Sum() const;
 
