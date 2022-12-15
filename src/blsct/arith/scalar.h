@@ -42,7 +42,9 @@ public:
     bool operator!=(const Scalar<S>& rhs) const;
     bool operator!=(const int& rhs) const;
 
+    template <typename SV>
     SV Underlying() const;
+
     bool IsValid() const;
 
     Scalar<S> Invert() const;

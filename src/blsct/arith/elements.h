@@ -87,10 +87,10 @@ public:
     std::vector<T> m_vec;
 };
 
-template <typename SV>
-using Scalars = Elements<Scalar<SV>>;
+template <typename S>
+using Scalars = Elements<S>;
 
-template <typename PV>
-using Points = Elements<Point<PV>>;
+template <typename P>
+using Points = Elements<P>;
 
 #endif // NAVCOIN_BLSCT_ARITH_ELEMENTS_H

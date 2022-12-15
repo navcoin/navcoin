@@ -7,5 +7,5 @@
 template <typename T>
 void Initializer<T>::Init()
 {
-    static_cast<T*>(this)->Init();
+    T::Init();
 }

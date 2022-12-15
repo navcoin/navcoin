@@ -357,20 +357,4 @@ BOOST_AUTO_TEST_CASE(test_elements_to)
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_elements_mulvec_elements)
-{
-    auto p1 = HerG1Point::GetBasePoint();
-    auto p2 = p1.Double();
-    Points<HerG1Point> ps(std::vector<HerG1Point> { p1, p2 });
-
-    HerScalar s1(2), s2(3);
-    Scalars<HerScalar> ss(std::vector<HerScalar> { s1, s2 });
-
-    // p should be G^2 + (G+G)^3 = G^8
-    auto p = ps.MulVec(ss);
-    auto q = HerG1Point::GetBasePoint() * 8;
-
-    BOOST_CHECK(p == q);
-}
-
 BOOST_AUTO_TEST_SUITE_END()
