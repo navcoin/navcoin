@@ -53,13 +53,6 @@ public:
     static P MapToG1(const std::string& s, const Endianness e = Endianness::Little);
     static P HashAndMap(const std::vector<uint8_t>& vec);
 
-    /**
-     * Multiply Point<T>s by Scalars element by element and then get the sum of all resulting points
-     * [g_1*s_1, g_2*s_2, ..., g_n*s_n].Sum()
-     */
-    template <typename PV, typename SV>
-    static P MulVec(const std::vector<PV>& g_vec, const std::vector<SV>& s_vec);
-
     static P Rand();
 
     bool IsValid() const;

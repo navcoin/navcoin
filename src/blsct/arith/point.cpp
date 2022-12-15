@@ -106,14 +106,6 @@ P Point<P>::HashAndMap(const std::vector<uint8_t>& vec)
 template HerG1Point Point<HerG1Point>::HashAndMap(const std::vector<uint8_t>& vec);
 
 template <typename P>
-template <typename PV, typename SV>
-P Point<P>::MulVec(const std::vector<PV>& g_vec, const std::vector<SV>& s_vec)
-{
-    return T::MulVec(g_vec, s_vec);
-}
-template HerG1Point Point<HerG1Point>::MulVec(const std::vector<mclBnG1>& g_vec, const std::vector<mclBnFr>& s_vec);
-
-template <typename P>
 P Point<P>::Rand()
 {
     return T::Rand();

@@ -223,25 +223,3 @@ Elements<T> Elements<T>::To(const size_t to_index) const
 }
 template Elements<HerScalar> Elements<HerScalar>::To(const size_t to_index) const;
 template Elements<HerG1Point> Elements<HerG1Point>::To(const size_t to_index) const;
-
-template <typename T>
-template <typename S>
-T Elements<T>::MulVec(const Elements<S>& scalars) const
-{
-    ConfirmSizesMatch(scalars.Size());
-
-    const size_t vec_count = m_vec.size();
-
-    std::vector<mclBnG1> vec_g1(vec_count);
-    std::vector<mclBnFr> vec_fr(vec_count);
-
-    for (size_t i = 0; i < vec_count; ++i) {
-        vec_g1[i] = m_vec[i].m_p;
-        vec_fr[i] = scalars[i].m_fr;
-    }
-
-    T ret;
-    mclBnG1_mulVec(&ret.m_p, vec_g1.data(), vec_fr.data(), vec_count);
-    return ret;
-}
-template HerG1Point Elements<HerG1Point>::MulVec(const Elements<HerScalar>&) const;

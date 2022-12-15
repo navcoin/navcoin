@@ -75,14 +75,6 @@ public:
     bool operator!=(const Elements<T>& rhs) const;
 
     /**
-     * MulVec is equivalent of (Elements<G1Point> * Elements<Scalar>).Sum(),
-     * but faster than that due to direct use of mcl library.
-     * Only works with Her arith classes.
-     */
-    template <typename S>
-    T MulVec(const Elements<S>& scalars) const;
-
-    /**
      * Returns elements slice [fromIndex, vec.size())
      */
     Elements<T> From(const size_t from_index) const;
