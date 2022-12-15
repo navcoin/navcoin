@@ -4,9 +4,10 @@
 
 #include <blsct/range_proof/config.h>
 #include <blsct/range_proof/range_proof_with_transcript.h>
+#include <hash.h>
 
-template <typename P, typename V>
-RangeProofWithTranscript<P,V> RangeProofWithTranscript<P,V>::Build(const RangeProof<P,V>& proof) {
+template <typename P, typename S>
+RangeProofWithTranscript<P,S> RangeProofWithTranscript<P,S>::Build(const RangeProof<P,S>& proof) {
     // build transcript from proof in the same way it was built in Prove function
     CHashWriter transcript_gen(0,0);
 
@@ -16,33 +17,33 @@ RangeProofWithTranscript<P,V> RangeProofWithTranscript<P,V>::Build(const RangePr
     transcript_gen << proof.A;
     transcript_gen << proof.S;
 
-    Scalar y = transcript_gen.GetHash();
+    Scalar<S> y = transcript_gen.GetHash();
     transcript_gen << y;
 
-    Scalar z = transcript_gen.GetHash();
+    Scalar<S> z = transcript_gen.GetHash();
     transcript_gen << z;
 
     transcript_gen << proof.T1;
     transcript_gen << proof.T2;
 
-    Scalar<V> x = transcript_gen.GetHash();
+    Scalar<S> x = transcript_gen.GetHash();
     transcript_gen << x;
 
     transcript_gen << proof.tau_x;
     transcript_gen << proof.mu;
     transcript_gen << proof.t_hat;
 
-    Scalar<V> cx_factor = transcript_gen.GetHash();
+    Scalar<S> cx_factor = transcript_gen.GetHash();
 
     auto num_rounds = RangeProofWithTranscript::RecoverNumRounds(proof.Vs.Size());
 
     // for each proof, generate w from Ls and Rs and store the inverse
-    Scalars xs;
-    Scalars inv_xs;
+    Scalars<S> xs;
+    Scalars<S> inv_xs;
     for (size_t i = 0; i < num_rounds; ++i) {
         transcript_gen << proof.Ls[i];
         transcript_gen << proof.Rs[i];
-        Scalar<V> x(transcript_gen.GetHash());
+        Scalar<S> x(transcript_gen.GetHash());
         xs.Add(x);
         inv_xs.Add(x.Invert());
     }
@@ -50,7 +51,7 @@ RangeProofWithTranscript<P,V> RangeProofWithTranscript<P,V>::Build(const RangePr
     size_t num_input_values_power_2 = Config::GetFirstPowerOf2GreaterOrEqTo(proof.Vs.Size());
     size_t concat_input_values_in_bits = num_input_values_power_2 * Config::m_input_value_bits;
 
-    return RangeProofWithTranscript(
+    return RangeProofWithTranscript<P,S>(
         proof,
         x,
         y,
@@ -63,8 +64,8 @@ RangeProofWithTranscript<P,V> RangeProofWithTranscript<P,V>::Build(const RangePr
     );
 }
 
-template <typename P, typename V>
-size_t RangeProofWithTranscript<P,V>::RecoverNumRounds(const size_t& num_input_values)
+template <typename P, typename S>
+size_t RangeProofWithTranscript<P,S>::RecoverNumRounds(const size_t& num_input_values)
 {
     auto num_input_values_pow2 =
         Config::GetFirstPowerOf2GreaterOrEqTo(num_input_values);

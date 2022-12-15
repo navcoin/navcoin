@@ -20,7 +20,7 @@ template Scalar<HerScalar>::Scalar();
 template <typename S>
 void Scalar<S>::Init()
 {
-    T::Init();
+    S::Init();
 }
 
 template <typename S>

@@ -55,27 +55,27 @@ private:
  * the public key whose private key is Sum(randomness). That will be
  * used later for signature verification.
  */
-template <typename PV>
+template <typename P>
 class GeneratorsFactory
 {
 public:
     GeneratorsFactory();
-    Generators<PV> GetInstance(const TokenId& token_id);
+    Generators<P> GetInstance(const TokenId& token_id);
 
 private:
-    Point<PV> DeriveGenerator(
-        const Point<PV>& p,
+    Point<P> DeriveGenerator(
+        const Point<P>& p,
         const size_t index,
         const TokenId& token_id
     );
 
     // G generators are cached
-    inline static std::map<const TokenId, const Point<PV>> m_G_cache;
+    inline static std::map<const TokenId, const Point<P>> m_G_cache;
 
     // made optional to initialize values lazily after mcl initialization
-    inline static std::optional<Point<PV>> m_H;
-    inline static std::optional<Points<PV>> m_Gi;
-    inline static std::optional<Points<PV>> m_Hi;
+    inline static std::optional<Point<P>> m_H;
+    inline static std::optional<Points<P>> m_Gi;
+    inline static std::optional<Points<P>> m_Hi;
 
     inline static boost::mutex m_init_mutex;
     inline static bool m_is_initialized = false;

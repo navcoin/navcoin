@@ -9,40 +9,40 @@
 #include <util/strencodings.h>
 #include <tinyformat.h>
 
-template <typename PV>
-Points<PV> Generators<PV>::GetGiSubset(const size_t& size) const
+template <typename P>
+Points<P> Generators<P>::GetGiSubset(const size_t& size) const
 {
     return Gi.get().To(size);
 }
 
-template <typename PV>
-Points<PV> Generators<PV>::GetHiSubset(const size_t& size) const
+template <typename P>
+Points<P> Generators<P>::GetHiSubset(const size_t& size) const
 {
     return Hi.get().To(size);
 }
 
-template <typename PV>
-GeneratorsFactory<PV>::GeneratorsFactory()
+template <typename P>
+GeneratorsFactory<P>::GeneratorsFactory()
 {
-    boost::lock_guard<boost::mutex> lock(GeneratorsFactory<PV>::m_init_mutex);
-    if (GeneratorsFactory<PV>::m_is_initialized) return;
+    boost::lock_guard<boost::mutex> lock(GeneratorsFactory<P>::m_init_mutex);
+    if (GeneratorsFactory<P>::m_is_initialized) return;
 
     MclInitializer::Init();
-    Point<PV>::Init();
+    Point<P>::Init();
 
-    m_H = Point<PV>::GetBasePoint();
+    m_H = Point<P>::GetBasePoint();
     Points<PV> Gi, Hi;
     m_Gi = Gi;
     m_Hi = Hi;
 
     const TokenId default_token_id;
-    const Point<PV> default_G = DeriveGenerator(Point<PV>::GetBasePoint(), 0, default_token_id);
+    const Point<P> default_G = DeriveGenerator(Point<P>::GetBasePoint(), 0, default_token_id);
     m_G_cache.insert(std::make_pair(default_token_id, default_G));
 
     for (size_t i = 0; i < Config::m_max_input_value_vec_len; ++i) {
         const size_t base_index = i * 2;
-        Point<PV> hi = DeriveGenerator(default_G, base_index + 1, default_token_id);
-        Point<PV> gi = DeriveGenerator(default_G, base_index + 2, default_token_id);
+        Point<P> hi = DeriveGenerator(default_G, base_index + 1, default_token_id);
+        Point<P> gi = DeriveGenerator(default_G, base_index + 2, default_token_id);
         m_Hi.value().Add(hi);
         m_Gi.value().Add(gi);
     }
@@ -50,9 +50,9 @@ GeneratorsFactory<PV>::GeneratorsFactory()
     m_is_initialized = true;
 }
 
-template <typename PV>
-Point<PV> GeneratorsFactory<PV>::DeriveGenerator(
-    const Point<PV>& p,
+template <typename P>
+Point<P> GeneratorsFactory<P>::DeriveGenerator(
+    const Point<P>& p,
     const size_t index,
     const TokenId& token_id)
 {
@@ -76,7 +76,7 @@ Point<PV> GeneratorsFactory<PV>::DeriveGenerator(
     auto hash = ss.GetHash();
 
     auto vec_hash = std::vector<uint8_t>(hash.begin(), hash.end());
-    auto ret = Point<PV>::MapToG1(vec_hash);
+    auto ret = Point<P>::MapToG1(vec_hash);
     if (ret.IsUnity()) {
         throw std::runtime_error(strprintf(
             "%s: Generated G1Point is the point at infinity. Try changing parameters", __func__));
@@ -84,16 +84,16 @@ Point<PV> GeneratorsFactory<PV>::DeriveGenerator(
     return ret;
 }
 
-template <typename PV>
-Generators<PV> GeneratorsFactory<PV>::GetInstance(const TokenId& token_id)
+template <typename P>
+Generators<P> GeneratorsFactory<P>::GetInstance(const TokenId& token_id)
 {
     // if G for the token_id hasn't been created, create and cache it
-    if (GeneratorsFactory<PV>::m_G_cache.count(token_id) == 0) {
-        const Point<PV> G = DeriveGenerator(GeneratorsFactory<PV>::m_H.value(), 0, token_id);
-        GeneratorsFactory<PV>::m_G_cache.emplace(token_id, G);
+    if (GeneratorsFactory<P>::m_G_cache.count(token_id) == 0) {
+        const Point<P> G = DeriveGenerator(GeneratorsFactory<P>::m_H.value(), 0, token_id);
+        GeneratorsFactory<P>::m_G_cache.emplace(token_id, G);
     }
-    Point<PV> G = GeneratorsFactory<PV>::m_G_cache[token_id];
+    Point<P> G = GeneratorsFactory<PV>::m_G_cache[token_id];
 
-    Generators<PV> gens(m_H.value(), G, m_Gi.value(), m_Hi.value());
+    Generators<P> gens(m_H.value(), G, m_Gi.value(), m_Hi.value());
     return gens;
 }
