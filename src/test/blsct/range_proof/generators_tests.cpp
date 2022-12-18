@@ -10,11 +10,11 @@
 
 #include <boost/test/unit_test.hpp>
 
-BOOST_FIXTURE_TEST_SUITE(generators_tests, MclTestingSetup)
+BOOST_FIXTURE_TEST_SUITE(generators_tests, HerTestingSetup)
 
 BOOST_AUTO_TEST_CASE(test_generators_get_instance)
 {
-    GeneratorsFactory gf;
+    GeneratorsFactory<HerG1Point> gf;
 
     TokenId token_id_1(uint256(1), 11ULL);
     Generators gens1 = gf.GetInstance(token_id_1);

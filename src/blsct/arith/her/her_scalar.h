@@ -62,6 +62,7 @@ public:
     bool operator!=(const HerScalar& b) const;
     bool operator!=(const int& b) const;
 
+    mclBnFr Underlying() const;
     bool IsValid() const;
 
     HerScalar Invert() const;

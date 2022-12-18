@@ -117,6 +117,13 @@ bool Scalar<S>::operator!=(const Scalar<S> &rhs) const
 }
 
 template <typename S>
+template <typename SV>
+SV Scalar<S>::Underlying() const
+{
+    return static_cast<S*>(this)->Underlying();
+}
+
+template <typename S>
 bool Scalar<S>::IsValid() const
 {
     return static_cast<S*>(this)->IsValid();

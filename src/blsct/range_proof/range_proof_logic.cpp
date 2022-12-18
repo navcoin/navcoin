@@ -29,7 +29,7 @@ AmountRecoveryRequest<P,S> AmountRecoveryRequest<P,S>::of(RangeProof<P,S>& proof
 {
     auto proof_with_transcript = RangeProofWithTranscript<P,S>::Build(proof);
 
-    AmountRecoveryRequest<P,V> req {
+    AmountRecoveryRequest<P,S> req {
         1,
         proof_with_transcript.x,
         proof_with_transcript.z,
@@ -52,21 +52,22 @@ AmountRecoveryResult<S> AmountRecoveryResult<S>::failure() {
 }
 
 template <typename P, typename S>
+template <typename I>
 RangeProofLogic<P,S>::RangeProofLogic()
 {
     if (m_is_initialized) return;
     boost::lock_guard<boost::mutex> lock(RangeProofLogic::m_init_mutex);
 
-    MclInitializer::Init();
+    Initializer<I>::Init();
     Point<P>::Init();
 
-    RangeProofLogic<P,S>::m_one = new Scalar(1);
-    RangeProofLogic<P,S>::m_two = new Scalar(2);
-    RangeProofLogic<P,S>::m_gf = new GeneratorsFactory();
+    RangeProofLogic<P,S>::m_one = new Scalar<S>(1);
+    RangeProofLogic<P,S>::m_two = new Scalar<S>(2);
+    RangeProofLogic<P,S>::m_gf = new GeneratorsFactory<P>();
     {
-        auto two_pows_64 = Scalars::FirstNPow(*m_two, Config::m_input_value_bits);
+        auto two_pows_64 = Scalars<S>::FirstNPow(*m_two, Config::m_input_value_bits);
         RangeProofLogic<P,S>::m_two_pows_64 = new Scalars<S>(two_pows_64);
-        auto ones_64 = Scalars::RepeatN(*RangeProofLogic<P,S>::m_one, Config::m_input_value_bits);
+        auto ones_64 = Scalars<S>::RepeatN(*RangeProofLogic<P,S>::m_one, Config::m_input_value_bits);
         RangeProofLogic<P,S>::m_inner_prod_1x2_pows_64 = new Scalar<S>((ones_64 * *RangeProofLogic<P,S>::m_two_pows_64).Sum());
     }
     {
@@ -189,7 +190,7 @@ RangeProof<P,S> RangeProofLogic<P,S>::Prove(
     }
 
     // Get Generators for the token_id
-    Generators<P,S> gens = m_gf->GetInstance(token_id);
+    Generators<P> gens = m_gf->GetInstance(token_id);
     auto Gi = gens.GetGiSubset(concat_input_values_in_bits);
     auto Hi = gens.GetHiSubset(concat_input_values_in_bits);
     auto H = gens.H.get();
@@ -293,7 +294,7 @@ retry:  // hasher is not cleared so that different hash will be obtained upon re
         }
     }
 
-    Scalars<S> y_pows = Scalars::FirstNPow(y, concat_input_values_in_bits);
+    Scalars<S> y_pows = Scalars<S>::FirstNPow(y, concat_input_values_in_bits);
     Scalars<S> r0 = (y_pows * (aR + zs)) + z_pow_twos;
     Scalars<S> r1 = y_pows * sR;
 
@@ -547,7 +548,7 @@ bool RangeProofLogic<P,S>::Verify(
         max_num_rounds = std::max(max_num_rounds, proof.Ls.Size());
 
         // derive transcript from the proof
-        auto proof_transcript = RangeProofWithTranscript::Build(proof);
+        auto proof_transcript = RangeProofWithTranscript<P,S>::Build(proof);
         proof_transcripts.push_back(proof_transcript);
     }
 
@@ -578,7 +579,7 @@ AmountRecoveryResult<S> RangeProofLogic<P,S>::RecoverAmounts(
         // failure if sizes of Ls and Rs differ or Vs is empty
         auto Ls_Rs_valid = req.Ls.Size() > 0 && req.Ls.Size() == req.Rs.Size();
         if (req.Vs.Size() == 0 || !Ls_Rs_valid) {
-            return AmountRecoveryResult::failure();
+            return AmountRecoveryResult<S>::failure();
         }
         // recovery can only be done when the number of value commitment is 1
         if (req.Vs.Size() != 1) {

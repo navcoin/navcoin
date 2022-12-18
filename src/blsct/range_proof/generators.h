@@ -9,26 +9,27 @@
 #include <boost/thread/mutex.hpp>
 
 #include <blsct/arith/elements.h>
+#include <blsct/arith/initializer.h>
 #include <blsct/arith/point.h>
 #include <blsct/arith/scalar.h>
 #include <blsct/range_proof/config.h>
 #include <ctokens/tokenid.h>
 
-template <typename PV>
+template <typename P>
 struct Generators {
 public:
     Generators(
-        Point<PV>& H, Point<PV>& G, Points<PV>& Gi, Points<PV>& Hi
+        Point<P>& H, Point<P>& G, Points<P>& Gi, Points<P>& Hi
     ): H{H}, G{G}, Gi{Gi}, Hi{Hi} {}
-    Points<PV> GetGiSubset(const size_t& size) const;
-    Points<PV> GetHiSubset(const size_t& size) const;
+    Points<P> GetGiSubset(const size_t& size) const;
+    Points<P> GetHiSubset(const size_t& size) const;
 
-    std::reference_wrapper<Point<PV>> H;
-    Point<PV> G;
+    std::reference_wrapper<Point<P>> H;
+    Point<P> G;
 
 private:
-    std::reference_wrapper<Points<PV>> Gi;
-    std::reference_wrapper<Points<PV>> Hi;
+    std::reference_wrapper<Points<P>> Gi;
+    std::reference_wrapper<Points<P>> Hi;
 };
 
 /**
@@ -59,7 +60,9 @@ template <typename P>
 class GeneratorsFactory
 {
 public:
+    template <typename I>
     GeneratorsFactory();
+
     Generators<P> GetInstance(const TokenId& token_id);
 
 private:

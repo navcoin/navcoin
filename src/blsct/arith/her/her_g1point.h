@@ -41,6 +41,7 @@ public:
     bool operator==(const HerG1Point& rhs) const;
     bool operator!=(const HerG1Point& rhs) const;
 
+    mclBnG1 Underlying() const;
     HerG1Point Double() const;
 
     static HerG1Point GetBasePoint();

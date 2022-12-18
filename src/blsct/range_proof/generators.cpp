@@ -6,6 +6,7 @@
 #include <blsct/range_proof/config.h>
 #include <blsct/range_proof/generators.h>
 #include <ctokens/tokenid.h>
+#include <hash.h>
 #include <util/strencodings.h>
 #include <tinyformat.h>
 
@@ -22,16 +23,17 @@ Points<P> Generators<P>::GetHiSubset(const size_t& size) const
 }
 
 template <typename P>
+template <typename I>
 GeneratorsFactory<P>::GeneratorsFactory()
 {
     boost::lock_guard<boost::mutex> lock(GeneratorsFactory<P>::m_init_mutex);
     if (GeneratorsFactory<P>::m_is_initialized) return;
 
-    MclInitializer::Init();
+    Initializer<I>::Init();
     Point<P>::Init();
 
     m_H = Point<P>::GetBasePoint();
-    Points<PV> Gi, Hi;
+    Points<P> Gi, Hi;
     m_Gi = Gi;
     m_Hi = Hi;
 
@@ -92,7 +94,7 @@ Generators<P> GeneratorsFactory<P>::GetInstance(const TokenId& token_id)
         const Point<P> G = DeriveGenerator(GeneratorsFactory<P>::m_H.value(), 0, token_id);
         GeneratorsFactory<P>::m_G_cache.emplace(token_id, G);
     }
-    Point<P> G = GeneratorsFactory<PV>::m_G_cache[token_id];
+    Point<P> G = GeneratorsFactory<P>::m_G_cache[token_id];
 
     Generators<P> gens(m_H.value(), G, m_Gi.value(), m_Hi.value());
     return gens;

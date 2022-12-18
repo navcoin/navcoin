@@ -174,6 +174,11 @@ bool HerScalar::operator!=(const HerScalar &b) const
     return !operator==(b);
 }
 
+mclBnFr HerScalar::Underlying() const
+{
+    return m_fr;
+}
+
 bool HerScalar::IsValid() const
 {
     return mclBnFr_isValid(&m_fr) == 1;

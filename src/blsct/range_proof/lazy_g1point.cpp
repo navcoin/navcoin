@@ -2,10 +2,18 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#include <blsct/arith/her/her_g1point.h>
+#include <blsct/arith/her/her_scalar.h>
 #include <blsct/range_proof/lazy_g1point.h>
 #include <bls/bls384_256.h> // must include this before bls/bls.h
 #include <bls/bls.h>
 #include <blsct/arith/her/her_scalar.h>
+
+template <typename P, typename S>
+LazyG1Point<P,S>::LazyG1Point(const P& base, const S& exp): m_base(base.m_p), m_exp(exp.m_fr)
+{
+}
+template LazyG1Point<HerG1Point,HerScalar>::LazyG1Point(const HerG1Point& base, const HerScalar& exp);
 
 template <typename P, typename S>
 LazyG1Points<P,S>::LazyG1Points(const Points<P>& bases, const Scalars<S>& exps) {
@@ -23,23 +31,24 @@ void LazyG1Points<P,S>::Add(const LazyG1Point<P,S>& point) {
 }
 
 template <typename P, typename S>
-Point<P> LazyG1Points<P,S>::Sum() const {
+template <typename PV, typename SV>
+P LazyG1Points<P,S>::Sum() const {
     if constexpr (std::is_same_v<S, HerScalar>) {
-        std::vector<P> bases;
-        std::vector<S> exps;
+        std::vector<PV> bases;
+        std::vector<SV> exps;
 
         for (auto point: points) {
-            bases.push_back(point.m_base);
-            exps.push_back(point.m_exp);
+            bases.push_back(point.m_base.Underlying());
+            exps.push_back(point.m_exp.Underlying());
         }
-        Point<P> p;
-        mclBnG1_mulVec(&p.m_p, bases.data(), exps.data(), points.size());
-        return p;
+        PV pv;
+        mclBnG1_mulVec(&pv, bases.data(), exps.data(), points.size());
+        return P(pv);
     } else {
         throw std::runtime_error("Not implemented");
     }
 }
-template Point<mclBnG1> LazyG1Points<mclBnG1,mclBnFr>::Sum() const;
+template HerG1Point LazyG1Points<HerG1Point,HerScalar>::Sum<mclBnG1,mclBnFr>() const;
 
 template <typename P, typename S>
 LazyG1Points<P,S> LazyG1Points<P,S>::operator+(const LazyG1Points<P,S>& rhs) const {

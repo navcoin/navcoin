@@ -4,19 +4,20 @@
 
 #include <test/util/setup_common.h>
 #include <blsct/range_proof/range_proof_logic.h>
+#include <blsct/arith/her/her_initializer.h>
 
 #include <tinyformat.h>
 #include <boost/test/unit_test.hpp>
 #include <util/strencodings.h>
 
-BOOST_FIXTURE_TEST_SUITE(range_proof_tests, MclTestingSetup)
+BOOST_FIXTURE_TEST_SUITE(range_proof_tests, HerTestingSetup)
 
 using MsgPair = std::pair<std::string, std::vector<unsigned char>>;
 
 struct TestCase
 {
     std::string name;
-    Scalars values;
+    Scalars<HerScalar> values;
     bool is_batched;  // prove function is called once for with all values
     bool should_complete_recovery;
     size_t num_amounts;
@@ -24,10 +25,10 @@ struct TestCase
     MsgPair msg;
 };
 
-static G1Point GenNonce()
+static Point<HerG1Point> GenNonce()
 {
     std::string nonce_str("nonce");
-    G1Point nonce = G1Point::HashAndMap(std::vector<unsigned char> { nonce_str.begin(), nonce_str.end() });
+    Point<HerG1Point> nonce = Point<HerG1Point>::HashAndMap(std::vector<unsigned char> { nonce_str.begin(), nonce_str.end() });
     return nonce;
 }
 
@@ -49,17 +50,17 @@ BOOST_AUTO_TEST_CASE(test_range_proof_prove_verify_one_value)
     auto msg = GenMsgPair();
     auto token_id = GenTokenId();
 
-    Scalar one(1);
-    std::vector<Scalar> vs_vec;
+    HerScalar one(1);
+    std::vector<HerScalar> vs_vec;
     vs_vec.push_back(one);
 
-    Scalars vs;
+    Scalars<HerScalar> vs;
     vs.Add(one);
 
-    RangeProofLogic rp;
+    RangeProofLogic<HerG1Point,HerScalar,HerInitializer> rp;
     auto p = rp.Prove(vs, nonce, msg.second, token_id);
 
-    auto is_valid = rp.Verify(std::vector<RangeProof> { p }, token_id);
+    auto is_valid = rp.Verify(std::vector<RangeProof<HerG1Point,HerScalar>> { p }, token_id);
     BOOST_CHECK(is_valid);
 }
 
@@ -69,19 +70,19 @@ BOOST_AUTO_TEST_CASE(test_range_proof_recovery_one_value)
     auto msg = GenMsgPair();
     auto token_id = GenTokenId();
 
-    Scalar one(1);
-    std::vector<Scalar> vs_vec;
+    HerScalar one(1);
+    std::vector<HerScalar> vs_vec;
     vs_vec.push_back(one);
 
-    Scalars vs;
+    Scalars<HerScalar> vs;
     vs.Add(one);
 
-    RangeProofLogic rp;
+    RangeProofLogic<HerG1Point,HerScalar> rp;
     auto proof = rp.Prove(vs, nonce, msg.second, token_id);
 
     size_t index = 0;
-    auto req = AmountRecoveryRequest::of(proof, index, nonce);
-    auto reqs = std::vector<AmountRecoveryRequest> { req };
+    auto req = AmountRecoveryRequest<HerG1Point,HerScalar>::of(proof, index, nonce);
+    auto reqs = std::vector<AmountRecoveryRequest<HerG1Point,HerScalar> { req };
     auto result = rp.RecoverAmounts(reqs, token_id);
 
     BOOST_CHECK(result.is_completed);
@@ -94,21 +95,21 @@ BOOST_AUTO_TEST_CASE(test_range_proof_recovery_one_value)
 
 static std::vector<TestCase> BuildTestCases()
 {
-    RangeProofLogic rp;
+    RangeProofLogic<HerG1Point,HerScalar> rp;
 
-    Scalar one(1);
-    Scalar two(2);
-    Scalar lower_bound(0);
-    Scalar upper_bound = (one << 64) - one;  // int64_t max
+    HerScalar one(1);
+    HerScalar two(2);
+    HerScalar lower_bound(0);
+    HerScalar upper_bound = (one << 64) - one;  // int64_t max
     // [LB, LB+1, UB-1, UB]
-    Scalars valid_inputs;
+    Scalars<HerScalar> valid_inputs;
     valid_inputs.Add(lower_bound);
     valid_inputs.Add(lower_bound + one);
     valid_inputs.Add(upper_bound - one);
     valid_inputs.Add(upper_bound);
 
     // [-1, UB+1, UB+2, UB*2]
-    Scalars invalid_inputs;
+    Scalars<HerScalar> invalid_inputs;
     invalid_inputs.Add(one.Negate());
     invalid_inputs.Add(upper_bound + one);
     invalid_inputs.Add(upper_bound + one + one);
@@ -118,7 +119,7 @@ static std::vector<TestCase> BuildTestCases()
 
     // test single valid value
     for (auto value: valid_inputs.m_vec) {
-        Scalars values;
+        Scalars<HerScalar> values;
         values.Add(value);
 
         TestCase x;
@@ -134,7 +135,7 @@ static std::vector<TestCase> BuildTestCases()
 
     // test single invalid value
     for (auto value: invalid_inputs.m_vec) {
-        Scalars values;
+        Scalars<HerScalar> values;
         values.Add(value);
 
         TestCase x;
@@ -176,8 +177,8 @@ static std::vector<TestCase> BuildTestCases()
 
     // test with messages of various length
     {
-        Scalars values;
-        values.Add(Scalar(1));
+        Scalars<HerScalar> values;
+        values.Add(HerScalar(1));
 
         std::vector<size_t> msg_sizes { 1ul, 23ul, 24ul, Config::m_max_message_size };
         for (auto msg_size: msg_sizes) {
@@ -196,9 +197,9 @@ static std::vector<TestCase> BuildTestCases()
     // test # of input values from 1 to max
     {
         for (size_t n=1; n<=Config::m_max_input_values; ++n) {
-            Scalars values;
+            Scalars<HerScalar> values;
             for (size_t i=0; i<n; ++i) {
-                values.Add(Scalar(i + 1));
+                values.Add(HerScalar(i + 1));
             }
             TestCase x;
             x.name = strprintf("%d valid input values", n).c_str();
@@ -214,7 +215,7 @@ static std::vector<TestCase> BuildTestCases()
 
     // test valid and invalid values mixed
     {
-        Scalars values;
+        Scalars<HerScalar> values;
         for (auto& s: valid_inputs.m_vec) values.Add(s);
         for (auto& s: invalid_inputs.m_vec) values.Add(s);
 
@@ -233,7 +234,7 @@ static std::vector<TestCase> BuildTestCases()
         // string of maximum message size 54
         const std::string s("Pneumonoultramicroscopicsilicovolcanoconiosis123456789");
         assert(s.size() == Config::m_max_message_size);
-        Scalars values;
+        Scalars<HerScalar> values;
         values.Add(one);
 
         for (size_t i=0; i<=s.size(); ++i) {  // try message of size 0 to 54
@@ -255,13 +256,13 @@ static std::vector<TestCase> BuildTestCases()
 }
 
 static void RunTestCase(
-    RangeProofLogic& rp,
+    RangeProofLogic<HerG1Point,HerScalar>& rp,
     TestCase& test_case
 ) {
     auto token_id = GenTokenId();
     auto nonce = GenNonce();
 
-    std::vector<RangeProof> proofs;
+    std::vector<RangeProof<HerG1Point,HerScalar>> proofs;
 
     // calculate proofs
     if (test_case.is_batched) {
@@ -269,7 +270,7 @@ static void RunTestCase(
         proofs.push_back(proof);
     } else {
         for (auto value: test_case.values.m_vec) {
-            Scalars single_value_vec;
+            Scalars<HerScalar> single_value_vec;
             single_value_vec.Add(value);
             auto proof = rp.Prove(single_value_vec, nonce, test_case.msg.second, token_id);
             proofs.push_back(proof);
@@ -281,10 +282,10 @@ static void RunTestCase(
     BOOST_CHECK(verify_result == test_case.verify_result);
 
     // recover value, gamma and message
-    std::vector<AmountRecoveryRequest> reqs;
+    std::vector<AmountRecoveryRequest<HerG1Point,HerScalar>> reqs;
 
     for (size_t i=0; i<proofs.size(); ++i) {
-        reqs.push_back(AmountRecoveryRequest::of(proofs[i], i, nonce));
+        reqs.push_back(AmountRecoveryRequest<HerG1Point,HerScalar>::of(proofs[i], i, nonce));
     }
     auto recovery_result = rp.RecoverAmounts(reqs, token_id);
     BOOST_CHECK(recovery_result.is_completed == test_case.should_complete_recovery);
@@ -309,7 +310,7 @@ static void RunTestCase(
 BOOST_AUTO_TEST_CASE(test_range_proof_prove_verify_recovery)
 {
     auto test_cases = BuildTestCases();
-    RangeProofLogic rp;
+    RangeProofLogic<HerG1Point,HerScalar> rp;
     for (auto test_case: test_cases) {
         RunTestCase(rp, test_case);
     }
@@ -317,11 +318,11 @@ BOOST_AUTO_TEST_CASE(test_range_proof_prove_verify_recovery)
 
 BOOST_AUTO_TEST_CASE(test_range_proof_message_size)
 {
-    RangeProofLogic rp;
+    RangeProofLogic<HerG1Point,HerScalar> rp;
 
-    Scalars values;
-    values.Add(Scalar(1));
-    G1Point nonce = G1Point::GetBasePoint();
+    Scalars<HerScalar> values;
+    values.Add(HerScalar(1));
+    Point<HerG1Point> nonce = Point<HerG1Point>::GetBasePoint();
     TokenId token_id;
 
     {
@@ -345,27 +346,27 @@ BOOST_AUTO_TEST_CASE(test_range_proof_message_size)
 
 BOOST_AUTO_TEST_CASE(test_range_proof_number_of_input_values)
 {
-    RangeProofLogic rp;
-    G1Point nonce = G1Point::GetBasePoint();
+    RangeProofLogic<HerG1Point,HerScalar> rp;
+    Point<HerG1Point> nonce = Point<HerG1Point>::GetBasePoint();
     std::vector<unsigned char> msg;
     TokenId token_id;
 
     {
         // should throw if there is no input value
-        Scalars values;
+        Scalars<HerScalar> values;
         BOOST_CHECK_THROW(rp.Prove(values, nonce, msg, token_id), std::runtime_error);
     }
     {
         // should not throw if number of input values is within the valid range
-        Scalars values;
-        values.Add(Scalar(1));
+        Scalars<HerScalar> values;
+        values.Add(HerScalar(1));
         BOOST_CHECK_NO_THROW(rp.Prove(values, nonce, msg, token_id));
     }
     {
         // should throw if number of input values is outsize the valid range
-        Scalars values;
+        Scalars<HerScalar> values;
         for (size_t i=0; i<Config::m_max_input_values + 1; ++i) {
-            values.Add(Scalar(1));
+            values.Add(HerScalar(1));
         }
         BOOST_CHECK_THROW(rp.Prove(values, nonce, msg, token_id), std::runtime_error);
     }
@@ -374,47 +375,47 @@ BOOST_AUTO_TEST_CASE(test_range_proof_number_of_input_values)
 BOOST_AUTO_TEST_CASE(test_range_proof_validate_proofs_by_sizes)
 {
     auto gen_valid_proof_wo_value_commitments = [](size_t num_inputs) {
-        RangeProof p;
+        RangeProof<HerG1Point,HerScalar> p;
         auto n = Config::GetFirstPowerOf2GreaterOrEqTo(num_inputs);
         for (size_t i=0; i<n; ++i) {
-            p.Vs.Add(G1Point::GetBasePoint());
+            p.Vs.Add(HerG1Point::GetBasePoint());
         }
         auto num_rounds = RangeProofWithTranscript::RecoverNumRounds(n);
         for (size_t i=0; i<num_rounds; ++i) {
-            p.Ls.Add(G1Point::GetBasePoint());
-            p.Rs.Add(G1Point::GetBasePoint());
+            p.Ls.Add(HerG1Point::GetBasePoint());
+            p.Rs.Add(HerG1Point::GetBasePoint());
         }
         return p;
     };
 
-    RangeProofLogic rp;
+    RangeProofLogic<HerG1Point,HerScalar> rp;
     {
         // no proof should validate fine
-        std::vector<RangeProof> proofs;
+        std::vector<RangeProof<HerG1Point,HerScalar>> proofs;
         BOOST_CHECK_NO_THROW(rp.ValidateProofsBySizes(proofs));
     }
     {
         // no value commitment
-        RangeProof p;
-        std::vector<RangeProof> proofs { p };
+        RangeProof<HerG1Point,HerScalar> p;
+        std::vector<RangeProof<HerG1Point,HerScalar>> proofs { p };
         BOOST_CHECK_THROW(rp.ValidateProofsBySizes(proofs), std::runtime_error);
     }
     {
         // minimum number of value commitments
         auto p = gen_valid_proof_wo_value_commitments(1);
-        std::vector<RangeProof> proofs { p };
+        std::vector<RangeProof<HerG1Point,HerScalar>> proofs { p };
         BOOST_CHECK_NO_THROW(rp.ValidateProofsBySizes(proofs));
     }
     {
         // maximum number of value commitments
         auto p = gen_valid_proof_wo_value_commitments(Config::m_max_input_values);
-        std::vector<RangeProof> proofs { p };
+        std::vector<RangeProof<HerG1Point,HerScalar>> proofs { p };
         BOOST_CHECK_NO_THROW(rp.ValidateProofsBySizes(proofs));
     }
     {
         // number of value commitments exceeding maximum
         auto p = gen_valid_proof_wo_value_commitments(Config::m_max_input_values + 1);
-        std::vector<RangeProof> proofs { p };
+        std::vector<RangeProof<HerG1Point,HerScalar>> proofs { p };
         BOOST_CHECK_THROW(rp.ValidateProofsBySizes(proofs), std::runtime_error);
     }
 }

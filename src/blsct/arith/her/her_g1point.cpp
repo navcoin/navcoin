@@ -89,6 +89,11 @@ HerG1Point HerG1Point::operator*(const HerScalar& rhs) const
     return ret;
 }
 
+mclBnG1 HerG1Point::Underlying() const
+{
+    return m_p;
+}
+
 HerG1Point HerG1Point::Double() const
 {
     HerG1Point temp;

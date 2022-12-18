@@ -8,6 +8,7 @@
 #include <optional>
 #include <vector>
 
+#include <blsct/arith/initializer.h>
 #include <blsct/range_proof/generators.h>
 #include <blsct/range_proof/range_proof_with_transcript.h>
 #include <consensus/amount.h>
@@ -62,6 +63,7 @@ template <typename P, typename S>
 class RangeProofLogic
 {
 public:
+    template <typename I>
     RangeProofLogic<P,S>();
 
     RangeProof<P,S> Prove(

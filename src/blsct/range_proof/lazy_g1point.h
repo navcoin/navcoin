@@ -10,7 +10,7 @@
 template <typename P, typename S>
 struct LazyG1Point {
 public:
-    LazyG1Point(const Point<P>& base, const Scalar<S>& exp): m_base(base.m_p), m_exp(exp.m_fr) {}
+    LazyG1Point(const P& base, const S& exp);
 
     const P m_base;
     const S m_exp;
@@ -19,11 +19,13 @@ public:
 template <typename P, typename S>
 struct LazyG1Points {
 public:
-    LazyG1Points<P,S>() {}
-    LazyG1Points<P,S>(const Points<P>& bases, const Scalars<S>& exps);
+    LazyG1Points() {}
+    LazyG1Points(const Points<P>& bases, const Scalars<S>& exps);
 
     void Add(const LazyG1Point<P,S>& point);
-    Point<P> Sum() const;
+
+    template <typename PV, typename SV>
+    P Sum() const;
 
     LazyG1Points<P,S> operator+(const LazyG1Points<P,S>& rhs) const;
     LazyG1Points<P,S> operator+(const LazyG1Point<P,S>& rhs) const;
