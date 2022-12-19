@@ -66,7 +66,7 @@ public:
     template <typename S>
     S GetHashWithSalt(const uint64_t salt) const;
 
-    unsigned int GetSerializeSize() const;
+    size_t GetSerializeSize() const;
 
     template <typename Stream>
     void Serialize(Stream& s) const;

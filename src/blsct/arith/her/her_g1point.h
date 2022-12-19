@@ -16,11 +16,6 @@
 #include <boost/thread/lock_guard.hpp>
 #include <boost/thread/mutex.hpp>
 
-/*
-Using `Her` prefix instead of `Mcl` because `fun:*mcl*` wildcard is used to
-suppress memory sanitizer that detects false positives in mcl library
-*/
-
 class HerG1Point : public Point<HerG1Point>
 {
 public:
@@ -31,30 +26,30 @@ public:
     HerG1Point(const uint256& b);
     HerG1Point(const mclBnG1& p);
 
+    // used as static initializer/disposer
     static void Init();
+    static void Dispose(); // exists for the sake of completeness. not actually used.
 
     HerG1Point operator=(const mclBnG1& rhs);
     HerG1Point operator+(const HerG1Point& rhs) const;
     HerG1Point operator-(const HerG1Point& rhs) const;
     HerG1Point operator*(const HerScalar& rhs) const;
 
+    /**
+     * Because  Elements cannot be used here, std::vector is used instead
+     */
+    std::vector<HerG1Point> operator*(const std::vector<HerScalar>& ss) const;
+
     bool operator==(const HerG1Point& rhs) const;
     bool operator!=(const HerG1Point& rhs) const;
 
-    mclBnG1 Underlying() const;
     HerG1Point Double() const;
+    mclBnG1 Underlying() const;
 
     static HerG1Point GetBasePoint();
     static HerG1Point MapToG1(const std::vector<uint8_t>& vec, const Endianness e = Endianness::Little);
     static HerG1Point MapToG1(const std::string& s, const Endianness e = Endianness::Little);
     static HerG1Point HashAndMap(const std::vector<uint8_t>& vec);
-
-    /**
-     * Multiply Points by Scalars element by element and then get the sum of all resulting points
-     * [g_1*s_1, g_2*s_2, ..., g_n*s_n].Sum()
-     */
-    static HerG1Point MulVec(const std::vector<mclBnG1>& g_vec, const std::vector<mclBnFr>& s_vec);
-
     static HerG1Point Rand();
 
     bool IsValid() const;
@@ -64,8 +59,9 @@ public:
     void SetVch(const std::vector<uint8_t>& vec);
 
     std::string GetString(const int& radix = 16) const;
+    HerScalar GetHashWithSalt(const uint64_t salt) const;
 
-    unsigned int GetSerializeSize() const;
+    size_t GetSerializeSize() const;
 
     template <typename Stream>
     void Serialize(Stream& s) const;

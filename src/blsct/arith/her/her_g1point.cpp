@@ -2,19 +2,11 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <blsct/arith/her/her_initializer.h>
 #include <blsct/arith/her/her_g1point.h>
-#include <blsct/arith/her/her_scalar.h>
-#include <blsct/arith/point.h>
 
-#include <hash.h>
 #include <numeric>
-#include <serialize.h>
-#include <streams.h>
-#include <uint256.h>
-#include <version.h>
 
-mclBnG1 HerG1Point::m_g;
+mclBnG1* HerG1Point::m_g = nullptr;
 boost::mutex HerG1Point::m_init_mutex;
 
 HerG1Point::HerG1Point()
@@ -53,45 +45,60 @@ void HerG1Point::Init()
     if (is_initialized) return;
 
     HerInitializer::Init();
-    mclBnG1 g;
+    mclBnG1* g = new mclBnG1();
     const char* serialized_g = "1 3685416753713387016781088315183077757961620795782546409894578378688607592378376318836054947676345821548104185464507 1339506544944476473020471379941921221584933875938349620426543736416511423956333506472724655353366534992391756441569";
-    if (mclBnG1_setStr(&g, serialized_g, strlen(serialized_g), 10) == -1) {
+    if (mclBnG1_setStr(g, serialized_g, strlen(serialized_g), 10) == -1) {
         throw std::runtime_error("HerG1Point::Init(): mclBnG1_setStr failed");
     }
     HerG1Point::m_g = g;
     is_initialized = true;
 }
 
-HerG1Point HerG1Point::operator=(const mclBnG1& rhs)
+void HerG1Point::Dispose()
 {
-    m_p = rhs;
+    if (HerG1Point::m_g != nullptr) delete HerG1Point::m_g;
+}
+
+HerG1Point HerG1Point::operator=(const mclBnG1& q)
+{
+    m_p = q;
     return *this;
 }
 
-HerG1Point HerG1Point::operator+(const HerG1Point& rhs) const
+HerG1Point HerG1Point::operator+(constHerG1Point& p) const
 {
     HerG1Point ret;
-    mclBnG1_add(&ret.m_p, &m_p, &rhs.m_p);
+    mclBnG1_add(&ret.m_p, &m_p, &p.m_p);
     return ret;
 }
 
-HerG1Point HerG1Point::operator-(const HerG1Point& rhs) const
+HerG1Point HerG1Point::operator-(constHerG1Point& p) const
 {
     HerG1Point ret;
-    mclBnG1_sub(&ret.m_p, &m_p, &rhs.m_p);
+    mclBnG1_sub(&ret.m_p, &m_p, &p.m_p);
     return ret;
 }
 
-HerG1Point HerG1Point::operator*(const HerScalar& rhs) const
+HerG1Point HerG1Point::operator*(const Scalar& s) const
 {
     HerG1Point ret;
-    mclBnG1_mul(&ret.m_p, &m_p, &rhs.m_fr);
+    mclBnG1_mul(&ret.m_p, &m_p, &s.m_fr);
     return ret;
 }
 
-mclBnG1 HerG1Point::Underlying() const
+std::vector<HerG1Point> HerG1Point::operator*(const std::vector<Scalar>& ss) const
 {
-    return m_p;
+    if (ss.size() == 0) {
+        throw std::runtime_error("HerG1Point::operator*: cannot multiplyHerG1Point by empty Scalars");
+    }
+    std::vector<HerG1Point> ret;
+
+    HerG1Point p = *this;
+    for(size_t i = 0; i < ss.size(); ++i) {
+       HerG1Point q = p * ss[i];
+        ret.push_back(q);
+    }
+    return ret;
 }
 
 HerG1Point HerG1Point::Double() const
@@ -103,7 +110,7 @@ HerG1Point HerG1Point::Double() const
 
 HerG1Point HerG1Point::GetBasePoint()
 {
-    HerG1Point g(HerG1Point::m_g);
+    HerG1Point g(*HerG1Point::m_g);
     return g;
 }
 
@@ -146,27 +153,14 @@ HerG1Point HerG1Point::HashAndMap(const std::vector<uint8_t>& vec)
     return temp;
 }
 
-HerG1Point HerG1Point::MulVec(const std::vector<mclBnG1>& g_vec, const std::vector<mclBnFr>& s_vec)
+bool HerG1Point::operator==(constHerG1Point& b) const
 {
-    if (g_vec.size() != s_vec.size()) {
-        throw std::runtime_error("HerG1Point::MulVec(): sizes of g_vec and s_vec must be equial");
-    }
-
-    HerG1Point ret;
-    const auto vec_count = g_vec.size();
-    mclBnG1_mulVec(&ret.m_p, g_vec.data(), s_vec.data(), vec_count);
-
-    return ret;
+    return mclBnG1_isEqual(&m_p, &b.m_p);
 }
 
-bool HerG1Point::operator==(const HerG1Point& rhs) const
+bool HerG1Point::operator!=(constHerG1Point& b) const
 {
-    return mclBnG1_isEqual(&m_p, &rhs.m_p);
-}
-
-bool HerG1Point::operator!=(const HerG1Point& rhs) const
-{
-    return !operator==(rhs);
+    return !operator==(b);
 }
 
 HerG1Point HerG1Point::Rand()
@@ -201,7 +195,7 @@ void HerG1Point::SetVch(const std::vector<uint8_t>& b)
     }
 }
 
-std::string HerG1Point::GetString(const int& radix) const
+std::string HerG1Point::GetString(const uint8_t& radix) const
 {
     char str[1024];
     if (mclBnG1_getStr(str, sizeof(str), &m_p, radix) == 0) {
@@ -210,23 +204,16 @@ std::string HerG1Point::GetString(const int& radix) const
     return std::string(str);
 }
 
-unsigned int HerG1Point::GetSerializeSize() const
+size_t HerG1Point::GetSerializeSize() const
 {
     return ::GetSerializeSize(GetVch());
 }
 
-template <typename Stream>
-void HerG1Point::Serialize(Stream& s) const
+HerScalar HerG1Point::GetHashWithSalt(const uint64_t salt) const
 {
-    ::Serialize(s, GetVch());
+    CHashWriter hasher(0,0);
+    hasher << *this;
+    hasher << salt;
+    HerScalar hash(hasher.GetHash());
+    return hash;
 }
-template void HerG1Point::Serialize(CDataStream& s) const;
-
-template <typename Stream>
-void HerG1Point::Unserialize(Stream& s)
-{
-    std::vector<uint8_t> vch;
-    ::Unserialize(s, vch);
-    SetVch(vch);
-}
-template void HerG1Point::Unserialize(CDataStream& s);

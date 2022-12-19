@@ -16,29 +16,26 @@
 #include <blsct/arith/scalar.h>
 #include <blsct/arith/point.h>
 
-/**
- * Expects below instantiations only:
- * - Elements<Point<P>>
- * - Elements<Scalar<V>>
- */
 template <typename T>
 class Elements
 {
 public:
     Elements();
     Elements(std::vector<T> vec);
+    Elements(const size_t& size, const T& default_value);
+    Elements(const Elements &x);
 
     T Sum() const;
+    T& operator[](const size_t& index);
+    T operator[](const size_t& index) const;
     size_t Size() const;
     void Add(const T x);
 
+    void ConfirmIndexInsideRange(const uint32_t& index) const;
     void ConfirmSizesMatch(const size_t& other_size) const;
-
-    static Elements<T> FirstNPow(const size_t& n, const T& k);
-    static Elements<T> RepeatN(const size_t& n, const T& k);
+    static Elements<T> FirstNPow(const Scalar& k, const size_t& n, const size_t& from_index = 0);
+    static Elements<T> RepeatN(const T& k, const size_t& n);
     static Elements<T> RandVec(const size_t& n, const bool exclude_zero = false);
-
-    T operator[](int index) const;
 
     /**
      * Scalars x Scalars
@@ -70,6 +67,8 @@ public:
      */
     Elements<T> operator-(const Elements<T>& rhs) const;
 
+    void operator=(const Elements<T>& other);
+
     bool operator==(const Elements<T>& rhs) const;
 
     bool operator!=(const Elements<T>& rhs) const;
@@ -83,6 +82,11 @@ public:
      * Returns elements slice [0, toIndex)
      */
     Elements<T> To(const size_t to_index) const;
+
+    /**
+     * Negate each contained elements
+     */
+    Elements<T> Negate() const;
 
     std::vector<T> m_vec;
 };

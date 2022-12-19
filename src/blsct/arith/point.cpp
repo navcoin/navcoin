@@ -159,11 +159,11 @@ S Point<P>::GetHashWithSalt(const uint64_t salt) const
 }
 
 template <typename P>
-unsigned int Point<P>::GetSerializeSize() const
+size_t Point<P>::GetSerializeSize() const
 {
     return static_cast<const P*>(this)->GetSerializeSize();
 }
-template unsigned int Point<HerG1Point>::GetSerializeSize() const;
+template size_t Point<HerG1Point>::GetSerializeSize() const;
 
 template <typename P>
 template <typename Stream>
