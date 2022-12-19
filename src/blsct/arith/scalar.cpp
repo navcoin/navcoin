@@ -166,9 +166,9 @@ Scalar<S> Scalar<S>::Rand(bool exclude_zero)
 }
 
 template <typename S>
-int64_t Scalar<S>::GetInt64() const
+uint64_t Scalar<S>::GetUint64() const
 {
-    return static_cast<S*>(this)->GetInt64();
+    return static_cast<S*>(this)->GetUint64();
 }
 
 template <typename S>

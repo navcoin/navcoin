@@ -63,6 +63,9 @@ public:
 
     std::string GetString(const int& radix = 16) const;
 
+    template <typename S>
+    S GetHashWithSalt(const uint64_t salt) const;
+
     unsigned int GetSerializeSize() const;
 
     template <typename Stream>

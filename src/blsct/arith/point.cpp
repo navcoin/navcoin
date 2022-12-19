@@ -148,6 +148,17 @@ std::string Point<P>::GetString(const int& radix) const
 template std::string Point<HerG1Point>::GetString(const int& radix) const;
 
 template <typename P>
+template <typename S>
+S Point<P>::GetHashWithSalt(const uint64_t salt) const
+{
+    CHashWriter hasher(0,0);
+    hasher << *this;
+    hasher << salt;
+    S hash(hasher.GetHash());
+    return hash;
+}
+
+template <typename P>
 unsigned int Point<P>::GetSerializeSize() const
 {
     return static_cast<const P*>(this)->GetSerializeSize();

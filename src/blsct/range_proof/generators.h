@@ -24,8 +24,8 @@ public:
     Points<P> GetGiSubset(const size_t& size) const;
     Points<P> GetHiSubset(const size_t& size) const;
 
-    std::reference_wrapper<Point<P>> H;
-    Point<P> G;
+    std::reference_wrapper<P> H;
+    P G;
 
 private:
     std::reference_wrapper<Points<P>> Gi;
@@ -56,18 +56,17 @@ private:
  * the public key whose private key is Sum(randomness). That will be
  * used later for signature verification.
  */
-template <typename P>
+template <typename P, typename I>
 class GeneratorsFactory
 {
 public:
-    template <typename I>
     GeneratorsFactory();
 
     Generators<P> GetInstance(const TokenId& token_id);
 
 private:
-    Point<P> DeriveGenerator(
-        const Point<P>& p,
+    P DeriveGenerator(
+        const P& p,
         const size_t index,
         const TokenId& token_id
     );
@@ -76,7 +75,7 @@ private:
     inline static std::map<const TokenId, const Point<P>> m_G_cache;
 
     // made optional to initialize values lazily after mcl initialization
-    inline static std::optional<Point<P>> m_H;
+    inline static std::optional<P> m_H;
     inline static std::optional<Points<P>> m_Gi;
     inline static std::optional<Points<P>> m_Hi;
 

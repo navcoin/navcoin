@@ -55,7 +55,7 @@ public:
 
     static Scalar<S> Rand(bool exclude_zero = false);
 
-    int64_t GetInt64() const;
+    uint64_t GetUint64() const;
 
     std::vector<uint8_t> GetVch() const;
     void SetVch(const std::vector<uint8_t>& v);

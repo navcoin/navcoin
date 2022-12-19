@@ -59,12 +59,11 @@ struct AmountRecoveryResult
 
 // implementation of range proof algorithms described
 // based on the paper: https://eprint.iacr.org/2017/1066.pdf
-template <typename P, typename S>
+template <typename P, typename S, typename I>
 class RangeProofLogic
 {
 public:
-    template <typename I>
-    RangeProofLogic<P,S>();
+    RangeProofLogic<P,S,I>();
 
     RangeProof<P,S> Prove(
         Scalars<S>& vs,
@@ -117,7 +116,7 @@ private:
 
     // using pointers for Scalar and GeneratorsFactory to avoid default constructors to be called before mcl initialization
     // these variables are meant to be constant. do not make changes after initialization.
-    static GeneratorsFactory<P>* m_gf;
+    static GeneratorsFactory<P,I>* m_gf;
     static Scalar<S>* m_one;
     static Scalar<S>* m_two;
     static Scalars<S>* m_two_pows_64;

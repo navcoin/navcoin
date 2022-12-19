@@ -31,8 +31,6 @@ suppress memory sanitizer that detects false positives in mcl library
 
 class HerScalar : public Scalar<HerScalar> {
 public:
-    static constexpr int WIDTH = 256 / 8;
-
     HerScalar(const int64_t& n = 0);
     HerScalar(const std::vector<uint8_t>& v);
     HerScalar(const mclBnFr& n_fr);
@@ -42,9 +40,9 @@ public:
     static void Init();
 
     HerScalar ApplyBitwiseOp(const HerScalar& a, const HerScalar& b,
-                             std::function<uint8_t(uint8_t, uint8_t)> op) const;
+                          std::function<uint8_t(uint8_t, uint8_t)> op) const;
 
-    void operator=(const uint64_t& n);
+    void operator=(const int64_t& n);  // using int64_t instead of uint64_t since underlying mcl lib takes int64_t
 
     HerScalar operator+(const HerScalar& b) const;
     HerScalar operator-(const HerScalar& b) const;
@@ -54,13 +52,13 @@ public:
     HerScalar operator^(const HerScalar& b) const;
     HerScalar operator&(const HerScalar& b) const;
     HerScalar operator~() const;
-    HerScalar operator<<(unsigned int shift) const;
-    HerScalar operator>>(unsigned int shift) const;
+    HerScalar operator<<(const uint32_t& shift) const;
+    HerScalar operator>>(const uint32_t& shift) const;
 
     bool operator==(const HerScalar& b) const;
-    bool operator==(const int& b) const;
+    bool operator==(const int32_t& b) const;
     bool operator!=(const HerScalar& b) const;
-    bool operator!=(const int& b) const;
+    bool operator!=(const int32_t& b) const;
 
     mclBnFr Underlying() const;
     bool IsValid() const;
@@ -71,24 +69,31 @@ public:
     HerScalar Cube() const;
     HerScalar Pow(const HerScalar& n) const;
 
-    static HerScalar Rand(bool exclude_zero = false);
+    static HerScalar Rand(const bool exclude_zero = false);
 
-    int64_t GetInt64() const;
+    uint64_t GetUint64() const;
 
-    std::vector<uint8_t> GetVch() const;
+    std::vector<uint8_t> GetVch(const bool trim_preceeding_zeros = false) const;
     void SetVch(const std::vector<uint8_t>& v);
 
     /**
      * Sets 2^n to the instance
      */
-    void SetPow2(int n);
+    void SetPow2(const uint32_t& n);
 
-    uint256 Hash(const int& n) const;
+    uint256 GetHashWithSalt(const uint64_t& salt) const;
 
-    std::string GetString(const int8_t radix = 16) const;
+    std::string GetString(const int8_t& radix = 16) const;
 
-    bool GetBit(uint8_t n) const;
-    std::vector<bool> GetBits() const;
+    /**
+     * extracts a specified bit of 32-byte serialization result
+     */
+    bool GetSeriBit(const uint8_t& n) const;
+
+    /**
+     * returns the binary representation m_fr
+     */
+    std::vector<bool> ToBinaryVec() const;
 
     unsigned int GetSerializeSize() const;
 

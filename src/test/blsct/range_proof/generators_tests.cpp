@@ -3,6 +3,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <blsct/arith/point.h>
+#include <blsct/arith/her/her_initializer.h>
 #include <blsct/range_proof/config.h>
 #include <blsct/range_proof/generators.h>
 #include <test/util/setup_common.h>
@@ -14,7 +15,7 @@ BOOST_FIXTURE_TEST_SUITE(generators_tests, HerTestingSetup)
 
 BOOST_AUTO_TEST_CASE(test_generators_get_instance)
 {
-    GeneratorsFactory<HerG1Point> gf;
+    GeneratorsFactory<HerG1Point,HerInitializer> gf;
 
     TokenId token_id_1(uint256(1), 11ULL);
     Generators gens1 = gf.GetInstance(token_id_1);
@@ -37,7 +38,7 @@ BOOST_AUTO_TEST_CASE(test_generators_get_instance)
 
 BOOST_AUTO_TEST_CASE(test_generators_h_static)
 {
-    GeneratorsFactory gf;
+    GeneratorsFactory<HerG1Point,HerInitializer> gf;
 
     TokenId token_id_1(uint256(1), 11ULL);
     Generators gens1 = gf.GetInstance(token_id_1);
@@ -49,12 +50,12 @@ BOOST_AUTO_TEST_CASE(test_generators_h_static)
     BOOST_CHECK(gens1.H.get() == gens2.H.get());
 
     // H should be equal to the base point
-    BOOST_CHECK(gens1.H.get() == G1Point::GetBasePoint());
+    BOOST_CHECK(gens1.H.get() == HerG1Point::GetBasePoint());
 }
 
 BOOST_AUTO_TEST_CASE(test_generators_g_derived_from_token_id)
 {
-    GeneratorsFactory gf;
+    GeneratorsFactory<HerG1Point,HerInitializer> gf;
 
     TokenId token_id_1(uint256(1), 11ULL);
     Generators gens1 = gf.GetInstance(token_id_1);
@@ -73,7 +74,7 @@ BOOST_AUTO_TEST_CASE(test_generators_g_derived_from_token_id)
 BOOST_AUTO_TEST_CASE(test_generators_get_gihi_subset)
 {
     TokenId token_id(uint256(1), 11ULL);
-    GeneratorsFactory gf;
+    GeneratorsFactory<HerG1Point,HerInitializer> gf;
 
     Generators gens = gf.GetInstance(token_id);
 

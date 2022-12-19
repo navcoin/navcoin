@@ -25,10 +25,10 @@ struct TestCase
     MsgPair msg;
 };
 
-static Point<HerG1Point> GenNonce()
+static HerG1Point GenNonce()
 {
     std::string nonce_str("nonce");
-    Point<HerG1Point> nonce = Point<HerG1Point>::HashAndMap(std::vector<unsigned char> { nonce_str.begin(), nonce_str.end() });
+    HerG1Point nonce = Point<HerG1Point>::HashAndMap(std::vector<unsigned char> { nonce_str.begin(), nonce_str.end() });
     return nonce;
 }
 
@@ -77,25 +77,25 @@ BOOST_AUTO_TEST_CASE(test_range_proof_recovery_one_value)
     Scalars<HerScalar> vs;
     vs.Add(one);
 
-    RangeProofLogic<HerG1Point,HerScalar> rp;
+    RangeProofLogic<HerG1Point,HerScalar,HerInitializer> rp;
     auto proof = rp.Prove(vs, nonce, msg.second, token_id);
 
     size_t index = 0;
     auto req = AmountRecoveryRequest<HerG1Point,HerScalar>::of(proof, index, nonce);
-    auto reqs = std::vector<AmountRecoveryRequest<HerG1Point,HerScalar> { req };
+    auto reqs = std::vector<AmountRecoveryRequest<HerG1Point,HerScalar>> { req };
     auto result = rp.RecoverAmounts(reqs, token_id);
 
     BOOST_CHECK(result.is_completed);
     auto xs = result.amounts;
     BOOST_CHECK(xs.size() == 1);
-    BOOST_CHECK(xs[0].gamma == nonce.GetHashWithSalt(100));
+    BOOST_CHECK(xs[0].gamma == nonce.GetHashWithSalt<HerScalar>(100));
     BOOST_CHECK(xs[0].amount == 1);
     BOOST_CHECK(xs[0].message == msg.first);
 }
 
 static std::vector<TestCase> BuildTestCases()
 {
-    RangeProofLogic<HerG1Point,HerScalar> rp;
+    RangeProofLogic<HerG1Point,HerScalar,HerInitializer> rp;
 
     HerScalar one(1);
     HerScalar two(2);
@@ -256,7 +256,7 @@ static std::vector<TestCase> BuildTestCases()
 }
 
 static void RunTestCase(
-    RangeProofLogic<HerG1Point,HerScalar>& rp,
+    RangeProofLogic<HerG1Point,HerScalar,HerInitializer>& rp,
     TestCase& test_case
 ) {
     auto token_id = GenTokenId();
@@ -296,7 +296,7 @@ static void RunTestCase(
 
         for (size_t i=0; i<amounts.size(); ++i) {
             auto x = amounts[i];
-            auto gamma = nonce.GetHashWithSalt(100 + i);
+            auto gamma = nonce.GetHashWithSalt<HerScalar>(100 + i);
 
             BOOST_CHECK(((uint64_t) x.amount) == test_case.values[i].GetUint64());
             BOOST_CHECK(x.gamma == gamma);
@@ -310,7 +310,7 @@ static void RunTestCase(
 BOOST_AUTO_TEST_CASE(test_range_proof_prove_verify_recovery)
 {
     auto test_cases = BuildTestCases();
-    RangeProofLogic<HerG1Point,HerScalar> rp;
+    RangeProofLogic<HerG1Point,HerScalar,HerInitializer> rp;
     for (auto test_case: test_cases) {
         RunTestCase(rp, test_case);
     }
@@ -318,7 +318,7 @@ BOOST_AUTO_TEST_CASE(test_range_proof_prove_verify_recovery)
 
 BOOST_AUTO_TEST_CASE(test_range_proof_message_size)
 {
-    RangeProofLogic<HerG1Point,HerScalar> rp;
+    RangeProofLogic<HerG1Point,HerScalar,HerInitializer> rp;
 
     Scalars<HerScalar> values;
     values.Add(HerScalar(1));
@@ -346,7 +346,7 @@ BOOST_AUTO_TEST_CASE(test_range_proof_message_size)
 
 BOOST_AUTO_TEST_CASE(test_range_proof_number_of_input_values)
 {
-    RangeProofLogic<HerG1Point,HerScalar> rp;
+    RangeProofLogic<HerG1Point,HerScalar,HerInitializer> rp;
     Point<HerG1Point> nonce = Point<HerG1Point>::GetBasePoint();
     std::vector<unsigned char> msg;
     TokenId token_id;
@@ -380,7 +380,7 @@ BOOST_AUTO_TEST_CASE(test_range_proof_validate_proofs_by_sizes)
         for (size_t i=0; i<n; ++i) {
             p.Vs.Add(HerG1Point::GetBasePoint());
         }
-        auto num_rounds = RangeProofWithTranscript::RecoverNumRounds(n);
+        auto num_rounds = RangeProofWithTranscript<HerG1Point,HerScalar>::RecoverNumRounds(n);
         for (size_t i=0; i<num_rounds; ++i) {
             p.Ls.Add(HerG1Point::GetBasePoint());
             p.Rs.Add(HerG1Point::GetBasePoint());
