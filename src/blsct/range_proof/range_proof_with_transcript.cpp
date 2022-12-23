@@ -2,20 +2,31 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <blsct/arith/range_proof/lazy_g1point.h>
-#include <blsct/arith/range_proof/range_proof_logic.h>
+#include <blsct/range_proof/lazy_g1point.h>
+#include <blsct/range_proof/range_proof_logic.h>
 #include <tinyformat.h>
 
-Scalar* RangeProofLogic::m_one = nullptr;
-Scalar* RangeProofLogic::m_two = nullptr;
-Scalars* RangeProofLogic::m_two_pows_64 = nullptr;
-Scalar* RangeProofLogic::m_inner_prod_1x2_pows_64 = nullptr;
-Scalar* RangeProofLogic::m_uint64_max = nullptr;
+template <typename S>
+Scalar<S>* RangeProofLogic::m_one = nullptr;
+
+template <typename S>
+Scalar<S>* RangeProofLogic::m_two = nullptr;
+
+template <typename S>
+Scalars<S>* RangeProofLogic::m_two_pows_64 = nullptr;
+
+template <typename S>
+Scalar<S>* RangeProofLogic::m_inner_prod_1x2_pows_64 = nullptr;
+
+template <typename S>
+Scalar<S>* RangeProofLogic::m_uint64_max = nullptr;
+
 GeneratorsFactory* RangeProofLogic::m_gf = nullptr;
 
-AmountRecoveryRequest AmountRecoveryRequest::of(RangeProof& proof, size_t& index, G1Point& nonce)
+template <typename P, typename S>
+AmountRecoveryRequest<P,S> AmountRecoveryRequest<P,S>::of(RangeProof<P,S>& proof, size_t& index, Point<P>& nonce)
 {
-    auto proof_with_transcript = RangeProofWithTranscript::Build(proof);
+    auto proof_with_transcript = RangeProofWithTranscript<P,S>::Build(proof);
 
     AmountRecoveryRequest req {
         1,

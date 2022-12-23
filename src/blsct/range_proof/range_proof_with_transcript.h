@@ -6,19 +6,20 @@
 #define NAVCOIN_BLSCT_ARITH_RANGE_PROOF_PROOF_WITH_TRANSCRIPT_H
 
 #include <blsct/arith/elements.h>
-#include <blsct/arith/range_proof/range_proof.h>
+#include <blsct/range_proof/range_proof.h>
 
+template <typename P, typename S>
 class RangeProofWithTranscript
 {
 public:
     RangeProofWithTranscript(
-        const RangeProof& proof,
-        const Scalar& x,
-        const Scalar& y,
-        const Scalar& z,
-        const Scalar& cx_factor,
-        const Scalars& xs,
-        const Scalars& inv_xs,
+        const RangeProof<P,S>& proof,
+        const Scalar<S>& x,
+        const Scalar<S>& y,
+        const Scalar<S>& z,
+        const Scalar<S>& cx_factor,
+        const Scalars<S>& xs,
+        const Scalars<S>& inv_xs,
         const size_t& num_input_values_power_2,
         const size_t& concat_input_values_in_bits
     ): proof{proof}, x{x}, y{y}, z{z}, cx_factor{cx_factor}, xs(xs),
@@ -33,13 +34,13 @@ public:
     const RangeProof proof;
 
     // transcript
-    const Scalar x;  // x used in the main prove procedure
-    const Scalar y;
-    const Scalar z;
-    const Scalar cx_factor;  // factor multiplied to cL and cR in inner product argument
-    const Scalars xs;      // x used in inner product argument
-    const Scalars inv_xs;  // x^-1 used in inner product argument
-    const Scalar inv_y;
+    const Scalar<S> x;  // x used in the main prove procedure
+    const Scalar<S> y;
+    const Scalar<S> z;
+    const Scalar<S> cx_factor;  // factor multiplied to cL and cR in inner product argument
+    const Scalars<S> xs;      // x used in inner product argument
+    const Scalars<S> inv_xs;  // x^-1 used in inner product argument
+    const Scalar<S> inv_y;
 
     const size_t num_input_values_power_2;  // M in old impl
     const size_t concat_input_values_in_bits;  // MN is old impl

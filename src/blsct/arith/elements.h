@@ -29,11 +29,12 @@ public:
     T& operator[](const size_t& index);
     T operator[](const size_t& index) const;
     size_t Size() const;
-    void Add(const T x);
+    void Add(const T& x);
+    bool Empty() const;
 
     void ConfirmIndexInsideRange(const uint32_t& index) const;
     void ConfirmSizesMatch(const size_t& other_size) const;
-    static Elements<T> FirstNPow(const Scalar& k, const size_t& n, const size_t& from_index = 0);
+    static Elements<T> FirstNPow(const T& k, const size_t& n, const size_t& from_index = 0);
     static Elements<T> RepeatN(const T& k, const size_t& n);
     static Elements<T> RandVec(const size_t& n, const bool exclude_zero = false);
 
@@ -67,7 +68,7 @@ public:
      */
     Elements<T> operator-(const Elements<T>& rhs) const;
 
-    void operator=(const Elements<T>& other);
+    void operator=(const Elements<T>& rhs);
 
     bool operator==(const Elements<T>& rhs) const;
 

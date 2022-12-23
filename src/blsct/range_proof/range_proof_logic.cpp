@@ -2,22 +2,31 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <blsct/arith/range_proof/lazy_g1point.h>
-#include <blsct/arith/range_proof/range_proof_logic.h>
+#include <blsct/range_proof/lazy_g1point.h>
+#include <blsct/range_proof/range_proof_logic.h>
 #include <tinyformat.h>
 
-Scalar* RangeProofLogic::m_one = nullptr;
-Scalar* RangeProofLogic::m_two = nullptr;
-Scalars* RangeProofLogic::m_two_pows_64 = nullptr;
-Scalar* RangeProofLogic::m_inner_prod_1x2_pows_64 = nullptr;
-Scalar* RangeProofLogic::m_uint64_max = nullptr;
-GeneratorsFactory* RangeProofLogic::m_gf = nullptr;
+template <typename P, typename S, typename I>
+Scalar<S>* RangeProofLogic<P,S,I>::m_one = nullptr;
 
-AmountRecoveryRequest AmountRecoveryRequest::of(RangeProof& proof, size_t& index, G1Point& nonce)
+template <typename P, typename S, typename I>
+Scalar<S>* RangeProofLogic<P,S,I>::m_two = nullptr;
+
+template <typename P, typename S, typename I>
+Scalars<S>* RangeProofLogic<P,S,I>::m_two_pows_64 = nullptr;
+
+template <typename P, typename S, typename I>
+Scalar<S>* RangeProofLogic<P,S,I>::m_inner_prod_1x2_pows_64 = nullptr;
+
+template <typename P, typename S, typename I>
+GeneratorsFactory<P,I>* RangeProofLogic<P,S,I>::m_gf = nullptr;
+
+template <typename P, typename S>
+AmountRecoveryRequest<P,S> AmountRecoveryRequest<P,S>::of(RangeProof<P,S>& proof, size_t& index, Point<P>& nonce)
 {
     auto proof_with_transcript = RangeProofWithTranscript::Build(proof);
 
-    AmountRecoveryRequest req {
+    AmountRecoveryRequest<P,S> req {
         1,
         proof_with_transcript.x,
         proof_with_transcript.z,
@@ -31,14 +40,16 @@ AmountRecoveryRequest AmountRecoveryRequest::of(RangeProof& proof, size_t& index
     return req;
 }
 
-AmountRecoveryResult AmountRecoveryResult::failure() {
+template <typename P, typename S>
+AmountRecoveryResult<P,S> AmountRecoveryResult<P,S>::failure() {
     return {
         false,
-        std::vector<RecoveredAmount>()
+        std::vector<RecoveredAmount<S>>()
     };
 }
 
-RangeProofLogic::RangeProofLogic()
+template <typename P, typename S, typename I>
+RangeProofLogic<P,S,I>::RangeProofLogic()
 {
     if (m_is_initialized) return;
     boost::lock_guard<boost::mutex> lock(RangeProofLogic::m_init_mutex);

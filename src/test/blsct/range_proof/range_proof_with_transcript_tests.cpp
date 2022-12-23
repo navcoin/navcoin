@@ -2,12 +2,12 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <blsct/arith/range_proof/range_proof_with_transcript.h>
+#include <blsct/range_proof/range_proof_with_transcript.h>
 
 #include <test/util/setup_common.h>
 #include <boost/test/unit_test.hpp>
 
-BOOST_FIXTURE_TEST_SUITE(range_proof_with_transcript_tests, MclTestingSetup)
+BOOST_FIXTURE_TEST_SUITE(range_proof_with_transcript_tests, HerTestingSetup)
 
 BOOST_AUTO_TEST_CASE(test_range_proof_with_transcript_recover_num_rounds)
 {

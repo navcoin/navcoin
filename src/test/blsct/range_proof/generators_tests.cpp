@@ -2,15 +2,15 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <blsct/arith/g1point.h>
-#include <blsct/arith/range_proof/config.h>
-#include <blsct/arith/range_proof/generators.h>
+#include <blsct/arith/point.h>
+#include <blsct/range_proof/config.h>
+#include <blsct/range_proof/generators.h>
 #include <test/util/setup_common.h>
 #include <uint256.h>
 
 #include <boost/test/unit_test.hpp>
 
-BOOST_FIXTURE_TEST_SUITE(generators_tests, MclTestingSetup)
+BOOST_FIXTURE_TEST_SUITE(generators_tests, HerTestingSetup)
 
 BOOST_AUTO_TEST_CASE(test_generators_get_instance)
 {

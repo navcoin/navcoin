@@ -7,12 +7,12 @@
 #include <blsct/keys.h>
 #include <boost/test/unit_test.hpp>
 
-BOOST_FIXTURE_TEST_SUITE(keys_tests, MclTestingSetup)
+BOOST_FIXTURE_TEST_SUITE(keys_tests, HerTestingSetup)
 
 BOOST_AUTO_TEST_CASE(blsct_keys)
 {
     // Single Public Key
-    G1Point generator = G1Point::GetBasePoint();
+    HerG1Point generator = HerG1Point::GetBasePoint();
 
     blsct::PublicKey invalidKey;
     BOOST_CHECK(!invalidKey.IsValid());
@@ -28,9 +28,9 @@ BOOST_AUTO_TEST_CASE(blsct_keys)
     BOOST_CHECK(keyFromPoint.IsValid());
     BOOST_CHECK(generator.GetVch() == keyFromPoint.GetVch());
 
-    G1Point point(generator.GetVch());
-    G1Point keyPointFromPoint;
-    G1Point keyPointFromVector;
+    HerG1Point point(generator.GetVch());
+    HerG1Point keyPointFromPoint;
+    HerG1Point keyPointFromVector;
 
     bool ret = keyFromVch.GetG1Point(keyPointFromVector);
     BOOST_CHECK(ret == true);
@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_CASE(blsct_keys)
     BOOST_CHECK(point == keyPointFromVector);
     BOOST_CHECK(point == keyPointFromPoint);
 
-    G1Point randomPoint = G1Point::Rand();
+    HerG1Point randomPoint = HerG1Point::Rand();
 
     blsct::PublicKey keyFromVchRandom(randomPoint.GetVch());
     BOOST_CHECK(randomPoint.GetVch() == keyFromVchRandom.GetVch());
@@ -49,9 +49,9 @@ BOOST_AUTO_TEST_CASE(blsct_keys)
     blsct::PublicKey keyFromPointRandom(randomPoint);
     BOOST_CHECK(randomPoint.GetVch() == keyFromPointRandom.GetVch());
 
-    G1Point pointR(randomPoint.GetVch());
-    G1Point keyPointFromPointRandom;
-    G1Point keyPointFromVectorRandom;
+    HerG1Point pointR(randomPoint.GetVch());
+    HerG1Point keyPointFromPointRandom;
+    HerG1Point keyPointFromVectorRandom;
 
     ret = keyFromVchRandom.GetG1Point(keyPointFromVectorRandom);
     BOOST_CHECK(ret == true);
@@ -79,13 +79,13 @@ BOOST_AUTO_TEST_CASE(blsct_keys)
     BOOST_CHECK(serializedViewKey == generator.GetVch());
     BOOST_CHECK(serializedSpendKey == pointR.GetVch());
 
-    G1Point viewKey;
+    HerG1Point viewKey;
 
     ret = doubleKeyFromPoints.GetViewKey(viewKey);
     BOOST_CHECK(ret == true);
     BOOST_CHECK(viewKey == generator);
 
-    G1Point spendKey;
+    HerG1Point spendKey;
 
     ret = doubleKeyFromPoints.GetSpendKey(spendKey);
     BOOST_CHECK(ret == true);

@@ -5,17 +5,17 @@
 #include <test/util/setup_common.h>
 
 #include <boost/test/unit_test.hpp>
-#include <blsct/arith/mcl_initializer.h>
+#include <blsct/arith/initializer.h>
 #include <blsct/arith/scalar.h>
 #include <uint256.h>
 
 #include <cinttypes>
 #include <limits>
 
-#define SCALAR_CURVE_ORDER_MINUS_1(x) Scalar x("73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000000", 16)
-#define SCALAR_INT64_MIN(x) Scalar x("52435875175126190479447740508185965837690552500527637822594435327901726408705", 10);
+#define SCALAR_CURVE_ORDER_MINUS_1(x) HerScalar x("73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000000", 16)
+#define SCALAR_INT64_MIN(x) HerScalar x("52435875175126190479447740508185965837690552500527637822594435327901726408705", 10);
 
-BOOST_FIXTURE_TEST_SUITE(scalar_tests, MclTestingSetup)
+BOOST_FIXTURE_TEST_SUITE(scalar_tests, HerTestingSetup)
 
 BOOST_AUTO_TEST_CASE(test_scalar_ctor_vec_uint8)
 {
@@ -130,33 +130,33 @@ BOOST_AUTO_TEST_CASE(test_scalar_ctor_vec_uint8)
     // uint256 constructor expects input vector to be big-endian
     {
         uint256 ui(one_zeros_be);
-        Scalar a(ui);
+        HerScalar a(ui);
         // Scalar::GetString drops preceding 0s
         BOOST_CHECK_EQUAL(a.GetString(), "100000000000000000000000000000000000000000000000000000000000000");
     }
     {
         uint256 ui(order_r_minus_1_be);
-        Scalar a(ui);
+        HerScalar a(ui);
         BOOST_CHECK_EQUAL(a.GetString(), "73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000000");
     }
     {
         uint256 ui(order_r_be);
-        Scalar a(order_r_be);
+        HerScalar a(order_r_be);
         BOOST_CHECK_EQUAL(a.GetString(), "0");
     }
 
     //// vector<uint8_t>
     // input vector is expected to be big-endian
     {
-        Scalar a(one_zeros_be);
+        HerScalar a(one_zeros_be);
         BOOST_CHECK_EQUAL(a.GetString(), "100000000000000000000000000000000000000000000000000000000000000");
     }
     {
-        Scalar a(order_r_minus_1_be);
+        HerScalar a(order_r_minus_1_be);
         BOOST_CHECK_EQUAL(a.GetString(), "73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000000");
     }
     {
-        Scalar a(order_r_be);
+        HerScalar a(order_r_be);
         BOOST_CHECK_EQUAL(a.GetString(), "0");
     }
 
@@ -167,13 +167,13 @@ BOOST_AUTO_TEST_CASE(test_scalar_ctor_vec_uint8)
             // test up to shift = 62 excluding the sign bit
             for(size_t shift = 0; shift < 63; ++shift) {
                 int64_t i = one << shift;
-                Scalar a(i);
+                HerScalar a(i);
                 BOOST_CHECK_EQUAL(a.GetUint64(), i);
             }
         }
         {
             int64_t i = -1;
-            Scalar a(i);
+            HerScalar a(i);
             // fr order: 0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001
             //       -1: 0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000000
             BOOST_CHECK_EQUAL(a.GetString().c_str(), "73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000000");
@@ -184,15 +184,15 @@ BOOST_AUTO_TEST_CASE(test_scalar_ctor_vec_uint8)
 BOOST_AUTO_TEST_CASE(test_scalar_add)
 {
     {
-        Scalar a(1);
-        Scalar b(2);
-        Scalar c(3);
+        HerScalar a(1);
+        HerScalar b(2);
+        HerScalar c(3);
         BOOST_CHECK((a + b) == c);
     }
     {
         SCALAR_CURVE_ORDER_MINUS_1(a);
-        Scalar b(1);
-        Scalar c(0);
+        HerScalar b(1);
+        HerScalar c(0);
         BOOST_CHECK((a + b) == c);
     }
 }
@@ -200,14 +200,14 @@ BOOST_AUTO_TEST_CASE(test_scalar_add)
 BOOST_AUTO_TEST_CASE(test_scalar_sub)
 {
     {
-        Scalar a(5);
-        Scalar b(3);
-        Scalar c(2);
+        HerScalar a(5);
+        HerScalar b(3);
+        HerScalar c(2);
         BOOST_CHECK((a - b) == c);
     }
     {
-        Scalar a(0);
-        Scalar b(1);
+        HerScalar a(0);
+        HerScalar b(1);
         SCALAR_CURVE_ORDER_MINUS_1(c);
         BOOST_CHECK((a - b) == c);
     }
@@ -215,17 +215,17 @@ BOOST_AUTO_TEST_CASE(test_scalar_sub)
 
 BOOST_AUTO_TEST_CASE(test_scalar_mul)
 {
-    Scalar a(2);
-    Scalar b(3);
-    Scalar c(6);
+    HerScalar a(2);
+    HerScalar b(3);
+    HerScalar c(6);
     BOOST_CHECK((a * b) == c);
 }
 
 BOOST_AUTO_TEST_CASE(test_scalar_div)
 {
-    Scalar a(6);
-    Scalar b(3);
-    Scalar c(2);
+    HerScalar a(6);
+    HerScalar b(3);
+    HerScalar c(2);
     BOOST_CHECK((a / b) == c);
 }
 
@@ -233,33 +233,33 @@ BOOST_AUTO_TEST_CASE(test_scalar_bitwise_or)
 {
     {
         // there is no bit that has 1 in both a and b
-        Scalar   a(0b0001000100010001);
-        Scalar   b(0b1100110011001100);
-        Scalar exp(0b1101110111011101);
+        HerScalar a(0b0001000100010001);
+        HerScalar b(0b1100110011001100);
+        HerScalar exp(0b1101110111011101);
         auto act = a | b;
         BOOST_CHECK(act == exp);
     }
     {
         // there are bits that have 1 in both aband b
-        Scalar   a(0b0001000100010001);
-        Scalar   b(0b1101110111001101);
-        Scalar exp(0b1101110111011101);
+        HerScalar a(0b0001000100010001);
+        HerScalar b(0b1101110111001101);
+        HerScalar exp(0b1101110111011101);
         auto act = a | b;
         BOOST_CHECK(act == exp);
     }
     {
         // a is shorter than b. expects big-endian merge
-        Scalar           a(0b11111111);
-        Scalar   b(0b1000100010001000);
-        Scalar exp(0b1000100011111111);
+        HerScalar a(0b11111111);
+        HerScalar b(0b1000100010001000);
+        HerScalar exp(0b1000100011111111);
         auto act = a | b;
         BOOST_CHECK(act == exp);
     }
     {
         // a is longer than b. expects big-endian merge
-        Scalar   a(0b1000100010001000);
-        Scalar           b(0b11111111);
-        Scalar exp(0b1000100011111111);
+        HerScalar a(0b1000100010001000);
+        HerScalar b(0b11111111);
+        HerScalar exp(0b1000100011111111);
         auto act = a | b;
         BOOST_CHECK(act == exp);
     }
@@ -269,33 +269,33 @@ BOOST_AUTO_TEST_CASE(test_scalar_bitwise_xor)
 {
     {
         // there is no bit that has 1 in both a and b
-        Scalar   a(0b0001000100010001);
-        Scalar   b(0b1100110011001100);
-        Scalar exp(0b1101110111011101);
+        HerScalar a(0b0001000100010001);
+        HerScalar b(0b1100110011001100);
+        HerScalar exp(0b1101110111011101);
         auto act = a ^ b;
         BOOST_CHECK(act == exp);
     }
     {
         // there are bits that have 1 in both aband b
-        Scalar   a(0b0001000100010001);
-        Scalar   b(0b1101110111001101);
-        Scalar exp(0b1100110011011100);
+        HerScalar a(0b0001000100010001);
+        HerScalar b(0b1101110111001101);
+        HerScalar exp(0b1100110011011100);
         auto act = a ^ b;
         BOOST_CHECK(act == exp);
     }
     {
         // a is shorter than b. expects big-endian merge
-        Scalar           a(0b11111111);
-        Scalar   b(0b1000100010001000);
-        Scalar exp(0b1000100001110111);
+        HerScalar a(0b11111111);
+        HerScalar b(0b1000100010001000);
+        HerScalar exp(0b1000100001110111);
         auto act = a ^ b;
         BOOST_CHECK(act == exp);
     }
     {
         // a is longer than b. expects big-endian merge
-        Scalar   a(0b1000100010001000);
-        Scalar           b(0b11111111);
-        Scalar exp(0b1000100001110111);
+        HerScalar a(0b1000100010001000);
+        HerScalar b(0b11111111);
+        HerScalar exp(0b1000100001110111);
         auto act = a ^ b;
         BOOST_CHECK(act == exp);
     }
@@ -305,33 +305,33 @@ BOOST_AUTO_TEST_CASE(test_scalar_bitwise_and)
 {
     {
         // there is no bit that has 1 in both a and b
-        Scalar   a(0b0001000100010001);
-        Scalar   b(0b1100110011001100);
-        Scalar                exp(0b0);
+        HerScalar a(0b0001000100010001);
+        HerScalar b(0b1100110011001100);
+        HerScalar exp(0b0);
         auto act = a & b;
         BOOST_CHECK(act == exp);
     }
     {
         // there are bits that have 1 in both aband b
-        Scalar   a(0b0001000100010001);
-        Scalar   b(0b1101110111001101);
-        Scalar    exp(0b1000100000001);
+        HerScalar a(0b0001000100010001);
+        HerScalar b(0b1101110111001101);
+        HerScalar exp(0b1000100000001);
         auto act = a & b;
         BOOST_CHECK(act == exp);
     }
     {
         // a is shorter than b. expects big-endian merge
-        Scalar           a(0b11111111);
-        Scalar   b(0b1000100010001000);
-        Scalar         exp(0b10001000);
+        HerScalar a(0b11111111);
+        HerScalar b(0b1000100010001000);
+        HerScalar exp(0b10001000);
         auto act = a & b;
         BOOST_CHECK(act == exp);
     }
     {
         // a is longer than b. expects big-endian merge
-        Scalar   a(0b1000100010001000);
-        Scalar           b(0b11111111);
-        Scalar         exp(0b10001000);
+        HerScalar a(0b1000100010001000);
+        HerScalar b(0b11111111);
+        HerScalar exp(0b10001000);
         auto act = a & b;
         BOOST_CHECK(act == exp);
     }
@@ -344,7 +344,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_bitwise_compl)
     // which is 1 inverted in 32-byte buffer
     // due to limitation of mclBnFr_deserialize
     int64_t n = INT64_MAX;
-    Scalar a(n);
+    HerScalar a(n);
     auto act = (~a).GetString(16);
 
     // ~INT64MAX is -9223372036854775808 which equals below in Fr
@@ -354,11 +354,11 @@ BOOST_AUTO_TEST_CASE(test_scalar_bitwise_compl)
 
 BOOST_AUTO_TEST_CASE(test_scalar_shift_left)
 {
-    Scalar one(1);
+    HerScalar one(1);
     uint64_t exp = 1;
     // test up to the positive max of int64_t since assignment op takes int64_t as an input
     for (size_t i = 0; i < 63; ++i) {
-        Scalar act = one << i;
+        HerScalar act = one << i;
         BOOST_CHECK_EQUAL(act.GetUint64(), exp);
         exp <<= 1;
     }
@@ -366,15 +366,15 @@ BOOST_AUTO_TEST_CASE(test_scalar_shift_left)
 
 BOOST_AUTO_TEST_CASE(test_scalar_shift_right)
 {
-    Scalar eight(8);
-    Scalar seven(7);
-    Scalar six(6);
-    Scalar five(5);
-    Scalar four(4);
-    Scalar three(3);
-    Scalar two(2);
-    Scalar one(1);
-    Scalar zero(0);
+    HerScalar eight(8);
+    HerScalar seven(7);
+    HerScalar six(6);
+    HerScalar five(5);
+    HerScalar four(4);
+    HerScalar three(3);
+    HerScalar two(2);
+    HerScalar one(1);
+    HerScalar zero(0);
 
     BOOST_CHECK((eight >> 1) == four);
     BOOST_CHECK((seven >> 1) == three);
@@ -390,11 +390,11 @@ BOOST_AUTO_TEST_CASE(test_scalar_assign)
 {
     {
         int64_t n = INT64_MAX;
-        Scalar a = n;
+        HerScalar a = n;
         BOOST_CHECK_EQUAL(a.GetUint64(), n);
     }
     {
-        Scalar a(INT64_MIN);
+        HerScalar a(INT64_MIN);
         SCALAR_INT64_MIN(b);
         BOOST_CHECK_EQUAL(a.GetString(16), b.GetString(16));
     }
@@ -402,7 +402,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_assign)
 
 BOOST_AUTO_TEST_CASE(test_scalar_equal_or_not_equal_to_integer)
 {
-    Scalar a(6);
+    HerScalar a(6);
     int b = 6;
     int c = 5;
     BOOST_CHECK(a == b);
@@ -411,48 +411,48 @@ BOOST_AUTO_TEST_CASE(test_scalar_equal_or_not_equal_to_integer)
 
 BOOST_AUTO_TEST_CASE(test_scalar_equal_or_not_equal_to_scalar)
 {
-    Scalar a(6);
-    Scalar b(6);
-    Scalar c(5);
+    HerScalar a(6);
+    HerScalar b(6);
+    HerScalar c(5);
     BOOST_CHECK(a == b);
     BOOST_CHECK(a != c);
 }
 
 BOOST_AUTO_TEST_CASE(test_scalar_invert)
 {
-    Scalar a(6);
-    Scalar b = a.Invert();
-    Scalar c = b.Invert();
+    HerScalar a(6);
+    HerScalar b = a.Invert();
+    HerScalar c = b.Invert();
     BOOST_CHECK(a == c);
 }
 
 BOOST_AUTO_TEST_CASE(test_scalar_invert_zero)
 {
-    Scalar a(0);
+    HerScalar a(0);
     BOOST_CHECK_THROW(a.Invert(), std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(test_scalar_negate)
 {
-    Scalar a(6);
-    Scalar b(-6);
-    Scalar c = a.Negate();
+    HerScalar a(6);
+    HerScalar b(-6);
+    HerScalar c = a.Negate();
     BOOST_CHECK(b == c);
 }
 
 BOOST_AUTO_TEST_CASE(test_scalar_square)
 {
-    Scalar a(9);
-    Scalar b(81);
-    Scalar c = a.Square();
+    HerScalar a(9);
+    HerScalar b(81);
+    HerScalar c = a.Square();
     BOOST_CHECK(b == c);
 }
 
 BOOST_AUTO_TEST_CASE(test_scalar_cube)
 {
-    Scalar a(3);
-    Scalar b(27);
-    Scalar c = a.Cube();
+    HerScalar a(3);
+    HerScalar b(27);
+    HerScalar c = a.Cube();
     BOOST_CHECK(b == c);
 }
 
@@ -472,15 +472,15 @@ BOOST_AUTO_TEST_CASE(test_scalar_pow)
         TestCase{195, 7, 10721172396796875},
     };
     for (auto tc: test_cases) {
-        Scalar a(tc.a);
-        Scalar b(tc.b);
-        Scalar c(tc.c);
-        Scalar d = a.Pow(b);
+        HerScalar a(tc.a);
+        HerScalar b(tc.b);
+        HerScalar c(tc.c);
+        HerScalar d = a.Pow(b);
         BOOST_CHECK(c == d);
     }
 
     // this is to check if calculation finishes within a reasonable amount of time
-    Scalar y(1);
+    HerScalar y(1);
     y.Invert().Pow(y.Invert());
 }
 
@@ -490,10 +490,10 @@ BOOST_AUTO_TEST_CASE(test_scalar_rand)
     for (auto exclude_zero : tf) {
         unsigned int num_tries = 1000000;
         unsigned int num_dups = 0;
-        auto x = Scalar::Rand();
+        auto x = HerScalar::Rand();
 
         for (size_t i = 0; i < num_tries; ++i) {
-            auto y = Scalar::Rand(exclude_zero);
+            auto y = HerScalar::Rand(exclude_zero);
             if (exclude_zero && y == 0) BOOST_FAIL("expected non-zero");
             if (x == y) ++num_dups;
         }
@@ -506,24 +506,24 @@ BOOST_AUTO_TEST_CASE(test_scalar_getuint64)
 {
     {
         // Scalar(int) operator takes int64_t, so let it take INT64_MAX
-        Scalar a(INT64_MAX);
+        HerScalar a(INT64_MAX);
         uint64_t b = a.GetUint64();
         uint64_t c = 9223372036854775807ul;  // is INT64_MAX
         BOOST_CHECK_EQUAL(b, c);
     }
     {
         // assignment operator takes int64_t
-        Scalar base(0b1);
+        HerScalar base(0b1);
         int64_t n = 1;
         for (uint8_t i=0; i<63; ++i) {  // test up to positive max of int64_t
-            Scalar a = base << i;
+            HerScalar a = base << i;
             BOOST_CHECK_EQUAL(a.GetUint64(), n);
             n <<= 1;
         }
     }
     {
         int64_t int64_t_min = std::numeric_limits<int64_t>::min();
-        Scalar s(int64_t_min);
+        HerScalar s(int64_t_min);
 
         // int64_t minimum value maps to:
         // '0b111111111111111111111111111111100000000000000000000000000000001'
@@ -570,7 +570,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_getvch)
         30,
         31,
     };
-    Scalar a(vec);
+    HerScalar a(vec);
     {
         auto a_vec = a.GetVch();
         BOOST_CHECK(vec == a_vec);
@@ -621,10 +621,10 @@ BOOST_AUTO_TEST_CASE(test_scalar_setvch)
             30,
             31,
         };
-        Scalar a;
+        HerScalar a;
         a.SetVch(vec);
 
-        Scalar b(vec);
+        HerScalar b(vec);
         BOOST_CHECK(a == b);
     }
     {
@@ -663,9 +663,9 @@ BOOST_AUTO_TEST_CASE(test_scalar_setvch)
             0,
             0,
         };
-        Scalar a;
+        HerScalar a;
         a.SetVch(vec);
-        Scalar b(vec);
+        HerScalar b(vec);
         BOOST_CHECK(a == b);
     }
     {
@@ -704,13 +704,13 @@ BOOST_AUTO_TEST_CASE(test_scalar_setvch)
             0,
             1,
         };
-        Scalar a;
+        HerScalar a;
         a.SetVch(vec);
         BOOST_CHECK_EQUAL(a.GetString(), "0");
     }
     {
         std::vector<uint8_t> vec;
-        Scalar a(100);
+        HerScalar a(100);
         a.SetVch(vec);
         BOOST_CHECK_EQUAL(a.GetUint64(), 0);
     }
@@ -752,10 +752,10 @@ BOOST_AUTO_TEST_CASE(test_scalar_get_and_setvch)
         30,
         31,
     };
-    Scalar a(vec);
+    HerScalar a(vec);
     auto a_vec = a.GetVch();
 
-    Scalar b(0);
+    HerScalar b(0);
     b.SetVch(a_vec);
     BOOST_CHECK(a == b);
 }
@@ -763,7 +763,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_get_and_setvch)
 BOOST_AUTO_TEST_CASE(test_scalar_setpow2)
 {
     for (size_t i = 0; i < 10; ++i) {
-        Scalar a;
+        HerScalar a;
         a.SetPow2(i);
         BOOST_CHECK_EQUAL(a.GetUint64(), std::pow(2, i));
     }
@@ -776,7 +776,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_hash)
     // - 32-byte big-endian array representing the Scalar value
     // - 4-byte little-endian array representing the parameter of Hash function
 
-    Scalar a(1);
+    HerScalar a(1);
     const int n = 51;
     uint256 digest = a.GetHashWithSalt(n);
     auto act = digest.GetHex();
@@ -787,7 +787,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_hash)
 // TODO fix this test
 BOOST_AUTO_TEST_CASE(test_scalar_getstring)
 {
-    Scalar a(0xffff);
+    HerScalar a(0xffff);
 
     auto act16 = a.GetString(16);
     std::string exp16("ffff");
@@ -803,7 +803,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_getstring)
 
     int64_t n = INT64_MIN;
     std::string s("52435875175126190479447740508185965837690552500527637822594435327901726408705");
-    Scalar b(n);
+    HerScalar b(n);
     auto act_int64_min = b.GetString(10);
     BOOST_CHECK(act_int64_min == s);
 }
@@ -821,7 +821,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_get_bits)
     std::string n_bin("111001111101101101001110101001100101001100111010111110101001000001100110011100111011000000010000000100110100001110110000000010101010011101111011010010000000010111111111111111001011011111111101111111111111111111111111111111100000000000000000000000000000000");
 
     auto u = uint256(n_vec);
-    Scalar s(u);
+    HerScalar s(u);
 
     std::string exp = n_bin;
     auto bs = s.ToBinaryVec();
@@ -837,7 +837,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_get_bits)
 BOOST_AUTO_TEST_CASE(test_scalar_get_bit)
 {
     {
-        Scalar a(0b100000001);
+        HerScalar a(0b100000001);
         BOOST_CHECK_EQUAL(a.GetSeriBit(0), true); // 1st byte
         BOOST_CHECK_EQUAL(a.GetSeriBit(1), false);
         BOOST_CHECK_EQUAL(a.GetSeriBit(2), false);
@@ -916,7 +916,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_create_64_bit_shift)
         0,
         1
     };
-    Scalar excess;
+    HerScalar excess;
     excess.SetVch(excess_ser);
 
     std::vector<unsigned char> vMsg = (excess >> 64).GetVch();
