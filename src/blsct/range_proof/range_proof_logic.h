@@ -8,6 +8,9 @@
 #include <optional>
 #include <vector>
 
+#include <blsct/arith/elements.h>
+#include <blsct/arith/point.h>
+#include <blsct/arith/scalar.h>
 #include <blsct/range_proof/generators.h>
 #include <blsct/range_proof/range_proof_with_transcript.h>
 #include <consensus/amount.h>
@@ -74,7 +77,7 @@ public:
         const TokenId& token_id
     ) const;
 
-    G1Point VerifyProofs(
+    Point<P> VerifyProofs(
         const std::vector<RangeProofWithTranscript<P,S>>& proof_transcripts,
         const Generators<P>& gens,
         const size_t& max_mn
@@ -109,7 +112,7 @@ private:
         const Scalar<S>& y,
         RangeProof<P,S>& proof,
         CHashWriter& transcript_gen
-    );
+    ) const;
 
     // using pointers for Scalar and GeneratorsFactory to avoid default constructors to be called before mcl initialization
     // these variables are meant to be constant. do not make changes after initialization.

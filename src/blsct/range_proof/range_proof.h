@@ -7,7 +7,7 @@
 
 #include <blsct/arith/elements.h>
 
-template <typename P, typename S>
+template <typename P, typename Sc>
 struct RangeProof
 {
     // intermediate values used to derive random values later
@@ -16,15 +16,15 @@ struct RangeProof
     P S;
     P T1;
     P T2;
-    S mu;
-    S tau_x;
+    Sc mu;
+    Sc tau_x;
     Points<P> Ls;
     Points<P> Rs;
 
     // proof results
-    S t_hat;   // inner product of l and r
-    S a;       // result of inner product argument
-    S b;       // result of inner product argument
+    Sc t_hat;   // inner product of l and r
+    Sc a;       // result of inner product argument
+    Sc b;       // result of inner product argument
 };
 
 #endif // NAVCOIN_BLSCT_RANGE_PROOF_RANGE_PROOF_H

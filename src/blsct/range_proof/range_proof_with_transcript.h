@@ -27,11 +27,11 @@ public:
         num_input_values_power_2(num_input_values_power_2),
         concat_input_values_in_bits(concat_input_values_in_bits) {}
 
-    static RangeProofWithTranscript Build(const RangeProof& proof);
+    static RangeProofWithTranscript<P,S> Build(const RangeProof<P,S>& proof);
 
     static size_t RecoverNumRounds(const size_t& num_input_values);
 
-    const RangeProof proof;
+    const RangeProof<P,S> proof;
 
     // transcript
     const Scalar<S> x;  // x used in the main prove procedure

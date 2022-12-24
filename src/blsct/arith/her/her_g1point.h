@@ -58,7 +58,7 @@ public:
     std::vector<uint8_t> GetVch() const;
     void SetVch(const std::vector<uint8_t>& vec);
 
-    std::string GetString(const int& radix = 16) const;
+    std::string GetString(const uint8_t& radix = 16) const;
     HerScalar GetHashWithSalt(const uint64_t salt) const;
 
     size_t GetSerializeSize() const;
@@ -72,7 +72,7 @@ public:
     mclBnG1 m_p;
 
 private:
-    static mclBnG1 m_g; // Using mclBnG1 instead of HerG1Point to get around chiken-and-egg issue
+    static mclBnG1* m_g; // Using mclBnG1 instead of HerG1Point to get around chiken-and-egg issue
     static boost::mutex m_init_mutex;
 };
 

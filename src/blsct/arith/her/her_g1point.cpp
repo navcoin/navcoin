@@ -65,28 +65,28 @@ HerG1Point HerG1Point::operator=(const mclBnG1& q)
     return *this;
 }
 
-HerG1Point HerG1Point::operator+(constHerG1Point& p) const
+HerG1Point HerG1Point::operator+(const HerG1Point& p) const
 {
     HerG1Point ret;
     mclBnG1_add(&ret.m_p, &m_p, &p.m_p);
     return ret;
 }
 
-HerG1Point HerG1Point::operator-(constHerG1Point& p) const
+HerG1Point HerG1Point::operator-(const HerG1Point& p) const
 {
     HerG1Point ret;
     mclBnG1_sub(&ret.m_p, &m_p, &p.m_p);
     return ret;
 }
 
-HerG1Point HerG1Point::operator*(const Scalar& s) const
+HerG1Point HerG1Point::operator*(const HerScalar& s) const
 {
     HerG1Point ret;
     mclBnG1_mul(&ret.m_p, &m_p, &s.m_fr);
     return ret;
 }
 
-std::vector<HerG1Point> HerG1Point::operator*(const std::vector<Scalar>& ss) const
+std::vector<HerG1Point> HerG1Point::operator*(const std::vector<HerScalar>& ss) const
 {
     if (ss.size() == 0) {
         throw std::runtime_error("HerG1Point::operator*: cannot multiplyHerG1Point by empty Scalars");
@@ -153,12 +153,12 @@ HerG1Point HerG1Point::HashAndMap(const std::vector<uint8_t>& vec)
     return temp;
 }
 
-bool HerG1Point::operator==(constHerG1Point& b) const
+bool HerG1Point::operator==(const HerG1Point& b) const
 {
     return mclBnG1_isEqual(&m_p, &b.m_p);
 }
 
-bool HerG1Point::operator!=(constHerG1Point& b) const
+bool HerG1Point::operator!=(const HerG1Point& b) const
 {
     return !operator==(b);
 }
