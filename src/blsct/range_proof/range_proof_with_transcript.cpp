@@ -4,6 +4,7 @@
 
 #include <blsct/range_proof/config.h>
 #include <blsct/range_proof/range_proof_with_transcript.h>
+#include <hash.h>
 
 template <typename P, typename S>
 RangeProofWithTranscript<P,S> RangeProofWithTranscript<P,S>::Build(const RangeProof<P,S>& proof) {

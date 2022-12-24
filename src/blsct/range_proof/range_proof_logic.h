@@ -15,6 +15,7 @@
 #include <blsct/range_proof/range_proof_with_transcript.h>
 #include <consensus/amount.h>
 #include <ctokens/tokenid.h>
+#include <hash.h>
 
 template <typename P, typename S>
 struct AmountRecoveryRequest
@@ -102,7 +103,7 @@ private:
     ) const;
 
     bool InnerProductArgument(
-        const size_t input_value_vec_len,
+        const size_t concat_input_values_in_bits,
         Points<P>& Gi,
         Points<P>& Hi,
         const Point<P>& u,

@@ -10,18 +10,21 @@
 
 #include <boost/test/unit_test.hpp>
 
+using P = HerG1Point;
+using S = HerScalar;
+
 BOOST_FIXTURE_TEST_SUITE(generators_tests, HerTestingSetup)
 
 BOOST_AUTO_TEST_CASE(test_generators_get_instance)
 {
-    GeneratorsFactory gf;
+    GeneratorsFactory<P,S> gf;
 
     TokenId token_id_1(uint256(1), 11ULL);
-    Generators gens1 = gf.GetInstance(token_id_1);
-    Generators gens1_2 = gf.GetInstance(token_id_1);
+    Generators<P> gens1 = gf.GetInstance(token_id_1);
+    Generators<P> gens1_2 = gf.GetInstance(token_id_1);
 
     TokenId token_id_2(uint256(2), 22ULL);
-    Generators gens2 = gf.GetInstance(token_id_2);
+    Generators<P> gens2 = gf.GetInstance(token_id_2);
 
     auto max_size = Config::m_max_input_value_vec_len;
 
@@ -37,45 +40,45 @@ BOOST_AUTO_TEST_CASE(test_generators_get_instance)
 
 BOOST_AUTO_TEST_CASE(test_generators_h_static)
 {
-    GeneratorsFactory gf;
+    GeneratorsFactory<P,S> gf;
 
     TokenId token_id_1(uint256(1), 11ULL);
-    Generators gens1 = gf.GetInstance(token_id_1);
+    Generators<P> gens1 = gf.GetInstance(token_id_1);
 
     TokenId token_id_2(uint256(2), 22ULL);
-    Generators gens2 = gf.GetInstance(token_id_2);
+    Generators<P> gens2 = gf.GetInstance(token_id_2);
 
     // regardless of token_id, the same H should be returned
     BOOST_CHECK(gens1.H.get() == gens2.H.get());
 
     // H should be equal to the base point
-    BOOST_CHECK(gens1.H.get() == G1Point::GetBasePoint());
+    BOOST_CHECK(gens1.H.get() == P::GetBasePoint());
 }
 
 BOOST_AUTO_TEST_CASE(test_generators_g_derived_from_token_id)
 {
-    GeneratorsFactory gf;
+    GeneratorsFactory<P,S> gf;
 
     TokenId token_id_1(uint256(1), 11ULL);
-    Generators gens1 = gf.GetInstance(token_id_1);
+    Generators<P> gens1 = gf.GetInstance(token_id_1);
 
     TokenId token_id_2(uint256(2), 22ULL);
-    Generators gens2 = gf.GetInstance(token_id_2);
+    Generators<P> gens2 = gf.GetInstance(token_id_2);
 
     // G should differ if token_id differs
     BOOST_CHECK(gens1.G != gens2.G);
 
     // the same G should be derived for the same token_id
-    Generators gens1_2 = gf.GetInstance(token_id_1);
+    Generators<P> gens1_2 = gf.GetInstance(token_id_1);
     BOOST_CHECK(gens1.G == gens1_2.G);
 }
 
 BOOST_AUTO_TEST_CASE(test_generators_get_gihi_subset)
 {
     TokenId token_id(uint256(1), 11ULL);
-    GeneratorsFactory gf;
+    GeneratorsFactory<P,S> gf;
 
-    Generators gens = gf.GetInstance(token_id);
+    Generators<P> gens = gf.GetInstance(token_id);
 
     // should be able to get empty Gi and Hi
     BOOST_CHECK_NO_THROW(gens.GetGiSubset(0));

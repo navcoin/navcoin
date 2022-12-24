@@ -29,7 +29,7 @@ template Elements<HerG1Point>::Elements(const Elements &x);
 template <typename T>
 bool Elements<T>::Empty() const
 {
-    return m_vec.empty()
+    return m_vec.empty();
 }
 template bool Elements<HerScalar>::Empty() const;
 template bool Elements<HerG1Point>::Empty() const;
@@ -83,14 +83,6 @@ template size_t Elements<HerScalar>::Size() const;
 template size_t Elements<HerG1Point>::Size() const;
 
 template <typename T>
-bool Elements<T>::Empty() const
-{
-    return m_vec.empty();
-}
-template bool Elements<HerScalar>::Empty() const;
-template bool Elements<HerG1Point>::Empty() const;
-
-template <typename T>
 void Elements<T>::Add(const T& x)
 {
     m_vec.push_back(x);
@@ -111,19 +103,15 @@ template void Elements<HerG1Point>::ConfirmSizesMatch(const size_t&) const;
 template <typename T>
 Elements<T> Elements<T>::FirstNPow(const T& k, const size_t& n, const size_t& from_index)
 {
-    if constexpr (std::is_same_v<T, Scalar>) {
-        Elements<Scalar> ret;
-        Scalar x(1);
-        for (size_t i = 0; i < n + from_index; ++i) {
-            if (i >= from_index) {
-                ret.m_vec.push_back(x);
-            }
-            x = x * k;
+    Elements<T> ret;
+    T x(1);
+    for (size_t i = 0; i < n + from_index; ++i) {
+        if (i >= from_index) {
+            ret.m_vec.push_back(x);
         }
-        return ret;
-    } else {
-        throw std::runtime_error("Not implemented");
+        x = x * k;
     }
+    return ret;
 }
 template Elements<HerScalar> Elements<HerScalar>::FirstNPow(const HerScalar&, const size_t&, const size_t& from_index);
 
@@ -142,16 +130,12 @@ template Elements<HerG1Point> Elements<HerG1Point>::RepeatN(const HerG1Point&, c
 template <typename T>
 Elements<T> Elements<T>::RandVec(const size_t& n, const bool exclude_zero)
 {
-    if constexpr (std::is_same_v<T, Scalar>) {
-        Elements<Scalar> ret;
-        for (size_t i = 0; i < n; ++i) {
-            auto x = Scalar::Rand(exclude_zero);
-            ret.m_vec.push_back(x);
-        }
-        return ret;
-    } else {
-        throw std::runtime_error("Not implemented");
+    Elements<T> ret;
+    for (size_t i = 0; i < n; ++i) {
+        auto x = T::Rand(exclude_zero);
+        ret.m_vec.push_back(x);
     }
+    return ret;
 }
 template Elements<HerScalar> Elements<HerScalar>::RandVec(const size_t&, const bool);
 
@@ -159,9 +143,9 @@ template <typename T>
 template <typename S>
 Elements<T> Elements<T>::operator*(const Elements<S>& rhs) const
 {
-    ConfirmSizesMatch(other.Size());
+    ConfirmSizesMatch(rhs.Size());
 
-    Elements<Scalar> ret;
+    Elements<T> ret;
     for (size_t i = 0; i < m_vec.size(); ++i) {
         ret.m_vec.push_back(m_vec[i] * rhs[i]);
     }
@@ -174,7 +158,7 @@ template <typename T>
 template <typename S>
 Elements<T> Elements<T>::operator*(const S& rhs) const
 {
-    Elements<S> ret;
+    Elements<T> ret;
     for (size_t i = 0; i < m_vec.size(); ++i) {
         ret.m_vec.push_back(m_vec[i] * rhs);
     }
@@ -215,7 +199,7 @@ template <typename T>
 void Elements<T>::operator=(const Elements<T>& rhs)
 {
     m_vec.clear();
-    for (size_t i = 0; i < other.m_vec.size(); ++i) {
+    for (size_t i = 0; i < rhs.m_vec.size(); ++i) {
         auto copy = T(rhs.m_vec[i]);
         m_vec.push_back(copy);
     }
@@ -281,7 +265,7 @@ template Elements<HerG1Point> Elements<HerG1Point>::To(const size_t to_index) co
 template <typename T>
 Elements<T> Elements<T>::Negate() const
 {
-    Scalars ret;
+    Elements<T> ret;
     for(auto& x: m_vec) {
         ret.Add(x.Negate());
     }

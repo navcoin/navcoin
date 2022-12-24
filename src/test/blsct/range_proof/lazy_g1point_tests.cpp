@@ -12,35 +12,40 @@
 
 BOOST_FIXTURE_TEST_SUITE(lazy_g1point_tests, HerTestingSetup)
 
+using P = HerG1Point;
+using S = HerScalar;
+using PV = mclBnG1;
+using PS = mclBnFr;
+
 BOOST_AUTO_TEST_CASE(test_lazy_g1points_ctor)
 {
-    auto g = HerG1Point::GetBasePoint();
+    auto g = P::GetBasePoint();
     auto g2 = g + g;
 
-    LazyG1Points points1(
-        std::vector<HerG1Point> { g, g2 },
-        std::vector<HerScalar> { 1, 2 }
+    LazyG1Points<P,S> points1(
+        std::vector<P> { g, g2 },
+        std::vector<S> { 1, 2 }
     );
 
-    LazyG1Points points2;
-    points2.Add(LazyG1Point(g, 1));
-    points2.Add(LazyG1Point(g, 2));
+    LazyG1Points<P,S> points2;
+    points2.Add(LazyG1Point<P,S>(g, 1));
+    points2.Add(LazyG1Point<P,S>(g, 2));
 
-    BOOST_CHECK(points1.Sum() == points1.Sum());
+    BOOST_CHECK((points1.Sum<PV,PS>()) == (points1.Sum<PV,PS>()));
 }
 
 BOOST_AUTO_TEST_CASE(test_lazy_g1points_sum)
 {
-    auto lazy_g = LazyG1Point(HerG1Point::GetBasePoint(), 1);
-    auto lazy_g2 = LazyG1Point(HerG1Point::GetBasePoint(), 2);
-    LazyG1Points lazy_points;
+    auto lazy_g = LazyG1Point<P,S>(P::GetBasePoint(), 1);
+    auto lazy_g2 = LazyG1Point<P,S>(P::GetBasePoint(), 2);
+    LazyG1Points<P,S> lazy_points;
     lazy_points.Add(lazy_g);
     lazy_points.Add(lazy_g2);
-    auto lazy_sum = lazy_points.Sum();
+    auto lazy_sum = lazy_points.Sum<PV,PS>();
 
-    auto g = HerG1Point::GetBasePoint();
+    auto g = P::GetBasePoint();
     auto g2 = g + g;
-    Points<HerG1Point> points;
+    Points<P> points;
     points.Add(g);
     points.Add(g2);
     auto sum = points.Sum();
@@ -50,33 +55,33 @@ BOOST_AUTO_TEST_CASE(test_lazy_g1points_sum)
 
 BOOST_AUTO_TEST_CASE(test_lazy_g1points_add_lazy_g1points_to_lazy_g1points)
 {
-    auto g = LazyG1Point(HerG1Point::GetBasePoint(), 1);
-    auto g2 = LazyG1Point(HerG1Point::GetBasePoint(), 2);
+    auto g = LazyG1Point<P,S>(P::GetBasePoint(), 1);
+    auto g2 = LazyG1Point<P,S>(P::GetBasePoint(), 2);
 
-    LazyG1Points ps1, ps2, ps3;
+    LazyG1Points<P,S> ps1, ps2, ps3;
     ps1.Add(g);
     ps2.Add(g2);
 
     ps3.Add(g);
     ps3.Add(g2);
 
-    BOOST_CHECK(ps3.Sum() == (ps1 + ps2).Sum());
+    BOOST_CHECK((ps3.Sum<PV,PS>()) == ((ps1 + ps2).Sum<PV,PS>()));
 }
 
 BOOST_AUTO_TEST_CASE(test_lazy_g1points_add_lazy_g1points_to_lazy_g1point)
 {
-    auto g = LazyG1Point(HerG1Point::GetBasePoint(), 1);
-    auto g2 = LazyG1Point(HerG1Point::GetBasePoint(), 2);
+    auto g = LazyG1Point<P,S>(P::GetBasePoint(), 1);
+    auto g2 = LazyG1Point<P,S>(P::GetBasePoint(), 2);
 
-    LazyG1Points ps1;
+    LazyG1Points<P,S> ps1;
     ps1.Add(g);
     auto ps2 = ps1 + g2;
 
-    LazyG1Points ps3;
+    LazyG1Points<P,S> ps3;
     ps3.Add(g);
     ps3.Add(g2);
 
-    BOOST_CHECK(ps3.Sum() == ps2.Sum());
+    BOOST_CHECK((ps3.Sum<PV,PS>()) == (ps2.Sum<PV,PS>()));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

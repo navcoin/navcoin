@@ -11,12 +11,15 @@
 
 BOOST_FIXTURE_TEST_SUITE(range_proof_tests, HerTestingSetup)
 
+using P = HerG1Point;
+using S = HerScalar;
+using I = HerInitializer;
 using MsgPair = std::pair<std::string, std::vector<unsigned char>>;
 
 struct TestCase
 {
     std::string name;
-    Scalars<HerScalar> values;
+    Scalars<S> values;
     bool is_batched;  // prove function is called once for with all values
     bool should_complete_recovery;
     size_t num_amounts;
@@ -49,11 +52,11 @@ BOOST_AUTO_TEST_CASE(test_range_proof_prove_verify_one_value)
     auto msg = GenMsgPair();
     auto token_id = GenTokenId();
 
-    HerScalar one(1);
-    std::vector<HerScalar> vs_vec;
+    S one(1);
+    std::vector<S> vs_vec;
     vs_vec.push_back(one);
 
-    Scalars<HerScalar> vs;
+    Scalars<S> vs;
     vs.Add(one);
 
     RangeProofLogic rp;
@@ -69,11 +72,11 @@ BOOST_AUTO_TEST_CASE(test_range_proof_recovery_one_value)
     auto msg = GenMsgPair();
     auto token_id = GenTokenId();
 
-    HerScalar one(1);
-    std::vector<HerScalar> vs_vec;
+    S one(1);
+    std::vector<S> vs_vec;
     vs_vec.push_back(one);
 
-    Scalars<HerScalar> vs;
+    Scalars<S> vs;
     vs.Add(one);
 
     RangeProofLogic rp;
@@ -96,19 +99,19 @@ static std::vector<TestCase> BuildTestCases()
 {
     RangeProofLogic rp;
 
-    HerScalar one(1);
-    HerScalar two(2);
-    HerScalar lower_bound(0);
-    HerScalar upper_bound = (one << 64) - one;  // int64_t max
+    S one(1);
+    S two(2);
+    S lower_bound(0);
+    S upper_bound = (one << 64) - one;  // int64_t max
     // [LB, LB+1, UB-1, UB]
-    Scalars<HerScalar> valid_inputs;
+    Scalars<S> valid_inputs;
     valid_inputs.Add(lower_bound);
     valid_inputs.Add(lower_bound + one);
     valid_inputs.Add(upper_bound - one);
     valid_inputs.Add(upper_bound);
 
     // [-1, UB+1, UB+2, UB*2]
-    Scalars<HerScalar> invalid_inputs;
+    Scalars<S> invalid_inputs;
     invalid_inputs.Add(one.Negate());
     invalid_inputs.Add(upper_bound + one);
     invalid_inputs.Add(upper_bound + one + one);
@@ -118,7 +121,7 @@ static std::vector<TestCase> BuildTestCases()
 
     // test single valid value
     for (auto value: valid_inputs.m_vec) {
-        Scalars<HerScalar> values;
+        Scalars<S> values;
         values.Add(value);
 
         TestCase x;
@@ -134,7 +137,7 @@ static std::vector<TestCase> BuildTestCases()
 
     // test single invalid value
     for (auto value: invalid_inputs.m_vec) {
-        Scalars<HerScalar> values;
+        Scalars<S> values;
         values.Add(value);
 
         TestCase x;
@@ -176,8 +179,8 @@ static std::vector<TestCase> BuildTestCases()
 
     // test with messages of various length
     {
-        Scalars<HerScalar> values;
-        values.Add(HerScalar(1));
+        Scalars<S> values;
+        values.Add(S(1));
 
         std::vector<size_t> msg_sizes { 1ul, 23ul, 24ul, Config::m_max_message_size };
         for (auto msg_size: msg_sizes) {
@@ -196,9 +199,9 @@ static std::vector<TestCase> BuildTestCases()
     // test # of input values from 1 to max
     {
         for (size_t n=1; n<=Config::m_max_input_values; ++n) {
-            Scalars<HerScalar> values;
+            Scalars<S> values;
             for (size_t i=0; i<n; ++i) {
-                values.Add(HerScalar(i + 1));
+                values.Add(S(i + 1));
             }
             TestCase x;
             x.name = strprintf("%d valid input values", n).c_str();
@@ -214,7 +217,7 @@ static std::vector<TestCase> BuildTestCases()
 
     // test valid and invalid values mixed
     {
-        Scalars<HerScalar> values;
+        Scalars<S> values;
         for (auto& s: valid_inputs.m_vec) values.Add(s);
         for (auto& s: invalid_inputs.m_vec) values.Add(s);
 
@@ -233,7 +236,7 @@ static std::vector<TestCase> BuildTestCases()
         // string of maximum message size 54
         const std::string s("Pneumonoultramicroscopicsilicovolcanoconiosis123456789");
         assert(s.size() == Config::m_max_message_size);
-        Scalars<HerScalar> values;
+        Scalars<S> values;
         values.Add(one);
 
         for (size_t i=0; i<=s.size(); ++i) {  // try message of size 0 to 54
@@ -269,7 +272,7 @@ static void RunTestCase(
         proofs.push_back(proof);
     } else {
         for (auto value: test_case.values.m_vec) {
-            Scalars<HerScalar> single_value_vec;
+            Scalars<S> single_value_vec;
             single_value_vec.Add(value);
             auto proof = rp.Prove(single_value_vec, nonce, test_case.msg.second, token_id);
             proofs.push_back(proof);
@@ -319,8 +322,8 @@ BOOST_AUTO_TEST_CASE(test_range_proof_message_size)
 {
     RangeProofLogic rp;
 
-    Scalars<HerScalar> values;
-    values.Add(HerScalar(1));
+    Scalars<S> values;
+    values.Add(S(1));
     HerG1Point nonce = HerG1Point::GetBasePoint();
     TokenId token_id;
 
@@ -352,20 +355,20 @@ BOOST_AUTO_TEST_CASE(test_range_proof_number_of_input_values)
 
     {
         // should throw if there is no input value
-        Scalars<HerScalar> values;
+        Scalars<S> values;
         BOOST_CHECK_THROW(rp.Prove(values, nonce, msg, token_id), std::runtime_error);
     }
     {
         // should not throw if number of input values is within the valid range
-        Scalars<HerScalar> values;
-        values.Add(HerScalar(1));
+        Scalars<S> values;
+        values.Add(S(1));
         BOOST_CHECK_NO_THROW(rp.Prove(values, nonce, msg, token_id));
     }
     {
         // should throw if number of input values is outsize the valid range
-        Scalars<HerScalar> values;
+        Scalars<S> values;
         for (size_t i=0; i<Config::m_max_input_values + 1; ++i) {
-            values.Add(HerScalar(1));
+            values.Add(S(1));
         }
         BOOST_CHECK_THROW(rp.Prove(values, nonce, msg, token_id), std::runtime_error);
     }
