@@ -2,6 +2,7 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#include <blsct/arith/her/her_initializer.h>
 #include <blsct/arith/initializer.h>
 
 template <typename T>
@@ -9,3 +10,4 @@ void Initializer<T>::Init()
 {
     T::Init();
 }
+template void Initializer<HerInitializer>::Init();

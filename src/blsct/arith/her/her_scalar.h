@@ -103,7 +103,9 @@ public:
     template <typename Stream>
     void Unserialize(Stream& s);
 
-    mclBnFr m_fr;
+    using UnderlyingType = mclBnFr;
+
+    UnderlyingType m_fr;
 };
 
 #endif // NAVCOIN_BLSCT_ARITH_HER_HER_SCALAR_H

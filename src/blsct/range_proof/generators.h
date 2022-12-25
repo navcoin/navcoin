@@ -18,9 +18,8 @@
 template <typename P>
 struct Generators {
 public:
-    Generators(
-        Point<P>& H, Point<P>& G, Points<P>& Gi, Points<P>& Hi
-    ): H{H}, G{G}, Gi{Gi}, Hi{Hi} {}
+    Generators(P& H, P& G, Points<P>& Gi, Points<P>& Hi):
+        H{H}, G{G}, Gi{Gi}, Hi{Hi} {}
     Points<P> GetGiSubset(const size_t& size) const;
     Points<P> GetHiSubset(const size_t& size) const;
 
@@ -72,7 +71,7 @@ private:
     );
 
     // G generators are cached
-    inline static std::map<const TokenId, const Point<P>> m_G_cache;
+    inline static std::map<const TokenId, const P> m_G_cache;
 
     // made optional to initialize values lazily after mcl initialization
     inline static std::optional<P> m_H;

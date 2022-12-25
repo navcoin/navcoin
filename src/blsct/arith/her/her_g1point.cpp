@@ -59,6 +59,11 @@ void HerG1Point::Dispose()
     if (HerG1Point::m_g != nullptr) delete HerG1Point::m_g;
 }
 
+mclBnG1 HerG1Point::Underlying() const
+{
+    return m_p;
+}
+
 HerG1Point HerG1Point::operator=(const mclBnG1& q)
 {
     m_p = q;

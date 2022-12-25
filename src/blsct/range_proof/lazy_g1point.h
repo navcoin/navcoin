@@ -24,7 +24,6 @@ public:
 
     void Add(const LazyG1Point<P,S>& point);
 
-    template <typename PV, typename SV>
     P Sum() const;
 
     LazyG1Points<P,S> operator+(const LazyG1Points<P,S>& rhs) const;

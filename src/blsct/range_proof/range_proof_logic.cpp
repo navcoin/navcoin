@@ -2,27 +2,33 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#include <blsct/arith/her/her_g1point.h>
+#include <blsct/arith/her/her_initializer.h>
+#include <blsct/arith/her/her_scalar.h>
 #include <blsct/range_proof/lazy_g1point.h>
 #include <blsct/range_proof/range_proof_logic.h>
 #include <tinyformat.h>
 
 template <typename P, typename S, typename I>
-Scalar<S>* RangeProofLogic<P,S,I>::m_one = nullptr;
+S* RangeProofLogic<P,S,I>::m_one = nullptr;
 
 template <typename P, typename S, typename I>
-Scalar<S>* RangeProofLogic<P,S,I>::m_two = nullptr;
+S* RangeProofLogic<P,S,I>::m_two = nullptr;
 
 template <typename P, typename S, typename I>
 Scalars<S>* RangeProofLogic<P,S,I>::m_two_pows_64 = nullptr;
 
 template <typename P, typename S, typename I>
-Scalar<S>* RangeProofLogic<P,S,I>::m_inner_prod_1x2_pows_64 = nullptr;
+S* RangeProofLogic<P,S,I>::m_inner_prod_1x2_pows_64 = nullptr;
+
+template <typename P, typename S, typename I>
+S* RangeProofLogic<P,S,I>::m_uint64_max = nullptr;
 
 template <typename P, typename S, typename I>
 GeneratorsFactory<P,I>* RangeProofLogic<P,S,I>::m_gf = nullptr;
 
 template <typename P, typename S>
-AmountRecoveryRequest<P,S> AmountRecoveryRequest<P,S>::of(RangeProof<P,S>& proof, size_t& index, Point<P>& nonce)
+AmountRecoveryRequest<P,S> AmountRecoveryRequest<P,S>::of(RangeProof<P,S>& proof, size_t& index, P& nonce)
 {
     auto proof_with_transcript = RangeProofWithTranscript<P,S>::Build(proof);
 
@@ -39,6 +45,7 @@ AmountRecoveryRequest<P,S> AmountRecoveryRequest<P,S>::of(RangeProof<P,S>& proof
     };
     return req;
 }
+template AmountRecoveryRequest<HerG1Point,HerScalar> AmountRecoveryRequest<HerG1Point,HerScalar>::of(RangeProof<HerG1Point,HerScalar>&, size_t&, HerG1Point&);
 
 template <typename P, typename S>
 AmountRecoveryResult<P,S> AmountRecoveryResult<P,S>::failure() {
@@ -47,6 +54,7 @@ AmountRecoveryResult<P,S> AmountRecoveryResult<P,S>::failure() {
         std::vector<RecoveredAmount<S>>()
     };
 }
+template AmountRecoveryResult<HerG1Point,HerScalar> AmountRecoveryResult<HerG1Point,HerScalar>::failure();
 
 template <typename P, typename S, typename I>
 RangeProofLogic<P,S,I>::RangeProofLogic()
@@ -55,42 +63,45 @@ RangeProofLogic<P,S,I>::RangeProofLogic()
     boost::lock_guard<boost::mutex> lock(RangeProofLogic<P,S,I>::m_init_mutex);
 
     I::Init();
-    Point<P>::Init();
+    P::Init();
 
-    RangeProofLogic<P,S,I>::m_one = new Scalar<S>(1);
-    RangeProofLogic<P,S,I>::m_two = new Scalar<S>(2);
+    RangeProofLogic<P,S,I>::m_one = new S(1);
+    RangeProofLogic<P,S,I>::m_two = new S(2);
     RangeProofLogic<P,S,I>::m_gf = new GeneratorsFactory<P,I>();
     {
         auto two_pows_64 = Scalars<S>::FirstNPow(*m_two, Config::m_input_value_bits);
         RangeProofLogic<P,S,I>::m_two_pows_64 = new Scalars<S>(two_pows_64);
         auto ones_64 = Scalars<S>::RepeatN(*RangeProofLogic<P,S,I>::m_one, Config::m_input_value_bits);
-        RangeProofLogic<P,S,I>::m_inner_prod_1x2_pows_64 = new Scalar((ones_64 * *RangeProofLogic<P,S,I>::m_two_pows_64).Sum());
+        RangeProofLogic<P,S,I>::m_inner_prod_1x2_pows_64 =
+            new S((ones_64 * *RangeProofLogic<P,S,I>::m_two_pows_64).Sum());
     }
     {
-        Scalar<S> int64_max(INT64_MAX);
-        Scalar<S> one(1);
-        Scalar<S> uint64_max = (int64_max << 1) + one;
-        RangeProofLogic<P,S,I>::m_uint64_max = new Scalar(uint64_max);
+        S int64_max(INT64_MAX);
+        S one(1);
+        S uint64_max = (int64_max << 1) + one;
+        RangeProofLogic<P,S,I>::m_uint64_max = new S(uint64_max);
     }
     m_is_initialized = true;
 }
+template RangeProofLogic<HerG1Point,HerScalar,HerInitializer>::RangeProofLogic();
 
 template <typename P, typename S, typename I>
-Scalar<S> RangeProofLogic<P,S,I>::GetUint64Max() const
+S RangeProofLogic<P,S,I>::GetUint64Max() const
 {
     return *m_uint64_max;
 }
+template HerScalar RangeProofLogic<HerG1Point,HerScalar,HerInitializer>::GetUint64Max() const;
 
 template <typename P, typename S, typename I>
 bool RangeProofLogic<P,S,I>::InnerProductArgument(
     const size_t concat_input_values_in_bits,
     Points<P>& Gi,
     Points<P>& Hi,
-    const Point<P>& u,
-    const Scalar<S>& cx_factor,  // factor to multiply to cL and cR
+    const P& u,
+    const S& cx_factor,  // factor to multiply to cL and cR
     Scalars<S>& a,
     Scalars<S>& b,
-    const Scalar<S>& y,
+    const S& y,
     RangeProof<P,S>& proof,
     CHashWriter& transcript_gen
 ) const {
@@ -101,15 +112,15 @@ bool RangeProofLogic<P,S,I>::InnerProductArgument(
     while (n > 1) {
         n /= 2;
 
-        Scalar<S> cL = (a.To(n) * b.From(n)).Sum();
-        Scalar<S> cR = (a.From(n) * b.To(n)).Sum();
+        S cL = (a.To(n) * b.From(n)).Sum();
+        S cR = (a.From(n) * b.To(n)).Sum();
 
-        Point<P> L = (
+        P L = (
             LazyG1Points(Gi.From(n), a.To(n)) +
             LazyG1Points(Hi.To(n), rounds == 0 ? b.From(n) * y_inv_pows.To(n) : b.From(n)) +
             LazyG1Point<P,S>(u, cL * cx_factor)
         ).Sum();
-        Point<P> R = (
+        P R = (
             LazyG1Points(Gi.To(n), a.From(n)) +
             LazyG1Points(Hi.From(n), rounds == 0 ? b.To(n) * y_inv_pows.From(n) : b.To(n)) +
             LazyG1Point<P,S>(u, cR * cx_factor)
@@ -120,10 +131,10 @@ bool RangeProofLogic<P,S,I>::InnerProductArgument(
         transcript_gen << L;
         transcript_gen << R;
 
-        Scalar<S> x = transcript_gen.GetHash();
+        S x = transcript_gen.GetHash();
         if (x == 0)
             return false;
-        Scalar<S> x_inv = x.Invert();
+        S x_inv = x.Invert();
 
         // update Gi, Hi, a, b and y_inv_pows
         if (n > 1) {  // if the last loop, there is no need to update Gi and Hi
@@ -149,10 +160,10 @@ bool RangeProofLogic<P,S,I>::InnerProductArgument(
 template <typename P, typename S, typename I>
 RangeProof<P,S> RangeProofLogic<P,S,I>::Prove(
     Scalars<S>& vs,
-    Point<P>& nonce,
+    P& nonce,
     const std::vector<uint8_t>& message,
     const TokenId& token_id
-) {
+) const {
     if (message.size() > Config::m_max_message_size) {
         throw std::runtime_error(strprintf("%s: message size is too large", __func__));
     }
@@ -182,7 +193,7 @@ RangeProof<P,S> RangeProofLogic<P,S,I>::Prove(
 
     // make the number of input values a power of 2 w/ 0s if needed
     while(vs.Size() < num_input_values_power_of_2) {
-        vs.Add(Scalar(0));
+        vs.Add(S(0));
     }
 
     // Get Generators<P> for the token_id
@@ -206,7 +217,7 @@ RangeProof<P,S> RangeProofLogic<P,S,I>::Prove(
     // Values to be obfuscated are encoded in binary and flattened to a single vector aL
     // only the first 64 bits of each Scalar<S> is picked up
     Scalars<S> aL;   // ** size of aL can be shorter than concat_input_values_in_bits
-    for (Scalar<S>& v: vs.m_vec) {  // for each input value
+    for (S& v: vs.m_vec) {  // for each input value
         for(size_t i=0; i<Config::m_input_value_bits; ++i) {
             aL.Add(v.GetSeriBit(i) ? 1 : 0);
         }
@@ -232,19 +243,19 @@ retry:  // hasher is not cleared so that different hash will be obtained upon re
     // Commitment to aL and aR (obfuscated with alpha)
 
     // part of the message up to Config::m_message_1_max_size
-    Scalar<S> msg1(
+    S msg1(
         message.size() > Config::m_message_1_max_size ?
             std::vector<uint8_t>(message.begin(), message.begin() + Config::m_message_1_max_size) :
             message
     );
     // message followed by 64-bit vs[0]
-    Scalar<S> msg1_v0 = (msg1 << Config::m_input_value_bits) | vs[0];
+    S msg1_v0 = (msg1 << Config::m_input_value_bits) | vs[0];
 
-    Scalar<S> alpha = nonce.GetHashWithSalt(1);
+    S alpha = nonce.GetHashWithSalt(1);
     alpha = alpha + msg1_v0;
 
     // Using generator H for alpha following the paper
-    proof.A = (LazyG1Points(Gi, aL) + LazyG1Points(Hi, aR) + LazyG1Point<P,S>(H, alpha)).Sum();
+    proof.A = (LazyG1Points<P,S>(Gi, aL) + LazyG1Points<P,S>(Hi, aR) + LazyG1Point<P,S>(H, alpha)).Sum();
 
     // (45)-(47)
     // Commitment to blinding vectors sL and sR (obfuscated with rho)
@@ -259,11 +270,11 @@ retry:  // hasher is not cleared so that different hash will be obtained upon re
     transcript_gen << proof.A;
     transcript_gen << proof.S;
 
-    Scalar<S> y = transcript_gen.GetHash();
+    S y = transcript_gen.GetHash();
     if (y == 0) goto retry;
     transcript_gen << y;
 
-    Scalar<S> z = transcript_gen.GetHash();
+    S z = transcript_gen.GetHash();
     if (z == 0) goto retry;
     transcript_gen << z;
 
@@ -295,15 +306,15 @@ retry:  // hasher is not cleared so that different hash will be obtained upon re
     Scalars<S> r1 = y_pows * sR;
 
     // Polynomial construction before (51)
-    Scalar<S> t1 = (l0 * r1).Sum() + (l1 * r0).Sum();
-    Scalar<S> t2 = (l1 * r1).Sum();
+    S t1 = (l0 * r1).Sum() + (l1 * r0).Sum();
+    S t2 = (l1 * r1).Sum();
 
     // (52)-(53)
-    Scalar<S> tau1 = nonce.GetHashWithSalt(3);
-    Scalar<S> tau2 = nonce.GetHashWithSalt(4);
+    S tau1 = nonce.GetHashWithSalt(3);
+    S tau2 = nonce.GetHashWithSalt(4);
 
     // part of the message after Config::m_message_1_max_size
-    Scalar<S> msg2 = Scalar({
+    S msg2 = S({
         message.size() > Config::m_message_1_max_size ?
             std::vector<uint8_t>(message.begin() + Config::m_message_1_max_size, message.end()) :
             std::vector<uint8_t>()
@@ -317,7 +328,7 @@ retry:  // hasher is not cleared so that different hash will be obtained upon re
     transcript_gen << proof.T1;
     transcript_gen << proof.T2;
 
-    Scalar<S> x = transcript_gen.GetHash();
+    S x = transcript_gen.GetHash();
     if (x == 0) goto retry;
 
     // x will be added to transcript later
@@ -330,8 +341,8 @@ retry:  // hasher is not cleared so that different hash will be obtained upon re
     proof.t_hat = (l * r).Sum();
 
     // RHS of (60)
-    Scalar<S> t0 = (l0 * r0).Sum();
-    Scalar<S> t_of_x = t0 + t1 * x + t2 * x.Square();
+    S t0 = (l0 * r0).Sum();
+    S t_of_x = t0 + t1 * x + t2 * x.Square();
 
     // (60)
     if (proof.t_hat != t_of_x)
@@ -347,7 +358,7 @@ retry:  // hasher is not cleared so that different hash will be obtained upon re
     transcript_gen << proof.mu;
     transcript_gen << proof.t_hat;
 
-    Scalar<S> cx_factor = transcript_gen.GetHash();
+    S cx_factor = transcript_gen.GetHash();
     if (cx_factor == 0) goto retry;
 
     if (!InnerProductArgument(  // fails if x == 0 is generated from transcript_gen
@@ -366,6 +377,12 @@ retry:  // hasher is not cleared so that different hash will be obtained upon re
     }
     return proof;
 }
+template RangeProof<HerG1Point,HerScalar> RangeProofLogic<HerG1Point,HerScalar,HerInitializer>::Prove(
+    Scalars<HerScalar>&,
+    HerG1Point&,
+    const std::vector<uint8_t>&,
+    const TokenId&
+) const;
 
 template <typename P, typename S, typename I>
 void RangeProofLogic<P,S,I>::ValidateProofsBySizes(
@@ -394,31 +411,34 @@ void RangeProofLogic<P,S,I>::ValidateProofsBySizes(
                 __func__, proof.Ls.Size(), proof.Rs.Size()));
     }
 }
+template void RangeProofLogic<HerG1Point,HerScalar,HerInitializer>::ValidateProofsBySizes(
+    const std::vector<RangeProof<HerG1Point,HerScalar>>&
+);
 
 template <typename P, typename S, typename I>
-Point<P> RangeProofLogic<P,S,I>::VerifyProofs(
+P RangeProofLogic<P,S,I>::VerifyProofs(
     const std::vector<RangeProofWithTranscript<P,S>>& proof_transcripts,
     const Generators<P>& gens,
     const size_t& max_mn
 ) const {
     LazyG1Points<P,S> points;
-    Scalar<S> h_pos_exp = 0;
-    Scalar<S> g_neg_exp = 0;
-    Scalar<S> h_neg_exp = 0;
-    Scalar<S> g_pos_exp = 0;
+    S h_pos_exp = 0;
+    S g_neg_exp = 0;
+    S h_neg_exp = 0;
+    S g_pos_exp = 0;
     Scalars<S> gi_exps(max_mn, 0);
     Scalars<S> hi_exps(max_mn, 0);
 
-    Point<P> G = gens.G;
-    Point<P> H = gens.H.get();
+    P G = gens.G;
+    P H = gens.H.get();
 
     for (const RangeProofWithTranscript<P,S>& p: proof_transcripts) {
         auto num_rounds = RangeProofWithTranscript<P,S>::RecoverNumRounds(p.proof.Vs.Size());
-        Scalar<S> weight_y = Scalar<S>::Rand();
-        Scalar<S> weight_z = Scalar<S>::Rand();
+        S weight_y = S::Rand();
+        S weight_z = S::Rand();
 
         Scalars<S> z_pows_from_2 = Scalars<S>::FirstNPow(p.z, p.num_input_values_power_2 + 1, 2); // z^2, z^3, ... // VectorPowers(pd.z, M+3);
-        Scalar<S> y_pows_sum = Scalars<S>::FirstNPow(p.y, p.concat_input_values_in_bits).Sum(); // VectorPowerSum(p.y, MN);
+        S y_pows_sum = Scalars<S>::FirstNPow(p.y, p.concat_input_values_in_bits).Sum(); // VectorPowerSum(p.y, MN);
 
         //////// (65)
         // g^t_hat * h^tau_x = V^(z^2) * g^delta_yz * T1^x * T2^(x^2)
@@ -430,7 +450,7 @@ Point<P> RangeProofLogic<P,S,I>::VerifyProofs(
         // delta(y,z) in (39)
         // = (z - z^2)*<1^n, y^n> - z^3<1^n,2^n>
         // = z*<1^n, y^n> (1) - z^2*<1^n, y^n> (2) - z^3<1^n,2^n> (3)
-        Scalar<S> delta_yz =
+        S delta_yz =
             p.z * y_pows_sum  // (1)
             - (z_pows_from_2[0] * y_pows_sum);  // (2)
         for (size_t i = 1; i <= p.num_input_values_power_2; ++i) {
@@ -464,7 +484,7 @@ Point<P> RangeProofLogic<P,S,I>::VerifyProofs(
 
         // this loop generates exponents for gi and hi generators so that
         // when there are aggregated, they become g and h in (16)
-        std::vector<Scalar<S>> acc_xs(1 << num_rounds, 1);  // initialize all elems to 1
+        std::vector<S> acc_xs(1 << num_rounds, 1);  // initialize all elems to 1
         acc_xs[0] = p.inv_xs[0];
         acc_xs[1] = p.xs[0];
         for (size_t i = 1; i < num_rounds; ++i) {
@@ -476,19 +496,19 @@ Point<P> RangeProofLogic<P,S,I>::VerifyProofs(
         }
 
         // for all bits of concat input values, do:
-        Scalar<S> y_inv_pow(1);
-        Scalar<S> y_pow(1);
+        S y_inv_pow(1);
+        S y_pow(1);
         for (size_t i = 0; i < p.concat_input_values_in_bits; ++i) {
             // g^a * h^b (16)
-            Scalar<S> gi_exp = p.proof.a * acc_xs[i];  // g^a in (16) is distributed to each generator
-            Scalar<S> hi_exp = p.proof.b *
+            S gi_exp = p.proof.a * acc_xs[i];  // g^a in (16) is distributed to each generator
+            S hi_exp = p.proof.b *
                 y_inv_pow *
                 acc_xs[p.concat_input_values_in_bits - 1 - i];  // h^b in (16) is distributed to each generator. y_inv_pow to turn generator to (h')
 
             gi_exp = gi_exp + p.z;  // g^(-z) in RHS (66)
 
             // ** z^2 * 2^n in (h')^(z * y^n + z^2 * 2^n) in RHS (66)
-            Scalar<S> tmp =
+            S tmp =
                 z_pows_from_2[i / Config::m_input_value_bits] *  // skipping the first 2 powers, different z_pow is assigned to each number
                 (*m_two_pows_64)[i % Config::m_input_value_bits];   // power of 2 corresponding to i-th bit of the number being processed
 
@@ -528,6 +548,11 @@ Point<P> RangeProofLogic<P,S,I>::VerifyProofs(
     // should be aggregated to zero if proofs are all valid
     return points.Sum();
 }
+template HerG1Point RangeProofLogic<HerG1Point,HerScalar,HerInitializer>::VerifyProofs(
+    const std::vector<RangeProofWithTranscript<HerG1Point,HerScalar>>&,
+    const Generators<HerG1Point>&,
+    const size_t&
+) const;
 
 template <typename P, typename S, typename I>
 bool RangeProofLogic<P,S,I>::Verify(
@@ -551,13 +576,17 @@ bool RangeProofLogic<P,S,I>::Verify(
     const size_t max_mn = 1 << max_num_rounds;
     const Generators<P> gens = m_gf->GetInstance(token_id);
 
-    Point<P> point_sum = VerifyProofs(
+    P point_sum = VerifyProofs(
         proof_transcripts,
         gens,
         max_mn
     );
     return point_sum.IsUnity();
 }
+template bool RangeProofLogic<HerG1Point,HerScalar,HerInitializer>::Verify(
+    const std::vector<RangeProof<HerG1Point,HerScalar>>&,
+    const TokenId&
+) const;
 
 template <typename P, typename S, typename I>
 AmountRecoveryResult<P,S> RangeProofLogic<P,S,I>::RecoverAmounts(
@@ -569,8 +598,8 @@ AmountRecoveryResult<P,S> RangeProofLogic<P,S,I>::RecoverAmounts(
 
     for (const AmountRecoveryRequest<P,S>& req: reqs) {
         const Generators<P> gens = m_gf->GetInstance(token_id);
-        Point<P> G = gens.G;
-        Point<P> H = gens.H.get();
+        P G = gens.G;
+        P H = gens.H.get();
 
         // failure if sizes of Ls and Rs differ or Vs is empty
         auto Ls_Rs_valid = req.Ls.Size() > 0 && req.Ls.Size() == req.Rs.Size();
@@ -583,11 +612,11 @@ AmountRecoveryResult<P,S> RangeProofLogic<P,S,I>::RecoverAmounts(
         }
 
         // recover Scalar<S> values from nonce
-        const Scalar<S> alpha = req.nonce.GetHashWithSalt(1);
-        const Scalar<S> rho = req.nonce.GetHashWithSalt(2);
-        const Scalar<S> tau1 = req.nonce.GetHashWithSalt(3);
-        const Scalar<S> tau2 = req.nonce.GetHashWithSalt(4);
-        const Scalar<S> input_value0_gamma = req.nonce.GetHashWithSalt(100);  // gamma for vs[0]
+        const S alpha = req.nonce.GetHashWithSalt(1);
+        const S rho = req.nonce.GetHashWithSalt(2);
+        const S tau1 = req.nonce.GetHashWithSalt(3);
+        const S tau2 = req.nonce.GetHashWithSalt(4);
+        const S input_value0_gamma = req.nonce.GetHashWithSalt(100);  // gamma for vs[0]
 
         // breakdown of mu is:
         // mu = alpha + rho * x ... (62)
@@ -600,11 +629,11 @@ AmountRecoveryResult<P,S> RangeProofLogic<P,S,I>::RecoverAmounts(
         // subtracting alpha from nonce from it results in:
         // (message << 64 | 64-bit v[0])
         //
-        const Scalar<S> message_v0 = (req.mu - rho * req.x) - alpha;
-        const Scalar<S> input_value0 = message_v0 & *RangeProofLogic<P,S,I>::m_uint64_max;
+        const S message_v0 = (req.mu - rho * req.x) - alpha;
+        const S input_value0 = message_v0 & *RangeProofLogic<P,S,I>::m_uint64_max;
 
         // skip this request if recovered input value 0 commitment doesn't match with Vs[0]
-        Point<P> input_value0_commitment = (H * input_value0_gamma) + (G * input_value0);
+        P input_value0_commitment = (H * input_value0_gamma) + (G * input_value0);
         if (input_value0_commitment != req.Vs[0]) {
             continue;
         }
@@ -627,7 +656,7 @@ AmountRecoveryResult<P,S> RangeProofLogic<P,S,I>::RecoverAmounts(
         // since tau1 in (61) is tau1 (C) + msg2, by subtracting tau1 (C) from RHS of (D)
         // msg2 can be extracted
         //
-        Scalar<S> msg2_scalar = ((tau_x - (tau2 * x.Square()) - (z.Square() * input_value0_gamma)) * x.Invert()) - tau1;
+        S msg2_scalar = ((tau_x - (tau2 * x.Square()) - (z.Square() * input_value0_gamma)) * x.Invert()) - tau1;
         std::vector<uint8_t> msg2 = msg2_scalar.GetVch(true);
 
         RecoveredAmount<S> recovered_amount(
@@ -643,3 +672,7 @@ AmountRecoveryResult<P,S> RangeProofLogic<P,S,I>::RecoverAmounts(
         recovered_amounts
     };
 }
+template AmountRecoveryResult<HerG1Point,HerScalar> RangeProofLogic<HerG1Point,HerScalar,HerInitializer>::RecoverAmounts(
+    const std::vector<AmountRecoveryRequest<HerG1Point,HerScalar>>&,
+    const TokenId&
+) const;

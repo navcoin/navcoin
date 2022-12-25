@@ -167,7 +167,7 @@ template <typename P>
 template <typename S>
 PrivateKey<P>::PrivateKey(S k_)
 {
-    if constexpr (std::is_same_v<S, CPrivKey>) {
+    if constexpr (std::is_same_v<S, std::vector<uint8_t>>) {
         k.resize(PrivateKey<P>::SIZE);
         memcpy(k.data(), &k_.front(), k.size());
     }
@@ -179,6 +179,8 @@ PrivateKey<P>::PrivateKey(S k_)
         throw std::runtime_error("Not implemented");
     }
 }
+template PrivateKey<HerG1Point>::PrivateKey(HerScalar k_);
+template PrivateKey<HerG1Point>::PrivateKey(std::vector<uint8_t> k_);
 
 template <typename P>
 bool PrivateKey<P>::operator==(const PrivateKey<P>& rhs) const

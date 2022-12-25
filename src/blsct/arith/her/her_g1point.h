@@ -69,7 +69,8 @@ public:
     template <typename Stream>
     void Unserialize(Stream& s);
 
-    mclBnG1 m_p;
+    using UnderlyingType = mclBnG1;
+    UnderlyingType m_p;
 
 private:
     static mclBnG1* m_g; // Using mclBnG1 instead of HerG1Point to get around chiken-and-egg issue

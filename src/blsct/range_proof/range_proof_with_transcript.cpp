@@ -3,6 +3,8 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <blsct/range_proof/config.h>
+#include <blsct/arith/her/her_g1point.h>
+#include <blsct/arith/her/her_scalar.h>
 #include <blsct/range_proof/range_proof_with_transcript.h>
 #include <hash.h>
 
@@ -17,23 +19,23 @@ RangeProofWithTranscript<P,S> RangeProofWithTranscript<P,S>::Build(const RangePr
     transcript_gen << proof.A;
     transcript_gen << proof.S;
 
-    Scalar<S> y = transcript_gen.GetHash();
+    S y = transcript_gen.GetHash();
     transcript_gen << y;
 
-    Scalar<S> z = transcript_gen.GetHash();
+    S z = transcript_gen.GetHash();
     transcript_gen << z;
 
     transcript_gen << proof.T1;
     transcript_gen << proof.T2;
 
-    Scalar<S> x = transcript_gen.GetHash();
+    S x = transcript_gen.GetHash();
     transcript_gen << x;
 
     transcript_gen << proof.tau_x;
     transcript_gen << proof.mu;
     transcript_gen << proof.t_hat;
 
-    Scalar<S> cx_factor = transcript_gen.GetHash();
+    S cx_factor = transcript_gen.GetHash();
 
     auto num_rounds = RangeProofWithTranscript<P,S>::RecoverNumRounds(proof.Vs.Size());
 
@@ -43,7 +45,7 @@ RangeProofWithTranscript<P,S> RangeProofWithTranscript<P,S>::Build(const RangePr
     for (size_t i = 0; i < num_rounds; ++i) {
         transcript_gen << proof.Ls[i];
         transcript_gen << proof.Rs[i];
-        Scalar<S> x(transcript_gen.GetHash());
+        S x(transcript_gen.GetHash());
         xs.Add(x);
         inv_xs.Add(x.Invert());
     }
@@ -63,6 +65,7 @@ RangeProofWithTranscript<P,S> RangeProofWithTranscript<P,S>::Build(const RangePr
         concat_input_values_in_bits
     );
 }
+template RangeProofWithTranscript<HerG1Point,HerScalar> RangeProofWithTranscript<HerG1Point,HerScalar>::Build(const RangeProof<HerG1Point,HerScalar>&);
 
 template <typename P, typename S>
 size_t RangeProofWithTranscript<P,S>::RecoverNumRounds(const size_t& num_input_values)
@@ -75,3 +78,4 @@ size_t RangeProofWithTranscript<P,S>::RecoverNumRounds(const size_t& num_input_v
 
     return num_rounds;
 }
+template size_t RangeProofWithTranscript<HerG1Point,HerScalar>::RecoverNumRounds(const size_t&);

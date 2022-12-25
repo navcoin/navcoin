@@ -202,18 +202,15 @@ std::string Scalar<S>::GetString(const int8_t radix) const
 }
 
 template <typename S>
-std::vector<bool> Scalar<S>::GetBits() const
+bool Scalar<S>::GetSeriBit(const uint8_t& n) const
 {
-    return static_cast<S*>(this)->GetBits();
+    return static_cast<S*>(this)->GetSeriBit(n);
 }
 
-/**
- * Since GetVch returns 32-byte vector, maximum bit index is 8 * 32 - 1 = 255
- */
 template <typename S>
-bool Scalar<S>::GetBit(uint8_t n) const
+std::vector<bool> Scalar<S>::ToBinaryVec() const
 {
-    return static_cast<S*>(this)->GetBit(n);
+    return static_cast<S*>(this)->ToBinaryVec();
 }
 
 template <typename S>

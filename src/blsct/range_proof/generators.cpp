@@ -95,10 +95,10 @@ Generators<P> GeneratorsFactory<P,I>::GetInstance(const TokenId& token_id)
 {
     // if G for the token_id hasn't been created, create and cache it
     if (GeneratorsFactory<P,I>::m_G_cache.count(token_id) == 0) {
-        const Point<P> G = DeriveGenerator(GeneratorsFactory<P,I>::m_H.value(), 0, token_id);
+        const P G = DeriveGenerator(GeneratorsFactory<P,I>::m_H.value(), 0, token_id);
         GeneratorsFactory<P,I>::m_G_cache.emplace(token_id, G);
     }
-    Point<P> G = GeneratorsFactory<P,I>::m_G_cache[token_id];
+    P G = GeneratorsFactory<P,I>::m_G_cache[token_id];
 
     Generators<P> gens(m_H.value(), G, m_Gi.value(), m_Hi.value());
     return gens;

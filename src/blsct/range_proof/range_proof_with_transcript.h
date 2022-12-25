@@ -14,10 +14,10 @@ class RangeProofWithTranscript
 public:
     RangeProofWithTranscript(
         const RangeProof<P,S>& proof,
-        const Scalar<S>& x,
-        const Scalar<S>& y,
-        const Scalar<S>& z,
-        const Scalar<S>& cx_factor,
+        const S& x,
+        const S& y,
+        const S& z,
+        const S& cx_factor,
         const Scalars<S>& xs,
         const Scalars<S>& inv_xs,
         const size_t& num_input_values_power_2,
@@ -34,13 +34,13 @@ public:
     const RangeProof<P,S> proof;
 
     // transcript
-    const Scalar<S> x;  // x used in the main prove procedure
-    const Scalar<S> y;
-    const Scalar<S> z;
-    const Scalar<S> cx_factor;  // factor multiplied to cL and cR in inner product argument
+    const S x;  // x used in the main prove procedure
+    const S y;
+    const S z;
+    const S cx_factor;  // factor multiplied to cL and cR in inner product argument
     const Scalars<S> xs;      // x used in inner product argument
     const Scalars<S> inv_xs;  // x^-1 used in inner product argument
-    const Scalar<S> inv_y;
+    const S inv_y;
 
     const size_t num_input_values_power_2;  // M in old impl
     const size_t concat_input_values_in_bits;  // MN is old impl

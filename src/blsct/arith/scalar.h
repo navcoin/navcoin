@@ -19,9 +19,6 @@ class Scalar {
 public:
     Scalar();
 
-    // template <typename SV>
-    // Scalar<S>(const SV& v);
-
     static void Init();
 
     void operator=(const uint64_t& n);
@@ -69,8 +66,8 @@ public:
 
     std::string GetString(const int8_t radix = 16) const;
 
-    bool GetBit(uint8_t n) const;
-    std::vector<bool> GetBits() const;
+    bool GetSeriBit(const uint8_t& n) const;
+    std::vector<bool> ToBinaryVec() const;
 
     unsigned int GetSerializeSize() const;
 
