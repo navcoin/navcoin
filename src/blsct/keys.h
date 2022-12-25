@@ -92,32 +92,23 @@ public:
     PrivateKey() { k.clear(); }
 
     template <typename S>
-    PrivateKey(S k_)
-    {
-        k.resize(PrivateKey<P>::SIZE);
-        std::vector<unsigned char> v = k_.GetVch();
-        memcpy(k.data(), &v.front(), k.size());
-    }
+    PrivateKey(S k_);
 
-    PrivateKey(CPrivKey k_)
-    {
-        k.resize(PrivateKey<P>::SIZE);
-        memcpy(k.data(), &k_.front(), k.size());
-    }
+    PrivateKey(CPrivKey k_);
 
     SERIALIZE_METHODS(PrivateKey<P>, obj) { READWRITE(std::vector<unsigned char>(obj.k.begin(), obj.k.end())); }
 
     bool operator==(const PrivateKey<P>& rhs) const;
 
     template <typename S>
-    P GetG1Point() const;
+    P GetPoint() const;
 
     PublicKey<P> GetPublicKey() const;
 
     template <typename S>
     S GetScalar() const;
 
-    template <typename V>
+    template <typename S>
     bool IsValid() const;
 
     void SetToZero();

@@ -164,6 +164,23 @@ std::vector<unsigned char> DoublePublicKey<P>::GetVch() const
 template std::vector<unsigned char> DoublePublicKey<HerG1Point>::GetVch() const;
 
 template <typename P>
+template <typename S>
+PrivateKey<P>::PrivateKey(S k_)
+{
+    if constexpr (std::is_same_v<S, CPrivKey>) {
+        k.resize(PrivateKey<P>::SIZE);
+        memcpy(k.data(), &k_.front(), k.size());
+    }
+    else if constexpr (std::is_same_v<S, HerScalar>) {
+        k.resize(PrivateKey<P>::SIZE);
+        std::vector<unsigned char> v = k_.GetVch();
+        memcpy(k.data(), &v.front(), k.size());
+    } else {
+        throw std::runtime_error("Not implemented");
+    }
+}
+
+template <typename P>
 bool PrivateKey<P>::operator==(const PrivateKey<P>& rhs) const
 {
     return k == rhs.k;
@@ -172,16 +189,16 @@ template bool PrivateKey<HerG1Point>::operator==(const PrivateKey<HerG1Point>& r
 
 template <typename P>
 template <typename S>
-P PrivateKey<P>::GetG1Point() const
+P PrivateKey<P>::GetPoint() const
 {
     return Point<P>::GetBasePoint() * S(std::vector<unsigned char>(k.begin(), k.end()));
 }
-template HerG1Point PrivateKey<HerG1Point>::GetG1Point<HerScalar>() const;
+template HerG1Point PrivateKey<HerG1Point>::GetPoint<HerScalar>() const;
 
 template <typename P>
 PublicKey<P> PrivateKey<P>::GetPublicKey() const
 {
-    return PublicKey(GetG1Point<HerScalar>());
+    return PublicKey(GetPoint<HerScalar>());
 }
 template PublicKey<HerG1Point> PrivateKey<HerG1Point>::GetPublicKey() const;
 
