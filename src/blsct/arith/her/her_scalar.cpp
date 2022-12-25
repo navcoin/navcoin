@@ -356,7 +356,7 @@ bool HerScalar::GetSeriBit(const uint8_t& n) const
 
 unsigned int HerScalar::GetSerializeSize() const
 {
-    return ::GetSerializeSize(GetVch());
+    return SERIALIZATION_SIZE_IN_BYTES;
 }
 
 template <typename Stream>

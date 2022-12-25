@@ -174,6 +174,7 @@ uint64_t Scalar<S>::GetUint64() const
 template <typename S>
 std::vector<uint8_t> Scalar<S>::GetVch() const
 {
+    printf("Scalar::GetVch\n");
     return static_cast<S*>(this)->GetVch();
 }
 

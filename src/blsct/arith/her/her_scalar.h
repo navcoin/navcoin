@@ -103,8 +103,9 @@ public:
     template <typename Stream>
     void Unserialize(Stream& s);
 
-    using UnderlyingType = mclBnFr;
+    static constexpr int SERIALIZATION_SIZE_IN_BYTES = 32;
 
+    using UnderlyingType = mclBnFr;
     UnderlyingType m_fr;
 };
 
