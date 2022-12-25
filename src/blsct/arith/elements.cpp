@@ -10,6 +10,21 @@
 #include <tinyformat.h>
 
 template <typename T>
+Elements<T>::Elements()
+{
+}
+template Elements<HerG1Point>::Elements();
+template Elements<HerScalar>::Elements();
+
+template <typename T>
+Elements<T>::Elements(const std::vector<T>& vec)
+{
+    m_vec = vec;
+}
+template Elements<HerG1Point>::Elements(const std::vector<HerG1Point>& vec);
+template Elements<HerScalar>::Elements(const std::vector<HerScalar>& vec);
+
+template <typename T>
 Elements<T>::Elements(const size_t& size, const T& default_value)
 {
     std::vector<T> vec(size, default_value);
@@ -19,12 +34,12 @@ template Elements<HerScalar>::Elements(const size_t&, const HerScalar&);
 template Elements<HerG1Point>::Elements(const size_t&, const HerG1Point&);
 
 template <typename T>
-Elements<T>::Elements(const Elements &x)
+Elements<T>::Elements(const Elements<T>& other)
 {
-    m_vec = x.m_vec;
+    m_vec = other.m_vec;
 }
-template Elements<HerScalar>::Elements(const Elements &x);
-template Elements<HerG1Point>::Elements(const Elements &x);
+template Elements<HerScalar>::Elements(const Elements<HerScalar> &x);
+template Elements<HerG1Point>::Elements(const Elements<HerG1Point> &x);
 
 template <typename T>
 bool Elements<T>::Empty() const

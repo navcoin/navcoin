@@ -21,9 +21,9 @@ class Elements
 {
 public:
     Elements();
-    Elements(std::vector<T> vec);
+    Elements(const std::vector<T>& vec);
     Elements(const size_t& size, const T& default_value);
-    Elements(const Elements &x);
+    Elements(const Elements& other);
 
     T Sum() const;
     T& operator[](const size_t& index);

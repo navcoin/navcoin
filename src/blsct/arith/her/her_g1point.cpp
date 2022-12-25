@@ -3,8 +3,8 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <blsct/arith/her/her_g1point.h>
-
 #include <numeric>
+#include <streams.h>
 
 mclBnG1* HerG1Point::m_g = nullptr;
 boost::mutex HerG1Point::m_init_mutex;
@@ -217,3 +217,19 @@ HerScalar HerG1Point::GetHashWithSalt(const uint64_t salt) const
     HerScalar hash(hasher.GetHash());
     return hash;
 }
+
+template <typename Stream>
+void HerG1Point::Serialize(Stream& s) const
+{
+    ::Serialize(s, GetVch());
+}
+template void HerG1Point::Serialize(CDataStream& s) const;
+
+template <typename Stream>
+void HerG1Point::Unserialize(Stream& s)
+{
+    std::vector<uint8_t> vch;
+    ::Unserialize(s, vch);
+    SetVch(vch);
+}
+template void HerG1Point::Unserialize(CDataStream& s);

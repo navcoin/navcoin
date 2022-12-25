@@ -16,12 +16,14 @@ Points<P> Generators<P>::GetGiSubset(const size_t& size) const
 {
     return Gi.get().To(size);
 }
+template Points<HerG1Point> Generators<HerG1Point>::GetGiSubset(const size_t&) const;
 
 template <typename P>
 Points<P> Generators<P>::GetHiSubset(const size_t& size) const
 {
     return Hi.get().To(size);
 }
+template Points<HerG1Point> Generators<HerG1Point>::GetHiSubset(const size_t&) const;
 
 template <typename P, typename I>
 GeneratorsFactory<P,I>::GeneratorsFactory()
@@ -86,6 +88,7 @@ P GeneratorsFactory<P,I>::DeriveGenerator(
     }
     return ret;
 }
+template HerG1Point GeneratorsFactory<HerG1Point,HerInitializer>::DeriveGenerator(const HerG1Point&, const size_t, const TokenId&);
 
 template <typename P, typename I>
 Generators<P> GeneratorsFactory<P,I>::GetInstance(const TokenId& token_id)
@@ -100,3 +103,4 @@ Generators<P> GeneratorsFactory<P,I>::GetInstance(const TokenId& token_id)
     Generators<P> gens(m_H.value(), G, m_Gi.value(), m_Hi.value());
     return gens;
 }
+template Generators<HerG1Point> GeneratorsFactory<HerG1Point,HerInitializer>::GetInstance(const TokenId&);

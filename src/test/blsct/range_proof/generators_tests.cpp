@@ -12,12 +12,13 @@
 
 using P = HerG1Point;
 using S = HerScalar;
+using I = HerInitializer;
 
 BOOST_FIXTURE_TEST_SUITE(generators_tests, HerTestingSetup)
 
 BOOST_AUTO_TEST_CASE(test_generators_get_instance)
 {
-    GeneratorsFactory<P,S> gf;
+    GeneratorsFactory<P,I> gf;
 
     TokenId token_id_1(uint256(1), 11ULL);
     Generators<P> gens1 = gf.GetInstance(token_id_1);
@@ -40,7 +41,7 @@ BOOST_AUTO_TEST_CASE(test_generators_get_instance)
 
 BOOST_AUTO_TEST_CASE(test_generators_h_static)
 {
-    GeneratorsFactory<P,S> gf;
+    GeneratorsFactory<P,I> gf;
 
     TokenId token_id_1(uint256(1), 11ULL);
     Generators<P> gens1 = gf.GetInstance(token_id_1);
@@ -57,7 +58,7 @@ BOOST_AUTO_TEST_CASE(test_generators_h_static)
 
 BOOST_AUTO_TEST_CASE(test_generators_g_derived_from_token_id)
 {
-    GeneratorsFactory<P,S> gf;
+    GeneratorsFactory<P,I> gf;
 
     TokenId token_id_1(uint256(1), 11ULL);
     Generators<P> gens1 = gf.GetInstance(token_id_1);
@@ -76,7 +77,7 @@ BOOST_AUTO_TEST_CASE(test_generators_g_derived_from_token_id)
 BOOST_AUTO_TEST_CASE(test_generators_get_gihi_subset)
 {
     TokenId token_id(uint256(1), 11ULL);
-    GeneratorsFactory<P,S> gf;
+    GeneratorsFactory<P,I> gf;
 
     Generators<P> gens = gf.GetInstance(token_id);
 
