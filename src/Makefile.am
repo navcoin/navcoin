@@ -159,6 +159,7 @@ BITCOIN_CORE_H = \
   blsct/arith/her/her_g1point.h \
   blsct/arith/her/her_initializer.h \
   blsct/arith/her/her_scalar.h \
+  blsct/arith/her/her_types.h \
   blsct/arith/elements.h \
   blsct/arith/initializer.h \
   blsct/arith/point.h \
