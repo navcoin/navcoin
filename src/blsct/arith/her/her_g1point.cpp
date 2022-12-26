@@ -229,6 +229,7 @@ void HerG1Point::Serialize(Stream& s) const
     ::Serialize(s, GetVch());
 }
 template void HerG1Point::Serialize(CDataStream& s) const;
+template void HerG1Point::Serialize(CHashWriter& s) const;
 
 template <typename Stream>
 void HerG1Point::Unserialize(Stream& s)
