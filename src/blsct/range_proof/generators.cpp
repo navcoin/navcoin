@@ -25,13 +25,13 @@ Points<P> Generators<P>::GetHiSubset(const size_t& size) const
 }
 template Points<HerG1Point> Generators<HerG1Point>::GetHiSubset(const size_t&) const;
 
-template <typename P, typename I>
-GeneratorsFactory<P,I>::GeneratorsFactory()
+template <typename P>
+GeneratorsFactory<P>::GeneratorsFactory()
 {
-    boost::lock_guard<boost::mutex> lock(GeneratorsFactory<P,I>::m_init_mutex);
-    if (GeneratorsFactory<P,I>::m_is_initialized) return;
+    boost::lock_guard<boost::mutex> lock(GeneratorsFactory<P>::m_init_mutex);
+    if (GeneratorsFactory<P>::m_is_initialized) return;
 
-    Initializer<I>::Init();
+    P::InitializerType::Init();
     Point<P>::Init();
 
     m_H = Point<P>::GetBasePoint();
@@ -53,10 +53,10 @@ GeneratorsFactory<P,I>::GeneratorsFactory()
 
     m_is_initialized = true;
 }
-template GeneratorsFactory<HerG1Point,HerInitializer>::GeneratorsFactory();
+template GeneratorsFactory<HerG1Point>::GeneratorsFactory();
 
-template <typename P, typename I>
-P GeneratorsFactory<P,I>::DeriveGenerator(
+template <typename P>
+P GeneratorsFactory<P>::DeriveGenerator(
     const P& p,
     const size_t index,
     const TokenId& token_id)
@@ -88,19 +88,19 @@ P GeneratorsFactory<P,I>::DeriveGenerator(
     }
     return ret;
 }
-template HerG1Point GeneratorsFactory<HerG1Point,HerInitializer>::DeriveGenerator(const HerG1Point&, const size_t, const TokenId&);
+template HerG1Point GeneratorsFactory<HerG1Point>::DeriveGenerator(const HerG1Point&, const size_t, const TokenId&);
 
-template <typename P, typename I>
-Generators<P> GeneratorsFactory<P,I>::GetInstance(const TokenId& token_id)
+template <typename P>
+Generators<P> GeneratorsFactory<P>::GetInstance(const TokenId& token_id)
 {
     // if G for the token_id hasn't been created, create and cache it
-    if (GeneratorsFactory<P,I>::m_G_cache.count(token_id) == 0) {
-        const P G = DeriveGenerator(GeneratorsFactory<P,I>::m_H.value(), 0, token_id);
-        GeneratorsFactory<P,I>::m_G_cache.emplace(token_id, G);
+    if (GeneratorsFactory<P>::m_G_cache.count(token_id) == 0) {
+        const P G = DeriveGenerator(GeneratorsFactory<P>::m_H.value(), 0, token_id);
+        GeneratorsFactory<P>::m_G_cache.emplace(token_id, G);
     }
-    P G = GeneratorsFactory<P,I>::m_G_cache[token_id];
+    P G = GeneratorsFactory<P>::m_G_cache[token_id];
 
     Generators<P> gens(m_H.value(), G, m_Gi.value(), m_Hi.value());
     return gens;
 }
-template Generators<HerG1Point> GeneratorsFactory<HerG1Point,HerInitializer>::GetInstance(const TokenId&);
+template Generators<HerG1Point> GeneratorsFactory<HerG1Point>::GetInstance(const TokenId&);

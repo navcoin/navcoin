@@ -14,8 +14,6 @@ BOOST_FIXTURE_TEST_SUITE(lazy_g1point_tests, HerTestingSetup)
 
 using P = HerG1Point;
 using S = HerScalar;
-using PV = mclBnG1;
-using PS = mclBnFr;
 
 BOOST_AUTO_TEST_CASE(test_lazy_g1points_ctor)
 {

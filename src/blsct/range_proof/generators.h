@@ -55,7 +55,7 @@ private:
  * the public key whose private key is Sum(randomness). That will be
  * used later for signature verification.
  */
-template <typename P, typename I>
+template <typename P>
 class GeneratorsFactory
 {
 public:

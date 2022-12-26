@@ -9,23 +9,23 @@
 #include <blsct/range_proof/range_proof_logic.h>
 #include <tinyformat.h>
 
-template <typename P, typename S, typename I>
-S* RangeProofLogic<P,S,I>::m_one = nullptr;
+template <typename P, typename S>
+S* RangeProofLogic<P,S>::m_one = nullptr;
 
-template <typename P, typename S, typename I>
-S* RangeProofLogic<P,S,I>::m_two = nullptr;
+template <typename P, typename S>
+S* RangeProofLogic<P,S>::m_two = nullptr;
 
-template <typename P, typename S, typename I>
-Scalars<S>* RangeProofLogic<P,S,I>::m_two_pows_64 = nullptr;
+template <typename P, typename S>
+Scalars<S>* RangeProofLogic<P,S>::m_two_pows_64 = nullptr;
 
-template <typename P, typename S, typename I>
-S* RangeProofLogic<P,S,I>::m_inner_prod_1x2_pows_64 = nullptr;
+template <typename P, typename S>
+S* RangeProofLogic<P,S>::m_inner_prod_1x2_pows_64 = nullptr;
 
-template <typename P, typename S, typename I>
-S* RangeProofLogic<P,S,I>::m_uint64_max = nullptr;
+template <typename P, typename S>
+S* RangeProofLogic<P,S>::m_uint64_max = nullptr;
 
-template <typename P, typename S, typename I>
-GeneratorsFactory<P,I>* RangeProofLogic<P,S,I>::m_gf = nullptr;
+template <typename P, typename S>
+GeneratorsFactory<P>* RangeProofLogic<P,S>::m_gf = nullptr;
 
 template <typename P, typename S>
 AmountRecoveryRequest<P,S> AmountRecoveryRequest<P,S>::of(RangeProof<P,S>& proof, size_t& index, P& nonce)
@@ -56,44 +56,44 @@ AmountRecoveryResult<P,S> AmountRecoveryResult<P,S>::failure() {
 }
 template AmountRecoveryResult<HerG1Point,HerScalar> AmountRecoveryResult<HerG1Point,HerScalar>::failure();
 
-template <typename P, typename S, typename I>
-RangeProofLogic<P,S,I>::RangeProofLogic()
+template <typename P, typename S>
+RangeProofLogic<P,S>::RangeProofLogic()
 {
     if (m_is_initialized) return;
-    boost::lock_guard<boost::mutex> lock(RangeProofLogic<P,S,I>::m_init_mutex);
+    boost::lock_guard<boost::mutex> lock(RangeProofLogic<P,S>::m_init_mutex);
 
-    I::Init();
+    P::InitializerType::Init();
     P::Init();
 
-    RangeProofLogic<P,S,I>::m_one = new S(1);
-    RangeProofLogic<P,S,I>::m_two = new S(2);
-    RangeProofLogic<P,S,I>::m_gf = new GeneratorsFactory<P,I>();
+    RangeProofLogic<P,S>::m_one = new S(1);
+    RangeProofLogic<P,S>::m_two = new S(2);
+    RangeProofLogic<P,S>::m_gf = new GeneratorsFactory<P>();
     {
         auto two_pows_64 = Scalars<S>::FirstNPow(*m_two, Config::m_input_value_bits);
-        RangeProofLogic<P,S,I>::m_two_pows_64 = new Scalars<S>(two_pows_64);
-        auto ones_64 = Scalars<S>::RepeatN(*RangeProofLogic<P,S,I>::m_one, Config::m_input_value_bits);
-        RangeProofLogic<P,S,I>::m_inner_prod_1x2_pows_64 =
-            new S((ones_64 * *RangeProofLogic<P,S,I>::m_two_pows_64).Sum());
+        RangeProofLogic<P,S>::m_two_pows_64 = new Scalars<S>(two_pows_64);
+        auto ones_64 = Scalars<S>::RepeatN(*RangeProofLogic<P,S>::m_one, Config::m_input_value_bits);
+        RangeProofLogic<P,S>::m_inner_prod_1x2_pows_64 =
+            new S((ones_64 * *RangeProofLogic<P,S>::m_two_pows_64).Sum());
     }
     {
         S int64_max(INT64_MAX);
         S one(1);
         S uint64_max = (int64_max << 1) + one;
-        RangeProofLogic<P,S,I>::m_uint64_max = new S(uint64_max);
+        RangeProofLogic<P,S>::m_uint64_max = new S(uint64_max);
     }
     m_is_initialized = true;
 }
-template RangeProofLogic<HerG1Point,HerScalar,HerInitializer>::RangeProofLogic();
+template RangeProofLogic<HerG1Point,HerScalar>::RangeProofLogic();
 
-template <typename P, typename S, typename I>
-S RangeProofLogic<P,S,I>::GetUint64Max() const
+template <typename P, typename S>
+S RangeProofLogic<P,S>::GetUint64Max() const
 {
     return *m_uint64_max;
 }
-template HerScalar RangeProofLogic<HerG1Point,HerScalar,HerInitializer>::GetUint64Max() const;
+template HerScalar RangeProofLogic<HerG1Point,HerScalar>::GetUint64Max() const;
 
-template <typename P, typename S, typename I>
-bool RangeProofLogic<P,S,I>::InnerProductArgument(
+template <typename P, typename S>
+bool RangeProofLogic<P,S>::InnerProductArgument(
     const size_t concat_input_values_in_bits,
     Points<P>& Gi,
     Points<P>& Hi,
@@ -157,8 +157,8 @@ bool RangeProofLogic<P,S,I>::InnerProductArgument(
     return true;
 }
 
-template <typename P, typename S, typename I>
-RangeProof<P,S> RangeProofLogic<P,S,I>::Prove(
+template <typename P, typename S>
+RangeProof<P,S> RangeProofLogic<P,S>::Prove(
     Scalars<S>& vs,
     P& nonce,
     const std::vector<uint8_t>& message,
@@ -377,15 +377,15 @@ retry:  // hasher is not cleared so that different hash will be obtained upon re
     }
     return proof;
 }
-template RangeProof<HerG1Point,HerScalar> RangeProofLogic<HerG1Point,HerScalar,HerInitializer>::Prove(
+template RangeProof<HerG1Point,HerScalar> RangeProofLogic<HerG1Point,HerScalar>::Prove(
     Scalars<HerScalar>&,
     HerG1Point&,
     const std::vector<uint8_t>&,
     const TokenId&
 ) const;
 
-template <typename P, typename S, typename I>
-void RangeProofLogic<P,S,I>::ValidateProofsBySizes(
+template <typename P, typename S>
+void RangeProofLogic<P,S>::ValidateProofsBySizes(
     const std::vector<RangeProof<P,S>>& proofs
 ) {
     for (const RangeProof<P,S>& proof: proofs) {
@@ -411,12 +411,12 @@ void RangeProofLogic<P,S,I>::ValidateProofsBySizes(
                 __func__, proof.Ls.Size(), proof.Rs.Size()));
     }
 }
-template void RangeProofLogic<HerG1Point,HerScalar,HerInitializer>::ValidateProofsBySizes(
+template void RangeProofLogic<HerG1Point,HerScalar>::ValidateProofsBySizes(
     const std::vector<RangeProof<HerG1Point,HerScalar>>&
 );
 
-template <typename P, typename S, typename I>
-P RangeProofLogic<P,S,I>::VerifyProofs(
+template <typename P, typename S>
+P RangeProofLogic<P,S>::VerifyProofs(
     const std::vector<RangeProofWithTranscript<P,S>>& proof_transcripts,
     const Generators<P>& gens,
     const size_t& max_mn
@@ -455,7 +455,7 @@ P RangeProofLogic<P,S,I>::VerifyProofs(
             - (z_pows_from_2[0] * y_pows_sum);  // (2)
         for (size_t i = 1; i <= p.num_input_values_power_2; ++i) {
             // multiply z^3, z^4, ..., z^(mn+3)
-            delta_yz = delta_yz - z_pows_from_2[i] * *RangeProofLogic<P,S,I>::m_inner_prod_1x2_pows_64;  // (3)
+            delta_yz = delta_yz - z_pows_from_2[i] * *RangeProofLogic<P,S>::m_inner_prod_1x2_pows_64;  // (3)
         }
 
         // g part of LHS in (65) where delta_yz on RHS is moved to LHS
@@ -548,14 +548,14 @@ P RangeProofLogic<P,S,I>::VerifyProofs(
     // should be aggregated to zero if proofs are all valid
     return points.Sum();
 }
-template HerG1Point RangeProofLogic<HerG1Point,HerScalar,HerInitializer>::VerifyProofs(
+template HerG1Point RangeProofLogic<HerG1Point,HerScalar>::VerifyProofs(
     const std::vector<RangeProofWithTranscript<HerG1Point,HerScalar>>&,
     const Generators<HerG1Point>&,
     const size_t&
 ) const;
 
-template <typename P, typename S, typename I>
-bool RangeProofLogic<P,S,I>::Verify(
+template <typename P, typename S>
+bool RangeProofLogic<P,S>::Verify(
     const std::vector<RangeProof<P,S>>& proofs,
     const TokenId& token_id
 ) const {
@@ -583,13 +583,13 @@ bool RangeProofLogic<P,S,I>::Verify(
     );
     return point_sum.IsUnity();
 }
-template bool RangeProofLogic<HerG1Point,HerScalar,HerInitializer>::Verify(
+template bool RangeProofLogic<HerG1Point,HerScalar>::Verify(
     const std::vector<RangeProof<HerG1Point,HerScalar>>&,
     const TokenId&
 ) const;
 
-template <typename P, typename S, typename I>
-AmountRecoveryResult<P,S> RangeProofLogic<P,S,I>::RecoverAmounts(
+template <typename P, typename S>
+AmountRecoveryResult<P,S> RangeProofLogic<P,S>::RecoverAmounts(
     const std::vector<AmountRecoveryRequest<P,S>>& reqs,
     const TokenId& token_id
 ) const {
@@ -630,7 +630,7 @@ AmountRecoveryResult<P,S> RangeProofLogic<P,S,I>::RecoverAmounts(
         // (message << 64 | 64-bit v[0])
         //
         const S message_v0 = (req.mu - rho * req.x) - alpha;
-        const S input_value0 = message_v0 & *RangeProofLogic<P,S,I>::m_uint64_max;
+        const S input_value0 = message_v0 & *RangeProofLogic<P,S>::m_uint64_max;
 
         // skip this request if recovered input value 0 commitment doesn't match with Vs[0]
         P input_value0_commitment = (H * input_value0_gamma) + (G * input_value0);
@@ -672,7 +672,7 @@ AmountRecoveryResult<P,S> RangeProofLogic<P,S,I>::RecoverAmounts(
         recovered_amounts
     };
 }
-template AmountRecoveryResult<HerG1Point,HerScalar> RangeProofLogic<HerG1Point,HerScalar,HerInitializer>::RecoverAmounts(
+template AmountRecoveryResult<HerG1Point,HerScalar> RangeProofLogic<HerG1Point,HerScalar>::RecoverAmounts(
     const std::vector<AmountRecoveryRequest<HerG1Point,HerScalar>>&,
     const TokenId&
 ) const;

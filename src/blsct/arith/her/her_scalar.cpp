@@ -344,7 +344,7 @@ std::vector<bool> HerScalar::ToBinaryVec() const
 bool HerScalar::GetSeriBit(const uint8_t& n) const
 {
     std::vector<uint8_t> vch = GetVch();
-    assert(vch.size() == 32);
+    assert(vch.size() == SERIALIZATION_SIZE_IN_BYTES);
 
     const uint8_t vchIdx = 31 - n / 8;  // vch is little-endian
     const uint8_t bitIdx = n % 8;

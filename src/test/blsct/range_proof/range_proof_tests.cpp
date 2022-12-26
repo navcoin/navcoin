@@ -13,7 +13,6 @@ BOOST_FIXTURE_TEST_SUITE(range_proof_tests, HerTestingSetup)
 
 using P = HerG1Point;
 using S = HerScalar;
-using I = HerInitializer;
 using MsgPair = std::pair<std::string, std::vector<unsigned char>>;
 
 struct TestCase
@@ -59,7 +58,7 @@ BOOST_AUTO_TEST_CASE(test_range_proof_prove_verify_one_value)
     Scalars<S> vs;
     vs.Add(one);
 
-    RangeProofLogic<P,S,I> rp;
+    RangeProofLogic<P,S> rp;
     auto p = rp.Prove(vs, nonce, msg.second, token_id);
 
     auto is_valid = rp.Verify(std::vector<RangeProof<P,S>> { p }, token_id);
@@ -79,7 +78,7 @@ BOOST_AUTO_TEST_CASE(test_range_proof_recovery_one_value)
     Scalars<S> vs;
     vs.Add(one);
 
-    RangeProofLogic<P,S,I> rp;
+    RangeProofLogic<P,S> rp;
     auto proof = rp.Prove(vs, nonce, msg.second, token_id);
 
     size_t index = 0;
@@ -97,7 +96,7 @@ BOOST_AUTO_TEST_CASE(test_range_proof_recovery_one_value)
 
 static std::vector<TestCase> BuildTestCases()
 {
-    RangeProofLogic<P,S,I> rp;
+    RangeProofLogic<P,S> rp;
 
     S one(1);
     S two(2);
@@ -258,7 +257,7 @@ static std::vector<TestCase> BuildTestCases()
 }
 
 static void RunTestCase(
-    RangeProofLogic<P,S,I>& rp,
+    RangeProofLogic<P,S>& rp,
     TestCase& test_case
 ) {
     auto token_id = GenTokenId();
@@ -312,7 +311,7 @@ static void RunTestCase(
 BOOST_AUTO_TEST_CASE(test_range_proof_prove_verify_recovery)
 {
     auto test_cases = BuildTestCases();
-    RangeProofLogic<P,S,I> rp;
+    RangeProofLogic<P,S> rp;
     for (auto test_case: test_cases) {
         RunTestCase(rp, test_case);
     }
@@ -320,7 +319,7 @@ BOOST_AUTO_TEST_CASE(test_range_proof_prove_verify_recovery)
 
 BOOST_AUTO_TEST_CASE(test_range_proof_message_size)
 {
-    RangeProofLogic<P,S,I> rp;
+    RangeProofLogic<P,S> rp;
 
     Scalars<S> values;
     values.Add(S(1));
@@ -348,7 +347,7 @@ BOOST_AUTO_TEST_CASE(test_range_proof_message_size)
 
 BOOST_AUTO_TEST_CASE(test_range_proof_number_of_input_values)
 {
-    RangeProofLogic<P,S,I> rp;
+    RangeProofLogic<P,S> rp;
     HerG1Point nonce = HerG1Point::GetBasePoint();
     std::vector<unsigned char> msg;
     TokenId token_id;
@@ -390,7 +389,7 @@ BOOST_AUTO_TEST_CASE(test_range_proof_validate_proofs_by_sizes)
         return p;
     };
 
-    RangeProofLogic<P,S,I> rp;
+    RangeProofLogic<P,S> rp;
     {
         // no proof should validate fine
         std::vector<RangeProof<P,S>> proofs;
