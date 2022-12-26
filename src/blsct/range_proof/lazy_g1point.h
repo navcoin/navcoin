@@ -7,30 +7,36 @@
 
 #include <blsct/arith/elements.h>
 
-template <typename P, typename S>
+template <typename T>
 struct LazyG1Point {
-public:
-    LazyG1Point(const P& base, const S& exp);
+    using Scalar = typename T::Scalar;
+    using Point = typename T::Point;
 
-    const P m_base;
-    const S m_exp;
+public:
+    LazyG1Point(const Point& base, const Scalar& exp);
+
+    const Point m_base;
+    const Scalar m_exp;
 };
 
-template <typename P, typename S>
+template <typename T>
 struct LazyG1Points {
+    using Scalar = typename T::Scalar;
+    using Point = typename T::Point;
+
 public:
     LazyG1Points() {}
-    LazyG1Points(const Points<P>& bases, const Scalars<S>& exps);
+    LazyG1Points(const Points<Point>& bases, const Scalars<Scalar>& exps);
 
-    void Add(const LazyG1Point<P,S>& point);
+    void Add(const LazyG1Point<T>& point);
 
-    P Sum() const;
+    Point Sum() const;
 
-    LazyG1Points<P,S> operator+(const LazyG1Points<P,S>& rhs) const;
-    LazyG1Points<P,S> operator+(const LazyG1Point<P,S>& rhs) const;
+    LazyG1Points<T> operator+(const LazyG1Points<T>& rhs) const;
+    LazyG1Points<T> operator+(const LazyG1Point<T>& rhs) const;
 
 private:
-    std::vector<LazyG1Point<P,S>> points;
+    std::vector<LazyG1Point<T>> points;
 };
 
 #endif // NAVCOIN_BLSCT_RANGE_PROOF_LAZY_G1POINT_H

@@ -4,6 +4,7 @@
 
 #include <blsct/arith/point.h>
 #include <blsct/arith/her/her_g1point.h>
+#include <blsct/arith/her/her_types.h>
 #include <blsct/range_proof/config.h>
 #include <blsct/range_proof/generators.h>
 #include <ctokens/tokenid.h>
@@ -11,36 +12,38 @@
 #include <util/strencodings.h>
 #include <tinyformat.h>
 
-template <typename P>
-Points<P> Generators<P>::GetGiSubset(const size_t& size) const
+template <typename T>
+Points<typename T::Point> Generators<T>::GetGiSubset(const size_t& size) const
 {
     return Gi.get().To(size);
 }
-template Points<HerG1Point> Generators<HerG1Point>::GetGiSubset(const size_t&) const;
+template Points<HerTypes::Point> Generators<HerTypes>::GetGiSubset(const size_t&) const;
 
-template <typename P>
-Points<P> Generators<P>::GetHiSubset(const size_t& size) const
+template <typename T>
+Points<typename T::Point> Generators<T>::GetHiSubset(const size_t& size) const
 {
     return Hi.get().To(size);
 }
-template Points<HerG1Point> Generators<HerG1Point>::GetHiSubset(const size_t&) const;
+template Points<HerTypes::Point> Generators<HerTypes>::GetHiSubset(const size_t&) const;
 
-template <typename P>
-GeneratorsFactory<P>::GeneratorsFactory()
+template <typename T>
+GeneratorsFactory<T>::GeneratorsFactory()
 {
+    using Point = typename T::Point;
+
     boost::lock_guard<boost::mutex> lock(GeneratorsFactory<P>::m_init_mutex);
     if (GeneratorsFactory<P>::m_is_initialized) return;
 
-    P::InitializerType::Init();
-    Point<P>::Init();
+    T::InitializerType::Init();
+    Point<Point>::Init();
 
-    m_H = Point<P>::GetBasePoint();
-    Points<P> Gi, Hi;
+    m_H = Point<Point>::GetBasePoint();
+    Points<Point> Gi, Hi;
     m_Gi = Gi;
     m_Hi = Hi;
 
     const TokenId default_token_id;
-    const P default_G = DeriveGenerator(Point<P>::GetBasePoint(), 0, default_token_id);
+    const Point default_G = DeriveGenerator(Point::GetBasePoint(), 0, default_token_id);
     m_G_cache.insert(std::make_pair(default_token_id, default_G));
 
     for (size_t i = 0; i < Config::m_max_input_value_vec_len; ++i) {
@@ -53,11 +56,11 @@ GeneratorsFactory<P>::GeneratorsFactory()
 
     m_is_initialized = true;
 }
-template GeneratorsFactory<HerG1Point>::GeneratorsFactory();
+template GeneratorsFactory<HerTypes>::GeneratorsFactory();
 
-template <typename P>
-P GeneratorsFactory<P>::DeriveGenerator(
-    const P& p,
+template <typename T>
+typename T::Point GeneratorsFactory<T>::DeriveGenerator(
+    const typename T::Point& p,
     const size_t index,
     const TokenId& token_id)
 {
@@ -81,26 +84,28 @@ P GeneratorsFactory<P>::DeriveGenerator(
     auto hash = ss.GetHash();
 
     auto vec_hash = std::vector<uint8_t>(hash.begin(), hash.end());
-    auto ret = P::MapToG1(vec_hash);
+    auto ret = Point::MapToG1(vec_hash);
     if (ret.IsUnity()) {
         throw std::runtime_error(strprintf(
             "%s: Generated G1Point is the point at infinity. Try changing parameters", __func__));
     }
     return ret;
 }
-template HerG1Point GeneratorsFactory<HerG1Point>::DeriveGenerator(const HerG1Point&, const size_t, const TokenId&);
+template HerTypes::Point GeneratorsFactory<HerTypes>::DeriveGenerator(const HerTypes::Point&, const size_t, const TokenId&);
 
-template <typename P>
-Generators<P> GeneratorsFactory<P>::GetInstance(const TokenId& token_id)
+template <typename T>
+Generators<T> GeneratorsFactory<T>::GetInstance(const TokenId& token_id)
 {
+    using Point = typename T::Point;
+
     // if G for the token_id hasn't been created, create and cache it
-    if (GeneratorsFactory<P>::m_G_cache.count(token_id) == 0) {
-        const P G = DeriveGenerator(GeneratorsFactory<P>::m_H.value(), 0, token_id);
+    if (GeneratorsFactory<T>::m_G_cache.count(token_id) == 0) {
+        const Point G = DeriveGenerator(GeneratorsFactory<T>::m_H.value(), 0, token_id);
         GeneratorsFactory<P>::m_G_cache.emplace(token_id, G);
     }
-    P G = GeneratorsFactory<P>::m_G_cache[token_id];
+    Point G = GeneratorsFactory<P>::m_G_cache[token_id];
 
-    Generators<P> gens(m_H.value(), G, m_Gi.value(), m_Hi.value());
+    Generators<T> gens(m_H.value(), G, m_Gi.value(), m_Hi.value());
     return gens;
 }
-template Generators<HerG1Point> GeneratorsFactory<HerG1Point>::GetInstance(const TokenId&);
+template Generators<HerTypes> GeneratorsFactory<HerTypes>::GetInstance(const TokenId&);

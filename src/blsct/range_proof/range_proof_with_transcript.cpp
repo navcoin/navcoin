@@ -5,11 +5,12 @@
 #include <blsct/range_proof/config.h>
 #include <blsct/arith/her/her_g1point.h>
 #include <blsct/arith/her/her_scalar.h>
+#include <blsct/arith/her/her_types.h>
 #include <blsct/range_proof/range_proof_with_transcript.h>
 #include <hash.h>
 
-template <typename P, typename S>
-RangeProofWithTranscript<P,S> RangeProofWithTranscript<P,S>::Build(const RangeProof<P,S>& proof) {
+template <typename T>
+RangeProofWithTranscript<T> RangeProofWithTranscript<T>::Build(const RangeProof<T>& proof) {
     // build transcript from proof in the same way it was built in Prove function
     CHashWriter transcript_gen(0,0);
 
@@ -65,10 +66,10 @@ RangeProofWithTranscript<P,S> RangeProofWithTranscript<P,S>::Build(const RangePr
         concat_input_values_in_bits
     );
 }
-template RangeProofWithTranscript<HerG1Point,HerScalar> RangeProofWithTranscript<HerG1Point,HerScalar>::Build(const RangeProof<HerG1Point,HerScalar>&);
+template RangeProofWithTranscript<HerTypes> RangeProofWithTranscript<HerTypes>::Build(const RangeProof<HerTypes>&);
 
-template <typename P, typename S>
-size_t RangeProofWithTranscript<P,S>::RecoverNumRounds(const size_t& num_input_values)
+template <typename T>
+size_t RangeProofWithTranscript<T>::RecoverNumRounds(const size_t& num_input_values)
 {
     auto num_input_values_pow2 =
         Config::GetFirstPowerOf2GreaterOrEqTo(num_input_values);
@@ -78,4 +79,4 @@ size_t RangeProofWithTranscript<P,S>::RecoverNumRounds(const size_t& num_input_v
 
     return num_rounds;
 }
-template size_t RangeProofWithTranscript<HerG1Point,HerScalar>::RecoverNumRounds(const size_t&);
+template size_t RangeProofWithTranscript<HerTypes>::RecoverNumRounds(const size_t&);

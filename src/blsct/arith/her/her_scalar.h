@@ -105,8 +105,6 @@ public:
 
     static constexpr int SERIALIZATION_SIZE_IN_BYTES = 32;
 
-    using InitializerType = HerInitializer;
-
     using UnderlyingType = mclBnFr;
     UnderlyingType m_fr;
 };

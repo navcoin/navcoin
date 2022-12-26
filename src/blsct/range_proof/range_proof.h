@@ -7,24 +7,27 @@
 
 #include <blsct/arith/elements.h>
 
-template <typename P, typename Sc>
+template <typename T>
 struct RangeProof
 {
+    using Point = typename T::Point;
+    using Scalar = typename T::Scalar;
+
     // intermediate values used to derive random values later
-    Points<P> Vs;
-    P A;
-    P S;
-    P T1;
-    P T2;
-    Sc mu;
-    Sc tau_x;
-    Points<P> Ls;
-    Points<P> Rs;
+    Points<Point> Vs;
+    Point A;
+    Point S;
+    Point T1;
+    Point T2;
+    Scalar mu;
+    Scalar tau_x;
+    Points<Point> Ls;
+    Points<Point> Rs;
 
     // proof results
-    Sc t_hat;   // inner product of l and r
-    Sc a;       // result of inner product argument
-    Sc b;       // result of inner product argument
+    Scalar t_hat;   // inner product of l and r
+    Scalar a;       // result of inner product argument
+    Scalar b;       // result of inner product argument
 };
 
 #endif // NAVCOIN_BLSCT_RANGE_PROOF_RANGE_PROOF_H

@@ -15,20 +15,22 @@
 #include <blsct/range_proof/config.h>
 #include <ctokens/tokenid.h>
 
-template <typename P>
+template <typename T>
 struct Generators {
-public:
-    Generators(P& H, P& G, Points<P>& Gi, Points<P>& Hi):
-        H{H}, G{G}, Gi{Gi}, Hi{Hi} {}
-    Points<P> GetGiSubset(const size_t& size) const;
-    Points<P> GetHiSubset(const size_t& size) const;
+    using Point = typename T::Point;
 
-    std::reference_wrapper<P> H;
-    P G;
+public:
+    Generators(Point& H, Point& G, Points<Point>& Gi, Points<Point>& Hi):
+        H{H}, G{G}, Gi{Gi}, Hi{Hi} {}
+    Points<Point> GetGiSubset(const size_t& size) const;
+    Points<Point> GetHiSubset(const size_t& size) const;
+
+    std::reference_wrapper<Point> H;
+    Point G;
 
 private:
-    std::reference_wrapper<Points<P>> Gi;
-    std::reference_wrapper<Points<P>> Hi;
+    std::reference_wrapper<Points<Point>> Gi;
+    std::reference_wrapper<Points<Point>> Hi;
 };
 
 /**
@@ -55,28 +57,30 @@ private:
  * the public key whose private key is Sum(randomness). That will be
  * used later for signature verification.
  */
-template <typename P>
+template <typename T>
 class GeneratorsFactory
 {
+    using Point = typename T::Point;
+
 public:
     GeneratorsFactory();
 
-    Generators<P> GetInstance(const TokenId& token_id);
+    Generators<T> GetInstance(const TokenId& token_id);
 
 private:
-    P DeriveGenerator(
-        const P& p,
+    Point DeriveGenerator(
+        const Point& p,
         const size_t index,
         const TokenId& token_id
     );
 
     // G generators are cached
-    inline static std::map<const TokenId, const P> m_G_cache;
+    inline static std::map<const TokenId, const Point> m_G_cache;
 
     // made optional to initialize values lazily after mcl initialization
-    inline static std::optional<P> m_H;
-    inline static std::optional<Points<P>> m_Gi;
-    inline static std::optional<Points<P>> m_Hi;
+    inline static std::optional<Point> m_H;
+    inline static std::optional<Points<Point>> m_Gi;
+    inline static std::optional<Points<Point>> m_Hi;
 
     inline static boost::mutex m_init_mutex;
     inline static bool m_is_initialized = false;

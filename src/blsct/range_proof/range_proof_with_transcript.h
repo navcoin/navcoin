@@ -8,18 +8,21 @@
 #include <blsct/arith/elements.h>
 #include <blsct/range_proof/range_proof.h>
 
-template <typename P, typename S>
+template <typename T>
 class RangeProofWithTranscript
 {
+    using Scalar = typename T::Scalar;
+    using Point = typename T::Point;
+
 public:
     RangeProofWithTranscript(
-        const RangeProof<P,S>& proof,
-        const S& x,
-        const S& y,
-        const S& z,
-        const S& cx_factor,
-        const Scalars<S>& xs,
-        const Scalars<S>& inv_xs,
+        const RangeProof<T>& proof,
+        const Scalar& x,
+        const Scalar& y,
+        const Scalar& z,
+        const Scalar& cx_factor,
+        const Scalars<Scalar>& xs,
+        const Scalars<Scalar>& inv_xs,
         const size_t& num_input_values_power_2,
         const size_t& concat_input_values_in_bits
     ): proof{proof}, x{x}, y{y}, z{z}, cx_factor{cx_factor}, xs(xs),
@@ -27,20 +30,20 @@ public:
         num_input_values_power_2(num_input_values_power_2),
         concat_input_values_in_bits(concat_input_values_in_bits) {}
 
-    static RangeProofWithTranscript<P,S> Build(const RangeProof<P,S>& proof);
+    static RangeProofWithTranscript<T> Build(const RangeProof<T>& proof);
 
     static size_t RecoverNumRounds(const size_t& num_input_values);
 
-    const RangeProof<P,S> proof;
+    const RangeProof<T> proof;
 
     // transcript
-    const S x;  // x used in the main prove procedure
-    const S y;
-    const S z;
-    const S cx_factor;  // factor multiplied to cL and cR in inner product argument
-    const Scalars<S> xs;      // x used in inner product argument
-    const Scalars<S> inv_xs;  // x^-1 used in inner product argument
-    const S inv_y;
+    const Scalar x;  // x used in the main prove procedure
+    const Scalar y;
+    const Scalar z;
+    const Scalar cx_factor;  // factor multiplied to cL and cR in inner product argument
+    const Scalars<Scalar> xs;      // x used in inner product argument
+    const Scalars<Scalar> inv_xs;  // x^-1 used in inner product argument
+    const Scalar inv_y;
 
     const size_t num_input_values_power_2;  // M in old impl
     const size_t concat_input_values_in_bits;  // MN is old impl

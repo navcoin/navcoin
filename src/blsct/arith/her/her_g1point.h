@@ -69,8 +69,6 @@ public:
     template <typename Stream>
     void Unserialize(Stream& s);
 
-    using InitializerType = HerInitializer;
-
     using UnderlyingType = mclBnG1;
     UnderlyingType m_p;
 
