@@ -2,9 +2,9 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <blsct/arith/point.h>
-#include <blsct/arith/her/her_g1point.h>
-#include <blsct/arith/her/her_types.h>
+#include <blsct/arith/point_facade.h>
+#include <blsct/arith/mcl/mcl_g1point.h>
+#include <blsct/arith/mcl/mcl.h>
 #include <blsct/range_proof/config.h>
 #include <blsct/range_proof/generators.h>
 #include <ctokens/tokenid.h>
@@ -17,14 +17,14 @@ Points<typename T::Point> Generators<T>::GetGiSubset(const size_t& size) const
 {
     return Gi.get().To(size);
 }
-template Points<HerTypes::Point> Generators<HerTypes>::GetGiSubset(const size_t&) const;
+template Points<Mcl::Point> Generators<Mcl>::GetGiSubset(const size_t&) const;
 
 template <typename T>
 Points<typename T::Point> Generators<T>::GetHiSubset(const size_t& size) const
 {
     return Hi.get().To(size);
 }
-template Points<HerTypes::Point> Generators<HerTypes>::GetHiSubset(const size_t&) const;
+template Points<Mcl::Point> Generators<Mcl>::GetHiSubset(const size_t&) const;
 
 template <typename T>
 GeneratorsFactory<T>::GeneratorsFactory()
@@ -56,7 +56,7 @@ GeneratorsFactory<T>::GeneratorsFactory()
 
     m_is_initialized = true;
 }
-template GeneratorsFactory<HerTypes>::GeneratorsFactory();
+template GeneratorsFactory<Mcl>::GeneratorsFactory();
 
 template <typename T>
 typename T::Point GeneratorsFactory<T>::DeriveGenerator(
@@ -91,7 +91,7 @@ typename T::Point GeneratorsFactory<T>::DeriveGenerator(
     }
     return ret;
 }
-template HerTypes::Point GeneratorsFactory<HerTypes>::DeriveGenerator(const HerTypes::Point&, const size_t, const TokenId&);
+template Mcl::Point GeneratorsFactory<Mcl>::DeriveGenerator(const Mcl::Point&, const size_t, const TokenId&);
 
 template <typename T>
 Generators<T> GeneratorsFactory<T>::GetInstance(const TokenId& token_id)
@@ -108,4 +108,4 @@ Generators<T> GeneratorsFactory<T>::GetInstance(const TokenId& token_id)
     Generators<T> gens(m_H.value(), G, m_Gi.value(), m_Hi.value());
     return gens;
 }
-template Generators<HerTypes> GeneratorsFactory<HerTypes>::GetInstance(const TokenId&);
+template Generators<Mcl> GeneratorsFactory<Mcl>::GetInstance(const TokenId&);

@@ -6,18 +6,17 @@
 
 #include <algorithm>
 #include <blsct/arith/elements.h>
-#include <blsct/arith/her/her_g1point.h>
-#include <blsct/arith/her/her_scalar.h>
+#include <blsct/arith/mcl/mcl_g1point.h>
+#include <blsct/arith/mcl/mcl_scalar.h>
 #include <blsct/arith/initializer.h>
-#include <blsct/arith/scalar.h>
 #include <boost/test/unit_test.hpp>
 #include <set>
 #include <streams.h>
 
-BOOST_FIXTURE_TEST_SUITE(elements_tests, HerTestingSetup)
+BOOST_FIXTURE_TEST_SUITE(elements_tests, MclTestingSetup)
 
-using P = HerG1Point;
-using S = HerScalar;
+using P = MclG1Point;
+using S = MclScalar;
 
 BOOST_AUTO_TEST_CASE(test_elements_constructors)
 {

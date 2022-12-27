@@ -6,8 +6,8 @@
 // inspired by https://github.com/b-g-goodell/research-lab/blob/master/source-code/StringCT-java/src/how/monero/hodl/bulletproof/Bulletproof.java
 // and https://github.com/monero-project/monero/blob/master/src/ringct/bulletproofs.cc
 
-#ifndef NAVCOIN_BLSCT_ARITH_HER_HER_SCALAR_H
-#define NAVCOIN_BLSCT_ARITH_HER_HER_SCALAR_H
+#ifndef NAVCOIN_BLSCT_ARITH_MCL_MCL_SCALAR_H
+#define NAVCOIN_BLSCT_ARITH_MCL_MCL_SCALAR_H
 
 #include <functional>
 #include <stddef.h>
@@ -16,9 +16,9 @@
 
 #include <bls/bls384_256.h> // must include this before bls/bls.h
 #include <bls/bls.h>
-#include <blsct/arith/her/her_initializer.h>
-#include <blsct/arith/her/her_scalar.h>
-#include <blsct/arith/scalar.h>
+#include <blsct/arith/mcl/mcl_initializer.h>
+#include <blsct/arith/mcl/mcl_scalar.h>
+#include <blsct/arith/scalar_facade.h>
 #include <hash.h>
 #include <serialize.h>
 #include <uint256.h>
@@ -29,47 +29,47 @@ Using `Her` prefix instead of `Mcl` because `fun:*mcl*` wildcard is used to
 suppress memory sanitizer that detects false positives in mcl library
 */
 
-class HerScalar : public Scalar<HerScalar> {
+class MclScalar : public ScalarFacade<MclScalar> {
 public:
-    HerScalar(const int64_t& n = 0);
-    HerScalar(const std::vector<uint8_t>& v);
-    HerScalar(const mclBnFr& n_fr);
-    HerScalar(const uint256& n);
-    HerScalar(const std::string& s, int radix);
+    MclScalar(const int64_t& n = 0);
+    MclScalar(const std::vector<uint8_t>& v);
+    MclScalar(const mclBnFr& n_fr);
+    MclScalar(const uint256& n);
+    MclScalar(const std::string& s, int radix);
 
     static void Init();
 
-    HerScalar ApplyBitwiseOp(const HerScalar& a, const HerScalar& b,
+    MclScalar ApplyBitwiseOp(const MclScalar& a, const MclScalar& b,
                           std::function<uint8_t(uint8_t, uint8_t)> op) const;
 
     void operator=(const int64_t& n);  // using int64_t instead of uint64_t since underlying mcl lib takes int64_t
 
-    HerScalar operator+(const HerScalar& b) const;
-    HerScalar operator-(const HerScalar& b) const;
-    HerScalar operator*(const HerScalar& b) const;
-    HerScalar operator/(const HerScalar& b) const;
-    HerScalar operator|(const HerScalar& b) const;
-    HerScalar operator^(const HerScalar& b) const;
-    HerScalar operator&(const HerScalar& b) const;
-    HerScalar operator~() const;
-    HerScalar operator<<(const uint32_t& shift) const;
-    HerScalar operator>>(const uint32_t& shift) const;
+    MclScalar operator+(const MclScalar& b) const;
+    MclScalar operator-(const MclScalar& b) const;
+    MclScalar operator*(const MclScalar& b) const;
+    MclScalar operator/(const MclScalar& b) const;
+    MclScalar operator|(const MclScalar& b) const;
+    MclScalar operator^(const MclScalar& b) const;
+    MclScalar operator&(const MclScalar& b) const;
+    MclScalar operator~() const;
+    MclScalar operator<<(const uint32_t& shift) const;
+    MclScalar operator>>(const uint32_t& shift) const;
 
-    bool operator==(const HerScalar& b) const;
+    bool operator==(const MclScalar& b) const;
     bool operator==(const int32_t& b) const;
-    bool operator!=(const HerScalar& b) const;
+    bool operator!=(const MclScalar& b) const;
     bool operator!=(const int32_t& b) const;
 
     mclBnFr Underlying() const;
     bool IsValid() const;
 
-    HerScalar Invert() const;
-    HerScalar Negate() const;
-    HerScalar Square() const;
-    HerScalar Cube() const;
-    HerScalar Pow(const HerScalar& n) const;
+    MclScalar Invert() const;
+    MclScalar Negate() const;
+    MclScalar Square() const;
+    MclScalar Cube() const;
+    MclScalar Pow(const MclScalar& n) const;
 
-    static HerScalar Rand(const bool exclude_zero = false);
+    static MclScalar Rand(const bool exclude_zero = false);
 
     uint64_t GetUint64() const;
 
@@ -103,10 +103,10 @@ public:
     template <typename Stream>
     void Unserialize(Stream& s);
 
-    static constexpr int SERIALIZATION_SIZE_IN_BYTES = 32;
+    static constexpr int SERIALIZATION_SIZE = 32;
 
     using UnderlyingType = mclBnFr;
     UnderlyingType m_fr;
 };
 
-#endif // NAVCOIN_BLSCT_ARITH_HER_HER_SCALAR_H
+#endif // NAVCOIN_BLSCT_ARITH_MCL_MCL_SCALAR_H

@@ -13,9 +13,6 @@
 #include <stdexcept>
 #include <vector>
 
-#include <blsct/arith/scalar.h>
-#include <blsct/arith/point.h>
-
 template <typename T>
 class Elements
 {
@@ -45,8 +42,8 @@ public:
      * G1Points x Scalars
      * [p1, p2] * [a1, ba] = [p1*a1, p2*a2]
      */
-    template <typename S>
-    Elements<T> operator*(const Elements<S>& rhs) const;
+    template <typename Scalar>
+    Elements<T> operator*(const Elements<Scalar>& rhs) const;
 
     /**
      * Scalars x Scalar
@@ -55,8 +52,8 @@ public:
      * G1Points x Scalar
      * [p1, p2] ^ s = [p1*s, p2*s]
      */
-    template <typename S>
-    Elements<T> operator*(const S& rhs) const;
+    template <typename Scalar>
+    Elements<T> operator*(const Scalar& rhs) const;
 
     /**
      * [p1, p2] + [q1, q2] = [p1+q1, p2+q2]
@@ -92,10 +89,10 @@ public:
     std::vector<T> m_vec;
 };
 
-template <typename S>
-using Scalars = Elements<S>;
+template <typename Scalar>
+using Scalars = Elements<Scalar>;
 
-template <typename P>
-using Points = Elements<P>;
+template <typename Point>
+using Points = Elements<Point>;
 
 #endif // NAVCOIN_BLSCT_ARITH_ELEMENTS_H

@@ -447,6 +447,6 @@ CBlock getBlock13b8a()
 
 HerTestingSetup::HerTestingSetup()
 {
-    HerInitializer::Init();
-    HerG1Point::Init();
+    MclInitializer::Init();
+    MclG1Point::Init();
 }

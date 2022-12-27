@@ -5,11 +5,11 @@
 #include <bls/bls384_256.h> // must include this before bls/bls.h
 #include <bls/bls.h>
 
-#include <blsct/arith/her/her_initializer.h>
+#include <blsct/arith/mcl/mcl_initializer.h>
 
-void HerInitializer::Init()
+void MclInitializer::Init()
 {
-    boost::lock_guard<boost::mutex> lock(HerInitializer::m_init_mutex);
+    boost::lock_guard<boost::mutex> lock(MclInitializer::m_init_mutex);
     static bool is_initialized = false;
     if (is_initialized) return;
 

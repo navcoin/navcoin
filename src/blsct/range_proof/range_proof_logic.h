@@ -9,8 +9,6 @@
 #include <vector>
 
 #include <blsct/arith/elements.h>
-// #include <blsct/arith/point.h>
-// #include <blsct/arith/scalar.h>
 #include <blsct/range_proof/generators.h>
 #include <blsct/range_proof/range_proof_with_transcript.h>
 #include <consensus/amount.h>
@@ -106,7 +104,7 @@ private:
     Scalar GetUint64Max() const;
 
     Point GenerateBaseG1PointH(
-        const P& p,
+        const Point& p,
         size_t index,
         TokenId token_id
     ) const;

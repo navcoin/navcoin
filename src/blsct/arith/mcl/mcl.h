@@ -6,18 +6,20 @@
 // inspired by https://github.com/b-g-goodell/research-lab/blob/master/source-code/StringCT-java/src/how/monero/hodl/bulletproof/Bulletproof.java
 // and https://github.com/monero-project/monero/blob/master/src/ringct/bulletproofs.cc
 
-#ifndef NAVCOIN_BLSCT_ARITH_HER_HER_TYPES_H
-#define NAVCOIN_BLSCT_ARITH_HER_HER_TYPES_H
+#ifndef NAVCOIN_BLSCT_ARITH_MCL_MCL_TYPES_H
+#define NAVCOIN_BLSCT_ARITH_MCL_MCL_TYPES_H
 
 #include <bls/bls384_256.h> // must include this before bls/bls.h
 #include <bls/bls.h>
-#include <blsct/arith/her/her_initializer.h>
+#include <blsct/arith/mcl/mcl_g1point.h>
+#include <blsct/arith/mcl/mcl_initializer.h>
+#include <blsct/arith/mcl/mcl_scalar.h>
 
-struct HerTypes
+struct Mcl
 {
-  using Point = mclBnG1;
-  using Scalar = mclBnFr;
-  using Initializer = HerInitializer;
+  using Point = MclG1Point;
+  using Scalar = MclScalar;
+  using Initializer = MclInitializer;
 };
 
-#endif // NAVCOIN_BLSCT_ARITH_HER_HER_TYPES_H
+#endif // NAVCOIN_BLSCT_ARITH_MCL_MCL_TYPES_H

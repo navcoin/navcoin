@@ -2,19 +2,18 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <blsct/arith/her/her_g1point.h>
-#include <blsct/arith/her/her_scalar.h>
-#include <blsct/arith/her/her_types.h>
+#include <blsct/arith/mcl/mcl_g1point.h>
+#include <blsct/arith/mcl/mcl_scalar.h>
+#include <blsct/arith/mcl/mcl.h>
 #include <blsct/range_proof/lazy_g1point.h>
 #include <bls/bls384_256.h> // must include this before bls/bls.h
 #include <bls/bls.h>
-#include <blsct/arith/her/her_scalar.h>
 
 template <typename T>
 LazyG1Point<T>::LazyG1Point(const typename T::Point& base, const typename T::Scalar& exp): m_base(base.m_p), m_exp(exp.m_fr)
 {
 }
-template LazyG1Point<HerTypes>::LazyG1Point(const HerTypes::Point& base, const HerTypes::Scalar& exp);
+template LazyG1Point<Mcl>::LazyG1Point(const Mcl::Point& base, const Mcl::Scalar& exp);
 
 template <typename T>
 LazyG1Points<T>::LazyG1Points(const Points<typename T::Point>& bases, const Scalars<typename T::Scalar>& exps) {
@@ -22,34 +21,34 @@ LazyG1Points<T>::LazyG1Points(const Points<typename T::Point>& bases, const Scal
         throw std::runtime_error("number of bases and exps don't match");
     }
     for (size_t i=0; i<bases.Size(); ++i) {
-        points.push_back(LazyG1Point(bases[i], exps[i]));
+        points.push_back(LazyG1Point<T>(bases[i], exps[i]));
     }
 }
-template LazyG1Points<HerTypes>::LazyG1Points(const Points<HerTypes::Point>& bases, const Scalars<HerTypes::Scalar>& exps);
+template LazyG1Points<Mcl>::LazyG1Points(const Points<Mcl::Point>& bases, const Scalars<Mcl::Scalar>& exps);
 
 template <typename T>
 void LazyG1Points<T>::Add(const LazyG1Point<T>& point) {
     points.push_back(point);
 }
-template void LazyG1Points<HerTypes>::Add(const LazyG1Point<HerTypes>& point);
+template void LazyG1Points<Mcl>::Add(const LazyG1Point<Mcl>& point);
 
 template <typename T>
 typename T::Point LazyG1Points<T>::Sum() const {
     using Point = typename T::Point;
     using Scalar = typename T::Scalar;
 
-    std::vector<Point::UnderlyingType> bases;
-    std::vector<Scalar::UnderlyingType> exps;
+    std::vector<typename Point::UnderlyingType> bases;
+    std::vector<typename Scalar::UnderlyingType> exps;
 
     for (auto point: points) {
         bases.push_back(point.m_base.Underlying());
         exps.push_back(point.m_exp.Underlying());
     }
-    Point::UnderlyingType pv;
+    typename Point::UnderlyingType pv;
     mclBnG1_mulVec(&pv, bases.data(), exps.data(), points.size());
     return Point(pv);
 }
-template HerTypes::Point LazyG1Points<HerTypes>::Sum() const;
+template Mcl::Point LazyG1Points<Mcl>::Sum() const;
 
 template <typename T>
 LazyG1Points<T> LazyG1Points<T>::operator+(const LazyG1Points<T>& rhs) const {
@@ -67,7 +66,7 @@ LazyG1Points<T> LazyG1Points<T>::operator+(const LazyG1Points<T>& rhs) const {
 
     return LazyG1Points<T>(bases, exps);
 }
-template LazyG1Points<HerTypes> LazyG1Points<HerTypes>::operator+(const LazyG1Points<HerTypes>& rhs) const;
+template LazyG1Points<Mcl> LazyG1Points<Mcl>::operator+(const LazyG1Points<Mcl>& rhs) const;
 
 template <typename T>
 LazyG1Points<T> LazyG1Points<T>::operator+(const LazyG1Point<T>& rhs) const {
@@ -83,4 +82,4 @@ LazyG1Points<T> LazyG1Points<T>::operator+(const LazyG1Point<T>& rhs) const {
 
     return LazyG1Points<T>(bases, exps);
 }
-template LazyG1Points<HerTypes> LazyG1Points<HerTypes>::operator+(const LazyG1Point<HerTypes>& rhs) const;
+template LazyG1Points<Mcl> LazyG1Points<Mcl>::operator+(const LazyG1Point<Mcl>& rhs) const;

@@ -156,14 +156,14 @@ BITCOIN_CORE_H = \
   bech32.h \
   blockencodings.h \
   blockfilter.h \
-  blsct/arith/her/her_g1point.h \
-  blsct/arith/her/her_initializer.h \
-  blsct/arith/her/her_scalar.h \
-  blsct/arith/her/her_types.h \
+  blsct/arith/mcl/mcl_g1point.h \
+  blsct/arith/mcl/mcl_initializer.h \
+  blsct/arith/mcl/mcl_scalar.h \
+  blsct/arith/mcl/mcl.h \
   blsct/arith/elements.h \
   blsct/arith/initializer.h \
-  blsct/arith/point.h \
-  blsct/arith/scalar.h \
+  blsct/arith/point_facade.h \
+  blsct/arith/scalar_facade.h \
   blsct/keys.h \
   blsct/range_proof/config.h \
   blsct/range_proof/generators.h \
@@ -402,13 +402,13 @@ libbitcoin_node_a_SOURCES = \
   banman.cpp \
   blockencodings.cpp \
   blockfilter.cpp \
-  blsct/arith/her/her_g1point.cpp \
-  blsct/arith/her/her_initializer.cpp \
-  blsct/arith/her/her_scalar.cpp \
+  blsct/arith/mcl/mcl_g1point.cpp \
+  blsct/arith/mcl/mcl_initializer.cpp \
+  blsct/arith/mcl/mcl_scalar.cpp \
   blsct/arith/elements.cpp \
   blsct/arith/initializer.cpp \
-  blsct/arith/point.cpp \
-  blsct/arith/scalar.cpp \
+  blsct/arith/point_facade.cpp \
+  blsct/arith/scalar_facade.cpp \
   blsct/keys.cpp \
   blsct/range_proof/config.cpp \
   blsct/range_proof/generators.cpp \

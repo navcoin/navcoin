@@ -5,8 +5,8 @@
 #ifndef KEY_H
 #define KEY_H
 
-#include <blsct/arith/point.h>
-#include <blsct/arith/scalar.h>
+#include <blsct/arith/point_facade.h>
+#include <blsct/arith/scalar_facade.h>
 #include <hash.h>
 #include <key.h>
 #include <serialize.h>
@@ -19,59 +19,63 @@
 namespace blsct {
 static const std::string subAddressHeader = "SubAddress\0";
 
-template <typename P>
+template <typename T>
 class PublicKey
 {
 private:
+    using Point = typename T::Point;
+
     std::vector<unsigned char> data;
 
 public:
     static constexpr size_t SIZE = 48;
 
     PublicKey() { data.clear(); }
-    PublicKey(const P& pk) : data(pk.GetVch()) {}
+    PublicKey(const Point& pk) : data(pk.GetVch()) {}
     PublicKey(const std::vector<unsigned char>& pk) : data(pk) {}
 
-    SERIALIZE_METHODS(PublicKey<P>, obj) { READWRITE(obj.data); }
+    SERIALIZE_METHODS(PublicKey<T>, obj) { READWRITE(obj.data); }
 
-    static PublicKey<P> Aggregate(std::vector<PublicKey<P>> vPk);
+    static PublicKey<T> Aggregate(std::vector<PublicKey<T>> vPk);
 
     uint256 GetHash() const;
     CKeyID GetID() const;
 
     std::string ToString() const;
 
-    bool operator==(const PublicKey<P>& rhs) const;
+    bool operator==(const PublicKey<T>& rhs) const;
 
     bool IsValid() const;
 
-    bool GetG1Point(P& ret) const;
+    bool GetG1Point(Point& ret) const;
     std::vector<unsigned char> GetVch() const;
 };
 
-template <typename P>
+template <typename T>
 class DoublePublicKey
 {
 private:
-    PublicKey<P> vk;
-    PublicKey<P> sk;
+    using Point = typename T::Point;
+
+    PublicKey<T> vk;
+    PublicKey<T> sk;
 
 public:
     static constexpr size_t SIZE = 48 * 2;
 
     DoublePublicKey() {}
-    DoublePublicKey(const P& vk_, const P& sk_) : vk(vk_.GetVch()), sk(sk_.GetVch()) {}
+    DoublePublicKey(const Point& vk_, const Point& sk_) : vk(vk_.GetVch()), sk(sk_.GetVch()) {}
     DoublePublicKey(const std::vector<unsigned char>& vk_, const std::vector<unsigned char>& sk_) : vk(vk_), sk(sk_) {}
 
-    SERIALIZE_METHODS(DoublePublicKey<P>, obj) { READWRITE(obj.vk.GetVch(), obj.sk.GetVch()); }
+    SERIALIZE_METHODS(DoublePublicKey<T>, obj) { READWRITE(obj.vk.GetVch(), obj.sk.GetVch()); }
 
     uint256 GetHash() const;
     CKeyID GetID() const;
 
-    bool GetViewKey(P& ret) const;
-    bool GetSpendKey(P& ret) const;
+    bool GetViewKey(Point& ret) const;
+    bool GetSpendKey(Point& ret) const;
 
-    bool operator==(const DoublePublicKey<P>& rhs) const;
+    bool operator==(const DoublePublicKey<T>& rhs) const;
 
     bool IsValid() const;
 
@@ -80,37 +84,30 @@ public:
     std::vector<unsigned char> GetVch() const;
 };
 
-template <typename P>
+template <typename T>
 class PrivateKey
 {
 private:
+    using Point = typename T::Point;
+    using Scalar = typename T::Scalar;
+
     CPrivKey k;
 
 public:
     static constexpr size_t SIZE = 32;
 
     PrivateKey() { k.clear(); }
-
-    template <typename S>
-    PrivateKey(S k_);
-
+    PrivateKey(Scalar k_);
     PrivateKey(CPrivKey k_);
 
-    SERIALIZE_METHODS(PrivateKey<P>, obj) { READWRITE(std::vector<unsigned char>(obj.k.begin(), obj.k.end())); }
+    SERIALIZE_METHODS(PrivateKey<T>, obj) { READWRITE(std::vector<unsigned char>(obj.k.begin(), obj.k.end())); }
 
-    bool operator==(const PrivateKey<P>& rhs) const;
+    bool operator==(const PrivateKey<T>& rhs) const;
 
-    template <typename S>
-    P GetPoint() const;
-
-    PublicKey<P> GetPublicKey() const;
-
-    template <typename S>
-    S GetScalar() const;
-
-    template <typename S>
+    Point GetPoint() const;
+    PublicKey<T> GetPublicKey() const;
+    Scalar GetScalar() const;
     bool IsValid() const;
-
     void SetToZero();
 
     friend class CCryptoKeyStore;

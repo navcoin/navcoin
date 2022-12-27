@@ -6,51 +6,51 @@
 // inspired by https://github.com/b-g-goodell/research-lab/blob/master/source-code/StringCT-java/src/how/monero/hodl/bulletproof/Bulletproof.java
 // and https://github.com/monero-project/monero/blob/master/src/ringct/bulletproofs.cc
 
-#ifndef NAVCOIN_BLSCT_ARITH_SCALAR_H
-#define NAVCOIN_BLSCT_ARITH_SCALAR_H
+#ifndef NAVCOIN_BLSCT_ARITH_SCALAR_FACADE_H
+#define NAVCOIN_BLSCT_ARITH_SCALAR_FACADE_H
 
 #include <string>
 #include <vector>
 #include <serialize.h>
 #include <uint256.h>
 
-template <typename S>
-class Scalar {
+template <typename T>
+class ScalarFacade {
 public:
-    Scalar();
+    ScalarFacade();
 
     static void Init();
 
     void operator=(const uint64_t& n);
 
-    Scalar<S> operator+(const Scalar<S>& rhs) const;
-    Scalar<S> operator-(const Scalar<S>& rhs) const;
-    Scalar<S> operator*(const Scalar<S>& rhs) const;
-    Scalar<S> operator/(const Scalar<S>& rhs) const;
-    Scalar<S> operator|(const Scalar<S>& rhs) const;
-    Scalar<S> operator^(const Scalar<S>& rhs) const;
-    Scalar<S> operator&(const Scalar<S>& rhs) const;
-    Scalar<S> operator~() const;
-    Scalar<S> operator<<(unsigned int shift) const;
-    Scalar<S> operator>>(unsigned int shift) const;
+    ScalarFacade<T> operator+(const ScalarFacade<T>& rhs) const;
+    ScalarFacade<T> operator-(const ScalarFacade<T>& rhs) const;
+    ScalarFacade<T> operator*(const ScalarFacade<T>& rhs) const;
+    ScalarFacade<T> operator/(const ScalarFacade<T>& rhs) const;
+    ScalarFacade<T> operator|(const ScalarFacade<T>& rhs) const;
+    ScalarFacade<T> operator^(const ScalarFacade<T>& rhs) const;
+    ScalarFacade<T> operator&(const ScalarFacade<T>& rhs) const;
+    ScalarFacade<T> operator~() const;
+    ScalarFacade<T> operator<<(unsigned int shift) const;
+    ScalarFacade<T> operator>>(unsigned int shift) const;
 
-    bool operator==(const Scalar<S>& rhs) const;
+    bool operator==(const ScalarFacade<T>& rhs) const;
     bool operator==(const int& rhs) const;
-    bool operator!=(const Scalar<S>& rhs) const;
+    bool operator!=(const ScalarFacade<T>& rhs) const;
     bool operator!=(const int& rhs) const;
 
-    template <typename SV>
-    SV Underlying() const;
+    template <typename Underlying>
+    Underlying Underlying() const;
 
     bool IsValid() const;
 
-    Scalar<S> Invert() const;
-    Scalar<S> Negate() const;
-    Scalar<S> Square() const;
-    Scalar<S> Cube() const;
-    Scalar<S> Pow(const Scalar<S>& n) const;
+    ScalarFacade<T> Invert() const;
+    ScalarFacade<T> Negate() const;
+    ScalarFacade<T> Square() const;
+    ScalarFacade<T> Cube() const;
+    ScalarFacade<T> Pow(const ScalarFacade<T>& n) const;
 
-    static Scalar<S> Rand(bool exclude_zero = false);
+    static ScalarFacade<T> Rand(bool exclude_zero = false);
 
     uint64_t GetUint64() const;
 
@@ -86,4 +86,4 @@ public:
     }
 };
 
-#endif // NAVCOIN_BLSCT_ARITH_SCALAR_H
+#endif // NAVCOIN_BLSCT_ARITH_SCALAR_FACADE_H
