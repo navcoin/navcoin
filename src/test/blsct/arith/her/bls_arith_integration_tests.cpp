@@ -19,13 +19,13 @@ BOOST_FIXTURE_TEST_SUITE(bls_arith_integration_tests, MclTestingSetup)
 BOOST_AUTO_TEST_CASE(test_integration_gg_ones_times_z)
 {
     auto z = MclScalar::Rand(true);
-    auto gg = Points<MclG1Point>(std::vector<MclG1Point>{
+    auto gg = Elements<MclG1Point>(std::vector<MclG1Point>{
         MclG1Point::MapToG1("g1"),
         MclG1Point::MapToG1("g2")});
     auto r1 = gg * z;
 
     MclScalar one(1);
-    auto ones = Scalars<MclScalar>::RepeatN(one, gg.Size());
+    auto ones = Elements<MclScalar>::RepeatN(one, gg.Size());
     auto r2 = gg * (ones * z);
 
     BOOST_CHECK(r1 == r2);
@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_66_67_excl_h_prime)
 {
     auto n = 2;
     MclScalar one(1);
-    auto ones = Scalars<MclScalar>::RepeatN(one, n);
+    auto ones = Elements<MclScalar>::RepeatN(one, n);
     auto z = MclScalar::Rand(true);
 
     auto alpha = MclScalar::Rand(true);
@@ -67,16 +67,16 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_66_67_excl_h_prime)
     auto x = MclScalar::Rand(true);
     auto mu = alpha + rho * x;
 
-    auto gg = Points<MclG1Point>(std::vector<MclG1Point>{
+    auto gg = Elements<MclG1Point>(std::vector<MclG1Point>{
         MclG1Point::MapToG1("g1"),
         MclG1Point::MapToG1("g2")});
     auto h = MclG1Point::MapToG1("h");
 
-    Scalars<MclScalar> al(std::vector<MclScalar> {
+    Elements<MclScalar> al(std::vector<MclScalar> {
         MclScalar {1},
         MclScalar {1}
     });
-    auto sl = Scalars<MclScalar>::RandVec(n);
+    auto sl = Elements<MclScalar>::RandVec(n);
     auto ll = al - (ones * z) + (sl * x);
 
     auto hmu_ggl = (h * mu) + (gg * ll).Sum();
@@ -93,14 +93,14 @@ BOOST_AUTO_TEST_CASE(test_integration_rebasing_base_point)
     auto n = 2;
 
     MclScalar one(1);
-    auto one_n = Scalars<MclScalar>::RepeatN(one, n);
+    auto one_n = Elements<MclScalar>::RepeatN(one, n);
     MclScalar two(n);
-    auto two_n = Scalars<MclScalar>::FirstNPow(two, n);
+    auto two_n = Elements<MclScalar>::FirstNPow(two, n);
 
     auto y = MclScalar::Rand(true);
     auto z = MclScalar::Rand(true);
-    auto y_n = Scalars<MclScalar>::FirstNPow(y, n);
-    auto hh = Points<MclG1Point>(std::vector<MclG1Point> {
+    auto y_n = Elements<MclScalar>::FirstNPow(y, n);
+    auto hh = Elements<MclG1Point>(std::vector<MclG1Point> {
         MclG1Point::MapToG1("h1"),
         MclG1Point::MapToG1("h2")
     });
@@ -117,11 +117,11 @@ BOOST_AUTO_TEST_CASE(test_integration_rebasing_base_point)
         BOOST_CHECK(lhs == rhs);
     }
     {
-        auto hhp = Points<MclG1Point>(std::vector<MclG1Point> {
+        auto hhp = Elements<MclG1Point>(std::vector<MclG1Point> {
             hh[0],
             hh[1] * y.Invert()
         });
-        auto y_pows_inv = Scalars<MclScalar>::FirstNPow(y.Invert(), n);
+        auto y_pows_inv = Elements<MclScalar>::FirstNPow(y.Invert(), n);
         auto lhs = hhp * (y_n * z + two_n * z.Square());
         auto rhs = hh * (one_n * z + two_n * z.Square() * y_pows_inv);
         BOOST_CHECK(lhs == rhs);
@@ -133,27 +133,27 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_66_67_only_h_prime)
     auto n = 2;
 
     MclScalar two(2);
-    auto two_n = Scalars<MclScalar>::FirstNPow(two, n);
+    auto two_n = Elements<MclScalar>::FirstNPow(two, n);
     MclScalar one(1);
-    auto one_n = Scalars<MclScalar>::RepeatN(one, n);
+    auto one_n = Elements<MclScalar>::RepeatN(one, n);
 
     auto x = MclScalar::Rand(true);
     auto y = MclScalar::Rand(true);
     auto z = MclScalar::Rand(true);
-    auto y_n = Scalars<MclScalar>::FirstNPow(y, n);
+    auto y_n = Elements<MclScalar>::FirstNPow(y, n);
 
-    Scalars<MclScalar> ar(std::vector<MclScalar>{
+    Elements<MclScalar> ar(std::vector<MclScalar>{
         MclScalar{1},
         MclScalar{1}});
-    auto sr = Scalars<MclScalar>::RandVec(n);
+    auto sr = Elements<MclScalar>::RandVec(n);
     auto zs = one_n * z;
-    auto hh = Points<MclG1Point>(std::vector<MclG1Point>{
+    auto hh = Elements<MclG1Point>(std::vector<MclG1Point>{
         MclG1Point::MapToG1("h1"),
         MclG1Point::MapToG1("h2")});
     auto a = hh * ar;
     auto s = hh * sr;
 
-    auto hhp = hh * Scalars<MclScalar>::FirstNPow(y.Invert(), n);
+    auto hhp = hh * Elements<MclScalar>::FirstNPow(y.Invert(), n);
 
     auto p = a + s * x + hhp * (y_n * z + two_n * z.Square());
     auto rr = y_n * (ar + zs + sr * x) + (two_n * z.Square());
@@ -194,16 +194,16 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_65_g_part_only_excl_ts)
 
     MclScalar one(1);
     MclScalar two(2);
-    auto one_n = Scalars<MclScalar>::FirstNPow(one, n);
-    auto two_n = Scalars<MclScalar>::FirstNPow(two, n);
-    auto y_n = Scalars<MclScalar>::FirstNPow(y, n);
+    auto one_n = Elements<MclScalar>::FirstNPow(one, n);
+    auto two_n = Elements<MclScalar>::FirstNPow(two, n);
+    auto y_n = Elements<MclScalar>::FirstNPow(y, n);
 
-    Scalars<MclScalar> al(std::vector<MclScalar>{
+    Elements<MclScalar> al(std::vector<MclScalar>{
         MclScalar{0},
         MclScalar{1}});
     auto ar = al - one_n;
-    auto sl = Scalars<MclScalar>::RandVec(n);
-    auto sr = Scalars<MclScalar>::RandVec(n);
+    auto sl = Elements<MclScalar>::RandVec(n);
+    auto sr = Elements<MclScalar>::RandVec(n);
 
     auto l = al - one_n * z;  // (39)
     auto r = y_n * (ar + one_n * z) + two_n * z.Square(); // (39)
@@ -240,17 +240,17 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_65_g_part_ts_only)
 
     MclScalar one(1);
     MclScalar two(2);
-    auto one_n = Scalars<MclScalar>::FirstNPow(one, n);
-    auto two_n = Scalars<MclScalar>::FirstNPow(two, n);
-    auto y_n = Scalars<MclScalar>::FirstNPow(y, n);
+    auto one_n = Elements<MclScalar>::FirstNPow(one, n);
+    auto two_n = Elements<MclScalar>::FirstNPow(two, n);
+    auto y_n = Elements<MclScalar>::FirstNPow(y, n);
 
-    Scalars<MclScalar> al(std::vector<MclScalar> {
+    Elements<MclScalar> al(std::vector<MclScalar> {
         MclScalar {0},
         MclScalar {1}
     });
     auto ar = al - one_n;
-    auto sl = Scalars<MclScalar>::RandVec(n);
-    auto sr = Scalars<MclScalar>::RandVec(n);
+    auto sl = Elements<MclScalar>::RandVec(n);
+    auto sr = Elements<MclScalar>::RandVec(n);
 
     const auto& l1 = sl;
     auto r0 = y_n * (ar + one_n * z) + two_n * z.Square();
@@ -287,17 +287,17 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_65_g_part_only)
 
     MclScalar one(1);
     MclScalar two(2);
-    auto one_n = Scalars<MclScalar>::FirstNPow(one, n);
-    auto two_n = Scalars<MclScalar>::FirstNPow(two, n);
-    auto y_n = Scalars<MclScalar>::FirstNPow(y, n);
+    auto one_n = Elements<MclScalar>::FirstNPow(one, n);
+    auto two_n = Elements<MclScalar>::FirstNPow(two, n);
+    auto y_n = Elements<MclScalar>::FirstNPow(y, n);
 
-    Scalars<MclScalar> al(std::vector<MclScalar> {
+    Elements<MclScalar> al(std::vector<MclScalar> {
         MclScalar {0},
         MclScalar {1}
     });
     auto ar = al - one_n;
-    auto sl = Scalars<MclScalar>::RandVec(n);
-    auto sr = Scalars<MclScalar>::RandVec(n);
+    auto sl = Elements<MclScalar>::RandVec(n);
+    auto sr = Elements<MclScalar>::RandVec(n);
 
     auto l0 = (al - one_n * z);
     const auto& l1 = sl;
@@ -337,9 +337,9 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_65_g_part_only)
 // P = g^a h^b u^<a,b>
 bool InnerProductArgument(
     const size_t& n,
-    const Points<MclG1Point>& gg, const Points<MclG1Point>& hh,
+    const Elements<MclG1Point>& gg, const Elements<MclG1Point>& hh,
     const MclG1Point& u, const MclG1Point& p,
-    const Scalars<MclScalar>& a, const Scalars<MclScalar>& b
+    const Elements<MclScalar>& a, const Elements<MclScalar>& b
 )
 {
     if (n == 1) {
@@ -372,17 +372,17 @@ BOOST_AUTO_TEST_CASE(test_integration_inner_product_argument)
 {
     auto n = 2;
 
-    auto gg = Points<MclG1Point>(std::vector{
+    auto gg = Elements<MclG1Point>(std::vector{
         MclG1Point::MapToG1("g1"),
         MclG1Point::MapToG1("g2")});
-    auto hh = Points<MclG1Point>(std::vector{
+    auto hh = Elements<MclG1Point>(std::vector{
         MclG1Point::MapToG1("h1"),
         MclG1Point::MapToG1("h2")});
     auto u = MclG1Point::MapToG1("u");
 
     // a, b are Scalar vectors
-    Scalars<MclScalar> a(std::vector<MclScalar> { MclScalar {2}, MclScalar {3} });
-    Scalars<MclScalar> b(std::vector<MclScalar> { MclScalar {5}, MclScalar {7} });
+    Elements<MclScalar> a(std::vector<MclScalar> { MclScalar {2}, MclScalar {3} });
+    Elements<MclScalar> b(std::vector<MclScalar> { MclScalar {5}, MclScalar {7} });
 
     auto p = (gg * a).Sum() + (hh * b).Sum() + u * (a * b).Sum();
 
@@ -398,23 +398,23 @@ BOOST_AUTO_TEST_CASE(test_integration_inner_product_argument)
 bool RangeProof(
     size_t n, MclG1Point V, MclScalar gamma,
     MclG1Point g, MclG1Point h,
-    Points<MclG1Point> gg, Points<MclG1Point> hh,
-    Scalars<MclScalar> al,
+    Elements<MclG1Point> gg, Elements<MclG1Point> hh,
+    Elements<MclScalar> al,
     bool use_inner_product_argument
 )
 {
     // On input upsilon and gamma, prover computes
     MclScalar one(1);
     MclScalar two(2);
-    auto one_n = Scalars<MclScalar>::FirstNPow(one, n);
-    auto two_n = Scalars<MclScalar>::FirstNPow(two, n);
+    auto one_n = Elements<MclScalar>::FirstNPow(one, n);
+    auto two_n = Elements<MclScalar>::FirstNPow(two, n);
 
     auto ar = al - one_n;
     auto alpha = MclScalar::Rand();
     auto a = (h * alpha) + (gg * al).Sum() + (hh * ar).Sum();
 
-    auto sl = Scalars<MclScalar>::RandVec(n);
-    auto sr = Scalars<MclScalar>::RandVec(n);
+    auto sl = Elements<MclScalar>::RandVec(n);
+    auto sr = Elements<MclScalar>::RandVec(n);
     auto rho = MclScalar::Rand();
     auto s = (h * rho) + (gg * sl).Sum() + (hh * sr).Sum();
 
@@ -426,7 +426,7 @@ bool RangeProof(
 
     // Define vector ploynomials l(x), r(x) and t(x)
     // t(x) = <l(x),r(x)> = <l0, r0> + (<l1, r0> + <l0, r1>) * x + <l1, r1> * x^2
-    auto y_n = Scalars<MclScalar>::FirstNPow(y, n);
+    auto y_n = Elements<MclScalar>::FirstNPow(y, n);
     auto l0 = al - one_n * z;
     const auto& l1 = sl;
     auto r0 = y_n * (ar + one_n * z) + two_n * z.Square();
@@ -457,7 +457,7 @@ bool RangeProof(
     // Prover sends l,r,t_hat,tau_x,mu to verifier
 
     // (64)
-    auto hhp = hh * Scalars<MclScalar>::FirstNPow(y.Invert(), n);
+    auto hhp = hh * Elements<MclScalar>::FirstNPow(y.Invert(), n);
 
     // (65)
     auto delta_yz =
@@ -493,7 +493,7 @@ bool RangeProof(
 BOOST_AUTO_TEST_CASE(test_integration_range_proof)
 {
     auto gamma = MclScalar::Rand();
-    Scalars<MclScalar> al(std::vector<MclScalar> {
+    Elements<MclScalar> al(std::vector<MclScalar> {
         MclScalar {1},
         MclScalar {0},
         MclScalar {0},
@@ -505,13 +505,13 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof)
     auto g = MclG1Point::MapToG1("g");
     auto h = MclG1Point::MapToG1("h");
 
-    auto gg = Points<MclG1Point>(std::vector<MclG1Point> {
+    auto gg = Elements<MclG1Point>(std::vector<MclG1Point> {
         MclG1Point::MapToG1("g1"),
         MclG1Point::MapToG1("g2"),
         MclG1Point::MapToG1("g3"),
         MclG1Point::MapToG1("g4")
     });
-    auto hh = Points<MclG1Point>(std::vector<MclG1Point> {
+    auto hh = Elements<MclG1Point>(std::vector<MclG1Point> {
         MclG1Point::MapToG1("h1"),
         MclG1Point::MapToG1("h2"),
         MclG1Point::MapToG1("h3"),

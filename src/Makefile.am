@@ -940,12 +940,12 @@ libbitcoinkernel_la_SOURCES = \
   kernel/bitcoinkernel.cpp \
   arith_uint256.cpp \
   blockfilter.cpp \
-  blsct/arith/her/her_g1point.cpp \
-  blsct/arith/her/her_initializer.cpp \
-  blsct/arith/her/her_scalar.cpp \
+  blsct/arith/mcl/mcl_g1point.cpp \
+  blsct/arith/mcl/mcl_initializer.cpp \
+  blsct/arith/mcl/mcl_scalar.cpp \
   blsct/arith/elements.cpp \
-  blsct/arith/point.cpp \
-  blsct/arith/scalar.cpp \
+  blsct/arith/point_facade.cpp \
+  blsct/arith/scalar_facade.cpp \
   blsct/keys.cpp \
   chain.cpp \
   chainparamsbase.cpp \

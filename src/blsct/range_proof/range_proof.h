@@ -12,17 +12,18 @@ struct RangeProof
 {
     using Point = typename T::Point;
     using Scalar = typename T::Scalar;
+    using Points = Elements<Point>;
 
     // intermediate values used to derive random values later
-    Points<Point> Vs;
+    Points Vs;
     Point A;
     Point S;
     Point T1;
     Point T2;
     Scalar mu;
     Scalar tau_x;
-    Points<Point> Ls;
-    Points<Point> Rs;
+    Points Ls;
+    Points Rs;
 
     // proof results
     Scalar t_hat;   // inner product of l and r

@@ -12,6 +12,7 @@
 template <typename T>
 RangeProofWithTranscript<T> RangeProofWithTranscript<T>::Build(const RangeProof<T>& proof) {
     using Scalar = typename T::Scalar;
+    using Scalars = Elements<Scalar>;
 
     // build transcript from proof in the same way it was built in Prove function
     CHashWriter transcript_gen(0,0);
@@ -43,8 +44,8 @@ RangeProofWithTranscript<T> RangeProofWithTranscript<T>::Build(const RangeProof<
     auto num_rounds = RangeProofWithTranscript<T>::RecoverNumRounds(proof.Vs.Size());
 
     // for each proof, generate w from Ls and Rs and store the inverse
-    Scalars<Scalar> xs;
-    Scalars<Scalar> inv_xs;
+    Scalars xs;
+    Scalars inv_xs;
     for (size_t i = 0; i < num_rounds; ++i) {
         transcript_gen << proof.Ls[i];
         transcript_gen << proof.Rs[i];

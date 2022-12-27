@@ -18,19 +18,20 @@
 template <typename T>
 struct Generators {
     using Point = typename T::Point;
+    using Points = Elements<Point>;
 
 public:
-    Generators(Point& H, Point& G, Points<Point>& Gi, Points<Point>& Hi):
+    Generators(Point& H, Point& G, Points& Gi, Points& Hi):
         H{H}, G{G}, Gi{Gi}, Hi{Hi} {}
-    Points<Point> GetGiSubset(const size_t& size) const;
-    Points<Point> GetHiSubset(const size_t& size) const;
+    Points GetGiSubset(const size_t& size) const;
+    Points GetHiSubset(const size_t& size) const;
 
     std::reference_wrapper<Point> H;
     Point G;
 
 private:
-    std::reference_wrapper<Points<Point>> Gi;
-    std::reference_wrapper<Points<Point>> Hi;
+    std::reference_wrapper<Points> Gi;
+    std::reference_wrapper<Points> Hi;
 };
 
 /**
@@ -61,6 +62,7 @@ template <typename T>
 class GeneratorsFactory
 {
     using Point = typename T::Point;
+    using Points = Elements<Point>;
 
 public:
     GeneratorsFactory();
@@ -79,8 +81,8 @@ private:
 
     // made optional to initialize values lazily after mcl initialization
     inline static std::optional<Point> m_H;
-    inline static std::optional<Points<Point>> m_Gi;
-    inline static std::optional<Points<Point>> m_Hi;
+    inline static std::optional<Points> m_Gi;
+    inline static std::optional<Points> m_Hi;
 
     inline static boost::mutex m_init_mutex;
     inline static bool m_is_initialized = false;

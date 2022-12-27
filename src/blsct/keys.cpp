@@ -8,7 +8,7 @@
 namespace blsct {
 
 template <typename T>
-PublicKey<typename T::Point> PublicKey<typename T::Point>::Aggregate(std::vector<PublicKey<typename T::Point>> vPk)
+PublicKey<T> PublicKey<T>::Aggregate(std::vector<PublicKey<T>> vPk)
 {
     using Point = typename T::Point;
 
@@ -77,7 +77,7 @@ bool PublicKey<T>::IsValid() const
 {
     if (data.size() == 0) return false;
 
-    P g1;
+    typename T::Point g1;
 
     if (!GetG1Point(g1)) return false;
 
@@ -168,20 +168,19 @@ template std::vector<unsigned char> DoublePublicKey<Mcl>::GetVch() const;
 template <typename T>
 PrivateKey<T>::PrivateKey(typename T::Scalar k_)
 {
-    if constexpr (std::is_same_v<T::Scalar, std::vector<uint8_t>>) {
-        k.resize(PrivateKey<T>::SIZE);
-        memcpy(k.data(), &k_.front(), k.size());
-    }
-    else if constexpr (std::is_same_v<T::Scalar, MclScalar>) {
-        k.resize(PrivateKey<T>::SIZE);
-        std::vector<unsigned char> v = k_.GetVch();
-        memcpy(k.data(), &v.front(), k.size());
-    } else {
-        throw std::runtime_error("Not implemented");
-    }
+    k.resize(PrivateKey<T>::SIZE);
+    std::vector<unsigned char> v = k_.GetVch();
+    memcpy(k.data(), &v.front(), k.size());
 }
-template PrivateKey<Mcl>::PrivateKey(Mcl::Scalar k_);
-template PrivateKey<Mcl>::PrivateKey(std::vector<uint8_t> k_);
+template PrivateKey<Mcl>::PrivateKey(Mcl::Scalar);
+
+template <typename T>
+PrivateKey<T>::PrivateKey(CPrivKey k_)
+{
+    k.resize(PrivateKey<T>::SIZE);
+    memcpy(k.data(), &k_.front(), k.size());
+}
+template PrivateKey<Mcl>::PrivateKey(CPrivKey);
 
 template <typename T>
 bool PrivateKey<T>::operator==(const PrivateKey<T>& rhs) const
@@ -193,21 +192,21 @@ template bool PrivateKey<Mcl>::operator==(const PrivateKey<Mcl>& rhs) const;
 template <typename T>
 typename T::Point PrivateKey<T>::GetPoint() const
 {
-    return PointFacade<P>::GetBasePoint() * S(std::vector<unsigned char>(k.begin(), k.end()));
+    return PointFacade<typename T::Point>::GetBasePoint() * typename T::Scalar(std::vector<unsigned char>(k.begin(), k.end()));
 }
-template Mcl::Point PrivateKey<Mcl>::GetPoint<Mcl::Scalar>() const;
+template Mcl::Point PrivateKey<Mcl>::GetPoint() const;
 
 template <typename T>
 PublicKey<T> PrivateKey<T>::GetPublicKey() const
 {
-    return PublicKey(GetPoint<Mcl>());
+    return PublicKey<T>(GetPoint());
 }
 template PublicKey<Mcl> PrivateKey<Mcl>::GetPublicKey() const;
 
 template <typename T>
 typename T::Scalar PrivateKey<T>::GetScalar() const
 {
-    return S(std::vector<unsigned char>(k.begin(), k.end()));
+    return typename T::Scalar(std::vector<unsigned char>(k.begin(), k.end()));
 }
 template Mcl::Scalar PrivateKey<Mcl>::GetScalar() const;
 
@@ -217,7 +216,7 @@ bool PrivateKey<T>::IsValid() const
     if (k.size() == 0) return false;
     return GetScalar().IsValid();
 }
-template bool PrivateKey<Mcl>::IsValid<Mcl::Scalar>() const;
+template bool PrivateKey<Mcl>::IsValid() const;
 
 template <typename T>
 void PrivateKey<T>::SetToZero()

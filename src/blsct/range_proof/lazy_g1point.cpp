@@ -16,7 +16,7 @@ LazyG1Point<T>::LazyG1Point(const typename T::Point& base, const typename T::Sca
 template LazyG1Point<Mcl>::LazyG1Point(const Mcl::Point& base, const Mcl::Scalar& exp);
 
 template <typename T>
-LazyG1Points<T>::LazyG1Points(const Points<typename T::Point>& bases, const Scalars<typename T::Scalar>& exps) {
+LazyG1Points<T>::LazyG1Points(const Elements<typename T::Point>& bases, const Elements<typename T::Scalar>& exps) {
     if (bases.Size() != exps.Size()) {
         throw std::runtime_error("number of bases and exps don't match");
     }
@@ -24,7 +24,7 @@ LazyG1Points<T>::LazyG1Points(const Points<typename T::Point>& bases, const Scal
         points.push_back(LazyG1Point<T>(bases[i], exps[i]));
     }
 }
-template LazyG1Points<Mcl>::LazyG1Points(const Points<Mcl::Point>& bases, const Scalars<Mcl::Scalar>& exps);
+template LazyG1Points<Mcl>::LazyG1Points(const Elements<Mcl::Point>& bases, const Elements<Mcl::Scalar>& exps);
 
 template <typename T>
 void LazyG1Points<T>::Add(const LazyG1Point<T>& point) {
@@ -52,8 +52,8 @@ template Mcl::Point LazyG1Points<Mcl>::Sum() const;
 
 template <typename T>
 LazyG1Points<T> LazyG1Points<T>::operator+(const LazyG1Points<T>& rhs) const {
-    Points<typename T::Point> bases;
-    Scalars<typename T::Scalar> exps;
+    Elements<typename T::Point> bases;
+    Elements<typename T::Scalar> exps;
 
     for (auto p: points) {
         bases.Add(p.m_base);
@@ -70,8 +70,8 @@ template LazyG1Points<Mcl> LazyG1Points<Mcl>::operator+(const LazyG1Points<Mcl>&
 
 template <typename T>
 LazyG1Points<T> LazyG1Points<T>::operator+(const LazyG1Point<T>& rhs) const {
-    Points<typename T::Point> bases;
-    Scalars<typename T::Scalar> exps;
+    Elements<typename T::Point> bases;
+    Elements<typename T::Scalar> exps;
 
     for (auto p: points) {
         bases.Add(p.m_base);

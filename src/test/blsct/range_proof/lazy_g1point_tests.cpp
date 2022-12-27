@@ -43,7 +43,7 @@ BOOST_AUTO_TEST_CASE(test_lazy_g1points_sum)
 
     auto g = Point::GetBasePoint();
     auto g2 = g + g;
-    Points<Point> points;
+    Elements<Point> points;
     points.Add(g);
     points.Add(g2);
     auto sum = points.Sum();

@@ -20,13 +20,14 @@ struct AmountRecoveryRequest
 {
     using Scalar = typename T::Scalar;
     using Point = typename T::Point;
+    using Points = Elements<Point>;
 
     size_t id;
     Scalar x;
     Scalar z;
-    Points<Point> Vs;
-    Points<Point> Ls;
-    Points<Point> Rs;
+    Points Vs;
+    Points Ls;
+    Points Rs;
     Scalar mu;
     Scalar tau_x;
     Point nonce;
@@ -69,12 +70,14 @@ class RangeProofLogic
 private:
     using Scalar = typename T::Scalar;
     using Point = typename T::Point;
+    using Scalars = Elements<Scalar>;
+    using Points = Elements<Point>;
 
 public:
     RangeProofLogic();
 
     RangeProof<T> Prove(
-        Scalars<Scalar>& vs,
+        Scalars& vs,
         Point& nonce,
         const std::vector<uint8_t>& message,
         const TokenId& token_id
@@ -111,12 +114,12 @@ private:
 
     bool InnerProductArgument(
         const size_t concat_input_values_in_bits,
-        Points<Point>& Gi,
-        Points<Point>& Hi,
+        Points& Gi,
+        Points& Hi,
         const Point& u,
         const Scalar& cx_factor,  // factor to multiply to cL and cR
-        Scalars<Scalar>& a,
-        Scalars<Scalar>& b,
+        Scalars& a,
+        Scalars& b,
         const Scalar& y,
         RangeProof<T>& proof,
         CHashWriter& transcript_gen
@@ -128,7 +131,7 @@ private:
 
     static Scalar* m_one;
     static Scalar* m_two;
-    static Scalars<Scalar>* m_two_pows_64;
+    static Scalars* m_two_pows_64;
     static Scalar* m_inner_prod_1x2_pows_64;
     static Scalar* m_uint64_max;
 

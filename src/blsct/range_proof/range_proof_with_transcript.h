@@ -13,6 +13,7 @@ class RangeProofWithTranscript
 {
     using Scalar = typename T::Scalar;
     using Point = typename T::Point;
+    using Scalars = Elements<Scalar>;
 
 public:
     RangeProofWithTranscript(
@@ -21,8 +22,8 @@ public:
         const Scalar& y,
         const Scalar& z,
         const Scalar& cx_factor,
-        const Scalars<Scalar>& xs,
-        const Scalars<Scalar>& inv_xs,
+        const Scalars& xs,
+        const Scalars& inv_xs,
         const size_t& num_input_values_power_2,
         const size_t& concat_input_values_in_bits
     ): proof{proof}, x{x}, y{y}, z{z}, cx_factor{cx_factor}, xs(xs),
@@ -41,8 +42,8 @@ public:
     const Scalar y;
     const Scalar z;
     const Scalar cx_factor;  // factor multiplied to cL and cR in inner product argument
-    const Scalars<Scalar> xs;      // x used in inner product argument
-    const Scalars<Scalar> inv_xs;  // x^-1 used in inner product argument
+    const Scalars xs;      // x used in inner product argument
+    const Scalars inv_xs;  // x^-1 used in inner product argument
     const Scalar inv_y;
 
     const size_t num_input_values_power_2;  // M in old impl

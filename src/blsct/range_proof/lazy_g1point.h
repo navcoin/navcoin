@@ -23,10 +23,12 @@ template <typename T>
 struct LazyG1Points {
     using Scalar = typename T::Scalar;
     using Point = typename T::Point;
+    using Scalars = Elements<Scalar>;
+    using Points = Elements<Point>;
 
 public:
     LazyG1Points() {}
-    LazyG1Points(const Points<Point>& bases, const Scalars<Scalar>& exps);
+    LazyG1Points(const Points& bases, const Scalars& exps);
 
     void Add(const LazyG1Point<T>& point);
 

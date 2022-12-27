@@ -13,32 +13,33 @@
 #include <tinyformat.h>
 
 template <typename T>
-Points<typename T::Point> Generators<T>::GetGiSubset(const size_t& size) const
+Elements<typename T::Point> Generators<T>::GetGiSubset(const size_t& size) const
 {
     return Gi.get().To(size);
 }
-template Points<Mcl::Point> Generators<Mcl>::GetGiSubset(const size_t&) const;
+template Elements<Mcl::Point> Generators<Mcl>::GetGiSubset(const size_t&) const;
 
 template <typename T>
-Points<typename T::Point> Generators<T>::GetHiSubset(const size_t& size) const
+Elements<typename T::Point> Generators<T>::GetHiSubset(const size_t& size) const
 {
     return Hi.get().To(size);
 }
-template Points<Mcl::Point> Generators<Mcl>::GetHiSubset(const size_t&) const;
+template Elements<Mcl::Point> Generators<Mcl>::GetHiSubset(const size_t&) const;
 
 template <typename T>
 GeneratorsFactory<T>::GeneratorsFactory()
 {
     using Point = typename T::Point;
+    using Points = Elements<Point>;
 
-    boost::lock_guard<boost::mutex> lock(GeneratorsFactory<P>::m_init_mutex);
-    if (GeneratorsFactory<P>::m_is_initialized) return;
+    boost::lock_guard<boost::mutex> lock(GeneratorsFactory<T>::m_init_mutex);
+    if (GeneratorsFactory<T>::m_is_initialized) return;
 
-    T::InitializerType::Init();
-    Point<Point>::Init();
+    T::Initializer::Init();
+    T::Point::Init();
 
-    m_H = Point<Point>::GetBasePoint();
-    Points<Point> Gi, Hi;
+    m_H = Point::GetBasePoint();
+    Points Gi, Hi;
     m_Gi = Gi;
     m_Hi = Hi;
 
@@ -48,8 +49,8 @@ GeneratorsFactory<T>::GeneratorsFactory()
 
     for (size_t i = 0; i < Config::m_max_input_value_vec_len; ++i) {
         const size_t base_index = i * 2;
-        P hi = DeriveGenerator(default_G, base_index + 1, default_token_id);
-        P gi = DeriveGenerator(default_G, base_index + 2, default_token_id);
+        Point hi = DeriveGenerator(default_G, base_index + 1, default_token_id);
+        Point gi = DeriveGenerator(default_G, base_index + 2, default_token_id);
         m_Hi.value().Add(hi);
         m_Gi.value().Add(gi);
     }
@@ -101,9 +102,9 @@ Generators<T> GeneratorsFactory<T>::GetInstance(const TokenId& token_id)
     // if G for the token_id hasn't been created, create and cache it
     if (GeneratorsFactory<T>::m_G_cache.count(token_id) == 0) {
         const Point G = DeriveGenerator(GeneratorsFactory<T>::m_H.value(), 0, token_id);
-        GeneratorsFactory<P>::m_G_cache.emplace(token_id, G);
+        GeneratorsFactory<T>::m_G_cache.emplace(token_id, G);
     }
-    Point G = GeneratorsFactory<P>::m_G_cache[token_id];
+    Point G = GeneratorsFactory<T>::m_G_cache[token_id];
 
     Generators<T> gens(m_H.value(), G, m_Gi.value(), m_Hi.value());
     return gens;

@@ -445,7 +445,7 @@ CBlock getBlock13b8a()
     return block;
 }
 
-HerTestingSetup::HerTestingSetup()
+MclTestingSetup::MclTestingSetup()
 {
     MclInitializer::Init();
     MclG1Point::Init();
