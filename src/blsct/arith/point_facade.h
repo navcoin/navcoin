@@ -8,7 +8,6 @@
 #include <stddef.h>
 #include <string>
 
-//#include <blsct/arith/scalar_facade.h>
 #include <serialize.h>
 #include <uint256.h>
 

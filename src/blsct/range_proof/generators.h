@@ -10,8 +10,6 @@
 
 #include <blsct/arith/elements.h>
 #include <blsct/arith/initializer.h>
-#include <blsct/arith/point_facade.h>
-#include <blsct/arith/scalar_facade.h>
 #include <blsct/range_proof/config.h>
 #include <ctokens/tokenid.h>
 

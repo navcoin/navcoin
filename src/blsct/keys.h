@@ -5,8 +5,6 @@
 #ifndef KEY_H
 #define KEY_H
 
-#include <blsct/arith/point_facade.h>
-#include <blsct/arith/scalar_facade.h>
 #include <hash.h>
 #include <key.h>
 #include <serialize.h>
