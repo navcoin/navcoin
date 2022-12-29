@@ -13,9 +13,9 @@
 #define SCALAR_CURVE_ORDER_MINUS_1(x) MclScalar x("73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000000", 16)
 #define SCALAR_INT64_MIN(x) MclScalar x("52435875175126190479447740508185965837690552500527637822594435327901726408705", 10);
 
-BOOST_FIXTURE_TEST_SUITE(scalar_tests, MclTestingSetup)
+BOOST_FIXTURE_TEST_SUITE(mcl_scalar_tests, MclTestingSetup)
 
-BOOST_AUTO_TEST_CASE(test_scalar_ctor_vec_uint8)
+BOOST_AUTO_TEST_CASE(test_ctor_vec_uint8)
 {
     // input vector modulo curve order r should be set to Scalar
 
@@ -179,7 +179,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_ctor_vec_uint8)
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_scalar_add)
+BOOST_AUTO_TEST_CASE(test_add)
 {
     {
         MclScalar a(1);
@@ -195,7 +195,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_add)
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_scalar_sub)
+BOOST_AUTO_TEST_CASE(test_sub)
 {
     {
         MclScalar a(5);
@@ -211,7 +211,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_sub)
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_scalar_mul)
+BOOST_AUTO_TEST_CASE(test_mul)
 {
     MclScalar a(2);
     MclScalar b(3);
@@ -219,7 +219,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_mul)
     BOOST_CHECK((a * b) == c);
 }
 
-BOOST_AUTO_TEST_CASE(test_scalar_div)
+BOOST_AUTO_TEST_CASE(test_div)
 {
     MclScalar a(6);
     MclScalar b(3);
@@ -227,7 +227,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_div)
     BOOST_CHECK((a / b) == c);
 }
 
-BOOST_AUTO_TEST_CASE(test_scalar_bitwise_or)
+BOOST_AUTO_TEST_CASE(test_bitwise_or)
 {
     {
         // there is no bit that has 1 in both a and b
@@ -263,7 +263,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_bitwise_or)
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_scalar_bitwise_xor)
+BOOST_AUTO_TEST_CASE(test_bitwise_xor)
 {
     {
         // there is no bit that has 1 in both a and b
@@ -299,7 +299,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_bitwise_xor)
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_scalar_bitwise_and)
+BOOST_AUTO_TEST_CASE(test_bitwise_and)
 {
     {
         // there is no bit that has 1 in both a and b
@@ -335,7 +335,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_bitwise_and)
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_scalar_bitwise_compl)
+BOOST_AUTO_TEST_CASE(test_bitwise_compl)
 {
     // ~ operator doesn't work w/ very large number such as ~1 i.e.
     // 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe
@@ -350,7 +350,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_bitwise_compl)
     BOOST_CHECK(act == exp);
 }
 
-BOOST_AUTO_TEST_CASE(test_scalar_shift_left)
+BOOST_AUTO_TEST_CASE(test_shift_left)
 {
     MclScalar one(1);
     uint64_t exp = 1;
@@ -362,7 +362,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_shift_left)
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_scalar_shift_right)
+BOOST_AUTO_TEST_CASE(test_shift_right)
 {
     MclScalar eight(8);
     MclScalar seven(7);
@@ -384,7 +384,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_shift_right)
     BOOST_CHECK((one >> 1) == zero);
 }
 
-BOOST_AUTO_TEST_CASE(test_scalar_assign)
+BOOST_AUTO_TEST_CASE(test_assign)
 {
     {
         int64_t n = INT64_MAX;
@@ -398,7 +398,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_assign)
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_scalar_equal_or_not_equal_to_integer)
+BOOST_AUTO_TEST_CASE(test_equal_or_not_equal_to_integer)
 {
     MclScalar a(6);
     int b = 6;
@@ -407,7 +407,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_equal_or_not_equal_to_integer)
     BOOST_CHECK(a != c);
 }
 
-BOOST_AUTO_TEST_CASE(test_scalar_equal_or_not_equal_to_scalar)
+BOOST_AUTO_TEST_CASE(test_equal_or_not_equal_to_scalar)
 {
     MclScalar a(6);
     MclScalar b(6);
@@ -416,7 +416,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_equal_or_not_equal_to_scalar)
     BOOST_CHECK(a != c);
 }
 
-BOOST_AUTO_TEST_CASE(test_scalar_invert)
+BOOST_AUTO_TEST_CASE(test_invert)
 {
     MclScalar a(6);
     MclScalar b = a.Invert();
@@ -424,13 +424,13 @@ BOOST_AUTO_TEST_CASE(test_scalar_invert)
     BOOST_CHECK(a == c);
 }
 
-BOOST_AUTO_TEST_CASE(test_scalar_invert_zero)
+BOOST_AUTO_TEST_CASE(test_invert_zero)
 {
     MclScalar a(0);
     BOOST_CHECK_THROW(a.Invert(), std::runtime_error);
 }
 
-BOOST_AUTO_TEST_CASE(test_scalar_negate)
+BOOST_AUTO_TEST_CASE(test_negate)
 {
     MclScalar a(6);
     MclScalar b(-6);
@@ -438,7 +438,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_negate)
     BOOST_CHECK(b == c);
 }
 
-BOOST_AUTO_TEST_CASE(test_scalar_square)
+BOOST_AUTO_TEST_CASE(test_square)
 {
     MclScalar a(9);
     MclScalar b(81);
@@ -446,7 +446,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_square)
     BOOST_CHECK(b == c);
 }
 
-BOOST_AUTO_TEST_CASE(test_scalar_cube)
+BOOST_AUTO_TEST_CASE(test_cube)
 {
     MclScalar a(3);
     MclScalar b(27);
@@ -454,7 +454,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_cube)
     BOOST_CHECK(b == c);
 }
 
-BOOST_AUTO_TEST_CASE(test_scalar_pow)
+BOOST_AUTO_TEST_CASE(test_pow)
 {
     struct TestCase {
         int64_t a;
@@ -482,7 +482,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_pow)
     y.Invert().Pow(y.Invert());
 }
 
-BOOST_AUTO_TEST_CASE(test_scalar_rand)
+BOOST_AUTO_TEST_CASE(test_rand)
 {
     std::vector<bool> tf {true, false};
     for (auto exclude_zero : tf) {
@@ -500,7 +500,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_rand)
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_scalar_getuint64)
+BOOST_AUTO_TEST_CASE(test_getuint64)
 {
     {
         // Scalar(int) operator takes int64_t, so let it take INT64_MAX
@@ -532,7 +532,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_getuint64)
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_scalar_getvch)
+BOOST_AUTO_TEST_CASE(test_getvch)
 {
     std::vector<uint8_t> vec{
         0,
@@ -582,7 +582,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_getvch)
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_scalar_setvch)
+BOOST_AUTO_TEST_CASE(test_setvch)
 {
     {
         std::vector<uint8_t> vec{
@@ -714,7 +714,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_setvch)
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_scalar_get_and_setvch)
+BOOST_AUTO_TEST_CASE(test_get_and_setvch)
 {
     std::vector<uint8_t> vec{
         0,
@@ -758,7 +758,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_get_and_setvch)
     BOOST_CHECK(a == b);
 }
 
-BOOST_AUTO_TEST_CASE(test_scalar_setpow2)
+BOOST_AUTO_TEST_CASE(test_setpow2)
 {
     for (size_t i = 0; i < 10; ++i) {
         MclScalar a;
@@ -767,7 +767,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_setpow2)
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_scalar_hash)
+BOOST_AUTO_TEST_CASE(test_hash)
 {
     // upon generating the digest, following data is added to the hasher:
     // - 1 byte storing the size of the following array
@@ -783,7 +783,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_hash)
 }
 
 // TODO fix this test
-BOOST_AUTO_TEST_CASE(test_scalar_getstring)
+BOOST_AUTO_TEST_CASE(test_getstring)
 {
     MclScalar a(0xffff);
 
@@ -806,7 +806,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_getstring)
     BOOST_CHECK(act_int64_min == s);
 }
 
-BOOST_AUTO_TEST_CASE(test_scalar_get_bits)
+BOOST_AUTO_TEST_CASE(test_get_bits)
 {
     // n is group order r minus 1
     std::vector<uint8_t> n_vec{
@@ -832,7 +832,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_get_bits)
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_scalar_get_bit)
+BOOST_AUTO_TEST_CASE(test_get_bit)
 {
     {
         MclScalar a(0b100000001);
@@ -875,7 +875,7 @@ BOOST_AUTO_TEST_CASE(test_scalar_get_bit)
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_scalar_create_64_bit_shift)
+BOOST_AUTO_TEST_CASE(test_create_64_bit_shift)
 {
     // serialized excess based on message "spaghetti meatballs"
     // = 7370616765747469206d65617462616c6c730000000000000001

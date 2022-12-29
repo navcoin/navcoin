@@ -13,9 +13,9 @@
 #include <set>
 #include <streams.h>
 
-BOOST_FIXTURE_TEST_SUITE(g1point_tests, MclTestingSetup)
+BOOST_FIXTURE_TEST_SUITE(mcl_g1point_tests, MclTestingSetup)
 
-BOOST_AUTO_TEST_CASE(test_g1point_constructors)
+BOOST_AUTO_TEST_CASE(test_constructors)
 {
     // Default
     {
@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE(test_g1point_constructors)
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_g1point_assign_op)
+BOOST_AUTO_TEST_CASE(test_assign_op)
 {
     auto g = MclG1Point::GetBasePoint();
     auto b = g + g;
@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE(test_g1point_assign_op)
     BOOST_CHECK(b == c);
 }
 
-BOOST_AUTO_TEST_CASE(test_g1point_point_add_sub)
+BOOST_AUTO_TEST_CASE(test_point_add_sub)
 {
     auto g = MclG1Point::GetBasePoint();
     auto p = g + g;
@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE(test_g1point_point_add_sub)
     BOOST_CHECK(q == g);
 }
 
-BOOST_AUTO_TEST_CASE(test_g1point_point_mul)
+BOOST_AUTO_TEST_CASE(test_point_mul)
 {
     auto g = MclG1Point::GetBasePoint();
     auto p = g + g + g;
@@ -77,7 +77,7 @@ BOOST_AUTO_TEST_CASE(test_g1point_point_mul)
     BOOST_CHECK(p == q);
 }
 
-BOOST_AUTO_TEST_CASE(test_g1point_points_mul)
+BOOST_AUTO_TEST_CASE(test_points_mul)
 {
     auto scalars = std::vector<MclScalar>({
         MclScalar(1), MclScalar(2)
@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_CASE(test_g1point_points_mul)
     BOOST_CHECK(qs[1] == p2);
 }
 
-BOOST_AUTO_TEST_CASE(test_g1point_point_equal_or_not_equal)
+BOOST_AUTO_TEST_CASE(test_point_equal_or_not_equal)
 {
     auto g = MclG1Point::GetBasePoint();
     BOOST_CHECK(g == g);
@@ -99,7 +99,7 @@ BOOST_AUTO_TEST_CASE(test_g1point_point_equal_or_not_equal)
     BOOST_CHECK(g != p);
 }
 
-BOOST_AUTO_TEST_CASE(test_g1point_double)
+BOOST_AUTO_TEST_CASE(test_double)
 {
     auto g = MclG1Point::GetBasePoint();
     auto g2 = g + g;
@@ -111,7 +111,7 @@ BOOST_AUTO_TEST_CASE(test_g1point_double)
     BOOST_CHECK(g4 == gdd);
 }
 
-BOOST_AUTO_TEST_CASE(test_g1point_get_base_point)
+BOOST_AUTO_TEST_CASE(test_get_base_point)
 {
     auto g = MclG1Point::GetBasePoint();
     char g_act[1024];
@@ -122,7 +122,7 @@ BOOST_AUTO_TEST_CASE(test_g1point_get_base_point)
     BOOST_CHECK_EQUAL(g_exp, g_act);
 }
 
-BOOST_AUTO_TEST_CASE(test_g1point_map_to_g1)
+BOOST_AUTO_TEST_CASE(test_map_to_g1)
 {
     // Different numbers should be mapped to different points
     std::set<std::string> xs;
@@ -195,7 +195,7 @@ BOOST_AUTO_TEST_CASE(test_g1point_map_to_g1)
     BOOST_CHECK_THROW(MclG1Point::MapToG1(empty_vec), std::runtime_error);
 }
 
-BOOST_AUTO_TEST_CASE(test_g1point_hash_and_map)
+BOOST_AUTO_TEST_CASE(test_hash_and_map)
 {
     std::vector<uint8_t> vec{
         0x73,
@@ -269,7 +269,7 @@ BOOST_AUTO_TEST_CASE(test_g1point_hash_and_map)
     BOOST_CHECK(p == q);
 }
 
-BOOST_AUTO_TEST_CASE(test_g1point_rand)
+BOOST_AUTO_TEST_CASE(test_rand)
 {
     unsigned int num_tries = 1000;
     unsigned int num_dups = 0;
@@ -282,7 +282,7 @@ BOOST_AUTO_TEST_CASE(test_g1point_rand)
     BOOST_CHECK(dupRatio < 0.001);
 }
 
-BOOST_AUTO_TEST_CASE(test_g1point_is_unity)
+BOOST_AUTO_TEST_CASE(test_is_unity)
 {
     auto g = MclG1Point::GetBasePoint();
     BOOST_CHECK_EQUAL(g.IsUnity(), false);
@@ -291,7 +291,7 @@ BOOST_AUTO_TEST_CASE(test_g1point_is_unity)
     BOOST_CHECK_EQUAL(p.IsUnity(), true);
 }
 
-BOOST_AUTO_TEST_CASE(test_g1point_get_set_vch)
+BOOST_AUTO_TEST_CASE(test_get_set_vch)
 {
     MclG1Point p(uint256::ONE);
     auto vec = p.GetVch();
@@ -303,7 +303,7 @@ BOOST_AUTO_TEST_CASE(test_g1point_get_set_vch)
     BOOST_CHECK(p == q);
 }
 
-BOOST_AUTO_TEST_CASE(test_g1point_get_string)
+BOOST_AUTO_TEST_CASE(test_get_string)
 {
     auto g = MclG1Point::GetBasePoint();
     const char* g_exp = "1 3685416753713387016781088315183077757961620795782546409894578378688607592378376318836054947676345821548104185464507 1339506544944476473020471379941921221584933875938349620426543736416511423956333506472724655353366534992391756441569";
@@ -311,14 +311,14 @@ BOOST_AUTO_TEST_CASE(test_g1point_get_string)
     BOOST_CHECK(g_exp == g_act);
 }
 
-BOOST_AUTO_TEST_CASE(test_g1point_get_serialize_size)
+BOOST_AUTO_TEST_CASE(test_get_serialize_size)
 {
     MclG1Point p(uint256::ONE);
     auto ser_size = p.GetSerializeSize();
     BOOST_CHECK_EQUAL(ser_size, 48ul);
 }
 
-BOOST_AUTO_TEST_CASE(test_g1point_serialize_unserialize)
+BOOST_AUTO_TEST_CASE(test_serialize_unserialize)
 {
     MclG1Point p(uint256::ONE);
     CDataStream st(0, 0);
@@ -332,7 +332,7 @@ BOOST_AUTO_TEST_CASE(test_g1point_serialize_unserialize)
     BOOST_CHECK(p == q);
 }
 
-BOOST_AUTO_TEST_CASE(test_g1point_get_hash_with_salt)
+BOOST_AUTO_TEST_CASE(test_get_hash_with_salt)
 {
     auto g = MclG1Point::GetBasePoint();
     auto a = g.GetHashWithSalt(1);
@@ -340,7 +340,7 @@ BOOST_AUTO_TEST_CASE(test_g1point_get_hash_with_salt)
     BOOST_CHECK(a != b);
 }
 
-BOOST_AUTO_TEST_CASE(test_g1point_operator_mul_g1point_by_scalars)
+BOOST_AUTO_TEST_CASE(test_operator_mul_g1point_by_scalars)
 {
     MclScalar one(1);
     MclScalar two(2);

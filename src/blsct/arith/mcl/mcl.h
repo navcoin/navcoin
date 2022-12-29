@@ -6,8 +6,8 @@
 // inspired by https://github.com/b-g-goodell/research-lab/blob/master/source-code/StringCT-java/src/how/monero/hodl/bulletproof/Bulletproof.java
 // and https://github.com/monero-project/monero/blob/master/src/ringct/bulletproofs.cc
 
-#ifndef NAVCOIN_BLSCT_ARITH_MCL_MCL_TYPES_H
-#define NAVCOIN_BLSCT_ARITH_MCL_MCL_TYPES_H
+#ifndef NAVCOIN_BLSCT_ARITH_MCL_MCL_H
+#define NAVCOIN_BLSCT_ARITH_MCL_MCL_H
 
 #include <bls/bls384_256.h> // must include this before bls/bls.h
 #include <bls/bls.h>
@@ -22,4 +22,4 @@ struct Mcl
   using Initializer = MclInitializer;
 };
 
-#endif // NAVCOIN_BLSCT_ARITH_MCL_MCL_TYPES_H
+#endif // NAVCOIN_BLSCT_ARITH_MCL_MCL_H

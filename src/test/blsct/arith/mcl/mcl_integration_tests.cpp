@@ -13,10 +13,10 @@
 #include <set>
 #include <streams.h>
 
-BOOST_FIXTURE_TEST_SUITE(bls_arith_integration_tests, MclTestingSetup)
+BOOST_FIXTURE_TEST_SUITE(mcl_integration_tests, MclTestingSetup)
 
 // gg^z == gg^(ones * z)
-BOOST_AUTO_TEST_CASE(test_integration_gg_ones_times_z)
+BOOST_AUTO_TEST_CASE(test_gg_ones_times_z)
 {
     auto z = MclScalar::Rand(true);
     auto gg = Elements<MclG1Point>(std::vector<MclG1Point>{
@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_CASE(test_integration_gg_ones_times_z)
     BOOST_CHECK(r1 == r2);
 }
 
-BOOST_AUTO_TEST_CASE(test_integration_offset_by_negation)
+BOOST_AUTO_TEST_CASE(test_offset_by_negation)
 {
     {
         MclScalar z(100);
@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE(test_integration_offset_by_negation)
 }
 
 // (66), (67) of the range proof excluding (h') part
-BOOST_AUTO_TEST_CASE(test_integration_range_proof_66_67_excl_h_prime)
+BOOST_AUTO_TEST_CASE(test_range_proof_66_67_excl_h_prime)
 {
     auto n = 2;
     MclScalar one(1);
@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_66_67_excl_h_prime)
     BOOST_CHECK(P == hmu_ggl);
 }
 
-BOOST_AUTO_TEST_CASE(test_integration_rebasing_base_point)
+BOOST_AUTO_TEST_CASE(test_rebasing_base_point)
 {
     auto n = 2;
 
@@ -128,7 +128,7 @@ BOOST_AUTO_TEST_CASE(test_integration_rebasing_base_point)
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_integration_range_proof_66_67_only_h_prime)
+BOOST_AUTO_TEST_CASE(test_range_proof_66_67_only_h_prime)
 {
     auto n = 2;
 
@@ -162,7 +162,7 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_66_67_only_h_prime)
     BOOST_CHECK(p == hhprr);
 }
 
-BOOST_AUTO_TEST_CASE(test_integration_range_proof_65_h_part_only)
+BOOST_AUTO_TEST_CASE(test_range_proof_65_h_part_only)
 {
     auto gamma = MclScalar::Rand();
     auto x = MclScalar::Rand(true);
@@ -184,7 +184,7 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_65_h_part_only)
     BOOST_CHECK(lhs == rhs);
 }
 
-BOOST_AUTO_TEST_CASE(test_integration_range_proof_65_g_part_only_excl_ts)
+BOOST_AUTO_TEST_CASE(test_range_proof_65_g_part_only_excl_ts)
 {
     auto n = 2;
 
@@ -230,7 +230,7 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_65_g_part_only_excl_ts)
     BOOST_CHECK(lhs == rhs);
 }
 
-BOOST_AUTO_TEST_CASE(test_integration_range_proof_65_g_part_ts_only)
+BOOST_AUTO_TEST_CASE(test_range_proof_65_g_part_ts_only)
 {
     auto n = 2;
 
@@ -276,7 +276,7 @@ BOOST_AUTO_TEST_CASE(test_integration_range_proof_65_g_part_ts_only)
     BOOST_CHECK(lhs == rhs);
 }
 
-BOOST_AUTO_TEST_CASE(test_integration_range_proof_65_g_part_only)
+BOOST_AUTO_TEST_CASE(test_range_proof_65_g_part_only)
 {
     auto n = 2;
 
@@ -368,7 +368,7 @@ bool InnerProductArgument(
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_integration_inner_product_argument)
+BOOST_AUTO_TEST_CASE(test_inner_product_argument)
 {
     auto n = 2;
 
@@ -490,7 +490,7 @@ bool RangeProof(
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_integration_range_proof)
+BOOST_AUTO_TEST_CASE(test_range_proof)
 {
     auto gamma = MclScalar::Rand();
     Elements<MclScalar> al(std::vector<MclScalar> {

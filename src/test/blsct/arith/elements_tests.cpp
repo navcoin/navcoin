@@ -8,7 +8,6 @@
 #include <blsct/arith/elements.h>
 #include <blsct/arith/mcl/mcl_g1point.h>
 #include <blsct/arith/mcl/mcl_scalar.h>
-#include <blsct/arith/initializer.h>
 #include <boost/test/unit_test.hpp>
 #include <set>
 #include <streams.h>
@@ -20,7 +19,7 @@ using Scalar = MclScalar;
 using Points = Elements<Point>;
 using Scalars = Elements<Scalar>;
 
-BOOST_AUTO_TEST_CASE(test_elements_constructors)
+BOOST_AUTO_TEST_CASE(test_constructors)
 {
     {
         Scalars ss(std::vector<Scalar> { Scalar{1}, Scalar{2} });
@@ -53,7 +52,7 @@ BOOST_AUTO_TEST_CASE(test_elements_constructors)
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_elements_size)
+BOOST_AUTO_TEST_CASE(test_size)
 {
     {
         Scalars ss(std::vector<Scalar> { Scalar{1}, Scalar{2} });
@@ -74,7 +73,7 @@ BOOST_AUTO_TEST_CASE(test_elements_size)
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_elements_empty)
+BOOST_AUTO_TEST_CASE(test_empty)
 {
     {
         Scalars ss(std::vector<Scalar> { Scalar{1}, Scalar{2} });
@@ -95,7 +94,7 @@ BOOST_AUTO_TEST_CASE(test_elements_empty)
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_elements_sum)
+BOOST_AUTO_TEST_CASE(test_sum)
 {
     {
         Scalars ss(std::vector<Scalar> { Scalar{1}, Scalar{2} });
@@ -121,7 +120,7 @@ BOOST_AUTO_TEST_CASE(test_elements_sum)
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_elements_add)
+BOOST_AUTO_TEST_CASE(test_add)
 {
     {
         Scalars ss;
@@ -139,7 +138,7 @@ BOOST_AUTO_TEST_CASE(test_elements_add)
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_elements_confirm_sizes_match)
+BOOST_AUTO_TEST_CASE(test_confirm_sizes_match)
 {
     {
         Scalars s1(std::vector<Scalar> { Scalar{1} });
@@ -165,7 +164,7 @@ BOOST_AUTO_TEST_CASE(test_elements_confirm_sizes_match)
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_elements_operator_mul_scalars)
+BOOST_AUTO_TEST_CASE(test_operator_mul_scalars)
 {
     // Points ^ Scalars -> Points
     {
@@ -192,7 +191,7 @@ BOOST_AUTO_TEST_CASE(test_elements_operator_mul_scalars)
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_elements_operator_mul_scalar)
+BOOST_AUTO_TEST_CASE(test_operator_mul_scalar)
 {
     // Scalars * Scalar -> Scalars
     {
@@ -219,7 +218,7 @@ BOOST_AUTO_TEST_CASE(test_elements_operator_mul_scalar)
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_elements_operator_add)
+BOOST_AUTO_TEST_CASE(test_operator_add)
 {
     {
         Scalars ss(std::vector<Scalar> { Scalar{2}, Scalar{3} });
@@ -240,7 +239,7 @@ BOOST_AUTO_TEST_CASE(test_elements_operator_add)
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_elements_operator_sub)
+BOOST_AUTO_TEST_CASE(test_operator_sub)
 {
     {
         Scalars ss(std::vector<Scalar> { Scalar{7}, Scalar{6} });
@@ -261,7 +260,7 @@ BOOST_AUTO_TEST_CASE(test_elements_operator_sub)
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_elements_operator_assign)
+BOOST_AUTO_TEST_CASE(test_operator_assign)
 {
     {
         Scalars a(std::vector<Scalar> { Scalar{2}, Scalar{3} });
@@ -283,7 +282,7 @@ BOOST_AUTO_TEST_CASE(test_elements_operator_assign)
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_elements_operator_eq)
+BOOST_AUTO_TEST_CASE(test_operator_eq)
 {
     {
         Scalars ss(std::vector<Scalar> { Scalar{2}, Scalar{3} });
@@ -300,7 +299,7 @@ BOOST_AUTO_TEST_CASE(test_elements_operator_eq)
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_elements_operator_ne)
+BOOST_AUTO_TEST_CASE(test_operator_ne)
 {
     {
         Scalars ss(std::vector<Scalar> { Scalar{2}, Scalar{3} });
@@ -317,7 +316,7 @@ BOOST_AUTO_TEST_CASE(test_elements_operator_ne)
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_elements_from)
+BOOST_AUTO_TEST_CASE(test_from)
 {
     Scalars ss(std::vector<Scalar> { Scalar{1}, Scalar{2}, Scalar{3} });
     {
@@ -359,7 +358,7 @@ BOOST_AUTO_TEST_CASE(test_elements_from)
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_elements_first_n_pow)
+BOOST_AUTO_TEST_CASE(test_first_n_pow)
 {
     {
         Scalar k(3);
@@ -404,7 +403,7 @@ BOOST_AUTO_TEST_CASE(test_elements_first_n_pow)
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_elements_repeat_n)
+BOOST_AUTO_TEST_CASE(test_repeat_n)
 {
     Scalar k(3);
     auto pows = Scalars::RepeatN(k, 3);
@@ -414,13 +413,13 @@ BOOST_AUTO_TEST_CASE(test_elements_repeat_n)
     BOOST_CHECK(pows[2] == k);
 }
 
-BOOST_AUTO_TEST_CASE(test_elements_rand_vec)
+BOOST_AUTO_TEST_CASE(test_rand_vec)
 {
     auto xs = Scalars::RandVec(3);
     BOOST_CHECK(xs.Size() == 3);
 }
 
-BOOST_AUTO_TEST_CASE(test_elements_to)
+BOOST_AUTO_TEST_CASE(test_to)
 {
     Scalars ss(std::vector<Scalar> { Scalar{1}, Scalar{2}, Scalar{3} });
     {
@@ -471,7 +470,7 @@ BOOST_AUTO_TEST_CASE(test_elements_to)
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_elements_negate)
+BOOST_AUTO_TEST_CASE(test_negate)
 {
     {
         Scalars ss(std::vector<Scalar> { Scalar{1}, Scalar{2} });
@@ -481,7 +480,7 @@ BOOST_AUTO_TEST_CASE(test_elements_negate)
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_elements_get_via_index_operator)
+BOOST_AUTO_TEST_CASE(test_get_via_index_operator)
 {
     {
         Scalar one(1);
@@ -501,7 +500,7 @@ BOOST_AUTO_TEST_CASE(test_elements_get_via_index_operator)
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_elements_set_via_index_operator)
+BOOST_AUTO_TEST_CASE(test_set_via_index_operator)
 {
     {
         Scalar one(1);

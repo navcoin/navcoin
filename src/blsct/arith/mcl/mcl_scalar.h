@@ -18,18 +18,13 @@
 #include <bls/bls.h>
 #include <blsct/arith/mcl/mcl_initializer.h>
 #include <blsct/arith/mcl/mcl_scalar.h>
-#include <blsct/arith/scalar_facade.h>
 #include <hash.h>
 #include <serialize.h>
 #include <uint256.h>
 #include <version.h>
 
-/*
-Using `Her` prefix instead of `Mcl` because `fun:*mcl*` wildcard is used to
-suppress memory sanitizer that detects false positives in mcl library
-*/
-
-class MclScalar : public ScalarFacade<MclScalar> {
+class MclScalar
+{
 public:
     MclScalar(const int64_t& n = 0);
     MclScalar(const std::vector<uint8_t>& v);

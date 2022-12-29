@@ -12,14 +12,12 @@
 #include <boost/thread/lock_guard.hpp>
 #include <boost/thread/mutex.hpp>
 
-#include <blsct/arith/initializer.h>
-
 /*
 Using `Her` prefix instead of `Mcl` because `fun:*mcl*` wildcard is used to
 suppress memory sanitizer that detects false positives in mcl library
 */
 
-class MclInitializer : public Initializer<MclInitializer>
+class MclInitializer
 {
 public:
     static void Init();

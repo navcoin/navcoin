@@ -11,12 +11,12 @@
 
 #include <bls/bls384_256.h> // must include this before bls/bls.h
 #include <bls/bls.h>
-#include <blsct/arith/point_facade.h>
+#include <blsct/arith/endianness.h>
 #include <blsct/arith/mcl/mcl_scalar.h>
 #include <boost/thread/lock_guard.hpp>
 #include <boost/thread/mutex.hpp>
 
-class MclG1Point : public PointFacade<MclG1Point>
+class MclG1Point
 {
 public:
     MclG1Point();

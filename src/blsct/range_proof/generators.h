@@ -9,7 +9,6 @@
 #include <boost/thread/mutex.hpp>
 
 #include <blsct/arith/elements.h>
-#include <blsct/arith/initializer.h>
 #include <blsct/range_proof/config.h>
 #include <ctokens/tokenid.h>
 

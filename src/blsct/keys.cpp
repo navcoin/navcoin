@@ -192,7 +192,7 @@ template bool PrivateKey<Mcl>::operator==(const PrivateKey<Mcl>& rhs) const;
 template <typename T>
 typename T::Point PrivateKey<T>::GetPoint() const
 {
-    return PointFacade<typename T::Point>::GetBasePoint() * typename T::Scalar(std::vector<unsigned char>(k.begin(), k.end()));
+    return T::Point::GetBasePoint() * typename T::Scalar(std::vector<unsigned char>(k.begin(), k.end()));
 }
 template Mcl::Point PrivateKey<Mcl>::GetPoint() const;
 

@@ -161,9 +161,7 @@ BITCOIN_CORE_H = \
   blsct/arith/mcl/mcl_scalar.h \
   blsct/arith/mcl/mcl.h \
   blsct/arith/elements.h \
-  blsct/arith/initializer.h \
-  blsct/arith/point_facade.h \
-  blsct/arith/scalar_facade.h \
+  blsct/arith/endianness.h \
   blsct/keys.h \
   blsct/range_proof/config.h \
   blsct/range_proof/generators.h \
@@ -406,9 +404,6 @@ libbitcoin_node_a_SOURCES = \
   blsct/arith/mcl/mcl_initializer.cpp \
   blsct/arith/mcl/mcl_scalar.cpp \
   blsct/arith/elements.cpp \
-  blsct/arith/initializer.cpp \
-  blsct/arith/point_facade.cpp \
-  blsct/arith/scalar_facade.cpp \
   blsct/keys.cpp \
   blsct/range_proof/config.cpp \
   blsct/range_proof/generators.cpp \
@@ -944,8 +939,6 @@ libbitcoinkernel_la_SOURCES = \
   blsct/arith/mcl/mcl_initializer.cpp \
   blsct/arith/mcl/mcl_scalar.cpp \
   blsct/arith/elements.cpp \
-  blsct/arith/point_facade.cpp \
-  blsct/arith/scalar_facade.cpp \
   blsct/keys.cpp \
   chain.cpp \
   chainparamsbase.cpp \

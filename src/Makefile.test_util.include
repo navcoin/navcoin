@@ -9,11 +9,11 @@ EXTRA_LIBRARIES += \
 
 TEST_UTIL_H = \
     test/util/blockfilter.h \
+    blsct/arith/elements.h \
+    blsct/arith/endianness.h \
     blsct/arith/mcl/mcl_g1point.h \
     blsct/arith/mcl/mcl_scalar.h \
     blsct/arith/mcl/mcl_initializer.h \
-    blsct/arith/point_facade.h \
-    blsct/arith/scalar_facade.h \
     blsct/keys.h \
     test/util/chainstate.h \
     test/util/logging.h \
@@ -30,20 +30,19 @@ libtest_util_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(MINIUPNPC_CPPFLAG
 libtest_util_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libtest_util_a_LIBADD = $(LIBBLS) $(LIBMCL)
 libtest_util_a_SOURCES = \
-  blsct/arith/mcl/mcl_g1point.cpp \
-  blsct/arith/mcl/mcl_scalar.cpp \
-  blsct/arith/mcl/mcl_initializer.cpp \
-  blsct/arith/point_facade.cpp \
-  blsct/arith/scalar_facade.cpp \
-  blsct/keys.cpp \
-  test/util/blockfilter.cpp \
-  test/util/logging.cpp \
-  test/util/mining.cpp \
-  test/util/net.cpp \
-  test/util/script.cpp \
-  test/util/setup_common.cpp \
-  test/util/str.cpp \
-  test/util/transaction_utils.cpp \
-  test/util/validation.cpp \
-  test/util/wallet.cpp \
-  $(TEST_UTIL_H)
+    blsct/arith/elements.cpp \
+    blsct/arith/mcl/mcl_g1point.cpp \
+    blsct/arith/mcl/mcl_scalar.cpp \
+    blsct/arith/mcl/mcl_initializer.cpp \
+    blsct/keys.cpp \
+    test/util/blockfilter.cpp \
+    test/util/logging.cpp \
+    test/util/mining.cpp \
+    test/util/net.cpp \
+    test/util/script.cpp \
+    test/util/setup_common.cpp \
+    test/util/str.cpp \
+    test/util/transaction_utils.cpp \
+    test/util/validation.cpp \
+    test/util/wallet.cpp \
+    $(TEST_UTIL_H)
