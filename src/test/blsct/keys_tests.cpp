@@ -112,6 +112,12 @@ BOOST_AUTO_TEST_CASE(blsct_keys)
 
     BOOST_CHECK_THROW(blsct::PrivateKey zeroPrivateKey(Scalar(0)), std::runtime_error);
 
+    {
+        MclScalar n(123);
+        blsct::PrivateKey pk(n);
+        BOOST_CHECK(pk.GetScalar() == n);
+    }
+
     std::vector<unsigned char> vectorKey = {
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
         16, 17, 1, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31};

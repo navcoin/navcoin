@@ -14,7 +14,7 @@ BOOST_FIXTURE_TEST_SUITE(blsct_signer_tests, MclTestingSetup)
 BOOST_AUTO_TEST_CASE(test_sign_verify_balance)
 {
     blsct::PrivateKey sk(1);
-    blsct::PublicKey pk(sk.GetPoint());
+    auto pk = sk.GetPublicKey();
     MclScalar balance(123);
     auto sig = blsct::Signer::SignBalance(sk, balance);
     auto res = blsct::Signer::VerifyBalance(pk, balance, sig);
