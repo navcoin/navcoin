@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef KEY_H
-#define KEY_H
+#ifndef NAVCOIN_BLSCT_KEYS_H
+#define NAVCOIN_BLSCT_KEYS_H
 
 #include <hash.h>
 #include <key.h>
@@ -13,15 +13,15 @@
 #include <uint256.h>
 #include <util/strencodings.h>
 #include <version.h>
+#include <blsct/arith/mcl/mcl.h>
 
 namespace blsct {
 static const std::string subAddressHeader = "SubAddress\0";
 
-template <typename T>
 class PublicKey
 {
 private:
-    using Point = typename T::Point;
+    using Point = MclG1Point;
 
     std::vector<unsigned char> data;
 
@@ -32,16 +32,16 @@ public:
     PublicKey(const Point& pk) : data(pk.GetVch()) {}
     PublicKey(const std::vector<unsigned char>& pk) : data(pk) {}
 
-    SERIALIZE_METHODS(PublicKey<T>, obj) { READWRITE(obj.data); }
+    SERIALIZE_METHODS(PublicKey, obj) { READWRITE(obj.data); }
 
-    static PublicKey<T> Aggregate(std::vector<PublicKey<T>> vPk);
+    static PublicKey Aggregate(std::vector<PublicKey> vPk);
 
     uint256 GetHash() const;
     CKeyID GetID() const;
 
     std::string ToString() const;
 
-    bool operator==(const PublicKey<T>& rhs) const;
+    bool operator==(const PublicKey& rhs) const;
 
     bool IsValid() const;
 
@@ -49,14 +49,13 @@ public:
     std::vector<unsigned char> GetVch() const;
 };
 
-template <typename T>
 class DoublePublicKey
 {
 private:
-    using Point = typename T::Point;
+    using Point = MclG1Point;
 
-    PublicKey<T> vk;
-    PublicKey<T> sk;
+    PublicKey vk;
+    PublicKey sk;
 
 public:
     static constexpr size_t SIZE = 48 * 2;
@@ -65,7 +64,7 @@ public:
     DoublePublicKey(const Point& vk_, const Point& sk_) : vk(vk_.GetVch()), sk(sk_.GetVch()) {}
     DoublePublicKey(const std::vector<unsigned char>& vk_, const std::vector<unsigned char>& sk_) : vk(vk_), sk(sk_) {}
 
-    SERIALIZE_METHODS(DoublePublicKey<T>, obj) { READWRITE(obj.vk.GetVch(), obj.sk.GetVch()); }
+    SERIALIZE_METHODS(DoublePublicKey, obj) { READWRITE(obj.vk.GetVch(), obj.sk.GetVch()); }
 
     uint256 GetHash() const;
     CKeyID GetID() const;
@@ -73,7 +72,7 @@ public:
     bool GetViewKey(Point& ret) const;
     bool GetSpendKey(Point& ret) const;
 
-    bool operator==(const DoublePublicKey<T>& rhs) const;
+    bool operator==(const DoublePublicKey& rhs) const;
 
     bool IsValid() const;
 
@@ -82,12 +81,11 @@ public:
     std::vector<unsigned char> GetVch() const;
 };
 
-template <typename T>
 class PrivateKey
 {
 private:
-    using Point = typename T::Point;
-    using Scalar = typename T::Scalar;
+    using Point = MclG1Point;
+    using Scalar = MclScalar;
 
     CPrivKey k;
 
@@ -98,12 +96,12 @@ public:
     PrivateKey(Scalar k_);
     PrivateKey(CPrivKey k_);
 
-    SERIALIZE_METHODS(PrivateKey<T>, obj) { READWRITE(std::vector<unsigned char>(obj.k.begin(), obj.k.end())); }
+    SERIALIZE_METHODS(PrivateKey, obj) { READWRITE(std::vector<unsigned char>(obj.k.begin(), obj.k.end())); }
 
-    bool operator==(const PrivateKey<T>& rhs) const;
+    bool operator==(const PrivateKey& rhs) const;
 
     Point GetPoint() const;
-    PublicKey<T> GetPublicKey() const;
+    PublicKey GetPublicKey() const;
     Scalar GetScalar() const;
     bool IsValid() const;
     void SetToZero();
@@ -120,4 +118,4 @@ public:
 
 } // namespace blsct
 
-#endif // KEY_H
+#endif // NAVCOIN_BLSCT_KEYS_H

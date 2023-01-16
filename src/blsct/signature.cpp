@@ -8,22 +8,28 @@ namespace blsct {
 
 bool Signature::VerifyBalance(blsct::PublicKey pk)
 {
+    return true;
 }
 
 bool Signature::VerifyBalanceBatch(std::vector<blsct::PublicKey> vPk)
 {
+    return true;
 }
 
-bool Signature::Verify(blsct::PublicKey pk, std::vector<unsigned char> msg)
+bool Signature::Verify(blsct::PublicKey pk, std::vector<uint8_t> msg)
 {
+    return true;
 }
 
-bool Signature::VerifyBatch(std::vector<blsct::PublicKey> vPk, std::vector<std::vector<unsigned char>> vMsg)
+bool Signature::VerifyBatch(std::vector<blsct::PublicKey> vPk, std::vector<std::vector<uint8_t>> vMsg)
 {
+    return true;
 }
 
 blsct::Signature Signature::Aggregate(std::vector<blsct::Signature> vSignatures)
 {
+    blsct::Signature x;
+    return x;
 }
 
 }  // namespace blsct
