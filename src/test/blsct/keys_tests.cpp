@@ -11,7 +11,7 @@
 #include <blsct/signature.h>
 #include <boost/test/unit_test.hpp>
 
-BOOST_FIXTURE_TEST_SUITE(keys_tests, MclTestingSetup)
+BOOST_FIXTURE_TEST_SUITE(blsct_keys_tests, MclTestingSetup)
 
 using Point = MclG1Point;
 using Scalar = MclScalar;
@@ -109,6 +109,8 @@ BOOST_AUTO_TEST_CASE(blsct_keys)
     // Private Key
     blsct::PrivateKey invalidPrivateKey;
     BOOST_CHECK(!invalidPrivateKey.IsValid());
+
+    BOOST_CHECK_THROW(blsct::PrivateKey zeroPrivateKey(Scalar(0)), std::runtime_error);
 
     std::vector<unsigned char> vectorKey = {
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,

@@ -138,6 +138,9 @@ std::vector<unsigned char> DoublePublicKey::GetVch() const
 
 PrivateKey::PrivateKey(Scalar k_)
 {
+    if (k_.IsZero()) {
+        throw std::runtime_error("Private key needs to be a non-zero scalar");
+    }
     k.resize(PrivateKey::SIZE);
     std::vector<unsigned char> v = k_.GetVch();
     memcpy(k.data(), &v.front(), k.size());
@@ -172,7 +175,8 @@ Scalar PrivateKey::GetScalar() const
 bool PrivateKey::IsValid() const
 {
     if (k.size() == 0) return false;
-    return GetScalar().IsValid();
+    Scalar s = GetScalar();
+    return s.IsValid() && !s.IsZero();
 }
 
 void PrivateKey::SetToZero()
@@ -183,11 +187,15 @@ void PrivateKey::SetToZero()
 // return the result of CoreSign(privateKey, "BLSCTBALANCE")
 std::vector<unsigned char> PrivateKey::SignBalance() const
 {
+    std::vector<unsigned char> x;
+    return x;
 }
 
 // return the result of AugmentedSchemeSign(privateKey, msg")
 std::vector<unsigned char> PrivateKey::Sign(std::vector<unsigned char> msg) const
 {
+    std::vector<unsigned char> x;
+    return x;
 }
 
 } // namespace blsct
