@@ -7,10 +7,20 @@
 #include <boost/test/unit_test.hpp>
 #include <test/util/setup_common.h>
 #include <util/strencodings.h>
-#include <blsct/keys.h>
-#include <blsct/signature.h>
+#include <blsct/signer.h>
 
-BOOST_FIXTURE_TEST_SUITE(blsct_signature_tests, MclTestingSetup)
+BOOST_FIXTURE_TEST_SUITE(signer_tests, MclTestingSetup)
+
+BOOST_AUTO_TEST_CASE(test_foo)
+{
+    blsct::PrivateKey sk(1);
+    std::vector<uint8_t> msg;
+    auto sig = blsct::Signer::CoreSign(sk, msg);
+}
+
+BOOST_AUTO_TEST_CASE(test_sign)
+{
+}
 
 BOOST_AUTO_TEST_SUITE_END()
 

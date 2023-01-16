@@ -14,6 +14,7 @@
 #include <util/strencodings.h>
 #include <version.h>
 #include <blsct/arith/mcl/mcl.h>
+#include <blsct/signature.h>
 
 namespace blsct {
 static const std::string subAddressHeader = "SubAddress\0";
@@ -105,12 +106,6 @@ public:
     Scalar GetScalar() const;
     bool IsValid() const;
     void SetToZero();
-
-    // return the result of CoreSign(privateKey, "BLSCTBALANCE")
-    std::vector<unsigned char> SignBalance() const;
-
-    // return the result of AugmentedSchemeSign(privateKey, msg")
-    std::vector<unsigned char> Sign(std::vector<unsigned char> msg) const;
 
     friend class CCryptoKeyStore;
     friend class CBasicKeyStore;

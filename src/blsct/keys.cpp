@@ -12,8 +12,6 @@ using Scalar = MclScalar;
 
 PublicKey PublicKey::Aggregate(std::vector<PublicKey> vPk)
 {
-    using Point = MclG1Point;
-
     auto retPoint = Point();
     bool isZero = true;
 
@@ -182,20 +180,6 @@ bool PrivateKey::IsValid() const
 void PrivateKey::SetToZero()
 {
     k.clear();
-}
-
-// return the result of CoreSign(privateKey, "BLSCTBALANCE")
-std::vector<unsigned char> PrivateKey::SignBalance() const
-{
-    std::vector<unsigned char> x;
-    return x;
-}
-
-// return the result of AugmentedSchemeSign(privateKey, msg")
-std::vector<unsigned char> PrivateKey::Sign(std::vector<unsigned char> msg) const
-{
-    std::vector<unsigned char> x;
-    return x;
 }
 
 } // namespace blsct

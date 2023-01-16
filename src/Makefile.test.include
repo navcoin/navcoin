@@ -92,6 +92,8 @@ BITCOIN_TESTS =\
   test/blsct/range_proof/range_proof_with_transcript_tests.cpp \
   test/blsct/keys_tests.cpp \
   test/blsct/signature_tests.cpp \
+  test/blsct/signer_tests.cpp \
+  test/blsct/util_tests.cpp \
   test/bswap_tests.cpp \
   test/checkqueue_tests.cpp \
   test/coins_tests.cpp \
