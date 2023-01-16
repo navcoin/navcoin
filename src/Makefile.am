@@ -170,6 +170,7 @@ BITCOIN_CORE_H = \
   blsct/range_proof/range_proof_logic.h \
   blsct/range_proof/range_proof_with_transcript.h \
   blsct/range_proof/range_proof.h \
+  blsct/signature.h \
   chain.h \
   chainparams.h \
   chainparamsbase.h \
@@ -414,6 +415,7 @@ libbitcoin_node_a_SOURCES = \
   blsct/range_proof/lazy_g1point.cpp \
   blsct/range_proof/range_proof_logic.cpp \
   blsct/range_proof/range_proof_with_transcript.cpp \
+  blsct/signature.cpp \
   chain.cpp \
   consensus/tx_verify.cpp \
   dbwrapper.cpp \
