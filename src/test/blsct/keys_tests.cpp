@@ -132,4 +132,12 @@ BOOST_AUTO_TEST_CASE(blsct_keys)
     BOOST_CHECK(blsct::PublicKey<T>::Aggregate(vecKeys) == publicKeyFromAddition);
 }
 
+BOOST_AUTO_TEST_CASE(sign_balance)
+{
+}
+
+BOOST_AUTO_TEST_CASE(sign)
+{
+}
+
 BOOST_AUTO_TEST_SUITE_END()

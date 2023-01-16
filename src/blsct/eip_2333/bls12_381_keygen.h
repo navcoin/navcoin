@@ -1,6 +1,7 @@
-// Copyright (c) 2011-2021 The Bitcoin Core developers
+// Copyright (c) 2023 The Navcoin developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
 
 #ifndef NAVCOIN_BLSCT_EIP_2333_BLS12_381_KEYGEN_H
 #define NAVCOIN_BLSCT_EIP_2333_BLS12_381_KEYGEN_H

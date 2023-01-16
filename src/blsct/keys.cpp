@@ -225,4 +225,17 @@ void PrivateKey<T>::SetToZero()
 }
 template void PrivateKey<Mcl>::SetToZero();
 
+// return the result of CoreSign(privateKey, "BLSCTBALANCE")
+template <typename T>
+std::vector<unsigned char> PrivateKey<T>::SignBalance() const
+{
+}
+
+// return the result of AugmentedSchemeSign(privateKey, msg")
+template <typename T>
+std::vector<unsigned char> PrivateKey<T>::Sign(std::vector<unsigned char> msg) const
+{
+}
+
 } // namespace blsct
+
