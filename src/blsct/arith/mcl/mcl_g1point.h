@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 
+#define BLS_ETH
 #include <bls/bls384_256.h> // must include this before bls/bls.h
 #include <bls/bls.h>
 #include <blsct/arith/endianness.h>

@@ -3,24 +3,23 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <blsct/signer.h>
-#include <blsct/util.h>
 
 namespace blsct {
 
 // returns the result of CoreVerify(PublicKey::Aggregate(vPk), "BLSCTBALANCE", signature)
-bool Signer::VerifyBalanceBatch(const std::vector<PublicKey>& vPk)
+bool Signer::VerifyBalanceBatch(const std::vector<PublicKey>& vPk, const Signature& sig)
 {
 	return true;
 }
 
 // returns the result of AugmentedSchemeVerify(pk, msg, signature)
-bool Signer::Verify(const PublicKey& pk, const std::vector<uint8_t>& msg)
+bool Signer::Verify(const PublicKey& pk, const std::vector<uint8_t>& msg, const Signature& sig)
 {
 	return true;
 }
 
 // returns the result of AugmentedSchemeAggregateVerify(vPk, vMsg, signature)
-bool Signer::VerifyBatch(const std::vector<PublicKey>& vPk, const std::vector<std::vector<uint8_t>>& vMsg)
+bool Signer::VerifyBatch(const std::vector<PublicKey>& vPk, const std::vector<std::vector<uint8_t>>& vMsg, const Signature& sig)
 {
 	return true;
 }
@@ -36,7 +35,7 @@ Signature Signer::CoreSign(const PrivateKey& sk, const std::vector<uint8_t>& mes
     return sig;
 }
 
-bool Signer::CoreVerify(const PublicKey& pk, const std::vector<uint8_t> message, const Signature& sig)
+bool Signer::CoreVerify(const PublicKey& pk, const std::vector<uint8_t>& message, const Signature& sig)
 {
     MclG1Point p;
     if (!pk.GetG1Point(p)) {
@@ -47,34 +46,28 @@ bool Signer::CoreVerify(const PublicKey& pk, const std::vector<uint8_t> message,
 
     // res is 1 if valid else 0
     auto res = blsVerify(&sig.data, &bls_pk, &message[0], message.size());
+    printf("Verify result: %d\n", res);
 
     return res == 1;
 }
 
-std::vector<uint8_t> Signer::GenMessageFromBalance(const MclScalar& balance)
-{
-    auto balance_array = Util::uint64_to_bytes(balance.GetUint64());
-    std::vector<uint8_t> message(balance_array.cbegin(), balance_array.cend());
-	return message;
-}
-
 // returns the result of CoreVerify(pk, "BLSCTBALANCE", signature)
-bool Signer::VerifyBalance(const PublicKey& pk, const MclScalar& balance, const Signature& sig)
+bool Signer::VerifyBalance(const PublicKey& pk, const Signature& sig)
 {
-	auto message = GenMessageFromBalance(balance);
-	auto res = CoreVerify(pk, message, sig);
+	auto res = CoreVerify(pk, BLSCTBALANCE, sig);
+    printf("Returned from CoreVerify\n");
 	return res;
 }
 
 // return the result of CoreSign(privateKey, "BLSCTBALANCE")
-Signature Signer::SignBalance(const PrivateKey& sk, const MclScalar& balance)
+Signature Signer::SignBalance(const PrivateKey& sk)
 {
-	auto message = GenMessageFromBalance(balance);
-    auto sig = CoreSign(sk, message);
+    auto sig = CoreSign(sk, BLSCTBALANCE);
+    printf("Returned from CoreSign\n");
     return sig;
 }
 
-// return the result of AugmentedSchemeSign(privateKey, msg")
+// return the result of AugmentedSchemeSign(privateKey, msg)
 Signature Signer::Sign(const PrivateKey& sk, const std::vector<unsigned char>& msg)
 {
     Signature sig;

@@ -5,6 +5,8 @@
 #ifndef NAVCOIN_BLSCT_SIGNER_H
 #define NAVCOIN_BLSCT_SIGNER_H
 
+#define BLS_ETH
+
 #include <vector>
 #include <blsct/arith/mcl/mcl.h>
 #include <blsct/keys.h>
@@ -15,32 +17,22 @@ namespace blsct {
 class Signer
 {
 public:
-    // return the result of CoreSign(privateKey, "BLSCTBALANCE")
-    static Signature SignBalance(const PrivateKey& sk, const MclScalar& balance);
+    static Signature SignBalance(const PrivateKey& sk);
+    static Signature Sign(const PrivateKey& sk, const std::vector<uint8_t>& msg);
 
-    // return the result of AugmentedSchemeSign(privateKey, msg")
-    static Signature Sign(const PrivateKey& sk, const std::vector<unsigned char>& msg);
+	static bool VerifyBalance(const PublicKey& pk, const Signature& sig);
 
-	// returns the result of CoreVerify(pk, "BLSCTBALANCE", signature)
-	static bool VerifyBalance(const PublicKey& pk, const MclScalar& balance, const Signature& sig);
-
-	// returns the result of CoreVerify(PublicKey::Aggregate(vPk), "BLSCTBALANCE", signature)
-	static bool VerifyBalanceBatch(const std::vector<PublicKey>& vPk);
-
-	// returns the result of AugmentedSchemeVerify(pk, msg, signature)
-	static bool Verify(const PublicKey& pk, const std::vector<uint8_t>& msg);
-
-	// returns the result of AugmentedSchemeAggregateVerify(vPk, vMsg, signature)
-	static bool VerifyBatch(const std::vector<PublicKey>& vPk, const std::vector<std::vector<uint8_t>>& vMsg);
+    static bool VerifyBalanceBatch(const std::vector<PublicKey>& vPk, const Signature& sig);
+    static bool Verify(const PublicKey& pk, const std::vector<uint8_t>& msg, const Signature& sig);
+    static bool VerifyBatch(const std::vector<PublicKey>& vPk, const std::vector<std::vector<uint8_t>>& vMsg, const Signature& sig);
 
 #ifndef BOOST_UNIT_TEST
 private:
 #endif
-    static std::vector<uint8_t> GenMessageFromBalance(const MclScalar& balance);
+    inline static const std::vector<uint8_t> BLSCTBALANCE = { 'B', 'L', 'S', 'C', 'T', 'B', 'A', 'L', 'A', 'N', 'C', 'E' };
 
 	static Signature CoreSign(const PrivateKey& sk, const std::vector<uint8_t>& message);
-
-	static bool CoreVerify(const PublicKey& pk, const std::vector<uint8_t> message, const Signature& sig);
+	static bool CoreVerify(const PublicKey& pk, const std::vector<uint8_t>& message, const Signature& sig);
 };
 
 }
