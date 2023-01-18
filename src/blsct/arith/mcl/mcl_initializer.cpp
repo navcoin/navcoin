@@ -16,6 +16,11 @@ void MclInitializer::Init()
     if (blsInit(MCL_BLS12_381, MCLBN_COMPILED_TIME_VAR) != 0) {
         throw std::runtime_error("blsInit failed");
     }
+	// auto r = blsSetETHmode(BLS_ETH_MODE_DRAFT_07);
+	// if (r != 0) {
+	// 	printf("err blsSetETHmode %d\n", r);
+	// 	throw std::runtime_error("");
+	// }
     mclBn_setETHserialization(1);
 
     is_initialized = true;

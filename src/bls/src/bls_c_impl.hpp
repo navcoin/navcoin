@@ -93,6 +93,7 @@ int blsInit(int curve, int compiledTimeVar)
 		return -(compiledTimeVar + (MCLBN_COMPILED_TIME_VAR * 1000));
 	}
 	const mcl::CurveParam* cp = mcl::getCurveParam(curve);
+	printf("cp = %d\n", cp)
 	if (cp == 0) return -1;
 	bool b;
 	initPairing(&b, *cp);
