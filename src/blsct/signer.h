@@ -19,9 +19,7 @@ class Signer
 public:
     static Signature SignBalance(const PrivateKey& sk);
     static Signature Sign(const PrivateKey& sk, const std::vector<uint8_t>& msg);
-
 	static bool VerifyBalance(const PublicKey& pk, const Signature& sig);
-
     static bool VerifyBalanceBatch(const std::vector<PublicKey>& vPk, const Signature& sig);
     static bool Verify(const PublicKey& pk, const std::vector<uint8_t>& msg, const Signature& sig);
     static bool VerifyBatch(const std::vector<PublicKey>& vPk, const std::vector<std::vector<uint8_t>>& vMsg, const Signature& sig);
@@ -29,7 +27,9 @@ public:
 #ifndef BOOST_UNIT_TEST
 private:
 #endif
-    inline static const std::vector<uint8_t> BLSCTBALANCE = { 'B', 'L', 'S', 'C', 'T', 'B', 'A', 'L', 'A', 'N', 'C', 'E' };
+    inline static const std::vector<uint8_t> BLSCTBALANCE = {
+        'B', 'L', 'S', 'C', 'T', 'B', 'A', 'L', 'A', 'N', 'C', 'E'
+    };
 
 	static Signature CoreSign(const PrivateKey& sk, const std::vector<uint8_t>& message);
 	static bool CoreVerify(const PublicKey& pk, const std::vector<uint8_t>& message, const Signature& sig);
