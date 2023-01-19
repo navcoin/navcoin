@@ -12,7 +12,7 @@
 
 BOOST_FIXTURE_TEST_SUITE(blsct_signer_tests, MclTestingSetup)
 
-BOOST_AUTO_TEST_CASE(compare_sk_pk)
+BOOST_AUTO_TEST_CASE(test_compatibility_bet_bls_keys_and_blsct_keys)
 {
     // secret key
     blsSecretKey bls_sk{1};
@@ -31,24 +31,18 @@ BOOST_AUTO_TEST_CASE(compare_sk_pk)
     auto c = blsct_g1_point.m_p;
     auto d = bls_pk.v;
     BOOST_CHECK(mclBnG1_isEqual(&c, &d) == 1);
-
-    // to suppress abort
-    blsSignature sig;
-    const char *msg = "abc";
-    size_t msgSize = 3;
-    blsSign(&sig, &bls_sk, msg, msgSize);
 }
 
-// BOOST_AUTO_TEST_CASE(test_sign_verify_balance)
-// {
-//     blsct::PrivateKey sk(1);
+BOOST_AUTO_TEST_CASE(test_sign_verify_balance)
+{
+    blsct::PrivateKey sk(1);
 
-//     auto pk = sk.GetPublicKey();
-//     auto sig = blsct::Signer::SignBalance(sk);
+    auto pk = sk.GetPublicKey();
+    auto sig = blsct::Signer::SignBalance(sk);
 
-//     auto res = blsct::Signer::VerifyBalance(pk, sig);
-//     BOOST_CHECK(res == true);
-// }
+    auto res = blsct::Signer::VerifyBalance(pk, sig);
+    BOOST_CHECK(res == true);
+}
 
 // BOOST_AUTO_TEST_CASE(test_simple_sample)
 // {

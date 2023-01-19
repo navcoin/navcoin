@@ -46,7 +46,6 @@ bool Signer::CoreVerify(const PublicKey& pk, const std::vector<uint8_t>& message
 
     // res is 1 if valid else 0
     auto res = blsVerify(&sig.data, &bls_pk, &message[0], message.size());
-    printf("Verify result: %d\n", res);
 
     return res == 1;
 }
@@ -55,7 +54,6 @@ bool Signer::CoreVerify(const PublicKey& pk, const std::vector<uint8_t>& message
 bool Signer::VerifyBalance(const PublicKey& pk, const Signature& sig)
 {
 	auto res = CoreVerify(pk, BLSCTBALANCE, sig);
-    printf("Returned from CoreVerify\n");
 	return res;
 }
 
@@ -63,7 +61,6 @@ bool Signer::VerifyBalance(const PublicKey& pk, const Signature& sig)
 Signature Signer::SignBalance(const PrivateKey& sk)
 {
     auto sig = CoreSign(sk, BLSCTBALANCE);
-    printf("Returned from CoreSign\n");
     return sig;
 }
 
