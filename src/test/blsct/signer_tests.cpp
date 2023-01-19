@@ -32,6 +32,7 @@ BOOST_AUTO_TEST_CASE(compare_sk_pk)
     auto c = blsct_g1_point.m_p;
     auto d = bls_pk.v;
     BOOST_CHECK(mclBnG1_isEqual(&c, &d) == 1);
+    printf("WORKED!");
 
     // to suppress abort
     blsSignature sig;

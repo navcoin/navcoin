@@ -79,12 +79,12 @@ $(LIBBLS):
 		ARCH='$(firstword $(subst -, ,$(HOST)))' \
 		CC='$(CC)' \
 		CXX='$(CXX)' \
-		CFLAGS='$(CXXFLAGS) -DBLS_ETH' \
+		CFLAGS='$(CXXFLAGS) -DBLS_ETH=1' \
 		LDFLAGS='$(LDFLAGS)' \
 		ARFLAGS='$(ARFLAGS)' \
 		AR='$(AR)' \
 		RANLIB='$(RANLIB)' \
-		$(MAKE) $(AM_MAKEFLAGS) -C bls lib/libbls384_256.a
+		$(MAKE) $(AM_MAKEFLAGS) BLS_ETH=1 -C bls lib/libbls384_256.a
 	$(RANLIB) bls/lib/libbls384_256.a
 
 $(LIBMCL):
