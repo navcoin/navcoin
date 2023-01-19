@@ -4,8 +4,7 @@
 
 #include <blsct/signature.h>  // this has to be included before bls/*
 
-#include <bls/bls384_256.h> // must include this before bls/bls.h
-#include <bls/bls.h>
+#include <bls/bls384_256.h>
 
 
 namespace blsct {

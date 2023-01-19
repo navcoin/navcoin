@@ -5,7 +5,7 @@
 #ifndef NAVCOIN_BLSCT_SIGNER_H
 #define NAVCOIN_BLSCT_SIGNER_H
 
-#define BLS_ETH
+#define BLS_ETH 1
 
 #include <vector>
 #include <blsct/arith/mcl/mcl.h>

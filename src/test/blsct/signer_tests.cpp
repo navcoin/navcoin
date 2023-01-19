@@ -3,8 +3,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #define BOOST_UNIT_TEST
-
-#define BLS_ETH
+#define BLS_ETH 1
 
 #include <boost/test/unit_test.hpp>
 #include <test/util/setup_common.h>
@@ -32,7 +31,6 @@ BOOST_AUTO_TEST_CASE(compare_sk_pk)
     auto c = blsct_g1_point.m_p;
     auto d = bls_pk.v;
     BOOST_CHECK(mclBnG1_isEqual(&c, &d) == 1);
-    printf("WORKED!");
 
     // to suppress abort
     blsSignature sig;
