@@ -44,7 +44,7 @@ bool Signer::CoreVerify(const PublicKey& pk, const std::vector<uint8_t>& message
     blsPublicKey bls_pk;
     bls_pk.v = p.Underlying();
 
-    // res is 1 if valid else 0
+    // res is 1 if valid. otherwise 0
     auto res = blsVerify(&sig.data, &bls_pk, &message[0], message.size());
 
     return res == 1;
