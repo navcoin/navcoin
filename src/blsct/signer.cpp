@@ -26,8 +26,7 @@ bool Signer::VerifyBatch(const std::vector<PublicKey>& vPk, const std::vector<st
 
 Signature Signer::CoreSign(const PrivateKey& sk, const std::vector<uint8_t>& message)
 {
-    blsSecretKey bls_sk;
-    bls_sk.v = sk.GetScalar().m_fr;
+    blsSecretKey bls_sk { sk.GetScalar().Underlying() };
 
     Signature sig;
     blsSign(&sig.data, &bls_sk, &message[0], message.size());
@@ -41,8 +40,7 @@ bool Signer::CoreVerify(const PublicKey& pk, const std::vector<uint8_t>& message
     if (!pk.GetG1Point(p)) {
       throw std::runtime_error("Failed to convert PublicKey to MclG1Point");
     }
-    blsPublicKey bls_pk;
-    bls_pk.v = p.Underlying();
+    blsPublicKey bls_pk { p.Underlying() };
 
     // res is 1 if valid. otherwise 0
     auto res = blsVerify(&sig.data, &bls_pk, &message[0], message.size());
