@@ -9,7 +9,9 @@ namespace blsct {
 // returns the result of CoreVerify(PublicKey::Aggregate(vPk), "BLSCTBALANCE", signature)
 bool Signer::VerifyBalanceBatch(const std::vector<PublicKey>& vPk, const Signature& sig)
 {
-	return true;
+    auto aggr_pk = PublicKey::Aggregate(vPk);
+	auto res = Signer::VerifyBalance(aggr_pk, sig);
+    return res;
 }
 
 // returns the result of AugmentedSchemeVerify(pk, msg, signature)

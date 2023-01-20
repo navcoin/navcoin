@@ -44,19 +44,20 @@ BOOST_AUTO_TEST_CASE(test_sign_verify_balance)
     BOOST_CHECK(res == true);
 }
 
-// BOOST_AUTO_TEST_CASE(test_simple_sample)
-// {
-//     blsSecretKey sec;
-//     blsSecretKeySetDecStr(&sec, "13", 2);
-//     blsPublicKey pub;
-//     blsGetPublicKey(&pub, &sec);
-//     blsSignature sig;
-//     const char *msg = "abc";
-//     size_t msgSize = 3;
-//     blsSign(&sig, &sec, msg, msgSize);
-//     printf("verify correct message %d\n", blsVerify(&sig, &pub, msg, msgSize));
-//     printf("verify wrong message %d\n", blsVerify(&sig, &pub, "xyz", msgSize));
-// }
+BOOST_AUTO_TEST_CASE(test_sign_verify_balance_batch)
+{
+    // blsct::PrivateKey sk1(1);
+    // blsct::PrivateKey sk1(12345);
+
+    // auto pk1 = sk1.GetPublicKey();
+    // auto pk2 = sk2.GetPublicKey();
+
+
+    // auto sig = blsct::Signer::SignBalance(sk);
+
+    // auto res = blsct::Signer::VerifyBalance(pk, sig);
+    // BOOST_CHECK(res == true);
+}
 
 BOOST_AUTO_TEST_SUITE_END()
 
