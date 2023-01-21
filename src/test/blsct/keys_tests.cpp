@@ -142,12 +142,10 @@ BOOST_AUTO_TEST_CASE(blsct_keys)
     BOOST_CHECK(blsct::PublicKey::Aggregate(vecKeys) == publicKeyFromAddition);
 }
 
-BOOST_AUTO_TEST_CASE(sign_balance)
+BOOST_AUTO_TEST_CASE(aggretate_empty_public_keys)
 {
-}
-
-BOOST_AUTO_TEST_CASE(sign)
-{
+    std::vector<blsct::PublicKey> pks;
+    BOOST_CHECK_THROW(blsct::PublicKey::Aggregate(pks), std::runtime_error);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -44,6 +44,22 @@ BOOST_AUTO_TEST_CASE(test_sign_verify_balance)
     BOOST_CHECK(res == true);
 }
 
+BOOST_AUTO_TEST_CASE(test_augment_message)
+{
+    std::vector<uint8_t> pk_data(blsct::PublicKey::SIZE);
+    for (size_t i=10; i<blsct::PublicKey::SIZE; ++i) {
+        pk_data[i] = i;
+    }
+    auto pk = blsct::PublicKey();
+    auto msg = std::vector<uint8_t> { 1, 2, 3, 4, 5 };
+    auto act = blsct::Signer::AugmentMessage(pk, msg);
+
+    auto exp = std::vector<uint8_t>(pk_data);
+    exp.insert(exp.end(), msg.begin(), msg.end());
+
+    BOOST_CHECK(act == exp);
+}
+
 BOOST_AUTO_TEST_CASE(test_sign_verify_balance_batch)
 {
     // blsct::PrivateKey sk1(1);
@@ -57,6 +73,14 @@ BOOST_AUTO_TEST_CASE(test_sign_verify_balance_batch)
 
     // auto res = blsct::Signer::VerifyBalance(pk, sig);
     // BOOST_CHECK(res == true);
+}
+
+BOOST_AUTO_TEST_CASE(test_sign_verify_batch_bad_inputs)
+{
+    // empty pks
+    // empty msgs
+    // pks msg sizes differ
+
 }
 
 BOOST_AUTO_TEST_SUITE_END()

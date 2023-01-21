@@ -22,7 +22,8 @@ public:
 	static bool VerifyBalance(const PublicKey& pk, const Signature& sig);
     static bool VerifyBalanceBatch(const std::vector<PublicKey>& vPk, const Signature& sig);
     static bool Verify(const PublicKey& pk, const std::vector<uint8_t>& msg, const Signature& sig);
-    static bool VerifyBatch(const std::vector<PublicKey>& vPk, const std::vector<std::vector<uint8_t>>& vMsg, const Signature& sig);
+    static bool VerifyBatch(
+        const std::vector<PublicKey>& vPk, const std::vector<std::vector<uint8_t>>& vMsg, const Signature& sig);
 
 #ifndef BOOST_UNIT_TEST
 private:
@@ -31,8 +32,16 @@ private:
         'B', 'L', 'S', 'C', 'T', 'B', 'A', 'L', 'A', 'N', 'C', 'E'
     };
 
-	static Signature CoreSign(const PrivateKey& sk, const std::vector<uint8_t>& message);
-	static bool CoreVerify(const PublicKey& pk, const std::vector<uint8_t>& message, const Signature& sig);
+    static blsPublicKey BlsPublicKeyOf(const PublicKey& pk);
+	static Signature CoreSign(const PrivateKey& sk, const std::vector<uint8_t>& msg);
+	static bool CoreVerify(const PublicKey& pk, const std::vector<uint8_t>& msg, const Signature& sig);
+    static bool CoreAggregateVerify(
+        const std::vector<PublicKey>& pks, const std::vector<std::vector<uint8_t>> msgs, const Signature& sig);
+    static std::vector<uint8_t> AugmentMessage(const PublicKey& pk, const std::vector<uint8_t> msg);
+    static Signature AugmentedSchemeSign(const PrivateKey& sk, const std::vector<uint8_t>& msg);
+    static bool AugmentedSchemeVerify(const PublicKey& pk, const std::vector<uint8_t>& msg, const Signature& sig);
+    static bool AugmentedSchemeAggregateVerify(
+        const std::vector<PublicKey>& vPk, const std::vector<std::vector<uint8_t>> vMsg, const Signature& sig);
 };
 
 }

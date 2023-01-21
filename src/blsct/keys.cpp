@@ -12,6 +12,9 @@ using Scalar = MclScalar;
 
 PublicKey PublicKey::Aggregate(std::vector<PublicKey> vPk)
 {
+    if (vPk.size() == 0)
+        throw std::runtime_error(strprintf("%s: Vector of public keys is empty", __func__));
+
     auto retPoint = Point();
     bool isZero = true;
 
