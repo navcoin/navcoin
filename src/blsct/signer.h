@@ -18,9 +18,10 @@ class Signer
 {
 public:
     static Signature SignBalance(const PrivateKey& sk);
-    static Signature Sign(const PrivateKey& sk, const std::vector<uint8_t>& msg);
 	static bool VerifyBalance(const PublicKey& pk, const Signature& sig);
     static bool VerifyBalanceBatch(const std::vector<PublicKey>& vPk, const Signature& sig);
+
+    static Signature Sign(const PrivateKey& sk, const std::vector<uint8_t>& msg);
     static bool Verify(const PublicKey& pk, const std::vector<uint8_t>& msg, const Signature& sig);
     static bool VerifyBatch(
         const std::vector<PublicKey>& vPk, const std::vector<std::vector<uint8_t>>& vMsg, const Signature& sig);

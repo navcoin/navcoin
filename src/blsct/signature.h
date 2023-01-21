@@ -20,9 +20,9 @@ class Signature
 {
 public:
     // returns the addition of the signatures contained in vSignatures;
-    Signature Aggregate(std::vector<blsct::Signature> vSignatures);
+    static Signature Aggregate(const std::vector<blsct::Signature>& vSignatures);
 
-    blsSignature data;
+    blsSignature m_data;
 };
 
 }  // namespace blsct

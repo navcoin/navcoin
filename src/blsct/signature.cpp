@@ -9,10 +9,15 @@
 
 namespace blsct {
 
-blsct::Signature Signature::Aggregate(std::vector<blsct::Signature> vSignatures)
+blsct::Signature Signature::Aggregate(const std::vector<blsct::Signature>& vSig)
 {
-    blsct::Signature x;
-    return x;
+    std::vector<blsSignature> bls_sigs;
+    std::transform(vSig.begin(), vSig.end(), bls_sigs.begin(), [](auto sig) {
+        return sig.m_data;
+    });
+    blsct::Signature aggr_sig;
+    blsAggregateSignature(&aggr_sig.m_data, &bls_sigs[0], bls_sigs.size());
+    return aggr_sig;
 }
 
 }  // namespace blsct
