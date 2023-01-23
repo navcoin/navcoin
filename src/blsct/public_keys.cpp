@@ -77,8 +77,9 @@ bool PublicKeys::VerifyBatch(const std::vector<PublicKey::Message>& msgs, const 
             "Expected the same positive numbers of public keys and messages, but got: %ld public keys and %ld messages", m_pks.size(), msgs.size()));
     }
     std::vector<std::vector<uint8_t>> aug_msgs;
-    for (size_t i=0; i<m_pks.size(); ++i) {
-        aug_msgs.push_back(m_pks[i].AugmentMessage(msgs[i]));
+    auto msg = msgs.begin();
+    for (auto pk=m_pks.begin(),end=m_pks.end(); pk!=end; ++pk,++msg) {
+        aug_msgs.push_back(pk->AugmentMessage(*msg));
     }
     return CoreAggregateVerify(aug_msgs, sig);
 }
