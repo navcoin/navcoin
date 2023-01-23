@@ -46,10 +46,10 @@ public:
     std::vector<uint8_t> AugmentMessage(const Message& msg) const;
 
     // Core operations
-	bool CoreVerify(const Message& msg, const Signature& sig) const;
+    bool CoreVerify(const Message& msg, const Signature& sig) const;
 
     // Basic scheme
-	bool VerifyBalance(const Signature& sig) const;
+    bool VerifyBalance(const Signature& sig) const;
 
     // Message augmentation scheme
     bool Verify(const Message& msg, const Signature& sig) const;
