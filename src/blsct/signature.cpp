@@ -2,17 +2,17 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#define BLS_ETH 1
+
 #include <blsct/signature.h>  // this has to be included before bls/*
-
 #include <bls/bls384_256.h>
-
 
 namespace blsct {
 
 blsct::Signature Signature::Aggregate(const std::vector<blsct::Signature>& vSig)
 {
     std::vector<blsSignature> bls_sigs;
-    std::transform(vSig.begin(), vSig.end(), bls_sigs.begin(), [](auto sig) {
+    std::transform(vSig.begin(), vSig.end(), std::back_inserter(bls_sigs), [](auto sig) {
         return sig.m_data;
     });
     blsct::Signature aggr_sig;

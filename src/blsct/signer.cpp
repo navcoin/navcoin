@@ -23,17 +23,13 @@ Signature Signer::CoreSign(const PrivateKey& sk, const std::vector<uint8_t>& msg
 
     Signature sig;
     blsSign(&sig.m_data, &bls_sk, &msg[0], msg.size());
-
     return sig;
 }
 
 bool Signer::CoreVerify(const PublicKey& pk, const std::vector<uint8_t>& msg, const Signature& sig)
 {
     auto bls_pk = BlsPublicKeyOf(pk);
-
-    // res is 1 if valid. otherwise 0
     auto res = blsVerify(&sig.m_data, &bls_pk, &msg[0], msg.size());
-
     return res == 1;
 }
 
@@ -41,23 +37,25 @@ bool Signer::CoreAggregateVerify(const std::vector<PublicKey>& pks, const std::v
 {
     assert(pks.size() == msgs.size());
 
+    std::vector<blsPublicKey> bls_pks;
+    std::transform(pks.begin(), pks.end(), std::back_inserter(bls_pks), [](const auto& pk) {
+        return BlsPublicKeyOf(pk);
+    });
+
+    // find the largest size of messages
     auto bls_msg_size = std::max_element(msgs.begin(), msgs.end(), [](const auto& a, const auto& b) {
         return a.size() < b.size();
     })->size();
     const size_t n = pks.size();
 
-    std::vector<blsPublicKey> bls_pks;
+
+    // copy all msgs to a vector of identical size message buffers
     std::vector<uint8_t> bls_msgs(bls_msg_size * n);
-
     for (size_t i=0; i<n; ++i) {
-        bls_pks.push_back(BlsPublicKeyOf(pks[i]));
-
-        // copy msg
-        uint8_t* p = &bls_msgs[i * bls_msg_size];
-
-        std::memset(p, 0, bls_msg_size);
+        uint8_t* msg_beg = &bls_msgs[i * bls_msg_size];
+        std::memset(msg_beg, 0, bls_msg_size);
         auto msg = msgs[i];
-        std::memcpy(p, &msg[0], msg.size());
+        std::memcpy(msg_beg, &msg[0], msg.size());
     }
 
     auto res = blsAggregateVerifyNoCheck(
@@ -70,19 +68,16 @@ bool Signer::CoreAggregateVerify(const std::vector<PublicKey>& pks, const std::v
     return res;
 }
 
-// return the result of CoreSign(privateKey, "BLSCTBALANCE")
 Signature Signer::SignBalance(const PrivateKey& sk)
 {
     return CoreSign(sk, BLSCTBALANCE);
 }
 
-// returns the result of CoreVerify(pk, "BLSCTBALANCE", signature)
 bool Signer::VerifyBalance(const PublicKey& pk, const Signature& sig)
 {
 	return CoreVerify(pk, BLSCTBALANCE, sig);
 }
 
-// returns the result of CoreVerify(PublicKey::Aggregate(vPk), "BLSCTBALANCE", signature)
 bool Signer::VerifyBalanceBatch(const std::vector<PublicKey>& vPk, const Signature& sig)
 {
     auto aggr_pk = PublicKey::Aggregate(vPk);
@@ -112,28 +107,6 @@ bool Signer::AugmentedSchemeVerify(const PublicKey& pk, const std::vector<uint8_
     return res;
 }
 
-/*
-result = AggregateVerify((PK_1, ..., PK_n),
-                         (message_1, ..., message_n),
-                         signature)
-
-Inputs:
-- PK_1, ..., PK_n, public keys in the format output by SkToPk.
-- message_1, ..., message_n, octet strings.
-- signature, an octet string output by Aggregate.
-
-Outputs:
-- result, either VALID or INVALID.
-
-Precondition: n >= 1, otherwise return INVALID.
-
-Procedure:
-1. for i in 1, ..., n:
-2.     mprime_i = PK_i || message_i
-3. return CoreAggregateVerify((PK_1, ..., PK_n),
-                              (mprime_1, ..., mprime_n),
-                              signature)
-*/
 bool Signer::AugmentedSchemeAggregateVerify(
     const std::vector<PublicKey>& vPk, const std::vector<std::vector<uint8_t>> vMsg, const Signature& sig)
 {

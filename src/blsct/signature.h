@@ -8,7 +8,7 @@
 #ifndef NAVCOIN_BLSCT_SIGNATURE_H
 #define NAVCOIN_BLSCT_SIGNATURE_H
 
-#include <blsct/arith/mcl/mcl.h>   // to define `BLS_ETH` macro.needed to setup bls library correctly
+#define BLS_ETH 1
 
 #include <blsct/keys.h>
 #include <blsct/signature.h>
@@ -19,8 +19,7 @@ namespace blsct {
 class Signature
 {
 public:
-    // returns the addition of the signatures contained in vSignatures;
-    static Signature Aggregate(const std::vector<blsct::Signature>& vSignatures);
+    static Signature Aggregate(const std::vector<blsct::Signature>& vSigs);
 
     blsSignature m_data;
 };

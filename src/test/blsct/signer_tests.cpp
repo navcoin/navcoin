@@ -14,7 +14,6 @@ namespace blsct {
 
 BOOST_FIXTURE_TEST_SUITE(blsct_signer_tests, MclTestingSetup)
 
-/*
 BOOST_AUTO_TEST_CASE(test_compatibility_bet_bls_keys_and_blsct_keys)
 {
     // secret key
@@ -149,43 +148,6 @@ BOOST_AUTO_TEST_CASE(test_verify_batch_bad_inputs)
         };
         BOOST_CHECK_THROW(Signer::VerifyBatch(pks, msgs, sig), std::runtime_error);
     }
-}
-*/
-
-BOOST_AUTO_TEST_CASE(test_minsample)
-{
-	blsSecretKey sk1;
-	blsSecretKeySetDecStr(&sk1, "13", 2);
-	blsSecretKey sk2;
-	blsSecretKeySetDecStr(&sk2, "24", 2);
-
-	blsPublicKey pk1;
-	blsGetPublicKey(&pk1, &sk1);
-	blsPublicKey pk2;
-	blsGetPublicKey(&pk2, &sk2);
-    blsPublicKey pks[2];
-    pks[0] = pk1;
-    pks[1] = pk2;
-
-    blsPublicKey aggr_pk;
-    blsMultiAggregatePublicKey(&aggr_pk, pks, 2);
-
-	const char *msg = "abc";
-	size_t msgSize = 3;
-	blsSignature sig1;
-	blsSign(&sig1, &sk1, msg, msgSize);
-	blsSignature sig2;
-	blsSign(&sig2, &sk2, msg, msgSize);
-
-    blsSignature sigs[2];
-    sigs[0] = sig1;
-    sigs[1] = sig2;
-
-    blsSignature aggr_sig;
-    blsAggregateSignature(&aggr_sig, sigs, 2);
-
-	printf("verify correct message, expecting 1: %d\n", blsVerify(&aggr_sig, &aggr_pk, msg, msgSize));
-	printf("verify wrong message, expecting 0:  %d\n", blsVerify(&aggr_sig, &aggr_pk, "xyz", msgSize));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
