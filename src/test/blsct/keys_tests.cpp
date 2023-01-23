@@ -7,11 +7,13 @@
 #include <test/util/setup_common.h>
 
 #include <blsct/arith/mcl/mcl.h>
-#include <blsct/keys.h>
+#include <blsct/public_key.h>
+#include <blsct/private_key.h>
+#include <blsct/double_public_key.h>
 #include <blsct/signature.h>
 #include <boost/test/unit_test.hpp>
 
-BOOST_FIXTURE_TEST_SUITE(blsct_keys_tests, MclTestingSetup)
+BOOST_FIXTURE_TEST_SUITE(blsct_public_private_double_public_keys_tests, MclTestingSetup)
 
 using Point = MclG1Point;
 using Scalar = MclScalar;

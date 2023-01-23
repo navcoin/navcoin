@@ -10,8 +10,7 @@
 
 #define BLS_ETH 1
 
-#include <blsct/keys.h>
-#include <blsct/signature.h>
+#include <bls/bls384_256.h>
 #include <vector>
 
 namespace blsct {
