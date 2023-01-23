@@ -20,7 +20,6 @@ class Signature
 public:
     static Signature Aggregate(const std::vector<blsct::Signature>& sigs);
 
-private:
     blsSignature m_data;
 };
 

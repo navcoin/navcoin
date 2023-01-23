@@ -6,6 +6,7 @@
 #define NAVCOIN_BLSCT_BLS12_381_COMMON_H
 
 #include <vector>
+#include <cstdint>
 
 namespace blsct {
 
