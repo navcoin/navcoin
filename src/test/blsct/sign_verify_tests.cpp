@@ -146,8 +146,8 @@ BOOST_AUTO_TEST_CASE(test_verify_batch_bad_inputs)
             PublicKey(),
         });
         std::vector<std::vector<uint8_t>> msgs {
-            std::vector<uint8_t> {'m', 's', 'g'},
-            std::vector<uint8_t> {'m', 's', 'g'},
+            std::vector<uint8_t> {'m', 's', 'g', '1'},
+            std::vector<uint8_t> {'m', 's', 'g', '2'},
         };
         BOOST_CHECK_THROW(pks.VerifyBatch(msgs, sig), std::runtime_error);
     }

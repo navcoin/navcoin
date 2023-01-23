@@ -51,7 +51,6 @@ bool PublicKeys::CoreAggregateVerify(const std::vector<PublicKey::Message>& msgs
     })->size();
     const size_t n = m_pks.size();
 
-
     // copy all msgs to a vector of message buffers of the largest message size
     std::vector<uint8_t> bls_msgs(bls_msg_size * n);
     for (size_t i=0; i<n; ++i) {
@@ -68,7 +67,7 @@ bool PublicKeys::CoreAggregateVerify(const std::vector<PublicKey::Message>& msgs
         bls_msg_size,
         n
     );
-    return res;
+    return res == 1;
 }
 
 bool PublicKeys::VerifyBatch(const std::vector<PublicKey::Message>& msgs, const Signature& sig) const
