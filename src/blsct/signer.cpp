@@ -92,7 +92,8 @@ std::vector<uint8_t> Signer::AugmentMessage(const PublicKey& pk, const std::vect
     return aug_msg;
 }
 
-Signature Signer::AugmentedSchemeSign(const PrivateKey& sk, const std::vector<uint8_t>& msg)
+// Augmented
+Signature Signer::Sign(const PrivateKey& sk, const std::vector<uint8_t>& msg)
 {
     auto pk = sk.GetPublicKey();
     auto aug_msg = AugmentMessage(pk, msg);
@@ -100,15 +101,17 @@ Signature Signer::AugmentedSchemeSign(const PrivateKey& sk, const std::vector<ui
     return sig;
 }
 
-bool Signer::AugmentedSchemeVerify(const PublicKey& pk, const std::vector<uint8_t>& msg, const Signature& sig)
+// Augmented
+bool Signer::Verify(const PublicKey& pk, const std::vector<uint8_t>& msg, const Signature& sig)
 {
     auto aug_msg = AugmentMessage(pk, msg);
     auto res = CoreVerify(pk, aug_msg, sig);
     return res;
 }
 
-bool Signer::AugmentedSchemeAggregateVerify(
-    const std::vector<PublicKey>& vPk, const std::vector<std::vector<uint8_t>> vMsg, const Signature& sig)
+// AugmentedSchemeAggregateVerify
+bool Signer::VerifyBatch(
+    const std::vector<PublicKey>& vPk, const std::vector<std::vector<uint8_t>>& vMsg, const Signature& sig)
 {
     if (vPk.size() != vMsg.size() || vPk.size() == 0) {
         throw std::runtime_error(strprintf(
@@ -119,22 +122,6 @@ bool Signer::AugmentedSchemeAggregateVerify(
         aug_msgs.push_back(AugmentMessage(vPk[i], vMsg[i]));
     }
     return CoreAggregateVerify(vPk, aug_msgs, sig);
-}
-
-Signature Signer::Sign(const PrivateKey& sk, const std::vector<unsigned char>& msg)
-{
-    return AugmentedSchemeSign(sk, msg);
-}
-
-bool Signer::Verify(const PublicKey& pk, const std::vector<uint8_t>& msg, const Signature& sig)
-{
-	return AugmentedSchemeVerify(pk, msg, sig);
-}
-
-// returns the result of AugmentedSchemeAggregateVerify(vPk, vMsg, signature)
-bool Signer::VerifyBatch(const std::vector<PublicKey>& vPk, const std::vector<std::vector<uint8_t>>& vMsg, const Signature& sig)
-{
-	return AugmentedSchemeAggregateVerify(vPk, vMsg, sig);
 }
 
 }

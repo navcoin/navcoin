@@ -17,10 +17,12 @@ namespace blsct {
 class Signer
 {
 public:
+    // Basic scheme
     static Signature SignBalance(const PrivateKey& sk);
 	static bool VerifyBalance(const PublicKey& pk, const Signature& sig);
     static bool VerifyBalanceBatch(const std::vector<PublicKey>& vPk, const Signature& sig);
 
+    // Message augmentation scheme
     static Signature Sign(const PrivateKey& sk, const std::vector<uint8_t>& msg);
     static bool Verify(const PublicKey& pk, const std::vector<uint8_t>& msg, const Signature& sig);
     static bool VerifyBatch(
@@ -34,15 +36,13 @@ private:
     };
 
     static blsPublicKey BlsPublicKeyOf(const PublicKey& pk);
+    static std::vector<uint8_t> AugmentMessage(const PublicKey& pk, const std::vector<uint8_t> msg);
+
+    // Core operations
 	static Signature CoreSign(const PrivateKey& sk, const std::vector<uint8_t>& msg);
 	static bool CoreVerify(const PublicKey& pk, const std::vector<uint8_t>& msg, const Signature& sig);
     static bool CoreAggregateVerify(
         const std::vector<PublicKey>& pks, const std::vector<std::vector<uint8_t>> msgs, const Signature& sig);
-    static std::vector<uint8_t> AugmentMessage(const PublicKey& pk, const std::vector<uint8_t> msg);
-    static Signature AugmentedSchemeSign(const PrivateKey& sk, const std::vector<uint8_t>& msg);
-    static bool AugmentedSchemeVerify(const PublicKey& pk, const std::vector<uint8_t>& msg, const Signature& sig);
-    static bool AugmentedSchemeAggregateVerify(
-        const std::vector<PublicKey>& vPk, const std::vector<std::vector<uint8_t>> vMsg, const Signature& sig);
 };
 
 }
