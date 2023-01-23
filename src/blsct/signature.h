@@ -19,7 +19,7 @@ namespace blsct {
 class Signature
 {
 public:
-    static Signature Aggregate(const std::vector<blsct::Signature>& vSigs);
+    static Signature Aggregate(const std::vector<blsct::Signature>& sigs);
 
     blsSignature m_data;
 };

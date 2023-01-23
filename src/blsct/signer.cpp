@@ -17,7 +17,7 @@ blsPublicKey Signer::BlsPublicKeyOf(const PublicKey& pk)
     return bls_pk;
 }
 
-Signature Signer::CoreSign(const PrivateKey& sk, const std::vector<uint8_t>& msg)
+Signature Signer::CoreSign(const PrivateKey& sk, const Message& msg)
 {
     blsSecretKey bls_sk { sk.GetScalar().Underlying() };
 
@@ -26,14 +26,14 @@ Signature Signer::CoreSign(const PrivateKey& sk, const std::vector<uint8_t>& msg
     return sig;
 }
 
-bool Signer::CoreVerify(const PublicKey& pk, const std::vector<uint8_t>& msg, const Signature& sig)
+bool Signer::CoreVerify(const PublicKey& pk, const Message& msg, const Signature& sig)
 {
     auto bls_pk = BlsPublicKeyOf(pk);
     auto res = blsVerify(&sig.m_data, &bls_pk, &msg[0], msg.size());
     return res == 1;
 }
 
-bool Signer::CoreAggregateVerify(const std::vector<PublicKey>& pks, const std::vector<std::vector<uint8_t>> msgs, const Signature& sig)
+bool Signer::CoreAggregateVerify(const std::vector<PublicKey>& pks, const std::vector<Message> msgs, const Signature& sig)
 {
     assert(pks.size() == msgs.size());
 
@@ -78,13 +78,13 @@ bool Signer::VerifyBalance(const PublicKey& pk, const Signature& sig)
 	return CoreVerify(pk, BLSCTBALANCE, sig);
 }
 
-bool Signer::VerifyBalanceBatch(const std::vector<PublicKey>& vPk, const Signature& sig)
+bool Signer::VerifyBalanceBatch(const std::vector<PublicKey>& pks, const Signature& sig)
 {
-    auto aggr_pk = PublicKey::Aggregate(vPk);
+    auto aggr_pk = PublicKey::Aggregate(pks);
 	return CoreVerify(aggr_pk, BLSCTBALANCE, sig);
 }
 
-std::vector<uint8_t> Signer::AugmentMessage(const PublicKey& pk, const std::vector<uint8_t> msg)
+std::vector<uint8_t> Signer::AugmentMessage(const PublicKey& pk, const Message msg)
 {
     auto pk_data = pk.GetVch();
     std::vector<uint8_t> aug_msg(pk_data);
@@ -92,8 +92,7 @@ std::vector<uint8_t> Signer::AugmentMessage(const PublicKey& pk, const std::vect
     return aug_msg;
 }
 
-// Augmented
-Signature Signer::Sign(const PrivateKey& sk, const std::vector<uint8_t>& msg)
+Signature Signer::Sign(const PrivateKey& sk, const Message& msg)
 {
     auto pk = sk.GetPublicKey();
     auto aug_msg = AugmentMessage(pk, msg);
@@ -101,27 +100,25 @@ Signature Signer::Sign(const PrivateKey& sk, const std::vector<uint8_t>& msg)
     return sig;
 }
 
-// Augmented
-bool Signer::Verify(const PublicKey& pk, const std::vector<uint8_t>& msg, const Signature& sig)
+bool Signer::Verify(const PublicKey& pk, const Message& msg, const Signature& sig)
 {
     auto aug_msg = AugmentMessage(pk, msg);
     auto res = CoreVerify(pk, aug_msg, sig);
     return res;
 }
 
-// AugmentedSchemeAggregateVerify
 bool Signer::VerifyBatch(
-    const std::vector<PublicKey>& vPk, const std::vector<std::vector<uint8_t>>& vMsg, const Signature& sig)
+    const std::vector<PublicKey>& pks, const std::vector<Message>& msgs, const Signature& sig)
 {
-    if (vPk.size() != vMsg.size() || vPk.size() == 0) {
+    if (pks.size() != msgs.size() || pks.size() == 0) {
         throw std::runtime_error(strprintf(
-            "Expected the same positive numbers of public keys and messages, but got: %ld public keys and %ld messages", vPk.size(), vMsg.size()));
+            "Expected the same positive numbers of public keys and messages, but got: %ld public keys and %ld messages", pks.size(), msgs.size()));
     }
     std::vector<std::vector<uint8_t>> aug_msgs;
-    for (size_t i=0; i<vPk.size(); ++i) {
-        aug_msgs.push_back(AugmentMessage(vPk[i], vMsg[i]));
+    for (size_t i=0; i<pks.size(); ++i) {
+        aug_msgs.push_back(AugmentMessage(pks[i], msgs[i]));
     }
-    return CoreAggregateVerify(vPk, aug_msgs, sig);
+    return CoreAggregateVerify(pks, aug_msgs, sig);
 }
 
 }
