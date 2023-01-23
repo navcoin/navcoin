@@ -33,7 +33,7 @@ PublicKey PublicKeys::Aggregate() const
 bool PublicKeys::VerifyBalanceBatch(const Signature& sig) const
 {
     auto aggr_pk = PublicKeys(m_pks).Aggregate();
-	return aggr_pk.CoreVerify(BLS12_381_Common::BLSCTBALANCE, sig);
+    return aggr_pk.CoreVerify(BLS12_381_Common::BLSCTBALANCE, sig);
 }
 
 bool PublicKeys::CoreAggregateVerify(const std::vector<PublicKey::Message>& msgs, const Signature& sig) const
