@@ -166,6 +166,7 @@ BITCOIN_CORE_H = \
   blsct/eip_2333/bls12_381_keygen.h \
   blsct/private_key.h \
   blsct/public_key.h \
+  blsct/public_keys.h \
   blsct/range_proof/config.h \
   blsct/range_proof/generators.h \
   blsct/range_proof/lazy_g1point.h \
@@ -415,6 +416,7 @@ libbitcoin_node_a_SOURCES = \
   blsct/eip_2333/bls12_381_keygen.cpp \
   blsct/private_key.cpp \
   blsct/public_key.cpp \
+  blsct/public_keys.cpp \
   blsct/range_proof/config.cpp \
   blsct/range_proof/generators.cpp \
   blsct/range_proof/lazy_g1point.cpp \
@@ -956,6 +958,7 @@ libbitcoinkernel_la_SOURCES = \
   blsct/double_public_key.cpp \
   blsct/private_key.cpp \
   blsct/public_key.cpp \
+  blsct/public_keys.cpp \
   chain.cpp \
   chainparamsbase.cpp \
   chainparams.cpp \

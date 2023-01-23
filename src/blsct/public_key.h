@@ -16,12 +16,12 @@ namespace blsct {
 class PublicKey
 {
 private:
-    using Point = MclG1Point;
-    using Message = std::vector<uint8_t>;
-
     std::vector<unsigned char> data;
 
 public:
+    using Point = MclG1Point;
+    using Message = std::vector<uint8_t>;
+
     static constexpr size_t SIZE = 48;
 
     PublicKey() { data.clear(); }
@@ -48,8 +48,6 @@ public:
 
     // Core operations
 	bool CoreVerify(const Message& msg, const Signature& sig);
-    static bool CoreAggregateVerify(
-        const std::vector<PublicKey>& pks, const std::vector<Message> msgs, const Signature& sig);
 
     // Basic scheme
 	bool VerifyBalance(const Signature& sig);
@@ -57,8 +55,6 @@ public:
 
     // Message augmentation scheme
     bool Verify(const Message& msg, const Signature& sig);
-    static bool VerifyBatch(
-        const std::vector<PublicKey>& pks, const std::vector<Message>& msgs, const Signature& sig);
 };
 
 }

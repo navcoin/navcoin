@@ -8,6 +8,7 @@
 
 #include <blsct/arith/mcl/mcl.h>
 #include <blsct/public_key.h>
+#include <blsct/public_keys.h>
 #include <blsct/private_key.h>
 #include <blsct/double_public_key.h>
 #include <blsct/signature.h>

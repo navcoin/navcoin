@@ -7,7 +7,7 @@
 
 namespace blsct {
 
-std::vector<uint8_t> BLS12_381_Common::AugmentMessage(const PublicKey& pk, const Message msg)
+std::vector<uint8_t> BLS12_381_Common::AugmentMessage(const PublicKey& pk, const Message& msg)
 {
     auto pk_data = pk.GetVch();
     std::vector<uint8_t> aug_msg(pk_data);

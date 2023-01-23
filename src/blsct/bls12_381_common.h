@@ -21,7 +21,7 @@ public:
         'B', 'L', 'S', 'C', 'T', 'B', 'A', 'L', 'A', 'N', 'C', 'E'
     };
 
-    static std::vector<uint8_t> AugmentMessage(const PublicKey& pk, const Message msg);
+    static std::vector<uint8_t> AugmentMessage(const PublicKey& pk, const Message& msg);
 };
 
 }
