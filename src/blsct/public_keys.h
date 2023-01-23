@@ -34,4 +34,4 @@ private:
 
 }
 
-#endif  // NAVCOIN_BLSCT_PUBLICS_KEY_H
+#endif  // NAVCOIN_BLSCT_PUBLICS_KEYS_H
