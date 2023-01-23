@@ -86,7 +86,7 @@ bool PublicKey::CoreVerify(const Message& msg, const Signature& sig) const
 
 bool PublicKey::VerifyBalance(const Signature& sig) const
 {
-	return CoreVerify(BLS12_381_Common::BLSCTBALANCE, sig);
+    return CoreVerify(BLS12_381_Common::BLSCTBALANCE, sig);
 }
 
 bool PublicKey::Verify(const Message& msg, const Signature& sig) const
