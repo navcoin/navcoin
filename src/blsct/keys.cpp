@@ -2,6 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#define BLS_ETH 1
+
 #include <blsct/arith/mcl/mcl.h>
 #include <blsct/keys.h>
 
@@ -78,6 +80,16 @@ bool PublicKey::IsValid() const
 std::vector<unsigned char> PublicKey::GetVch() const
 {
     return data;
+}
+
+blsPublicKey PublicKey::ToBlsPublicKey() const
+{
+    MclG1Point p;
+    if (!GetG1Point(p)) {
+      throw std::runtime_error("Failed to convert PublicKey to MclG1Point");
+    }
+    blsPublicKey bls_pk { p.Underlying() };
+    return bls_pk;
 }
 
 CKeyID DoublePublicKey::GetID() const

@@ -37,7 +37,6 @@ private:
         'B', 'L', 'S', 'C', 'T', 'B', 'A', 'L', 'A', 'N', 'C', 'E'
     };
 
-    static blsPublicKey BlsPublicKeyOf(const PublicKey& pk);
     static std::vector<uint8_t> AugmentMessage(const PublicKey& pk, const std::vector<uint8_t> msg);
 
     // Core operations

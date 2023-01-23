@@ -48,6 +48,8 @@ public:
 
     bool GetG1Point(Point& ret) const;
     std::vector<unsigned char> GetVch() const;
+
+    blsPublicKey ToBlsPublicKey() const;
 };
 
 class DoublePublicKey

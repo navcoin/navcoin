@@ -7,16 +7,6 @@
 
 namespace blsct {
 
-blsPublicKey Signer::BlsPublicKeyOf(const PublicKey& pk)
-{
-    MclG1Point p;
-    if (!pk.GetG1Point(p)) {
-      throw std::runtime_error("Failed to convert PublicKey to MclG1Point");
-    }
-    blsPublicKey bls_pk { p.Underlying() };
-    return bls_pk;
-}
-
 Signature Signer::CoreSign(const PrivateKey& sk, const Message& msg)
 {
     blsSecretKey bls_sk { sk.GetScalar().Underlying() };
@@ -28,7 +18,7 @@ Signature Signer::CoreSign(const PrivateKey& sk, const Message& msg)
 
 bool Signer::CoreVerify(const PublicKey& pk, const Message& msg, const Signature& sig)
 {
-    auto bls_pk = BlsPublicKeyOf(pk);
+    auto bls_pk = pk.ToBlsPublicKey();
     auto res = blsVerify(&sig.m_data, &bls_pk, &msg[0], msg.size());
     return res == 1;
 }
@@ -39,17 +29,17 @@ bool Signer::CoreAggregateVerify(const std::vector<PublicKey>& pks, const std::v
 
     std::vector<blsPublicKey> bls_pks;
     std::transform(pks.begin(), pks.end(), std::back_inserter(bls_pks), [](const auto& pk) {
-        return BlsPublicKeyOf(pk);
+        return pk.ToBlsPublicKey();
     });
 
-    // find the largest size of messages
+    // find the largest message size
     auto bls_msg_size = std::max_element(msgs.begin(), msgs.end(), [](const auto& a, const auto& b) {
         return a.size() < b.size();
     })->size();
     const size_t n = pks.size();
 
 
-    // copy all msgs to a vector of identical size message buffers
+    // copy all msgs to a vector of message buffers of the largest message size
     std::vector<uint8_t> bls_msgs(bls_msg_size * n);
     for (size_t i=0; i<n; ++i) {
         uint8_t* msg_beg = &bls_msgs[i * bls_msg_size];
