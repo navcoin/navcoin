@@ -411,7 +411,6 @@ libbitcoin_node_a_SOURCES = \
   blsct/arith/mcl/mcl_initializer.cpp \
   blsct/arith/mcl/mcl_scalar.cpp \
   blsct/arith/elements.cpp \
-  blsct/bls12_381_common.cpp \
   blsct/double_public_key.cpp \
   blsct/eip_2333/bls12_381_keygen.cpp \
   blsct/private_key.cpp \

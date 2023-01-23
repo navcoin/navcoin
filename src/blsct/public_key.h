@@ -30,8 +30,6 @@ public:
 
     SERIALIZE_METHODS(PublicKey, obj) { READWRITE(obj.data); }
 
-    static PublicKey Aggregate(std::vector<PublicKey> vPk);
-
     uint256 GetHash() const;
     CKeyID GetID() const;
 
@@ -45,16 +43,16 @@ public:
     std::vector<unsigned char> GetVch() const;
 
     blsPublicKey ToBlsPublicKey() const;
+    std::vector<uint8_t> AugmentMessage(const Message& msg) const;
 
     // Core operations
-	bool CoreVerify(const Message& msg, const Signature& sig);
+	bool CoreVerify(const Message& msg, const Signature& sig) const;
 
     // Basic scheme
-	bool VerifyBalance(const Signature& sig);
-    static bool VerifyBalanceBatch(const std::vector<PublicKey>& pks, const Signature& sig);
+	bool VerifyBalance(const Signature& sig) const;
 
     // Message augmentation scheme
-    bool Verify(const Message& msg, const Signature& sig);
+    bool Verify(const Message& msg, const Signature& sig) const;
 };
 
 }

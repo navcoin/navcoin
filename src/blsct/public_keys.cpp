@@ -10,12 +10,38 @@
 
 namespace blsct {
 
-bool PublicKeys::CoreAggregateVerify(const std::vector<PublicKey>& pks, const std::vector<PublicKey::Message>& msgs, const Signature& sig)
+PublicKey PublicKeys::Aggregate() const
 {
-    assert(pks.size() == msgs.size());
+    if (m_pks.size() == 0) throw std::runtime_error(strprintf("%s: Vector of public keys is empty", __func__));
+
+    auto retPoint = PublicKey::Point();
+    bool isZero = true;
+
+    for (auto& pk : m_pks) {
+        PublicKey::Point pkG1;
+        bool success = pk.GetG1Point(pkG1);
+        if (!success)
+            throw std::runtime_error(strprintf("%s: Vector of public keys has an invalid element", __func__));
+
+        retPoint = isZero ? pkG1 : retPoint + pkG1;
+        isZero = false;
+    }
+
+    return PublicKey(retPoint);
+}
+
+bool PublicKeys::VerifyBalanceBatch(const Signature& sig) const
+{
+    auto aggr_pk = PublicKeys(m_pks).Aggregate();
+	return aggr_pk.CoreVerify(BLS12_381_Common::BLSCTBALANCE, sig);
+}
+
+bool PublicKeys::CoreAggregateVerify(const std::vector<PublicKey::Message>& msgs, const Signature& sig) const
+{
+    assert(m_pks.size() == msgs.size());
 
     std::vector<blsPublicKey> bls_pks;
-    std::transform(pks.begin(), pks.end(), std::back_inserter(bls_pks), [](const auto& pk) {
+    std::transform(m_pks.begin(), m_pks.end(), std::back_inserter(bls_pks), [](const auto& pk) {
         return pk.ToBlsPublicKey();
     });
 
@@ -23,7 +49,7 @@ bool PublicKeys::CoreAggregateVerify(const std::vector<PublicKey>& pks, const st
     auto bls_msg_size = std::max_element(msgs.begin(), msgs.end(), [](const auto& a, const auto& b) {
         return a.size() < b.size();
     })->size();
-    const size_t n = pks.size();
+    const size_t n = m_pks.size();
 
 
     // copy all msgs to a vector of message buffers of the largest message size
@@ -45,7 +71,7 @@ bool PublicKeys::CoreAggregateVerify(const std::vector<PublicKey>& pks, const st
     return res;
 }
 
-bool PublicKeys::VerifyBatch(const std::vector<PublicKey::Message>& msgs, const Signature& sig)
+bool PublicKeys::VerifyBatch(const std::vector<PublicKey::Message>& msgs, const Signature& sig) const
 {
     if (m_pks.size() != msgs.size() || m_pks.size() == 0) {
         throw std::runtime_error(strprintf(
@@ -53,9 +79,9 @@ bool PublicKeys::VerifyBatch(const std::vector<PublicKey::Message>& msgs, const 
     }
     std::vector<std::vector<uint8_t>> aug_msgs;
     for (size_t i=0; i<m_pks.size(); ++i) {
-        aug_msgs.push_back(BLS12_381_Common::AugmentMessage(m_pks[i], msgs[i]));
+        aug_msgs.push_back(m_pks[i].AugmentMessage(msgs[i]));
     }
-    return CoreAggregateVerify(m_pks, aug_msgs, sig);
+    return CoreAggregateVerify(aug_msgs, sig);
 }
 
 }  // namespace blsct

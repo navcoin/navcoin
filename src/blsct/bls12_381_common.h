@@ -20,8 +20,6 @@ public:
     inline static const std::vector<uint8_t> BLSCTBALANCE = {
         'B', 'L', 'S', 'C', 'T', 'B', 'A', 'L', 'A', 'N', 'C', 'E'
     };
-
-    static std::vector<uint8_t> AugmentMessage(const PublicKey& pk, const Message& msg);
 };
 
 }

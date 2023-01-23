@@ -17,13 +17,17 @@ class PublicKeys
 public:
     PublicKeys(const std::vector<PublicKey>& pks): m_pks(pks) {}
 
+    PublicKey Aggregate() const;
+
+    // Basic scheme
+    bool VerifyBalanceBatch(const Signature& sig) const;
+
     // Message augmentation scheme
-    bool VerifyBatch(const std::vector<PublicKey::Message>& msgs, const Signature& sig);
+    bool VerifyBatch(const std::vector<PublicKey::Message>& msgs, const Signature& sig) const;
 
 private:
     // Core operations
-    static bool CoreAggregateVerify(
-        const std::vector<PublicKey>& pks, const std::vector<PublicKey::Message>& msgs, const Signature& sig);
+    bool CoreAggregateVerify(const std::vector<PublicKey::Message>& msgs, const Signature& sig) const;
 
     std::vector<PublicKey> m_pks;
 };

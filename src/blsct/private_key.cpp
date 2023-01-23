@@ -56,7 +56,7 @@ void PrivateKey::SetToZero()
     k.clear();
 }
 
-Signature PrivateKey::CoreSign(const Message& msg)
+Signature PrivateKey::CoreSign(const Message& msg) const
 {
     blsSecretKey bls_sk { GetScalar().Underlying() };
 
@@ -65,15 +65,15 @@ Signature PrivateKey::CoreSign(const Message& msg)
     return sig;
 }
 
-Signature PrivateKey::SignBalance()
+Signature PrivateKey::SignBalance() const
 {
     return CoreSign(BLS12_381_Common::BLSCTBALANCE);
 }
 
-Signature PrivateKey::Sign(const Message& msg)
+Signature PrivateKey::Sign(const Message& msg) const
 {
     auto pk = GetPublicKey();
-    auto aug_msg = BLS12_381_Common::AugmentMessage(pk, msg);
+    auto aug_msg = pk.AugmentMessage(msg);
     auto sig = CoreSign(aug_msg);
     return sig;
 }

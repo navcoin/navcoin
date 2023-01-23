@@ -8,11 +8,14 @@
 #include <boost/test/unit_test.hpp>
 #include <test/util/setup_common.h>
 #include <util/strencodings.h>
-#include <blsct/signer.h>
+#include <blsct/private_key.h>
+#include <blsct/public_key.h>
+#include <blsct/public_keys.h>
+#include <blsct/bls12_381_common.h>
 
 namespace blsct {
 
-BOOST_FIXTURE_TEST_SUITE(blsct_signer_tests, MclTestingSetup)
+BOOST_FIXTURE_TEST_SUITE(blsct_sign_verify_tests, MclTestingSetup)
 
 BOOST_AUTO_TEST_CASE(test_compatibility_bet_bls_keys_and_blsct_keys)
 {
@@ -40,9 +43,9 @@ BOOST_AUTO_TEST_CASE(test_sign_verify_balance)
     blsct::PrivateKey sk(1);
 
     auto pk = sk.GetPublicKey();
-    auto sig = blsct::Signer::SignBalance(sk);
+    auto sig = sk.SignBalance();
 
-    auto res = blsct::Signer::VerifyBalance(pk, sig);
+    auto res = pk.VerifyBalance(sig);
     BOOST_CHECK(res == true);
 }
 
@@ -51,25 +54,25 @@ BOOST_AUTO_TEST_CASE(test_sign_verify_balance_batch)
     blsct::PrivateKey sk1(1);
     blsct::PrivateKey sk2(12345);
 
-    std::vector<blsct::PublicKey> pks {
+    std::vector<blsct::Signature> sigs {
+        sk1.SignBalance(),
+        sk2.SignBalance(),
+    };
+    PublicKeys pks(std::vector<blsct::PublicKey> {
         sk1.GetPublicKey(),
         sk2.GetPublicKey(),
-    };
-    std::vector<blsct::Signature> sigs {
-        blsct::Signer::SignBalance(sk1),
-        blsct::Signer::SignBalance(sk2),
-    };
+    });
     auto aggr_sig = blsct::Signature::Aggregate(sigs);
+    auto res = pks.VerifyBalanceBatch(aggr_sig);
 
-    auto res = blsct::Signer::VerifyBalanceBatch(pks, aggr_sig);
     BOOST_CHECK(res == true);
 }
 
 BOOST_AUTO_TEST_CASE(test_sign_verify_balance_batch_bad_inputs)
 {
-    std::vector<blsct::PublicKey> pks;
+    PublicKeys pks(std::vector<blsct::PublicKey> {});
     blsct::Signature aggr_sig;
-    BOOST_CHECK_THROW(blsct::Signer::VerifyBalanceBatch(pks, aggr_sig), std::runtime_error);
+    BOOST_CHECK_THROW(pks.VerifyBalanceBatch(aggr_sig), std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(test_augment_message)
@@ -77,7 +80,7 @@ BOOST_AUTO_TEST_CASE(test_augment_message)
     std::vector<uint8_t> pk_data(blsct::PublicKey::SIZE);
     auto pk = blsct::PublicKey(pk_data);
     auto msg = std::vector<uint8_t> { 1, 2, 3, 4, 5 };
-    auto act = blsct::Signer::AugmentMessage(pk, msg);
+    auto act = pk.AugmentMessage(msg);
 
     auto exp = std::vector<uint8_t>(pk_data);
     exp.insert(exp.end(), msg.begin(), msg.end());
@@ -90,8 +93,8 @@ BOOST_AUTO_TEST_CASE(test_sign_verify)
     auto pk = sk.GetPublicKey();
     std::vector<uint8_t> msg {'m', 's', 'g'};
 
-    auto sig = blsct::Signer::Sign(sk, msg);
-    auto res = blsct::Signer::Verify(pk, msg, sig);
+    auto sig = sk.Sign(msg);
+    auto res = pk.Verify(msg, sig);
     BOOST_CHECK(res == true);
 }
 
@@ -100,21 +103,21 @@ BOOST_AUTO_TEST_CASE(test_verify_batch)
     blsct::PrivateKey sk1(1);
     blsct::PrivateKey sk2(12345);
 
-    std::vector<blsct::PublicKey> pks {
+    PublicKeys pks(std::vector<blsct::PublicKey> {
         sk1.GetPublicKey(),
         sk2.GetPublicKey(),
-    };
+    });
     std::vector<std::vector<uint8_t>> msgs {
         std::vector<uint8_t> {'m', 's', 'g', '1'},
         std::vector<uint8_t> {'m', 's', 'g', '2'},
     };
     std::vector<blsct::Signature> sigs {
-        blsct::Signer::Sign(sk1, msgs[0]),
-        blsct::Signer::Sign(sk2, msgs[1]),
+        sk1.Sign(msgs[0]),
+        sk2.Sign(msgs[1]),
     };
     auto aggr_sig = blsct::Signature::Aggregate(sigs);
 
-    auto res = blsct::Signer::VerifyBatch(pks, msgs, aggr_sig);
+    auto res = pks.VerifyBatch(msgs, aggr_sig);
     BOOST_CHECK(res == true);
 }
 
@@ -123,30 +126,30 @@ BOOST_AUTO_TEST_CASE(test_verify_batch_bad_inputs)
     blsct::Signature sig;
     {
         // empty pks
-        std::vector<PublicKey> empty_pks;
+        PublicKeys empty_pks(std::vector<PublicKey> {});
         std::vector<std::vector<uint8_t>> msgs {
             std::vector<uint8_t> {'m', 's', 'g'},
         };
-        BOOST_CHECK_THROW(Signer::VerifyBatch(empty_pks, msgs, sig), std::runtime_error);
+        BOOST_CHECK_THROW(empty_pks.VerifyBatch(msgs, sig), std::runtime_error);
     }
     {
         // empty msgs
-        std::vector<PublicKey> pks {
+        PublicKeys pks(std::vector<PublicKey> {
             PublicKey(),
-        };
+        });
         std::vector<std::vector<uint8_t>> empty_msgs;
-        BOOST_CHECK_THROW(Signer::VerifyBatch(pks, empty_msgs, sig), std::runtime_error);
+        BOOST_CHECK_THROW(pks.VerifyBatch(empty_msgs, sig), std::runtime_error);
     }
     {
         // numbers of pks and msgs don't match
-        std::vector<PublicKey> pks {
+        PublicKeys pks(std::vector<PublicKey> {
             PublicKey(),
-        };
+        });
         std::vector<std::vector<uint8_t>> msgs {
             std::vector<uint8_t> {'m', 's', 'g'},
             std::vector<uint8_t> {'m', 's', 'g'},
         };
-        BOOST_CHECK_THROW(Signer::VerifyBatch(pks, msgs, sig), std::runtime_error);
+        BOOST_CHECK_THROW(pks.VerifyBatch(msgs, sig), std::runtime_error);
     }
 }
 

@@ -40,13 +40,13 @@ public:
     void SetToZero();
 
     // Basic scheme
-    Signature SignBalance();
+    Signature SignBalance() const;
 
     // Message augmentation scheme
-    Signature Sign(const Message& msg);
+    Signature Sign(const Message& msg) const;
 
     // Core operations
-	Signature CoreSign(const Message& msg);
+	Signature CoreSign(const Message& msg) const;
 
     friend class CCryptoKeyStore;
     friend class CBasicKeyStore;
