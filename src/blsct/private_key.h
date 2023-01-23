@@ -46,7 +46,7 @@ public:
     Signature Sign(const Message& msg) const;
 
     // Core operations
-	Signature CoreSign(const Message& msg) const;
+    Signature CoreSign(const Message& msg) const;
 
     friend class CCryptoKeyStore;
     friend class CBasicKeyStore;
