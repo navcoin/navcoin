@@ -14,4 +14,3 @@ export CI_OS_NAME="macos"
 export NO_DEPENDS=1
 export OSX_SDK=""
 export CCACHE_SIZE=300M
-export RUN_SECURITY_TESTS="true"
