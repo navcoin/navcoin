@@ -1,5 +1,5 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2009-2021 The Bitcoin Core developers
+// Copyright (c) 2009-2022 The Bitcoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -31,6 +31,7 @@
 #include <util/syscall_sandbox.h>
 #include <util/system.h>
 #include <util/thread.h>
+#include <util/threadinterrupt.h>
 #include <util/trace.h>
 #include <util/translation.h>
 
@@ -91,13 +92,12 @@ static constexpr auto FEELER_SLEEP_WINDOW{1s};
 /** Used to pass flags to the Bind() function */
 enum BindFlags {
     BF_NONE         = 0,
-    BF_EXPLICIT     = (1U << 0),
-    BF_REPORT_ERROR = (1U << 1),
+    BF_REPORT_ERROR = (1U << 0),
     /**
      * Do not call AddLocal() for our special addresses, e.g., for incoming
      * Tor connections, to prevent gossiping them over the network.
      */
-    BF_DONT_ADVERTISE = (1U << 2),
+    BF_DONT_ADVERTISE = (1U << 1),
 };
 
 // The set of sockets cannot be modified while waiting
@@ -971,8 +971,7 @@ void CConnman::CreateNodeFromAcceptedSocket(std::unique_ptr<Sock>&& sock,
         return;
     }
 
-    if (!IsSelectableSocket(sock->Get()))
-    {
+    if (!sock->IsSelectable()) {
         LogPrintf("connection from %s dropped: non-selectable socket\n", addr.ToString());
         return;
     }
@@ -2231,9 +2230,6 @@ bool CConnman::Bind(const CService& addr_, unsigned int flags, NetPermissionFlag
 {
     const CService addr{MaybeFlipIPv6toCJDNS(addr_)};
 
-    if (!(flags & BF_EXPLICIT) && !IsReachable(addr)) {
-        return false;
-    }
     bilingual_str strError;
     if (!BindListenPort(addr, strError, permissions)) {
         if ((flags & BF_REPORT_ERROR) && m_client_interface) {
@@ -2253,13 +2249,13 @@ bool CConnman::InitBinds(const Options& options)
 {
     bool fBound = false;
     for (const auto& addrBind : options.vBinds) {
-        fBound |= Bind(addrBind, (BF_EXPLICIT | BF_REPORT_ERROR), NetPermissionFlags::None);
+        fBound |= Bind(addrBind, BF_REPORT_ERROR, NetPermissionFlags::None);
     }
     for (const auto& addrBind : options.vWhiteBinds) {
-        fBound |= Bind(addrBind.m_service, (BF_EXPLICIT | BF_REPORT_ERROR), addrBind.m_flags);
+        fBound |= Bind(addrBind.m_service, BF_REPORT_ERROR, addrBind.m_flags);
     }
     for (const auto& addr_bind : options.onion_binds) {
-        fBound |= Bind(addr_bind, BF_EXPLICIT | BF_DONT_ADVERTISE, NetPermissionFlags::None);
+        fBound |= Bind(addr_bind, BF_DONT_ADVERTISE, NetPermissionFlags::None);
     }
     if (options.bind_on_any) {
         struct in_addr inaddr_any;

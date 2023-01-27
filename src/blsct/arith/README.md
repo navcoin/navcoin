@@ -28,12 +28,12 @@ This effectively makes the [Mcl](../arith//mcl/mcl.h) implementation an interfac
 
 ## Adding a new implementation
 ### Based on existing implementation
-1. Copy existing top-level structure and the headers of aliased classes to a different directoryr
-2. Rename them
-3. Add implementation of all the functions defined in the headers
+1. Copy existing top-level structure and the headers of aliased classes to a different directory.
+2. Rename them.
+3. Add implementation of all the functions defined in the headers.
 
 ### From scratch
-Below is one way of developing a new implementation of `Generic Arith Classes`:
+Below is one way of developing a new implmentation of `Generic Arith Classes`:
 
 1. Define the top-level structure that exposes aliases to its associated `Scalar`, `Point`, and `Initializer` classes. Let each alias point to an empty class.
 
