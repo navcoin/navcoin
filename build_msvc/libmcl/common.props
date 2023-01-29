@@ -7,7 +7,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)/../src/bls/mcl/../cybozulib/include;$(SolutionDir)/../src/bls/mcl/../../cybozulib_ext/include;$(SolutionDir)/../src/bls/mcl/../include;$(SolutionDir)/../src/bls/mcl/../../xbyak</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\src\bls\mcl\src;..\..\src\bls\mcl\include;</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup>
@@ -19,7 +19,7 @@
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);NOMINMAX</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(SolutionDir)../cybozulib_ext/lib;$(SolutionDir)lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)libmcl\</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup />
