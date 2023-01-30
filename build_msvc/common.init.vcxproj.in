@@ -102,6 +102,5 @@
       <AdditionalOptions>/ignore:4221</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>
-
   <Import Project="common.init.vcxproj.user" Condition="Exists('common.init.vcxproj.user')" />
 </Project>
