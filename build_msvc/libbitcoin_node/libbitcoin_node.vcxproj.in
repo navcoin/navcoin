@@ -19,7 +19,6 @@
       <ObjectFileName>$(IntDir)wallet_init.obj</ObjectFileName>
     </ClCompile>
   </ItemGroup>
-  <AdditionalOptions>/WX-</AdditionalOptions>
   <Import Project="$(SolutionDir)common.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

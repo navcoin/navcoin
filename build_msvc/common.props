@@ -13,7 +13,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <!-- <WarningLevel>Level4</WarningLevel> -->
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeaderFile />
       <PrecompiledHeaderOutputFile />
