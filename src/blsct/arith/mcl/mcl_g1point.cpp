@@ -135,7 +135,6 @@ MclG1Point MclG1Point::MapToG1(const std::vector<uint8_t>& vec, const Endianness
             throw std::runtime_error("MclG1Point::MapToG1(): mclBnFp_setBigEndianMod failed");
         }
     }
-
     if (mclBnFp_mapToG1(&temp.m_p, &v) != 0) {
         throw std::runtime_error("MclG1Point::MapToG1(): mclBnFp_mapToG1 failed");
     }
