@@ -145,7 +145,7 @@ MclG1Point MclG1Point::MapToG1(const std::vector<uint8_t>& vec, const Endianness
 MclG1Point MclG1Point::MapToG1(const std::string& s, const Endianness e)
 {
     std::vector<uint8_t> vec(s.begin(), s.end());
-    return MapToG1(vec);
+    return MapToG1(vec, e);
 }
 
 MclG1Point MclG1Point::HashAndMap(const std::vector<uint8_t>& vec)
