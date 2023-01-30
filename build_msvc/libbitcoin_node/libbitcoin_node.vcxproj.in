@@ -8,11 +8,18 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
   </PropertyGroup>
     <ItemGroup>
+    <ProjectReference Include="..\..\src\bls\src\proj\bls.vcxproj">
+      <Project>{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\bls\mcl\src\proj\mcl.vcxproj">
+      <Project>{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}</Project>
+    </ProjectReference>
 @SOURCE_FILES@
     <ClCompile Include="..\..\src\wallet\init.cpp">
       <ObjectFileName>$(IntDir)wallet_init.obj</ObjectFileName>
     </ClCompile>
   </ItemGroup>
+  <Import Project="$(SolutionDir)common.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <Import Project="..\common.vcxproj" />
