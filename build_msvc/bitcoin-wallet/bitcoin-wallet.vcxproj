@@ -39,7 +39,7 @@
     <ProjectReference Include="..\libsecp256k1\libsecp256k1.vcxproj">
       <Project>{bb493552-3b8c-4a8c-bf69-a6e7a51d2ea6}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\bls\src\proj\bls384_256.vcxproj">
+    <ProjectReference Include="..\..\src\bls\src\proj\bls.vcxproj">
       <Project>{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\src\bls\mcl\src\proj\mcl.vcxproj">
