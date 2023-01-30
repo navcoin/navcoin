@@ -2,9 +2,6 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup>
-    <OutDir>$(SolutionDir)bin\</OutDir>
-  </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)\..\src\bls\mcl\../cybozulib/include;$(SolutionDir)\..\src\bls\mcl\../cybozulib_ext/include;$(SolutionDir)\..\src\bls\mcl\include;$(SolutionDir)\..\src\bls\mcl\../xbyak;$(SolutionDir)..\src\bls\include;$(SolutionDir)..\src;$(SolutionDir)..\src\univalue\include;$(SolutionDir)..\src\leveldb\include;$(SolutionDir)..\src\minisketch\include</AdditionalIncludeDirectories>
@@ -19,7 +16,7 @@
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);NOMINMAX;BLS_ETH;MCL_USE_VINT;MCL_VINT_FIXED_BUFFER;MCL_DONT_USE_OPENSSL;MCL_DONT_USE_XBYAK;MCL_SIZEOF_UNIT=4;MCL_MAX_BIT_SIZE=384;CYBOZU_MINIMUM_EXCEPTION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(SolutionDir)../cybozulib_ext/lib;$(SolutionDir)lib;$(SolutionDir)libmcl</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)../cybozulib_ext/lib;$(SolutionDir)lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup />
