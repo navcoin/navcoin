@@ -46,10 +46,10 @@
       <Project>{1e065f03-3566-47d0-8fa9-daa72b084e7d}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\src\bls\src\proj\bls384_256.vcxproj">
-      <Project>{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}</Project>
+      <Project>{1DBB979A-C212-45CD-9563-446A96F87F72}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\src\bls\mcl\src\proj\mcl.vcxproj">
-      <Project>{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}</Project>
+      <Project>{1DBB979A-C212-45CD-9563-446A96F87F71}</Project>
     </ProjectReference>
   </ItemGroup>
   <Target Name="RawBenchHeaderGen" BeforeTargets="PrepareForBuild">
