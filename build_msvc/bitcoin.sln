@@ -28,9 +28,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bitcoin-cli", "bitcoin-cli\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bench_bench_navcoin", "bench_bench_navcoin\bench_bench_navcoin.vcxproj", "{1125654E-E1B2-4431-8B5C-62EA9A2FEECB}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bitcoin-tx", "bitcoin-tx\bitcoin-tx.vcxproj", "{D3022AF6-AD33-4CE3-B358-87CB6A1B29CF}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "navcoin-tx", "navcoin-tx\navcoin-tx.vcxproj", "{D3022AF6-AD33-4CE3-B358-87CB6A1B29CF}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bitcoin-util", "bitcoin-util\bitcoin-util.vcxproj", "{57A04EC9-542A-4E40-83D0-AC3BE1F36805}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "navcoin-util", "navcoin-util\navcoin-util.vcxproj", "{57A04EC9-542A-4E40-83D0-AC3BE1F36805}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bitcoin-wallet", "bitcoin-wallet\bitcoin-wallet.vcxproj", "{84DE8790-EDE3-4483-81AC-C32F15E861F4}"
 EndProject

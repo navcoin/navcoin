@@ -73,7 +73,8 @@ def bctest(testDir, testObj, buildenv):
     are not as expected. Error is caught by bctester() and reported.
     """
     # Get the exec names and arguments
-    execprog = os.path.join(buildenv["BUILDDIR"], "src", testObj["exec"] + buildenv["EXEEXT"])
+    execprog = os.path.join(buildenv["BUILDDIR"], "build_msvc", "x64", "Release", testObj["exec"] + buildenv["EXEEXT"])
+    print(f"execprog: {execprog}")
     execargs = testObj['args']
     execrun = [execprog] + execargs
 
