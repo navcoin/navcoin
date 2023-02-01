@@ -238,17 +238,17 @@ class BitcoinTestFramework(metaclass=BitcoinTestMetaClass):
 
         fname_navcoind = os.path.join(
             config["environment"]["BUILDDIR"],
-            "src",
+            "build_msvc", "x64", "Release",
             "navcoind" + config["environment"]["EXEEXT"],
         )
         fname_bitcoincli = os.path.join(
             config["environment"]["BUILDDIR"],
-            "src",
+            "build_msvc", "x64", "Release",
             "navcoin-cli" + config["environment"]["EXEEXT"],
         )
         fname_bitcoinutil = os.path.join(
             config["environment"]["BUILDDIR"],
-            "src",
+            "build_msvc", "x64", "Release",
             "navcoin-util" + config["environment"]["EXEEXT"],
         )
         self.options.navcoind = os.getenv("BITCOIND", default=fname_navcoind)
