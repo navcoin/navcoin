@@ -5,8 +5,8 @@
 #define BLS_ETH 1
 
 #include <algorithm>
-#include <blsct/signature.h>
 #include <bls/bls384_256.h>
+#include <blsct/signature.h>
 #include <iterator>
 #include <streams.h>
 #include <tinyformat.h>
@@ -24,26 +24,20 @@ Signature Signature::Aggregate(const std::vector<blsct::Signature>& sigs)
     return aggr_sig;
 }
 
-template <typename Stream>
-void Signature::Serialize(Stream& s) const
+std::vector<unsigned char> Signature::GetVch() const
 {
     size_t ser_size = mclBn_getFpByteSize() * 2;
-    std::vector<uint8_t> buf(ser_size);
+    std::vector<unsigned char> buf(ser_size);
     size_t n = mclBnG2_serialize(&buf[0], ser_size, &m_data.v);
     if (n != ser_size) {
         throw std::runtime_error(strprintf(
             "%s: Expected serialization size to be %ld, but got %ld", __func__, ser_size, n));
     }
-    ::Serialize(s, buf);
+    return buf;
 }
-template void Signature::Serialize(CDataStream&) const;
 
-template <typename Stream>
-void Signature::Unserialize(Stream& s)
+void Signature::SetVch(const std::vector<unsigned char>& buf)
 {
-    std::vector<uint8_t> buf;
-    ::Unserialize(s, buf);
-
     size_t ser_size = mclBn_getFpByteSize() * 2;
     if (buf.size() != ser_size) {
         throw std::runtime_error(strprintf(
@@ -53,6 +47,5 @@ void Signature::Unserialize(Stream& s)
         throw std::runtime_error(strprintf("%s: Deserialization failed", __func__));
     }
 }
-template void Signature::Unserialize(CDataStream& s);
 
-}  // namespace blsct
+} // namespace blsct
