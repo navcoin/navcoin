@@ -1609,6 +1609,8 @@ uint256 SignatureHash(const CScript& scriptCode, const T& txTo, unsigned int nIn
         ss << hashOutputs;
         // Locktime
         ss << txTo.nLockTime;
+        ss << txTo.balanceSig;
+        ss << txTo.txSig;
         // Sighash type
         ss << nHashType;
 

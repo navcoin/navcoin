@@ -58,13 +58,24 @@ public:
     std::string GetString(const uint8_t& radix = 16) const;
     MclScalar GetHashWithSalt(const uint64_t salt) const;
 
-    size_t GetSerializeSize() const;
+    size_t GetSerializeSize() const
+    {
+        return SERIALIZATION_SIZE;
+    }
 
     template <typename Stream>
-    void Serialize(Stream& s) const;
+    void Serialize(Stream& s) const
+    {
+        ::Serialize(s, GetVch());
+    }
 
     template <typename Stream>
-    void Unserialize(Stream& s);
+    void Unserialize(Stream& s)
+    {
+        std::vector<uint8_t> vch;
+        ::Unserialize(s, vch);
+        SetVch(vch);
+    }
 
     using UnderlyingType = mclBnG1;
     UnderlyingType m_p;
