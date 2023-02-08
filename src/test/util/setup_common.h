@@ -94,11 +94,18 @@ struct BasicTestingSetup {
     ArgsManager m_args;
 };
 
+/**
+ * Setup that initializes external mcl library
+ */
+struct MclTestingSetup : public BasicTestingSetup {
+    MclTestingSetup(const std::string& chainName = CBaseChainParams::MAIN, const std::vector<const char*>& extra_args = {});
+};
+
 /** Testing setup that performs all steps up until right before
  * ChainstateManager gets initialized. Meant for testing ChainstateManager
  * initialization behaviour.
  */
-struct ChainTestingSetup : public BasicTestingSetup {
+struct ChainTestingSetup : public MclTestingSetup {
     node::CacheSizes m_cache_sizes{};
 
     explicit ChainTestingSetup(const std::string& chainName = CBaseChainParams::MAIN, const std::vector<const char*>& extra_args = {});
@@ -237,11 +244,5 @@ private:
     const std::string m_reason;
 };
 
-/**
- * Setup that initializes external mcl library
- */
-struct MclTestingSetup {
-    MclTestingSetup();
-};
-
 #endif // BITCOIN_TEST_UTIL_SETUP_COMMON_H
+
