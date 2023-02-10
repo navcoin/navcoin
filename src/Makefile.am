@@ -661,6 +661,10 @@ libbitcoin_consensus_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libbitcoin_consensus_a_SOURCES = \
   arith_uint256.cpp \
   arith_uint256.h \
+  blsct/arith/mcl/mcl_g1point.cpp \
+  blsct/arith/mcl/mcl_initializer.cpp \
+  blsct/arith/mcl/mcl_scalar.cpp \
+  blsct/signature.cpp \
   consensus/amount.h \
   consensus/merkle.cpp \
   consensus/merkle.h \
@@ -972,6 +976,7 @@ libbitcoinkernel_la_SOURCES = \
   blsct/private_key.cpp \
   blsct/public_key.cpp \
   blsct/public_keys.cpp \
+  blsct/signature.cpp \
   chain.cpp \
   chainparamsbase.cpp \
   chainparams.cpp \
@@ -1066,7 +1071,7 @@ libbitcoinconsensus_la_LIBADD = \
   $(LIBBLS) \
   $(LIBMCL) \
   $(LIBSECP256K1)
-libbitcoinconsensus_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(builddir)/obj -I$(srcdir)/secp256k1/include -DBUILD_BITCOIN_INTERNAL
+libbitcoinconsensus_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(builddir)/obj $(BLS_INCLUDES) -I$(srcdir)/secp256k1/include -DBUILD_BITCOIN_INTERNAL
 libbitcoinconsensus_la_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 
 endif

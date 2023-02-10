@@ -97,8 +97,15 @@ std::ostream& operator<<(std::ostream& os, const uint256& num)
     return os;
 }
 
+
+MclTestingSetup::MclTestingSetup()
+{
+    MclInitializer::Init();
+    MclG1Point::Init();
+}
+
 BasicTestingSetup::BasicTestingSetup(const std::string& chainName, const std::vector<const char*>& extra_args)
-    : m_path_root{fs::temp_directory_path() / "test_common_" PACKAGE_NAME / g_insecure_rand_ctx_temp_path.rand256().ToString()},
+    : MclTestingSetup(), m_path_root{fs::temp_directory_path() / "test_common_" PACKAGE_NAME / g_insecure_rand_ctx_temp_path.rand256().ToString()},
       m_args{}
 {
     m_node.args = &gArgs;
@@ -438,8 +445,3 @@ CBlock getBlock13b8a()
     return block;
 }
 
-MclTestingSetup::MclTestingSetup()
-{
-    MclInitializer::Init();
-    MclG1Point::Init();
-}

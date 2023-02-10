@@ -6,6 +6,8 @@
 #ifndef BITCOIN_PRIMITIVES_TRANSACTION_H
 #define BITCOIN_PRIMITIVES_TRANSACTION_H
 
+#include <blsct/arith/mcl/mcl_g1point.h>
+#include <blsct/signature.h>
 #include <consensus/amount.h>
 #include <prevector.h>
 #include <script/script.h>
@@ -159,6 +161,14 @@ class CTxOut
 public:
     CAmount nValue;
     CScript scriptPubKey;
+    MclG1Point& valueCommitment(std::optional<MclG1Point> new_value = std::nullopt) {
+        static auto x = new MclG1Point();
+        if (new_value.has_value()) {
+            delete x;
+            x = &new_value.value();
+        }
+        return *x;
+    };
 
     CTxOut()
     {
@@ -306,6 +316,8 @@ public:
     const std::vector<CTxOut> vout;
     const int32_t nVersion;
     const uint32_t nLockTime;
+    blsct::Signature balanceSig;
+    blsct::Signature txSig;
 
 private:
     /** Memory only. */
@@ -382,6 +394,8 @@ struct CMutableTransaction
     std::vector<CTxOut> vout;
     int32_t nVersion;
     uint32_t nLockTime;
+    blsct::Signature balanceSig;
+    blsct::Signature txSig;
 
     explicit CMutableTransaction();
     explicit CMutableTransaction(const CTransaction& tx);

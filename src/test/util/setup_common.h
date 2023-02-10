@@ -81,10 +81,17 @@ static inline bool InsecureRandBool() { return g_insecure_rand_ctx.randbool(); }
 
 static constexpr CAmount CENT{1000000};
 
+/**
+ * Setup that initializes external mcl library
+ */
+struct MclTestingSetup {
+    MclTestingSetup();
+};
+
 /** Basic testing setup.
  * This just configures logging, data dir and chain parameters.
  */
-struct BasicTestingSetup {
+struct BasicTestingSetup : public MclTestingSetup {
     node::NodeContext m_node; // keep as first member to be destructed last
 
     explicit BasicTestingSetup(const std::string& chainName = CBaseChainParams::MAIN, const std::vector<const char*>& extra_args = {});
@@ -235,13 +242,6 @@ public:
 
 private:
     const std::string m_reason;
-};
-
-/**
- * Setup that initializes external mcl library
- */
-struct MclTestingSetup {
-    MclTestingSetup();
 };
 
 #endif // BITCOIN_TEST_UTIL_SETUP_COMMON_H
