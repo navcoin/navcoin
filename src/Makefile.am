@@ -661,8 +661,9 @@ libbitcoin_consensus_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libbitcoin_consensus_a_SOURCES = \
   arith_uint256.cpp \
   arith_uint256.h \
-  blsct/arith/mcl/mcl_g1point.cpp \
+  blsct/arith/elements.cpp \
   blsct/arith/mcl/mcl_initializer.cpp \
+  blsct/arith/mcl/mcl_g1point.cpp \
   blsct/arith/mcl/mcl_scalar.cpp \
   blsct/signature.cpp \
   consensus/amount.h \
@@ -703,6 +704,7 @@ libbitcoin_common_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libbitcoin_common_a_SOURCES = \
   base58.cpp \
   bech32.cpp \
+  blsct/arith/elements.cpp \
   chainparams.cpp \
   coins.cpp \
   common/bloom.cpp \

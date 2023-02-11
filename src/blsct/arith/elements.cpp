@@ -3,8 +3,8 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <blsct/arith/elements.h>
-#include <blsct/arith/mcl/mcl_scalar.h>
 #include <blsct/arith/mcl/mcl_g1point.h>
+#include <blsct/arith/mcl/mcl_scalar.h>
 #include <tinyformat.h>
 
 template <typename T>
@@ -36,8 +36,8 @@ Elements<T>::Elements(const Elements<T>& other)
 {
     m_vec = other.m_vec;
 }
-template Elements<MclScalar>::Elements(const Elements<MclScalar> &x);
-template Elements<MclG1Point>::Elements(const Elements<MclG1Point> &x);
+template Elements<MclScalar>::Elements(const Elements<MclScalar>& x);
+template Elements<MclG1Point>::Elements(const Elements<MclG1Point>& x);
 
 template <typename T>
 bool Elements<T>::Empty() const
@@ -46,6 +46,12 @@ bool Elements<T>::Empty() const
 }
 template bool Elements<MclScalar>::Empty() const;
 template bool Elements<MclG1Point>::Empty() const;
+
+template <typename T>
+void Elements<T>::Clear()
+{
+    m_vec.clear();
+}
 
 template <typename T>
 T Elements<T>::Sum() const
@@ -60,7 +66,8 @@ template MclScalar Elements<MclScalar>::Sum() const;
 template MclG1Point Elements<MclG1Point>::Sum() const;
 
 template <typename T>
-void Elements<T>::ConfirmIndexInsideRange(const uint32_t& index) const {
+void Elements<T>::ConfirmIndexInsideRange(const uint32_t& index) const
+{
     if (index >= m_vec.size()) {
         auto s = strprintf("index %d is out of range [0..%d]", index, m_vec.size() - 1ul);
         throw std::runtime_error(s);
@@ -279,7 +286,7 @@ template <typename T>
 Elements<T> Elements<T>::Negate() const
 {
     Elements<T> ret;
-    for(auto& x: m_vec) {
+    for (auto& x : m_vec) {
         ret.Add(x.Negate());
     }
     return ret;

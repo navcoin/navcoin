@@ -6,9 +6,11 @@
 #ifndef BITCOIN_PRIMITIVES_TRANSACTION_H
 #define BITCOIN_PRIMITIVES_TRANSACTION_H
 
-#include <blsct/arith/mcl/mcl_g1point.h>
+#include <blsct/arith/mcl/mcl.h>
+#include <blsct/range_proof/range_proof.h>
 #include <blsct/signature.h>
 #include <consensus/amount.h>
+#include <ctokens/tokenid.h>
 #include <prevector.h>
 #include <script/script.h>
 #include <serialize.h>
@@ -42,12 +44,16 @@ public:
 
     static constexpr uint32_t NULL_INDEX = std::numeric_limits<uint32_t>::max();
 
-    COutPoint(): n(NULL_INDEX) { }
-    COutPoint(const uint256& hashIn, uint32_t nIn): hash(hashIn), n(nIn) { }
+    COutPoint() : n(NULL_INDEX) {}
+    COutPoint(const uint256& hashIn, uint32_t nIn) : hash(hashIn), n(nIn) {}
 
     SERIALIZE_METHODS(COutPoint, obj) { READWRITE(obj.hash, obj.n); }
 
-    void SetNull() { hash.SetNull(); n = NULL_INDEX; }
+    void SetNull()
+    {
+        hash.SetNull();
+        n = NULL_INDEX;
+    }
     bool IsNull() const { return (hash.IsNull() && n == NULL_INDEX); }
 
     friend bool operator<(const COutPoint& a, const COutPoint& b)
@@ -133,14 +139,14 @@ public:
         nSequence = SEQUENCE_FINAL;
     }
 
-    explicit CTxIn(COutPoint prevoutIn, CScript scriptSigIn=CScript(), uint32_t nSequenceIn=SEQUENCE_FINAL);
-    CTxIn(uint256 hashPrevTx, uint32_t nOut, CScript scriptSigIn=CScript(), uint32_t nSequenceIn=SEQUENCE_FINAL);
+    explicit CTxIn(COutPoint prevoutIn, CScript scriptSigIn = CScript(), uint32_t nSequenceIn = SEQUENCE_FINAL);
+    CTxIn(uint256 hashPrevTx, uint32_t nOut, CScript scriptSigIn = CScript(), uint32_t nSequenceIn = SEQUENCE_FINAL);
 
     SERIALIZE_METHODS(CTxIn, obj) { READWRITE(obj.prevout, obj.scriptSig, obj.nSequence); }
 
     friend bool operator==(const CTxIn& a, const CTxIn& b)
     {
-        return (a.prevout   == b.prevout &&
+        return (a.prevout == b.prevout &&
                 a.scriptSig == b.scriptSig &&
                 a.nSequence == b.nSequence);
     }
@@ -158,31 +164,84 @@ public:
  */
 class CTxOut
 {
+private:
+    std::optional<RangeProof<Mcl>*> rangeProof;
+    std::optional<MclG1Point*> spendingKey;
+    std::optional<MclG1Point*> ephemeralKey;
+    std::optional<MclG1Point*> blindingKey;
+
 public:
-    CAmount nValue;
+    static const uint32_t BLSCT_MARKER = 0x1 << 0;
+    static const uint32_t TOKEN_MARKER = 0x1 << 1;
+
+    CAmount nValue; // TODO: remove
     CScript scriptPubKey;
-    MclG1Point& valueCommitment(std::optional<MclG1Point> new_value = std::nullopt) {
-        static auto x = new MclG1Point();
-        if (new_value.has_value()) {
-            delete x;
-            x = &new_value.value();
-        }
-        return *x;
-    };
+    std::vector<uint8_t> rangeProofVec;
+    std::vector<uint8_t> spendingKeyVec;
+    std::vector<uint8_t> blindingKeyVec;
+    std::vector<uint8_t> ephemeralKeyVec;
+    TokenId tokenId;
 
     CTxOut()
     {
         SetNull();
     }
 
-    CTxOut(const CAmount& nValueIn, CScript scriptPubKeyIn);
+    CTxOut(const CAmount& nValueIn, CScript scriptPubKeyIn, TokenId tokenId = TokenId());
 
-    SERIALIZE_METHODS(CTxOut, obj) { READWRITE(obj.nValue, obj.scriptPubKey); }
+    template <typename Stream>
+    void Serialize(Stream& s) const
+    {
+        uint32_t nFlags = 0;
+
+        if (rangeProofVec.size() > 0 || spendingKeyVec.size() > 0 || blindingKeyVec.size() > 0 || ephemeralKeyVec.size() > 0)
+            nFlags |= BLSCT_MARKER;
+        if (!tokenId.IsNull())
+            nFlags |= TOKEN_MARKER;
+        if (nFlags > 0) {
+            ::Serialize(s, std::numeric_limits<uint64_t>::max());
+            ::Serialize(s, nFlags);
+        } else {
+            ::Serialize(s, nValue);
+        }
+        ::Serialize(s, scriptPubKey);
+        if (nFlags & BLSCT_MARKER) {
+            ::Serialize(s, rangeProofVec);
+            ::Serialize(s, spendingKeyVec);
+            ::Serialize(s, blindingKeyVec);
+            ::Serialize(s, ephemeralKeyVec);
+        }
+        if (nFlags & TOKEN_MARKER)
+            ::Serialize(s, tokenId);
+    }
+
+    template <typename Stream>
+    void Unserialize(Stream& s)
+    {
+        ::Unserialize(s, nValue);
+        uint32_t nFlags = 0;
+        if (nValue == std::numeric_limits<uint64_t>::max()) {
+            ::Unserialize(s, nFlags);
+        }
+        ::Unserialize(s, scriptPubKey);
+        if (nFlags & BLSCT_MARKER) {
+            ::Unserialize(s, rangeProofVec);
+            ::Unserialize(s, spendingKeyVec);
+            ::Unserialize(s, blindingKeyVec);
+            ::Unserialize(s, ephemeralKeyVec);
+        }
+        if (nFlags & TOKEN_MARKER)
+            ::Unserialize(s, tokenId);
+    }
 
     void SetNull()
     {
         nValue = -1;
         scriptPubKey.clear();
+        rangeProofVec.clear();
+        spendingKeyVec.clear();
+        blindingKeyVec.clear();
+        ephemeralKeyVec.clear();
     }
 
     bool IsNull() const
@@ -190,15 +249,85 @@ public:
         return (nValue == -1);
     }
 
+    void SetRangeProof(const RangeProof<Mcl>& p)
+    {
+        rangeProofVec = SerializeRangeProof<Mcl>(p);
+    }
+
+    const RangeProof<Mcl> GetRangeProof()
+    {
+        if (!rangeProof.has_value()) {
+            const_cast<CTxOut*>(this)->rangeProof = new RangeProof<Mcl>;
+            *(const_cast<CTxOut*>(this)->rangeProof.value()) = UnserializeRangeProof<Mcl>(rangeProofVec);
+        }
+        return *(rangeProof.value());
+    }
+
+    void SetSpendingKey(const MclG1Point& p)
+    {
+        spendingKeyVec = p.GetVch();
+    }
+
+    const MclG1Point GetSpendingKey()
+    {
+        if (!spendingKey.has_value()) {
+            const_cast<CTxOut*>(this)->spendingKey = new MclG1Point();
+            const_cast<CTxOut*>(this)->spendingKey.value()->SetVch(spendingKeyVec);
+        }
+        return *(spendingKey.value());
+    }
+
+    void SetEphemeralKey(const MclG1Point& p)
+    {
+        ephemeralKeyVec = p.GetVch();
+    }
+
+    const MclG1Point GetEphemeralKey()
+    {
+        if (!ephemeralKey.has_value()) {
+            const_cast<CTxOut*>(this)->ephemeralKey = new MclG1Point();
+            const_cast<CTxOut*>(this)->ephemeralKey.value()->SetVch(ephemeralKeyVec);
+        }
+        return *(ephemeralKey.value());
+    }
+
+    void SetBlindingKey(const MclG1Point& p)
+    {
+        blindingKeyVec = p.GetVch();
+    }
+
+    const MclG1Point GetBlindingKey()
+    {
+        if (!blindingKey.has_value()) {
+            const_cast<CTxOut*>(this)->blindingKey = new MclG1Point();
+            const_cast<CTxOut*>(this)->blindingKey.value()->SetVch(blindingKeyVec);
+        }
+        return *(blindingKey.value());
+    }
+
     friend bool operator==(const CTxOut& a, const CTxOut& b)
     {
-        return (a.nValue       == b.nValue &&
-                a.scriptPubKey == b.scriptPubKey);
+        return (a.nValue == b.nValue &&
+                a.scriptPubKey == b.scriptPubKey && a.rangeProofVec == b.rangeProofVec &&
+                a.spendingKeyVec == b.spendingKeyVec && a.ephemeralKeyVec == b.ephemeralKeyVec &&
+                a.blindingKeyVec == b.blindingKeyVec);
     }
 
     friend bool operator!=(const CTxOut& a, const CTxOut& b)
     {
         return !(a == b);
+    }
+
+    ~CTxOut()
+    {
+        if (rangeProof.has_value())
+            delete rangeProof.value();
+        if (spendingKey.has_value())
+            delete spendingKey.value();
+        if (ephemeralKey.has_value())
+            delete ephemeralKey.value();
+        if (blindingKey.has_value())
+            delete blindingKey.value();
     }
 
     std::string ToString() const;
@@ -223,14 +352,17 @@ struct CMutableTransaction;
  *   - CScriptWitness scriptWitness; (deserialized into CTxIn)
  * - uint32_t nLockTime
  */
-template<typename Stream, typename TxType>
-inline void UnserializeTransaction(TxType& tx, Stream& s) {
+template <typename Stream, typename TxType>
+inline void UnserializeTransaction(TxType& tx, Stream& s)
+{
     const bool fAllowWitness = !(s.GetVersion() & SERIALIZE_TRANSACTION_NO_WITNESS);
 
     s >> tx.nVersion;
     unsigned char flags = 0;
     tx.vin.clear();
     tx.vout.clear();
+    tx.balanceSigVec.clear();
+    tx.txSigVec.clear();
     /* Try to read the vin. In case the dummy is there, this will be read as an empty vector. */
     s >> tx.vin;
     if (tx.vin.size() == 0 && fAllowWitness) {
@@ -260,10 +392,15 @@ inline void UnserializeTransaction(TxType& tx, Stream& s) {
         throw std::ios_base::failure("Unknown transaction optional data");
     }
     s >> tx.nLockTime;
+    if (tx.IsBLSCT()) {
+        s >> tx.balanceSigVec;
+        s >> tx.txSigVec;
+    }
 }
 
-template<typename Stream, typename TxType>
-inline void SerializeTransaction(const TxType& tx, Stream& s) {
+template <typename Stream, typename TxType>
+inline void SerializeTransaction(const TxType& tx, Stream& s)
+{
     const bool fAllowWitness = !(s.GetVersion() & SERIALIZE_TRANSACTION_NO_WITNESS);
 
     s << tx.nVersion;
@@ -289,9 +426,13 @@ inline void SerializeTransaction(const TxType& tx, Stream& s) {
         }
     }
     s << tx.nLockTime;
+    if (tx.IsBLSCT()) {
+        s << tx.balanceSigVec;
+        s << tx.txSigVec;
+    }
 }
 
-template<typename TxType>
+template <typename TxType>
 inline CAmount CalculateOutputValue(const TxType& tx)
 {
     return std::accumulate(tx.vout.cbegin(), tx.vout.cend(), CAmount{0}, [](CAmount sum, const auto& txout) { return sum + txout.nValue; });
@@ -305,7 +446,8 @@ class CTransaction
 {
 public:
     // Default transaction version.
-    static const int32_t CURRENT_VERSION=2;
+    static const int32_t CURRENT_VERSION = 2;
+    static const int32_t BLSCT_MARKER = 1 << 5;
 
     // The local variables are made const to prevent unintended modification
     // without updating the cached hash value. However, CTransaction is not
@@ -316,13 +458,16 @@ public:
     const std::vector<CTxOut> vout;
     const int32_t nVersion;
     const uint32_t nLockTime;
-    blsct::Signature balanceSig;
-    blsct::Signature txSig;
+    const std::vector<uint8_t> balanceSigVec;
+    const std::vector<uint8_t> txSigVec;
+    ;
 
 private:
     /** Memory only. */
     const uint256 hash;
     const uint256 m_witness_hash;
+    std::optional<blsct::Signature*> balanceSig;
+    std::optional<blsct::Signature*> txSig;
 
     uint256 ComputeHash() const;
     uint256 ComputeWitnessHash() const;
@@ -333,21 +478,41 @@ public:
     explicit CTransaction(CMutableTransaction&& tx);
 
     template <typename Stream>
-    inline void Serialize(Stream& s) const {
+    inline void Serialize(Stream& s) const
+    {
         SerializeTransaction(*this, s);
     }
 
     /** This deserializing constructor is provided instead of an Unserialize method.
      *  Unserialize is not possible, since it would require overwriting const fields. */
     template <typename Stream>
-    CTransaction(deserialize_type, Stream& s) : CTransaction(CMutableTransaction(deserialize, s)) {}
+    CTransaction(deserialize_type, Stream& s) : CTransaction(CMutableTransaction(deserialize, s))
+    {
+    }
 
-    bool IsNull() const {
+    bool IsNull() const
+    {
         return vin.empty() && vout.empty();
     }
 
     const uint256& GetHash() const { return hash; }
     const uint256& GetWitnessHash() const { return m_witness_hash; };
+    const blsct::Signature GetBalanceSignature() const
+    {
+        if (!balanceSig.has_value()) {
+            const_cast<CTransaction*>(this)->balanceSig = new blsct::Signature();
+            balanceSig.value()->SetVch(balanceSigVec);
+        }
+        return *(balanceSig.value());
+    }
+    const blsct::Signature GetTransactionSignature() const
+    {
+        if (!txSig.has_value()) {
+            const_cast<CTransaction*>(this)->txSig = new blsct::Signature();
+            txSig.value()->SetVch(txSigVec);
+        }
+        return *(txSig.value());
+    }
 
     // Return sum of txouts.
     CAmount GetValueOut() const;
@@ -364,6 +529,11 @@ public:
         return (vin.size() == 1 && vin[0].prevout.IsNull());
     }
 
+    bool IsBLSCT() const
+    {
+        return nVersion & BLSCT_MARKER;
+    }
+
     friend bool operator==(const CTransaction& a, const CTransaction& b)
     {
         return a.hash == b.hash;
@@ -374,7 +544,7 @@ public:
         return a.hash != b.hash;
     }
 
-    std::string ToString() const;
+    std::string ToString(bool fIncludeSignatures = false) const;
 
     bool HasWitness() const
     {
@@ -385,34 +555,44 @@ public:
         }
         return false;
     }
+
+    ~CTransaction()
+    {
+        if (balanceSig.has_value())
+            delete balanceSig.value();
+        if (txSig.has_value())
+            delete txSig.value();
+    }
 };
 
 /** A mutable version of CTransaction. */
-struct CMutableTransaction
-{
+struct CMutableTransaction {
     std::vector<CTxIn> vin;
     std::vector<CTxOut> vout;
     int32_t nVersion;
     uint32_t nLockTime;
-    blsct::Signature balanceSig;
-    blsct::Signature txSig;
+    std::vector<uint8_t> balanceSigVec;
+    std::vector<uint8_t> txSigVec;
 
     explicit CMutableTransaction();
     explicit CMutableTransaction(const CTransaction& tx);
 
     template <typename Stream>
-    inline void Serialize(Stream& s) const {
+    inline void Serialize(Stream& s) const
+    {
         SerializeTransaction(*this, s);
     }
 
 
     template <typename Stream>
-    inline void Unserialize(Stream& s) {
+    inline void Unserialize(Stream& s)
+    {
         UnserializeTransaction(*this, s);
     }
 
     template <typename Stream>
-    CMutableTransaction(deserialize_type, Stream& s) {
+    CMutableTransaction(deserialize_type, Stream& s)
+    {
         Unserialize(s);
     }
 
@@ -430,10 +610,29 @@ struct CMutableTransaction
         }
         return false;
     }
+
+    bool IsBLSCT() const
+    {
+        return nVersion & CTransaction::BLSCT_MARKER;
+    }
+
+    void SetBalanceSignature(const blsct::Signature& sig)
+    {
+        balanceSigVec = sig.GetVch();
+    }
+
+    void SetTransactionSignature(const blsct::Signature& sig)
+    {
+        txSigVec = sig.GetVch();
+    }
 };
 
 typedef std::shared_ptr<const CTransaction> CTransactionRef;
-template <typename Tx> static inline CTransactionRef MakeTransactionRef(Tx&& txIn) { return std::make_shared<const CTransaction>(std::forward<Tx>(txIn)); }
+template <typename Tx>
+static inline CTransactionRef MakeTransactionRef(Tx&& txIn)
+{
+    return std::make_shared<const CTransaction>(std::forward<Tx>(txIn));
+}
 
 /** A generic txid reference (txid or wtxid). */
 class GenTxid

@@ -145,11 +145,10 @@ bool CCoinsViewCache::SpendCoin(const COutPoint &outpoint, Coin* moveout) {
     return true;
 }
 
-static const Coin coinEmpty;
-
 const Coin& CCoinsViewCache::AccessCoin(const COutPoint &outpoint) const {
     CCoinsMap::const_iterator it = FetchCoin(outpoint);
     if (it == cacheCoins.end()) {
+        static const Coin coinEmpty;
         return coinEmpty;
     } else {
         return it->second.coin;
@@ -278,17 +277,23 @@ void CCoinsViewCache::ReallocateCache()
     ::new (&cacheCoins) CCoinsMap();
 }
 
-static const size_t MIN_TRANSACTION_OUTPUT_WEIGHT = WITNESS_SCALE_FACTOR * ::GetSerializeSize(CTxOut(), PROTOCOL_VERSION);
-static const size_t MAX_OUTPUTS_PER_BLOCK = MAX_BLOCK_WEIGHT / MIN_TRANSACTION_OUTPUT_WEIGHT;
+const size_t MIN_TRANSACTION_OUTPUT_WEIGHT() {
+    static size_t ret = WITNESS_SCALE_FACTOR * ::GetSerializeSize(CTxOut(), PROTOCOL_VERSION);
+    return ret;
+}
+const size_t MAX_OUTPUTS_PER_BLOCK() {
+    return  MAX_BLOCK_WEIGHT / MIN_TRANSACTION_OUTPUT_WEIGHT();
+}
 
 const Coin& AccessByTxid(const CCoinsViewCache& view, const uint256& txid)
 {
     COutPoint iter(txid, 0);
-    while (iter.n < MAX_OUTPUTS_PER_BLOCK) {
+    while (iter.n < MAX_OUTPUTS_PER_BLOCK()) {
         const Coin& alternate = view.AccessCoin(iter);
         if (!alternate.IsSpent()) return alternate;
         ++iter.n;
     }
+    static const Coin coinEmpty;
     return coinEmpty;
 }
 
