@@ -40,15 +40,15 @@ std::vector<uint8_t> SerializeRangeProof(const RangeProof<T>& proof)
     s << proof.Vs;
     s << proof.Ls;
     s << proof.Rs;
-    s << proof.A.GetVch();
-    s << proof.S.GetVch();
-    s << proof.T1.GetVch();
-    s << proof.T2.GetVch();
-    s << proof.tau_x.GetVch();
-    s << proof.mu.GetVch();
-    s << proof.a.GetVch();
-    s << proof.b.GetVch();
-    s << proof.t_hat.GetVch();
+    s << proof.A;
+    s << proof.S;
+    s << proof.T1;
+    s << proof.T2;
+    s << proof.tau_x;
+    s << proof.mu;
+    s << proof.a;
+    s << proof.b;
+    s << proof.t_hat;
 
     Span spanStream(s);
     std::vector<uint8_t> vRet(spanStream.size());
@@ -69,42 +69,15 @@ RangeProof<T> UnserializeRangeProof(const std::vector<unsigned char>& vecIn)
     s >> retProof.Vs;
     s >> retProof.Ls;
     s >> retProof.Rs;
-
-    std::vector<uint8_t> vA;
-    s >> vA;
-    retProof.A.SetVch(vA);
-
-    std::vector<uint8_t> vS;
-    s >> vS;
-    retProof.S.SetVch(vS);
-
-    std::vector<uint8_t> vT1;
-    s >> vT1;
-    retProof.T1.SetVch(vT1);
-
-    std::vector<uint8_t> vT2;
-    s >> vT2;
-    retProof.T2.SetVch(vT2);
-
-    std::vector<uint8_t> vtau_x;
-    s >> vtau_x;
-    retProof.tau_x.SetVch(vtau_x);
-
-    std::vector<uint8_t> vmu;
-    s >> vmu;
-    retProof.mu.SetVch(vmu);
-
-    std::vector<uint8_t> va;
-    s >> va;
-    retProof.a.SetVch(va);
-
-    std::vector<uint8_t> vb;
-    s >> vb;
-    retProof.b.SetVch(vb);
-
-    std::vector<uint8_t> vt_hat;
-    s >> vt_hat;
-    retProof.t_hat.SetVch(vt_hat);
+    s >> retProof.A;
+    s >> retProof.S;
+    s >> retProof.T1;
+    s >> retProof.T2;
+    s >> retProof.tau_x;
+    s >> retProof.mu;
+    s >> retProof.a;
+    s >> retProof.b;
+    s >> retProof.t_hat;
 
     return retProof;
 }
