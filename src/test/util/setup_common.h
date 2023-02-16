@@ -93,7 +93,8 @@ struct BasicTestingSetup {
     const fs::path m_path_root;
     ArgsManager m_args;
 private:
-    volatile AtomicMclInit m_for_side_effect_only;
+    static inline volatile StaticMclInit m_for_side_effect_only_1;
+    volatile AtomicMclInit m_for_side_effect_only_2;
 };
 
 /** Testing setup that performs all steps up until right before

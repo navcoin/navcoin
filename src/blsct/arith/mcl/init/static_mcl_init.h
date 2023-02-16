@@ -13,12 +13,13 @@
 /**
  * Note that:
  * - This class initializes Mcl library for static context
- * - Define this variable before other static variables that
- *   instantiate MclG1Point class directly or indirectly are
- *   defined. Currently defined at the beginning of `MclG1Point`
- *   class definition.
+ * - Define this variable before any other static variables
+ *   that instantiate MclG1Point class directly or indirectly
+ *   are defined
  * - volatile keyword is necessary to protect the line from
  *   comipler optimization
+ * - inline keyword is necessary to force the instantiation
+ *   of the variable
  * - Defining this variable as a global variable results in
  *   memory leaks
 */
