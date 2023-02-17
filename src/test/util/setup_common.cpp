@@ -8,6 +8,7 @@
 
 #include <addrman.h>
 #include <banman.h>
+#include <blsct/arith/mcl/init/static_mcl_init.h>
 #include <chainparams.h>
 #include <common/url.h>
 #include <config/bitcoin-config.h>
@@ -65,6 +66,8 @@ using node::CalculateCacheSizes;
 using node::LoadChainstate;
 using node::RegenerateCommitments;
 using node::VerifyLoadedChainstate;
+
+volatile StaticMclInit m_for_side_effect_only_1;
 
 const std::function<std::string(const char*)> G_TRANSLATION_FUN = nullptr;
 UrlDecodeFn* const URL_DECODE = nullptr;
