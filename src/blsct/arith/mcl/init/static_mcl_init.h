@@ -18,8 +18,6 @@
  *   are defined
  * - volatile keyword is necessary to protect the line from
  *   comipler optimization
- * - inline keyword is necessary to force the instantiation
- *   of the variable
  * - Defining this variable as a global variable results in
  *   memory leaks
 */

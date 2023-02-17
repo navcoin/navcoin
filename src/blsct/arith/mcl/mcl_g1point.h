@@ -19,10 +19,10 @@
 
 class MclG1Point
 {
-// private:
-//     // This initializes Mcl library for static context before
-//     // the library is used. Needs to be defined at the beginning.
-//     static volatile StaticMclInit for_side_effect_only;
+private:
+    // This initializes Mcl library for static context before
+    // the library is used. Needs to be defined at the beginning.
+    static volatile StaticMclInit for_side_effect_only;
 public:
     MclG1Point();
     MclG1Point(const std::vector<uint8_t>& v);
