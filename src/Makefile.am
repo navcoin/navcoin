@@ -20,6 +20,7 @@ noinst_LTLIBRARIES =
 
 bin_PROGRAMS =
 noinst_PROGRAMS =
+check_PROGRAMS =
 TESTS =
 BENCHMARKS =
 
@@ -182,6 +183,7 @@ BITCOIN_CORE_H = \
   clientversion.h \
   coins.h \
   common/bloom.h \
+  common/init.h \
   common/run_command.h \
   common/url.h \
   compat/assumptions.h \
@@ -222,7 +224,9 @@ BITCOIN_CORE_H = \
   interfaces/ipc.h \
   interfaces/node.h \
   interfaces/wallet.h \
+  kernel/blockmanager_opts.h \
   kernel/chain.h \
+  kernel/chainparams.h \
   kernel/chainstatemanager_opts.h \
   kernel/checks.h \
   kernel/coinstats.h \
@@ -248,13 +252,16 @@ BITCOIN_CORE_H = \
   netbase.h \
   netgroup.h \
   netmessagemaker.h \
+  node/blockmanager_args.h \
   node/blockstorage.h \
   node/caches.h \
   node/chainstate.h \
   node/chainstatemanager_args.h \
   node/coin.h \
+  node/coins_view_args.h \
   node/connection_types.h \
   node/context.h \
+  node/database_args.h \
   node/eviction.h \
   node/interface_ui.h \
   node/mempool_args.h \
@@ -325,6 +332,7 @@ BITCOIN_CORE_H = \
   util/check.h \
   util/epochguard.h \
   util/error.h \
+  util/exception.h \
   util/fastrange.h \
   util/fees.h \
   util/getuniquepath.h \
@@ -446,13 +454,16 @@ libbitcoin_node_a_SOURCES = \
   net.cpp \
   net_processing.cpp \
   netgroup.cpp \
+  node/blockmanager_args.cpp \
   node/blockstorage.cpp \
   node/caches.cpp \
   node/chainstate.cpp \
   node/chainstatemanager_args.cpp \
   node/coin.cpp \
+  node/coins_view_args.cpp \
   node/connection_types.cpp \
   node/context.cpp \
+  node/database_args.cpp \
   node/eviction.cpp \
   node/interface_ui.cpp \
   node/interfaces.cpp \
@@ -701,6 +712,7 @@ libbitcoin_common_a_SOURCES = \
   chainparams.cpp \
   coins.cpp \
   common/bloom.cpp \
+  common/init.cpp \
   common/interfaces.cpp \
   common/run_command.cpp \
   compressor.cpp \
@@ -709,6 +721,7 @@ libbitcoin_common_a_SOURCES = \
   deploymentinfo.cpp \
   external_signer.cpp \
   init/common.cpp \
+  kernel/chainparams.cpp \
   key.cpp \
   key_io.cpp \
   merkleblock.cpp \
@@ -758,6 +771,7 @@ libbitcoin_util_a_SOURCES = \
   util/bytevectorhash.cpp \
   util/check.cpp \
   util/error.cpp \
+  util/exception.cpp \
   util/fees.cpp \
   util/getuniquepath.cpp \
   util/hasher.cpp \
@@ -924,11 +938,12 @@ navcoin_chainstate_SOURCES = bitcoin-chainstate.cpp
 navcoin_chainstate_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(BOOST_CPPFLAGS)
 navcoin_chainstate_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 
-# $(LIBTOOL_APP_LDFLAGS) deliberately omitted here so that we can test linking
-# bitcoin-chainstate against libbitcoinkernel as a shared or static library by
-# setting --{en,dis}able-shared.
-navcoin_chainstate_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(PTHREAD_FLAGS)
-navcoin_chainstate_LDADD = $(LIBBITCOINKERNEL)
+bitcoin_chainstate_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(PTHREAD_FLAGS) $(LIBTOOL_APP_LDFLAGS) -static
+bitcoin_chainstate_LDADD = $(LIBBITCOINKERNEL)
+
+# libtool is unable to calculate this indirect dependency, presumably because it's a subproject.
+# libsecp256k1 only needs to be linked in when libbitcoinkernel is static.
+bitcoin_chainstate_LDADD += $(LIBSECP256K1) $(LIBBLS) $(LIBMCL)
 #
 
 # bitcoinkernel library #
@@ -946,15 +961,6 @@ libbitcoinkernel_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(builddir)/obj -I$(srcdir)/secp
 # Note this is a quick hack that will be removed as we incrementally define what
 # to export from the library.
 libbitcoinkernel_la_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS) -fvisibility=default
-
-# TODO: For now, Specify -static in both CXXFLAGS and LDFLAGS when building for
-#       windows targets so libtool will only build a static version of this
-#       library. There are unresolved problems when building dll's for mingw-w64
-#       and attempting to statically embed libstdc++, libpthread, etc.
-if TARGET_WINDOWS
-libbitcoinkernel_la_LDFLAGS += -static
-libbitcoinkernel_la_CXXFLAGS += -static
-endif
 
 # TODO: libbitcoinkernel is a work in progress consensus engine library, as more
 #       and more modules are decoupled from the consensus engine, this list will
@@ -988,6 +994,7 @@ libbitcoinkernel_la_SOURCES = \
   hash.cpp \
   kernel/chain.cpp \
   kernel/checks.cpp \
+  kernel/chainparams.cpp \
   kernel/coinstats.cpp \
   kernel/context.cpp \
   kernel/cs_main.cpp \
@@ -1026,6 +1033,7 @@ libbitcoinkernel_la_SOURCES = \
   uint256.cpp \
   util/bytevectorhash.cpp \
   util/check.cpp \
+  util/exception.cpp \
   util/getuniquepath.cpp \
   util/hasher.cpp \
   util/moneystr.cpp \
