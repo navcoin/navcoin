@@ -63,6 +63,9 @@ if USE_NATPMP
 FUZZ_SUITE_LD_COMMON += $(NATPMP_LIBS)
 endif
 
+BITCOIN_TESTS_H = \
+  test/blsct/arith/shared_scalar_tests.h
+
 # test_navcoin binary #
 BITCOIN_TESTS =\
   test/addrman_tests.cpp \
@@ -86,13 +89,21 @@ BITCOIN_TESTS =\
   test/blsct/arith/mcl/mcl_g1point_tests.cpp \
   test/blsct/arith/mcl/mcl_integration_tests.cpp \
   test/blsct/arith/mcl/mcl_scalar_tests.cpp \
+  test/blsct/arith/secp256k1/secp256k1_point_tests.cpp \
+  test/blsct/arith/secp256k1/secp256k1_scalar_tests.cpp \
+  test/blsct/building_block/generator_deriver_tests.cpp \
+  test/blsct/building_block/imp_inner_prod_arg_tests.cpp \
+  test/blsct/building_block/lazy_point_tests.cpp \
+  test/blsct/common_tests.cpp \
   test/blsct/eip_2333/bls12_381_keygen_tests.cpp \
   test/blsct/keys_tests.cpp \
-  test/blsct/range_proof/config_tests.cpp \
   test/blsct/range_proof/generators_tests.cpp \
-  test/blsct/range_proof/lazy_g1point_tests.cpp \
+  test/blsct/range_proof/range_proof_logic_tests.cpp \
   test/blsct/range_proof/range_proof_tests.cpp \
   test/blsct/range_proof/range_proof_with_transcript_tests.cpp \
+  test/blsct/set_mem_proof/set_mem_proof_setup_tests.cpp \
+  test/blsct/set_mem_proof/set_mem_proof_prover_tests.cpp \
+  test/blsct/set_mem_proof/set_mem_proof_tests.cpp \
   test/blsct/signature_tests.cpp \
   test/blsct/sign_verify_tests.cpp \
   test/bswap_tests.cpp \
@@ -205,6 +216,8 @@ FUZZ_SUITE_LD_COMMON +=\
 if USE_BDB
 BITCOIN_TESTS += wallet/test/db_tests.cpp
 endif
+
+BITCOIN_TESTS += $(BITCOIN_TESTS_H)
 
 FUZZ_WALLET_SRC = \
  wallet/test/fuzz/coinselection.cpp \

@@ -65,7 +65,7 @@ blsPublicKey PublicKey::ToBlsPublicKey() const
     if (!GetG1Point(p)) {
       throw std::runtime_error("Failed to convert PublicKey to MclG1Point");
     }
-    blsPublicKey bls_pk { p.Underlying() };
+    blsPublicKey bls_pk { p.GetUnderlying() };
     return bls_pk;
 }
 

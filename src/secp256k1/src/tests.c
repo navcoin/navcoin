@@ -7322,6 +7322,10 @@ static void run_ecdsa_edge_cases(void) {
 # include "modules/schnorrsig/tests_impl.h"
 #endif
 
+#ifdef ENABLE_MODULE_EXPORT
+# include "modules/export/tests_impl.h"
+#endif
+
 static void run_secp256k1_memczero_test(void) {
     unsigned char buf1[6] = {1, 2, 3, 4, 5, 6};
     unsigned char buf2[sizeof(buf1)];
@@ -7528,6 +7532,10 @@ int main(int argc, char **argv) {
         return EXIT_FAILURE;
     }
     printf("test count = %i\n", COUNT);
+
+#ifdef ENABLE_MODULE_EXPORT
+    run_export_tests();
+#endif
 
     /* find random seed */
     secp256k1_testrand_init(argc > 2 ? argv[2] : NULL);
