@@ -59,29 +59,26 @@ Scalar SetMemProofSetup::H4(const std::vector<uint8_t>& msg) const
     return ret;
 }
 
-Point SetMemProofSetup::H5(const std::vector<uint8_t>& msg) const
+Point SetMemProofSetup::GenPoint(const std::vector<uint8_t>& msg, const uint64_t& i)
 {
     Scalar x;
     x.SetVch(msg);
-    uint256 hash = x.GetHashWithSalt(5);
+    uint256 hash = x.GetHashWithSalt(i);
     Point p(hash);
     return p;
+}
+
+Point SetMemProofSetup::H5(const std::vector<uint8_t>& msg) const
+{
+    return GenPoint(msg, 5);
 }
 
 Point SetMemProofSetup::H6(const std::vector<uint8_t>& msg) const
 {
-    Scalar x;
-    x.SetVch(msg);
-    uint256 hash = x.GetHashWithSalt(6);
-    Point p(hash);
-    return p;
+    return GenPoint(msg, 6);
 }
 
 Point SetMemProofSetup::H7(const std::vector<uint8_t>& msg) const
 {
-    Scalar x;
-    x.SetVch(msg);
-    uint256 hash = x.GetHashWithSalt(7);
-    Point p(hash);
-    return p;
+    return GenPoint(msg, 7);
 }

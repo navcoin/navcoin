@@ -51,6 +51,7 @@ private:
         const PedersenCommitment<Mcl>& pedersen
     ): g{g}, h{h}, hs{hs}, pedersen{pedersen} {}
 
+    static Point GenPoint(const std::vector<uint8_t>& msg, const uint64_t& i);
     static Points GenGenerators(const Point& base_point, const size_t& size);
 
     inline static const GeneratorDeriver m_deriver = GeneratorDeriver("set_membership_proof");
