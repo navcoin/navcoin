@@ -708,8 +708,11 @@ libbitcoin_consensus_a_SOURCES = \
   consensus/params.h \
   consensus/tx_check.cpp \
   consensus/validation.h \
+  fs.cpp \
+  fs.h \
   hash.cpp \
   hash.h \
+  kernel/bitcoinkernel.cpp \
   key.cpp \
   key.h \
   logging.h \
@@ -744,6 +747,8 @@ libbitcoin_consensus_a_SOURCES = \
   util/check.h \
   util/strencodings.cpp \
   util/strencodings.h \
+  util/syserror.cpp \
+  util/syserror.h \
   util/time.cpp \
   util/time.h \
   util/threadnames.cpp \
