@@ -24,15 +24,17 @@ const typename SetMemProofProver<T>::Scalar& SetMemProofProver<T>::One()
     }
     return *x;
 }
+template
+const typename SetMemProofProver<Secp256k1>::Scalar& SetMemProofProver<Secp256k1>::One();
 
 template <typename T>
 typename T::Scalar SetMemProofProver<T>::ComputeX(
     const SetMemProofSetup<T>& setup,
-    const typename T::Scalar& omega,
-    const typename T::Scalar& y,
-    const typename T::Scalar& z,
-    const typename T::Point& T1,
-    const typename T::Point& T2
+    const Scalar& omega,
+    const Scalar& y,
+    const Scalar& z,
+    const Point& T1,
+    const Point& T2
 ) {
     CDataStream st(SER_DISK, PROTOCOL_VERSION);
     st << omega << y << z << T1 << T2;
@@ -40,6 +42,15 @@ typename T::Scalar SetMemProofProver<T>::ComputeX(
     Scalar x = setup.H1(vec);
     return x;
 }
+template
+typename Secp256k1::Scalar SetMemProofProver<Secp256k1>::ComputeX(
+    const SetMemProofSetup<Secp256k1>& setup,
+    const Scalar& omega,
+    const Scalar& y,
+    const Scalar& z,
+    const Point& T1,
+    const Point& T2
+);
 
 template <typename T>
 CHashWriter SetMemProofProver<T>::GenInitialFiatShamir(
@@ -56,6 +67,17 @@ CHashWriter SetMemProofProver<T>::GenInitialFiatShamir(
     fiat_shamir << Ys << A1 << A2 << S1 << S2 << S3 << phi << eta;
     return fiat_shamir;
 }
+template
+CHashWriter SetMemProofProver<Secp256k1>::GenInitialFiatShamir(
+    const Points& Ys,
+    const Point& A1,
+    const Point& A2,
+    const Point& S1,
+    const Point& S2,
+    const Point& S3,
+    const Point& phi,
+    const Scalar& eta
+);
 
 template <typename T>
 typename SetMemProofProver<T>::Points SetMemProofProver<T>::ExtendYs(
@@ -82,6 +104,12 @@ typename SetMemProofProver<T>::Points SetMemProofProver<T>::ExtendYs(
     }
     return Ys;
 }
+template
+typename SetMemProofProver<Secp256k1>::Points SetMemProofProver<Secp256k1>::ExtendYs(
+    const SetMemProofSetup<Secp256k1>& setup,
+    const Points& Ys_src,
+    const size_t& new_size
+);
 
 template <typename T>
 SetMemProof<T> SetMemProofProver<T>::Prove(
@@ -186,7 +214,7 @@ retry: // retrying without generating fiat_shamir again to get different hashes
 
     GEN_FIAT_SHAMIR_VAR(c_factor, fiat_shamir, retry);
 
-    auto iipa_res = ImpInnerProdArg::Run<Mcl>(
+    auto iipa_res = ImpInnerProdArg::Run<T>(
         n,
         Ys, Hi, setup.g,
         l, r,
@@ -195,7 +223,7 @@ retry: // retrying without generating fiat_shamir again to get different hashes
     );
     if (iipa_res == std::nullopt) goto retry;
 
-    auto proof = SetMemProof(
+    auto proof = SetMemProof<T>(
         phi, A1,
         A2, S1, S2, S3, T1, T2,
         tau_x, mu, z_alpha, z_tau, z_beta,
@@ -208,6 +236,15 @@ retry: // retrying without generating fiat_shamir again to get different hashes
     );
     return proof;
 }
+template
+SetMemProof<Secp256k1> SetMemProofProver<Secp256k1>::Prove(
+    const SetMemProofSetup<Secp256k1>& setup,
+    const Points& Ys_src,
+    const Point& sigma,
+    const Scalar& m,
+    const Scalar& f,
+    const Scalar& eta
+);
 
 template <typename T>
 bool SetMemProofProver<T>::Verify(
@@ -244,7 +281,7 @@ retry:
     Points h_primes = setup.hs.To(n) * y_inv_to_n;
     Scalar x = ComputeX(setup, omega, y, z, proof.T1, proof.T2);
 
-    G_H_Gi_Hi_ZeroVerifier<Mcl> verifier(n);
+    G_H_Gi_Hi_ZeroVerifier<T> verifier(n);
 
     //////// (18)
     {
@@ -280,14 +317,14 @@ retry:
 
         Scalars xs;
         {
-            auto maybe_xs = ImpInnerProdArg::GenAllRoundXs<Mcl>(num_rounds, proof.Ls, proof.Rs, fiat_shamir);
+            auto maybe_xs = ImpInnerProdArg::GenAllRoundXs<T>(num_rounds, proof.Ls, proof.Rs, fiat_shamir);
             if (!maybe_xs.has_value()) goto retry;
             xs = maybe_xs.value();
         }
         auto x_invs = xs.Invert();
-        auto gen_exps = ImpInnerProdArg::GenGeneratorExponents<Mcl>(num_rounds, xs);
+        auto gen_exps = ImpInnerProdArg::GenGeneratorExponents<T>(num_rounds, xs);
 
-        ImpInnerProdArg::LoopWithYPows<Mcl>(n, y,
+        ImpInnerProdArg::LoopWithYPows<T>(n, y,
             [&](const size_t& i, const Scalar& y_pow, const Scalar& y_inv_pow) {
                 verifier.SetGiExp(i, (proof.a * gen_exps[i]).Negate() - z);
                 verifier.SetHiExp(i,
@@ -330,3 +367,10 @@ retry:
 
     return verifier.Verify(setup.g, setup.h, Ys, setup.hs.To(n));
 }
+template
+bool SetMemProofProver<Secp256k1>::Verify(
+    const SetMemProofSetup<Secp256k1>& setup,
+    const Points& Ys_src,
+    const Scalar& eta,
+    const SetMemProof<Secp256k1>& proof
+);

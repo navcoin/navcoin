@@ -1,5 +1,6 @@
 #include <blsct/building_block/g_h_gi_hi_zero_verifier.h>
 #include <blsct/arith/mcl/mcl.h>
+#include <blsct/arith/secp256k1/secp256k1.h>
 
 template <typename T>
 using Scalar = typename G_H_Gi_Hi_ZeroVerifier<T>::Scalar;
@@ -17,6 +18,8 @@ void G_H_Gi_Hi_ZeroVerifier<T>::AddPoint(const LazyPoint<T>& p)
 }
 template
 void G_H_Gi_Hi_ZeroVerifier<Mcl>::AddPoint(const LazyPoint<Mcl>& p);
+template
+void G_H_Gi_Hi_ZeroVerifier<Secp256k1>::AddPoint(const LazyPoint<Secp256k1>& p);
 
 template <typename T>
 void G_H_Gi_Hi_ZeroVerifier<T>::AddPositiveG(const Scalar& exp)
@@ -25,6 +28,8 @@ void G_H_Gi_Hi_ZeroVerifier<T>::AddPositiveG(const Scalar& exp)
 }
 template
 void G_H_Gi_Hi_ZeroVerifier<Mcl>::AddPositiveG(const Scalar& exp);
+template
+void G_H_Gi_Hi_ZeroVerifier<Secp256k1>::AddPositiveG(const Scalar& exp);
 
 template <typename T>
 void G_H_Gi_Hi_ZeroVerifier<T>::AddPositiveH(const Scalar& exp)
@@ -33,6 +38,8 @@ void G_H_Gi_Hi_ZeroVerifier<T>::AddPositiveH(const Scalar& exp)
 }
 template
 void G_H_Gi_Hi_ZeroVerifier<Mcl>::AddPositiveH(const Scalar& exp);
+template
+void G_H_Gi_Hi_ZeroVerifier<Secp256k1>::AddPositiveH(const Scalar& exp);
 
 template <typename T>
 void G_H_Gi_Hi_ZeroVerifier<T>::AddNegativeG(const Scalar& exp)
@@ -41,6 +48,8 @@ void G_H_Gi_Hi_ZeroVerifier<T>::AddNegativeG(const Scalar& exp)
 }
 template
 void G_H_Gi_Hi_ZeroVerifier<Mcl>::AddNegativeG(const Scalar& exp);
+template
+void G_H_Gi_Hi_ZeroVerifier<Secp256k1>::AddNegativeG(const Scalar& exp);
 
 template <typename T>
 void G_H_Gi_Hi_ZeroVerifier<T>::AddNegativeH(const Scalar& exp)
@@ -49,6 +58,8 @@ void G_H_Gi_Hi_ZeroVerifier<T>::AddNegativeH(const Scalar& exp)
 }
 template
 void G_H_Gi_Hi_ZeroVerifier<Mcl>::AddNegativeH(const Scalar& exp);
+template
+void G_H_Gi_Hi_ZeroVerifier<Secp256k1>::AddNegativeH(const Scalar& exp);
 
 template <typename T>
 void G_H_Gi_Hi_ZeroVerifier<T>::SetGiExp(const size_t& i, const Scalar& s)
@@ -57,6 +68,8 @@ void G_H_Gi_Hi_ZeroVerifier<T>::SetGiExp(const size_t& i, const Scalar& s)
 }
 template
 void G_H_Gi_Hi_ZeroVerifier<Mcl>::SetGiExp(const size_t& i, const Scalar& s);
+template
+void G_H_Gi_Hi_ZeroVerifier<Secp256k1>::SetGiExp(const size_t& i, const Scalar& s);
 
 template <typename T>
 void G_H_Gi_Hi_ZeroVerifier<T>::SetHiExp(const size_t& i, const Scalar& s)
@@ -65,6 +78,8 @@ void G_H_Gi_Hi_ZeroVerifier<T>::SetHiExp(const size_t& i, const Scalar& s)
 }
 template
 void G_H_Gi_Hi_ZeroVerifier<Mcl>::SetHiExp(const size_t& i, const Scalar& s);
+template
+void G_H_Gi_Hi_ZeroVerifier<Secp256k1>::SetHiExp(const size_t& i, const Scalar& s);
 
 template <typename T>
 bool G_H_Gi_Hi_ZeroVerifier<T>::Verify(const Point& g, const Point&h, const Points& Gi, const Points& Hi)
@@ -82,3 +97,5 @@ bool G_H_Gi_Hi_ZeroVerifier<T>::Verify(const Point& g, const Point&h, const Poin
 }
 template
 bool G_H_Gi_Hi_ZeroVerifier<Mcl>::Verify(const Point& g, const Point&h, const Points& Gi, const Points& Hi);
+template
+bool G_H_Gi_Hi_ZeroVerifier<Secp256k1>::Verify(const Point& g, const Point&h, const Points& Gi, const Points& Hi);

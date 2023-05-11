@@ -710,8 +710,8 @@ libbitcoin_consensus_a_SOURCES = \
   consensus/validation.h \
   hash.cpp \
   hash.h \
-  key.h \
   key.cpp \
+  key.h \
   logging.h \
   logging.cpp \
   prevector.h \
@@ -732,18 +732,22 @@ libbitcoin_consensus_a_SOURCES = \
   script/script.h \
   script/script_error.cpp \
   script/script_error.h \
+  support/lockedpool.cpp \
+  support/lockedpool.h \
   serialize.h \
   span.h \
   streams.h \
   tinyformat.h \
   uint256.cpp \
   uint256.h \
-  util/check.h \
   util/check.cpp \
+  util/check.h \
   util/strencodings.cpp \
   util/strencodings.h \
-  util/time.h \
   util/time.cpp \
+  util/time.h \
+  util/threadnames.cpp \
+  util/threadnames.h \
   version.h
 #
 
