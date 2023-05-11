@@ -44,6 +44,12 @@ Secp256k1Scalar::Secp256k1Scalar(const std::vector<uint8_t>& msg, uint8_t index)
     secp256k1_export_scalar_set_bytes(&m_scalar, hash);
 }
 
+Secp256k1Scalar::Secp256k1Scalar(const uint256& n)
+{
+    std::vector<uint8_t> vec(n.begin(), n.end());
+    Secp256k1Scalar::SetVch(vec);
+}
+
 Secp256k1Scalar::Secp256k1Scalar(const Secp256k1Scalar& s)
 {
     memcpy(&m_scalar, &s.m_scalar, sizeof(Secp256k1Scalar::Underlying));

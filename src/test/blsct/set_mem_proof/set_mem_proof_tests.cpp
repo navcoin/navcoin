@@ -5,16 +5,16 @@
 #define BOOST_UNIT_TEST
 #define BLS_ETH 1
 
-#include <blsct/arith/mcl/mcl.h>
+#include <blsct/arith/secp256k1/secp256k1.h>
 #include <blsct/arith/elements.h>
 #include <blsct/set_mem_proof/set_mem_proof.h>
 #include <streams.h>
 #include <boost/test/unit_test.hpp>
 #include <test/util/setup_common.h>
 
-using Scalar = Mcl::Scalar;
-using Point = Mcl::Point;
-using Points = Elements<Mcl::Point>;
+using Scalar = Secp256k1::Scalar;
+using Point = Secp256k1::Point;
+using Points = Elements<Point>;
 
 BOOST_FIXTURE_TEST_SUITE(set_mem_proof_tests, BasicTestingSetup)
 
@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE(test_equal)
     Scalar b(8);
     Scalar omega(9);
 
-    auto p = SetMemProof(
+    auto p = SetMemProof<Secp256k1>(
         phi,
         A1,
         A2,
@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE(test_equal)
         omega
     );
 
-    auto q = SetMemProof(
+    auto q = SetMemProof<Secp256k1>(
         phi,
         g,
         A2,
@@ -122,7 +122,7 @@ BOOST_AUTO_TEST_CASE(test_de_ser)
     Scalar b(8);
     Scalar omega(9);
 
-    auto p = SetMemProof(
+    auto p = SetMemProof<Secp256k1>(
         phi,
         A1,
         A2,
@@ -147,7 +147,7 @@ BOOST_AUTO_TEST_CASE(test_de_ser)
     CDataStream st(SER_DISK, PROTOCOL_VERSION);
     p.Serialize(st);
 
-    SetMemProof q;
+    SetMemProof<Secp256k1> q;
     q.Unserialize(st);
 
     BOOST_CHECK(p  == q);

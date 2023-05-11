@@ -5,6 +5,8 @@
 #include <blsct/arith/elements.h>
 #include <blsct/arith/mcl/mcl_g1point.h>
 #include <blsct/arith/mcl/mcl_scalar.h>
+#include <blsct/arith/secp256k1/secp256k1_point.h>
+#include <blsct/arith/secp256k1/secp256k1_scalar.h>
 #include <tinyformat.h>
 #include <deque>
 
@@ -14,6 +16,9 @@ Elements<T>::Elements()
 }
 template Elements<MclG1Point>::Elements();
 template Elements<MclScalar>::Elements();
+template Elements<Secp256k1Point>::Elements();
+template Elements<Secp256k1Scalar>::Elements();
+
 
 template <typename T>
 Elements<T>::Elements(const std::vector<T>& vec)
@@ -22,6 +27,8 @@ Elements<T>::Elements(const std::vector<T>& vec)
 }
 template Elements<MclG1Point>::Elements(const std::vector<MclG1Point>& vec);
 template Elements<MclScalar>::Elements(const std::vector<MclScalar>& vec);
+template Elements<Secp256k1Point>::Elements(const std::vector<Secp256k1Point>& vec);
+template Elements<Secp256k1Scalar>::Elements(const std::vector<Secp256k1Scalar>& vec);
 
 template <typename T>
 Elements<T>::Elements(const size_t& size, const T& default_value)
@@ -31,6 +38,8 @@ Elements<T>::Elements(const size_t& size, const T& default_value)
 }
 template Elements<MclScalar>::Elements(const size_t&, const MclScalar&);
 template Elements<MclG1Point>::Elements(const size_t&, const MclG1Point&);
+template Elements<Secp256k1Scalar>::Elements(const size_t&, const Secp256k1Scalar&);
+template Elements<Secp256k1Point>::Elements(const size_t&, const Secp256k1Point&);
 
 template <typename T>
 Elements<T>::Elements(const Elements<T>& other)
@@ -39,6 +48,8 @@ Elements<T>::Elements(const Elements<T>& other)
 }
 template Elements<MclScalar>::Elements(const Elements<MclScalar>& x);
 template Elements<MclG1Point>::Elements(const Elements<MclG1Point>& x);
+template Elements<Secp256k1Scalar>::Elements(const Elements<Secp256k1Scalar>& x);
+template Elements<Secp256k1Point>::Elements(const Elements<Secp256k1Point>& x);
 
 template <typename T>
 bool Elements<T>::Empty() const
@@ -47,6 +58,8 @@ bool Elements<T>::Empty() const
 }
 template bool Elements<MclScalar>::Empty() const;
 template bool Elements<MclG1Point>::Empty() const;
+template bool Elements<Secp256k1Scalar>::Empty() const;
+template bool Elements<Secp256k1Point>::Empty() const;
 
 template <typename T>
 std::vector<uint8_t> Elements<T>::GetVch() const
@@ -60,6 +73,8 @@ std::vector<uint8_t> Elements<T>::GetVch() const
 }
 template std::vector<uint8_t> Elements<MclScalar>::GetVch() const;
 template std::vector<uint8_t> Elements<MclG1Point>::GetVch() const;
+template std::vector<uint8_t> Elements<Secp256k1Scalar>::GetVch() const;
+template std::vector<uint8_t> Elements<Secp256k1Point>::GetVch() const;
 
 template <typename T>
 T Elements<T>::Sum() const
@@ -72,6 +87,8 @@ T Elements<T>::Sum() const
 }
 template MclScalar Elements<MclScalar>::Sum() const;
 template MclG1Point Elements<MclG1Point>::Sum() const;
+template Secp256k1Scalar Elements<Secp256k1Scalar>::Sum() const;
+template Secp256k1Point Elements<Secp256k1Point>::Sum() const;
 
 template <typename T>
 void Elements<T>::ConfirmIndexInsideRange(const uint32_t& index) const
@@ -83,6 +100,8 @@ void Elements<T>::ConfirmIndexInsideRange(const uint32_t& index) const
 }
 template void Elements<MclScalar>::ConfirmIndexInsideRange(const uint32_t&) const;
 template void Elements<MclG1Point>::ConfirmIndexInsideRange(const uint32_t&) const;
+template void Elements<Secp256k1Scalar>::ConfirmIndexInsideRange(const uint32_t&) const;
+template void Elements<Secp256k1Point>::ConfirmIndexInsideRange(const uint32_t&) const;
 
 template <typename T>
 T& Elements<T>::operator[](const size_t& index)
@@ -92,6 +111,8 @@ T& Elements<T>::operator[](const size_t& index)
 }
 template MclScalar& Elements<MclScalar>::operator[](const size_t&);
 template MclG1Point& Elements<MclG1Point>::operator[](const size_t&);
+template Secp256k1Scalar& Elements<Secp256k1Scalar>::operator[](const size_t&);
+template Secp256k1Point& Elements<Secp256k1Point>::operator[](const size_t&);
 
 template <typename T>
 T Elements<T>::operator[](const size_t& index) const
@@ -101,6 +122,8 @@ T Elements<T>::operator[](const size_t& index) const
 }
 template MclScalar Elements<MclScalar>::operator[](const size_t&) const;
 template MclG1Point Elements<MclG1Point>::operator[](const size_t&) const;
+template Secp256k1Scalar Elements<Secp256k1Scalar>::operator[](const size_t&) const;
+template Secp256k1Point Elements<Secp256k1Point>::operator[](const size_t&) const;
 
 template <typename T>
 size_t Elements<T>::Size() const
@@ -109,6 +132,8 @@ size_t Elements<T>::Size() const
 }
 template size_t Elements<MclScalar>::Size() const;
 template size_t Elements<MclG1Point>::Size() const;
+template size_t Elements<Secp256k1Scalar>::Size() const;
+template size_t Elements<Secp256k1Point>::Size() const;
 
 template <typename T>
 void Elements<T>::Add(const T& x)
@@ -117,6 +142,8 @@ void Elements<T>::Add(const T& x)
 }
 template void Elements<MclScalar>::Add(const MclScalar&);
 template void Elements<MclG1Point>::Add(const MclG1Point&);
+template void Elements<Secp256k1Scalar>::Add(const Secp256k1Scalar&);
+template void Elements<Secp256k1Point>::Add(const Secp256k1Point&);
 
 template <typename T>
 void Elements<T>::Clear()
@@ -125,6 +152,8 @@ void Elements<T>::Clear()
 }
 template void Elements<MclScalar>::Clear();
 template void Elements<MclG1Point>::Clear();
+template void Elements<Secp256k1Scalar>::Clear();
+template void Elements<Secp256k1Point>::Clear();
 
 template <typename T>
 inline void Elements<T>::ConfirmSizesMatch(const size_t& other_size) const
@@ -135,6 +164,8 @@ inline void Elements<T>::ConfirmSizesMatch(const size_t& other_size) const
 }
 template void Elements<MclScalar>::ConfirmSizesMatch(const size_t&) const;
 template void Elements<MclG1Point>::ConfirmSizesMatch(const size_t&) const;
+template void Elements<Secp256k1Scalar>::ConfirmSizesMatch(const size_t&) const;
+template void Elements<Secp256k1Point>::ConfirmSizesMatch(const size_t&) const;
 
 template <typename T>
 Elements<T> Elements<T>::FirstNPow(const T& k, const size_t& n, const size_t& from_index)
@@ -150,6 +181,7 @@ Elements<T> Elements<T>::FirstNPow(const T& k, const size_t& n, const size_t& fr
     return ret;
 }
 template Elements<MclScalar> Elements<MclScalar>::FirstNPow(const MclScalar&, const size_t&, const size_t& from_index);
+template Elements<Secp256k1Scalar> Elements<Secp256k1Scalar>::FirstNPow(const Secp256k1Scalar&, const size_t&, const size_t& from_index);
 
 template <typename T>
 Elements<T> Elements<T>::RepeatN(const T& k, const size_t& n)
@@ -162,6 +194,8 @@ Elements<T> Elements<T>::RepeatN(const T& k, const size_t& n)
 }
 template Elements<MclScalar> Elements<MclScalar>::RepeatN(const MclScalar&, const size_t&);
 template Elements<MclG1Point> Elements<MclG1Point>::RepeatN(const MclG1Point&, const size_t&);
+template Elements<Secp256k1Scalar> Elements<Secp256k1Scalar>::RepeatN(const Secp256k1Scalar&, const size_t&);
+template Elements<Secp256k1Point> Elements<Secp256k1Point>::RepeatN(const Secp256k1Point&, const size_t&);
 
 template <typename T>
 Elements<T> Elements<T>::RandVec(const size_t& n, const bool exclude_zero)
@@ -174,6 +208,7 @@ Elements<T> Elements<T>::RandVec(const size_t& n, const bool exclude_zero)
     return ret;
 }
 template Elements<MclScalar> Elements<MclScalar>::RandVec(const size_t&, const bool);
+template Elements<Secp256k1Scalar> Elements<Secp256k1Scalar>::RandVec(const size_t&, const bool);
 
 template <typename T>
 template <typename Scalar>
@@ -189,6 +224,8 @@ Elements<T> Elements<T>::operator*(const Elements<Scalar>& rhs) const
 }
 template Elements<MclScalar> Elements<MclScalar>::operator*(const Elements<MclScalar>&) const;
 template Elements<MclG1Point> Elements<MclG1Point>::operator*(const Elements<MclScalar>&) const;
+template Elements<Secp256k1Scalar> Elements<Secp256k1Scalar>::operator*(const Elements<Secp256k1Scalar>&) const;
+template Elements<Secp256k1Point> Elements<Secp256k1Point>::operator*(const Elements<Secp256k1Scalar>&) const;
 
 template <typename T>
 template <typename Scalar>
@@ -202,6 +239,8 @@ Elements<T> Elements<T>::operator*(const Scalar& rhs) const
 }
 template Elements<MclScalar> Elements<MclScalar>::operator*(const MclScalar&) const;
 template Elements<MclG1Point> Elements<MclG1Point>::operator*(const MclScalar&) const;
+template Elements<Secp256k1Scalar> Elements<Secp256k1Scalar>::operator*(const Secp256k1Scalar&) const;
+template Elements<Secp256k1Point> Elements<Secp256k1Point>::operator*(const Secp256k1Scalar&) const;
 
 template <typename T>
 Elements<T> Elements<T>::operator+(const Elements<T>& rhs) const
@@ -216,6 +255,8 @@ Elements<T> Elements<T>::operator+(const Elements<T>& rhs) const
 }
 template Elements<MclScalar> Elements<MclScalar>::operator+(const Elements<MclScalar>&) const;
 template Elements<MclG1Point> Elements<MclG1Point>::operator+(const Elements<MclG1Point>&) const;
+template Elements<Secp256k1Scalar> Elements<Secp256k1Scalar>::operator+(const Elements<Secp256k1Scalar>&) const;
+template Elements<Secp256k1Point> Elements<Secp256k1Point>::operator+(const Elements<Secp256k1Point>&) const;
 
 template <typename T>
 Elements<T> Elements<T>::operator-(const Elements<T>& rhs) const
@@ -230,6 +271,8 @@ Elements<T> Elements<T>::operator-(const Elements<T>& rhs) const
 }
 template Elements<MclScalar> Elements<MclScalar>::operator-(const Elements<MclScalar>&) const;
 template Elements<MclG1Point> Elements<MclG1Point>::operator-(const Elements<MclG1Point>&) const;
+template Elements<Secp256k1Scalar> Elements<Secp256k1Scalar>::operator-(const Elements<Secp256k1Scalar>&) const;
+template Elements<Secp256k1Point> Elements<Secp256k1Point>::operator-(const Elements<Secp256k1Point>&) const;
 
 template <typename T>
 void Elements<T>::operator=(const Elements<T>& rhs)
@@ -242,6 +285,8 @@ void Elements<T>::operator=(const Elements<T>& rhs)
 }
 template void Elements<MclScalar>::operator=(const Elements<MclScalar>&);
 template void Elements<MclG1Point>::operator=(const Elements<MclG1Point>&);
+template void Elements<Secp256k1Scalar>::operator=(const Elements<Secp256k1Scalar>&);
+template void Elements<Secp256k1Point>::operator=(const Elements<Secp256k1Point>&);
 
 template <typename T>
 bool Elements<T>::operator==(const Elements<T>& rhs) const
@@ -257,6 +302,8 @@ bool Elements<T>::operator==(const Elements<T>& rhs) const
 }
 template bool Elements<MclScalar>::operator==(const Elements<MclScalar>&) const;
 template bool Elements<MclG1Point>::operator==(const Elements<MclG1Point>&) const;
+template bool Elements<Secp256k1Scalar>::operator==(const Elements<Secp256k1Scalar>&) const;
+template bool Elements<Secp256k1Point>::operator==(const Elements<Secp256k1Point>&) const;
 
 template <typename T>
 bool Elements<T>::operator!=(const Elements<T>& rhs) const
@@ -265,6 +312,8 @@ bool Elements<T>::operator!=(const Elements<T>& rhs) const
 }
 template bool Elements<MclScalar>::operator!=(const Elements<MclScalar>&) const;
 template bool Elements<MclG1Point>::operator!=(const Elements<MclG1Point>&) const;
+template bool Elements<Secp256k1Scalar>::operator!=(const Elements<Secp256k1Scalar>&) const;
+template bool Elements<Secp256k1Point>::operator!=(const Elements<Secp256k1Point>&) const;
 
 template <typename T>
 Elements<T> Elements<T>::From(const size_t from_index) const
@@ -281,6 +330,8 @@ Elements<T> Elements<T>::From(const size_t from_index) const
 }
 template Elements<MclScalar> Elements<MclScalar>::From(const size_t from_index) const;
 template Elements<MclG1Point> Elements<MclG1Point>::From(const size_t from_index) const;
+template Elements<Secp256k1Scalar> Elements<Secp256k1Scalar>::From(const size_t from_index) const;
+template Elements<Secp256k1Point> Elements<Secp256k1Point>::From(const size_t from_index) const;
 
 template <typename T>
 Elements<T> Elements<T>::To(const size_t to_index) const
@@ -297,6 +348,8 @@ Elements<T> Elements<T>::To(const size_t to_index) const
 }
 template Elements<MclScalar> Elements<MclScalar>::To(const size_t to_index) const;
 template Elements<MclG1Point> Elements<MclG1Point>::To(const size_t to_index) const;
+template Elements<Secp256k1Scalar> Elements<Secp256k1Scalar>::To(const size_t to_index) const;
+template Elements<Secp256k1Point> Elements<Secp256k1Point>::To(const size_t to_index) const;
 
 template <typename T>
 Elements<T> Elements<T>::Negate() const
@@ -308,6 +361,7 @@ Elements<T> Elements<T>::Negate() const
     return ret;
 }
 template Elements<MclScalar> Elements<MclScalar>::Negate() const;
+template Elements<Secp256k1Scalar> Elements<Secp256k1Scalar>::Negate() const;
 
 template <typename T>
 Elements<T> Elements<T>::Invert() const
@@ -345,3 +399,4 @@ Elements<T> Elements<T>::Invert() const
     return ret;
 }
 template Elements<MclScalar> Elements<MclScalar>::Invert() const;
+template Elements<Secp256k1Scalar> Elements<Secp256k1Scalar>::Invert() const;

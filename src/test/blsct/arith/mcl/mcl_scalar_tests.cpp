@@ -40,27 +40,6 @@ BOOST_FIXTURE_TEST_SUITE(mcl_scalar_tests, BasicTestingSetup)
 
 BOOST_AUTO_TEST_CASE(test_ctor_uint256_int64)
 {
-    //// uint256
-    // uint256 constructor expects input vector to be big-endian
-    {
-        ONE_BE_32(one)
-        uint256 ui(one);
-        Scalar a(ui);
-        // Scalar::GetString drops preceding 0s
-        BOOST_CHECK_EQUAL(a.GetString(), "100000000000000000000000000000000000000000000000000000000000000");
-    }
-    {
-        CURVE_ORDER_MINUS_1_VEC(vec);
-        uint256 ui(vec);
-        Scalar a(ui);
-        BOOST_CHECK_EQUAL(a.GetString(), "73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000000");
-    }
-    {
-        CURVE_ORDER_VEC(vec);
-        uint256 ui(vec);
-        Scalar a(ui);
-        BOOST_CHECK_EQUAL(a.GetString(), "0");
-    }
     //// int64_t
     {
         uint64_t one = 1;

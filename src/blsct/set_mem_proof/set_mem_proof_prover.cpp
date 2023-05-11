@@ -14,13 +14,10 @@
 #include <streams.h>
 #include <version.h>
 
-using Scalar = SetMemProofProver::Scalar;
-using Point = SetMemProofProver::Point;
-using Scalars = SetMemProofProver::Scalars;
-using Points = SetMemProofProver::Points;
-
-const Scalar& SetMemProofProver::One()
+template <typename T>
+const typename SetMemProofProver<T>::Scalar& SetMemProofProver<T>::One()
 {
+    using Scalar = typename T::Scalar;
     static Scalar* x = nullptr;
     if (x == nullptr) {
         x = new Scalar(1);
@@ -28,13 +25,14 @@ const Scalar& SetMemProofProver::One()
     return *x;
 }
 
-Scalar SetMemProofProver::ComputeX(
-    const SetMemProofSetup& setup,
-    const Scalar& omega,
-    const Scalar& y,
-    const Scalar& z,
-    const Point& T1,
-    const Point& T2
+template <typename T>
+typename T::Scalar SetMemProofProver<T>::ComputeX(
+    const SetMemProofSetup<T>& setup,
+    const typename T::Scalar& omega,
+    const typename T::Scalar& y,
+    const typename T::Scalar& z,
+    const typename T::Point& T1,
+    const typename T::Point& T2
 ) {
     CDataStream st(SER_DISK, PROTOCOL_VERSION);
     st << omega << y << z << T1 << T2;
@@ -43,7 +41,8 @@ Scalar SetMemProofProver::ComputeX(
     return x;
 }
 
-CHashWriter SetMemProofProver::GenInitialFiatShamir(
+template <typename T>
+CHashWriter SetMemProofProver<T>::GenInitialFiatShamir(
     const Points& Ys,
     const Point& A1,
     const Point& A2,
@@ -58,8 +57,9 @@ CHashWriter SetMemProofProver::GenInitialFiatShamir(
     return fiat_shamir;
 }
 
-Points SetMemProofProver::ExtendYs(
-    const SetMemProofSetup& setup,
+template <typename T>
+typename SetMemProofProver<T>::Points SetMemProofProver<T>::ExtendYs(
+    const SetMemProofSetup<T>& setup,
     const Points& Ys_src,
     const size_t& new_size
 ) {
@@ -83,8 +83,9 @@ Points SetMemProofProver::ExtendYs(
     return Ys;
 }
 
-SetMemProof SetMemProofProver::Prove(
-    const SetMemProofSetup& setup,
+template <typename T>
+SetMemProof<T> SetMemProofProver<T>::Prove(
+    const SetMemProofSetup<T>& setup,
     const Points& Ys_src,
     const Point& sigma,
     const Scalar& m,
@@ -208,13 +209,14 @@ retry: // retrying without generating fiat_shamir again to get different hashes
     return proof;
 }
 
-bool SetMemProofProver::Verify(
-    const SetMemProofSetup& setup,
+template <typename T>
+bool SetMemProofProver<T>::Verify(
+    const SetMemProofSetup<T>& setup,
     const Points& Ys_src,
     const Scalar& eta,
-    const SetMemProof& proof
+    const SetMemProof<T>& proof
 ) {
-    using LazyPoint = LazyPoint<Mcl>;
+    using LazyPoint = LazyPoint<T>;
 
     size_t n = blsct::Common::GetFirstPowerOf2GreaterOrEqTo(Ys_src.Size());
     if (n > setup.N) {

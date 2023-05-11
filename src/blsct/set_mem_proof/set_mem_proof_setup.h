@@ -6,17 +6,18 @@
 #define NAVCOIN_BLSCT_SET_MEM_PROOF_SET_MEM_SETUP_H
 
 #include <vector>
-#include <blsct/arith/mcl/mcl.h>
+#include <blsct/arith/secp256k1/secp256k1.h>
 #include <blsct/arith/elements.h>
 #include <blsct/building_block/generator_deriver.h>
 #include <blsct/building_block/pedersen_commitment.h>
 #include <mutex>
 
 // N is the maximum size of the set of membership public key
+template <typename T>
 class SetMemProofSetup {
 public:
-    using Scalar = Mcl::Scalar;
-    using Point = Mcl::Point;
+    using Scalar = typename T::Scalar;
+    using Point = typename T::Point;
     using Scalars = Elements<Scalar>;
     using Points = Elements<Point>;
 
@@ -39,7 +40,7 @@ public:
     Point H6(const std::vector<uint8_t>& msg) const;
     Point H7(const std::vector<uint8_t>& msg) const;
 
-    const PedersenCommitment<Mcl> pedersen;
+    const PedersenCommitment<T> pedersen;
 
 #ifndef BOOST_UNIT_TEST
 private:
@@ -48,13 +49,13 @@ private:
         const Point& g,
         const Point& h,
         const Points& hs,
-        const PedersenCommitment<Mcl>& pedersen
+        const PedersenCommitment<T>& pedersen
     ): g{g}, h{h}, hs{hs}, pedersen{pedersen} {}
 
     static Point GenPoint(const std::vector<uint8_t>& msg, const uint64_t& i);
     static Points GenGenerators(const Point& base_point, const size_t& size);
 
-    inline static const GeneratorDeriver m_deriver = GeneratorDeriver("set_membership_proof");
+    inline static const GeneratorDeriver m_deriver = GeneratorDeriver<Point>("set_membership_proof");
     inline static std::mutex m_init_mutex;
     inline static bool m_is_initialized = false;
 };

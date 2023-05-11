@@ -9,7 +9,7 @@
 #include <test/util/setup_common.h>
 #include <cstdio>
 #include <sstream>
-#include <blsct/arith/mcl/mcl.h>
+#include <blsct/arith/secp256k1/secp256k1.h>
 #include <blsct/arith/elements.h>
 #include <blsct/building_block/pedersen_commitment.h>
 #include <blsct/set_mem_proof/set_mem_proof_prover.h>
@@ -18,14 +18,14 @@
 
 BOOST_FIXTURE_TEST_SUITE(set_mem_proof_prover_tests, BasicTestingSetup)
 
-using Point = Mcl::Point;
-using Scalar = Mcl::Scalar;
+using Point = Secp256k1::Point;
+using Scalar = Secp256k1::Scalar;
 using Points = Elements<Point>;
-using Prover = SetMemProofProver;
+using Prover = SetMemProofProver<Secp256k1>;
 
 BOOST_AUTO_TEST_CASE(test_extend_ys)
 {
-    auto setup = SetMemProofSetup::Get();
+    auto setup = SetMemProofSetup<Secp256k1>::Get();
     {
         Points ys;
         auto ys2 = Prover::ExtendYs(setup, ys, 1);
@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE(test_prove_verify_small_size_good_inputs_of_power_of_2)
     auto y2 = Point::MapToPoint("y2", Endianness::Little);
     auto y4 = Point::MapToPoint("y4", Endianness::Little);
 
-    auto setup = SetMemProofSetup::Get();
+    auto setup = SetMemProofSetup<Secp256k1>::Get();
 
     Scalar m = Scalar::Rand();
     Scalar f = Scalar::Rand();
@@ -106,7 +106,7 @@ BOOST_AUTO_TEST_CASE(test_prove_verify_small_size_good_inputs_of_non_power_of_2)
     auto y1 = Point::MapToPoint("y1", Endianness::Little);
     auto y2 = Point::MapToPoint("y2", Endianness::Little);
 
-    auto setup = SetMemProofSetup::Get();
+    auto setup = SetMemProofSetup<Secp256k1>::Get();
 
     Scalar m = Scalar::Rand();
     Scalar f = Scalar::Rand();
@@ -130,7 +130,7 @@ BOOST_AUTO_TEST_CASE(test_prove_verify_small_size_sigma_not_included)
     auto y2 = Point::MapToPoint("y2", Endianness::Little);
     auto y4 = Point::MapToPoint("y4", Endianness::Little);
 
-    auto setup = SetMemProofSetup::Get();
+    auto setup = SetMemProofSetup<Secp256k1>::Get();
 
     Scalar m = Scalar::Rand();
     Scalar f = Scalar::Rand();
@@ -158,7 +158,7 @@ BOOST_AUTO_TEST_CASE(test_prove_verify_small_size_sigma_not_included)
 
 BOOST_AUTO_TEST_CASE(test_prove_verify_small_size_sigma_generated_from_other_inputs)
 {
-    auto setup = SetMemProofSetup::Get();
+    auto setup = SetMemProofSetup<Secp256k1>::Get();
 
     // Commitment set includes A=g*f_a+h*m_a, B=g*f_b+h*m_b, and C=g*f_c+h*m_c
     Scalar m_a = Scalar::Rand();
@@ -200,7 +200,7 @@ BOOST_AUTO_TEST_CASE(test_prove_verify_small_size_sigma_in_different_pos)
     auto y2 = Point::MapToPoint("y2", Endianness::Little);
     auto y3 = Point::MapToPoint("y4", Endianness::Little);
 
-    auto setup = SetMemProofSetup::Get();
+    auto setup = SetMemProofSetup<Secp256k1>::Get();
 
     Scalar m = Scalar::Rand();
     Scalar f = Scalar::Rand();
@@ -231,7 +231,7 @@ BOOST_AUTO_TEST_CASE(test_prove_verify_small_size_different_eta)
     auto y2 = Point::MapToPoint("y2", Endianness::Little);
     auto y4 = Point::MapToPoint("y4", Endianness::Little);
 
-    auto setup = SetMemProofSetup::Get();
+    auto setup = SetMemProofSetup<Secp256k1>::Get();
 
     Scalar m = Scalar::Rand();
     Scalar f = Scalar::Rand();
@@ -261,7 +261,7 @@ BOOST_AUTO_TEST_CASE(test_prove_verify_small_size_same_sigma_different_ys)
     auto y2_2 = Point::MapToPoint("y2_2", Endianness::Little);
     auto y4_2 = Point::MapToPoint("y4_2", Endianness::Little);
 
-    auto setup = SetMemProofSetup::Get();
+    auto setup = SetMemProofSetup<Secp256k1>::Get();
 
     Scalar m = Scalar::Rand();
     Scalar f = Scalar::Rand();
@@ -289,7 +289,7 @@ BOOST_AUTO_TEST_CASE(test_prove_verify_small_size_same_sigma_different_ys)
 
 BOOST_AUTO_TEST_CASE(test_prove_verify_large_size_input)
 {
-    auto setup = SetMemProofSetup::Get();
+    auto setup = SetMemProofSetup<Secp256k1>::Get();
 
     const size_t NUM_INPUTS = setup.N;
     Points Ys;

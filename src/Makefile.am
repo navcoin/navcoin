@@ -162,7 +162,6 @@ BITCOIN_CORE_H = \
   blsct/arith/mcl/mcl_scalar.h \
   blsct/arith/secp256k1/secp256k1.h \
   blsct/arith/secp256k1/secp256k1_point.h \
-  blsct/arith/secp256k1/secp256k1_init.h \
   blsct/arith/secp256k1/secp256k1_scalar.h \
   blsct/arith/elements.h \
   blsct/arith/endianness.h \
@@ -696,9 +695,13 @@ libbitcoin_consensus_a_SOURCES = \
   blsct/arith/elements.cpp \
   blsct/arith/mcl/mcl_g1point.cpp \
   blsct/arith/mcl/mcl_scalar.cpp \
+  blsct/arith/secp256k1/secp256k1_point.cpp \
+  blsct/arith/secp256k1/secp256k1_scalar.cpp \
   blsct/common.cpp \
   blsct/range_proof/range_proof.cpp \
   blsct/signature.cpp \
+  clientversion.cpp \
+  clientversion.h \
   consensus/amount.h \
   consensus/merkle.cpp \
   consensus/merkle.h \
@@ -707,6 +710,10 @@ libbitcoin_consensus_a_SOURCES = \
   consensus/validation.h \
   hash.cpp \
   hash.h \
+  key.h \
+  key.cpp \
+  logging.h \
+  logging.cpp \
   prevector.h \
   primitives/block.cpp \
   primitives/block.h \
@@ -714,6 +721,10 @@ libbitcoin_consensus_a_SOURCES = \
   primitives/transaction.h \
   pubkey.cpp \
   pubkey.h \
+  random.cpp \
+  random.h \
+  randomenv.cpp \
+  randomenv.h \
   script/bitcoinconsensus.cpp \
   script/interpreter.cpp \
   script/interpreter.h \
@@ -727,8 +738,12 @@ libbitcoin_consensus_a_SOURCES = \
   tinyformat.h \
   uint256.cpp \
   uint256.h \
+  util/check.h \
+  util/check.cpp \
   util/strencodings.cpp \
   util/strencodings.h \
+  util/time.h \
+  util/time.cpp \
   version.h
 #
 
@@ -1003,6 +1018,8 @@ libbitcoinkernel_la_SOURCES = \
   blockfilter.cpp \
   blsct/arith/mcl/mcl_g1point.cpp \
   blsct/arith/mcl/mcl_scalar.cpp \
+  blsct/arith/secp256k1/secp256k1_point.cpp \
+  blsct/arith/secp256k1/secp256k1_scalar.cpp \
   blsct/arith/elements.cpp \
   blsct/double_public_key.cpp \
   blsct/private_key.cpp \

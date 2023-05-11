@@ -1,8 +1,10 @@
 #include <blsct/building_block/generator_deriver.h>
 #include <util/strencodings.h>
+#include <hash.h>
 #include <optional>
 
-Point GeneratorDeriver::Derive(
+template <typename Point>
+Point GeneratorDeriver<Point>::Derive(
     const Point& p,
     const size_t index,
     const std::optional<TokenId>& token_id

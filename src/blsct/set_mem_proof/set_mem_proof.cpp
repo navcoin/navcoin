@@ -3,9 +3,11 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <blsct/set_mem_proof/set_mem_proof.h>
+#include <blsct/arith/secp256k1/secp256k1.h>
 #include <streams.h>
 
-bool SetMemProof::operator==(const SetMemProof& other) const
+template <typename T>
+bool SetMemProof<T>::operator==(const SetMemProof& other) const
 {
     return phi == other.phi
         && A1 == other.A1
@@ -28,13 +30,15 @@ bool SetMemProof::operator==(const SetMemProof& other) const
         && omega == other.omega;
 }
 
-bool SetMemProof::operator!=(const SetMemProof& other) const
+template <typename T>
+bool SetMemProof<T>::operator!=(const SetMemProof& other) const
 {
     return !operator==(other);
 }
 
+template <typename T>
 template <typename Stream>
-void SetMemProof::Serialize(Stream& st) const
+void SetMemProof<T>::Serialize(Stream& st) const
 {
     st << phi
        << A1
@@ -57,10 +61,11 @@ void SetMemProof::Serialize(Stream& st) const
        << omega;
 }
 template
-void SetMemProof::Serialize(CDataStream& st) const;
+void SetMemProof<Secp256k1>::Serialize(CDataStream& st) const;
 
+template <typename T>
 template <typename Stream>
-void SetMemProof::Unserialize(Stream& st)
+void SetMemProof<T>::Unserialize(Stream& st)
 {
     st >> phi
        >> A1
@@ -83,4 +88,4 @@ void SetMemProof::Unserialize(Stream& st)
        >> omega;
 }
 template
-void SetMemProof::Unserialize(CDataStream& st);
+void SetMemProof<Secp256k1>::Unserialize(CDataStream& st);

@@ -31,6 +31,7 @@ public:
     Secp256k1Scalar(const std::vector<uint8_t>& v);
     Secp256k1Scalar(const Underlying& other_underlying);
     Secp256k1Scalar(const std::vector<uint8_t>& msg, uint8_t index);
+    Secp256k1Scalar(const uint256& n);
 
     Secp256k1Scalar(const Secp256k1Scalar& s);
     Secp256k1Scalar& operator=(const Secp256k1Scalar& s);

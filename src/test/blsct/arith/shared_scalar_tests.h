@@ -40,6 +40,25 @@ BOOST_AUTO_TEST_CASE(test_ctors) {
             BOOST_CHECK_EQUAL(a.GetString(), "100000000000000000000000000000000000000000000000000000000000000");
         }
     }
+    //// uint256
+    {
+        ONE_BE_32(one)
+        uint256 ui(one);
+        Scalar a(ui);
+        BOOST_CHECK_EQUAL(a.GetString(), "100000000000000000000000000000000000000000000000000000000000000");
+    }
+    {
+        CURVE_ORDER_MINUS_1_VEC(vec);
+        uint256 ui(vec);
+        Scalar a(ui);
+        BOOST_CHECK_EQUAL(a.GetString(), CURVE_ORDER_MINUS_1_STR);
+    }
+    {
+        CURVE_ORDER_VEC(vec);
+        uint256 ui(vec);
+        Scalar a(ui);
+        BOOST_CHECK_EQUAL(a.GetString(), "0");
+    }
 }
 
 BOOST_AUTO_TEST_CASE(test_msg_int_ctor)
