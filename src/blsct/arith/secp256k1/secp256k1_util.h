@@ -8,6 +8,7 @@
 #include <blsct/arith/secp256k1/secp256k1_point.h>
 #include <blsct/arith/secp256k1/secp256k1_scalar.h>
 #include <blsct/building_block/lazy_point.h>
+#include <stdexcept>
 #include <vector>
 
 struct Secp256k1Util {
@@ -15,8 +16,17 @@ struct Secp256k1Util {
     template <typename T>
     static Secp256k1Point MultiplyLazyPoints(const std::vector<LazyPoint<T>>& points)
     {
-        Secp256k1Point ret;
-        return ret;
+        if (points.size() == 0) {
+            throw std::runtime_error("Cannot multiply empty vector of points");
+        }
+
+        Secp256k1Point sum = points[0].m_base * points[0].m_exp;
+
+        for (size_t i=1; i<points.size(); ++i) {
+            auto p = points[i].m_base * points[i].m_exp;
+            sum = sum + p;
+        }
+        return sum;
     }
 };
 

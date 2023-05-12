@@ -1,4 +1,6 @@
 #include <blsct/arith/elements.h>
+#include <blsct/arith/mcl/mcl.h>
+#include <blsct/arith/secp256k1/secp256k1.h>
 #include <blsct/set_mem_proof/set_mem_proof_setup.h>
 #include <blsct/building_block/generator_deriver.h>
 #include <ctokens/tokenid.h>
@@ -24,6 +26,8 @@ const SetMemProofSetup<T>& SetMemProofSetup<T>::Get()
 }
 template
 const SetMemProofSetup<Secp256k1>& SetMemProofSetup<Secp256k1>::Get();
+template
+const SetMemProofSetup<Mcl>& SetMemProofSetup<Mcl>::Get();
 
 template <typename T>
 typename SetMemProofSetup<T>::Points SetMemProofSetup<T>::GenGenerators(
@@ -43,6 +47,11 @@ typename SetMemProofSetup<Secp256k1>::Points SetMemProofSetup<Secp256k1>::GenGen
     const typename Secp256k1::Point& base_point,
     const size_t& size
 );
+template
+typename SetMemProofSetup<Mcl>::Points SetMemProofSetup<Mcl>::GenGenerators(
+    const typename Mcl::Point& base_point,
+    const size_t& size
+);
 
 template <typename T>
 typename T::Scalar SetMemProofSetup<T>::H1(const std::vector<uint8_t>& msg) const
@@ -52,6 +61,8 @@ typename T::Scalar SetMemProofSetup<T>::H1(const std::vector<uint8_t>& msg) cons
 }
 template
 typename Secp256k1::Scalar SetMemProofSetup<Secp256k1>::H1(const std::vector<uint8_t>& msg) const;
+template
+typename Mcl::Scalar SetMemProofSetup<Mcl>::H1(const std::vector<uint8_t>& msg) const;
 
 template <typename T>
 typename T::Scalar SetMemProofSetup<T>::H2(const std::vector<uint8_t>& msg) const
@@ -61,6 +72,8 @@ typename T::Scalar SetMemProofSetup<T>::H2(const std::vector<uint8_t>& msg) cons
 }
 template
 typename Secp256k1::Scalar SetMemProofSetup<Secp256k1>::H2(const std::vector<uint8_t>& msg) const;
+template
+typename Mcl::Scalar SetMemProofSetup<Mcl>::H2(const std::vector<uint8_t>& msg) const;
 
 template <typename T>
 typename T::Scalar SetMemProofSetup<T>::H3(const std::vector<uint8_t>& msg) const
@@ -70,6 +83,8 @@ typename T::Scalar SetMemProofSetup<T>::H3(const std::vector<uint8_t>& msg) cons
 }
 template
 typename Secp256k1::Scalar SetMemProofSetup<Secp256k1>::H3(const std::vector<uint8_t>& msg) const;
+template
+typename Mcl::Scalar SetMemProofSetup<Mcl>::H3(const std::vector<uint8_t>& msg) const;
 
 template <typename T>
 typename T::Scalar SetMemProofSetup<T>::H4(const std::vector<uint8_t>& msg) const
@@ -79,6 +94,8 @@ typename T::Scalar SetMemProofSetup<T>::H4(const std::vector<uint8_t>& msg) cons
 }
 template
 typename Secp256k1::Scalar SetMemProofSetup<Secp256k1>::H4(const std::vector<uint8_t>& msg) const;
+template
+typename Mcl::Scalar SetMemProofSetup<Mcl>::H4(const std::vector<uint8_t>& msg) const;
 
 template <typename T>
 typename T::Point SetMemProofSetup<T>::GenPoint(const std::vector<uint8_t>& msg, const uint64_t& i)
@@ -91,6 +108,8 @@ typename T::Point SetMemProofSetup<T>::GenPoint(const std::vector<uint8_t>& msg,
 }
 template
 typename Secp256k1::Point SetMemProofSetup<Secp256k1>::GenPoint(const std::vector<uint8_t>& msg, const uint64_t& i);
+template
+typename Mcl::Point SetMemProofSetup<Mcl>::GenPoint(const std::vector<uint8_t>& msg, const uint64_t& i);
 
 template <typename T>
 typename T::Point SetMemProofSetup<T>::H5(const std::vector<uint8_t>& msg) const
@@ -99,6 +118,8 @@ typename T::Point SetMemProofSetup<T>::H5(const std::vector<uint8_t>& msg) const
 }
 template
 typename Secp256k1::Point SetMemProofSetup<Secp256k1>::H5(const std::vector<uint8_t>& msg) const;
+template
+typename Mcl::Point SetMemProofSetup<Mcl>::H5(const std::vector<uint8_t>& msg) const;
 
 template <typename T>
 typename T::Point SetMemProofSetup<T>::H6(const std::vector<uint8_t>& msg) const
@@ -107,6 +128,8 @@ typename T::Point SetMemProofSetup<T>::H6(const std::vector<uint8_t>& msg) const
 }
 template
 typename Secp256k1::Point SetMemProofSetup<Secp256k1>::H6(const std::vector<uint8_t>& msg) const;
+template
+typename Mcl::Point SetMemProofSetup<Mcl>::H6(const std::vector<uint8_t>& msg) const;
 
 template <typename T>
 typename T::Point SetMemProofSetup<T>::H7(const std::vector<uint8_t>& msg) const
@@ -115,3 +138,5 @@ typename T::Point SetMemProofSetup<T>::H7(const std::vector<uint8_t>& msg) const
 }
 template
 typename Secp256k1::Point SetMemProofSetup<Secp256k1>::H7(const std::vector<uint8_t>& msg) const;
+template
+typename Mcl::Point SetMemProofSetup<Mcl>::H7(const std::vector<uint8_t>& msg) const;

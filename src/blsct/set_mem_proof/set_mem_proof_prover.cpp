@@ -2,11 +2,13 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <blsct/common.h>
+#include <blsct/arith/mcl/mcl.h>
+#include <blsct/arith/secp256k1/secp256k1.h>
 #include <blsct/building_block/fiat_shamir.h>
 #include <blsct/building_block/imp_inner_prod_arg.h>
 #include <blsct/building_block/lazy_points.h>
 #include <blsct/building_block/g_h_gi_hi_zero_verifier.h>
+#include <blsct/common.h>
 #include <blsct/set_mem_proof/set_mem_proof_prover.h>
 #include <stdexcept>
 #include <cmath>
@@ -26,6 +28,8 @@ const typename SetMemProofProver<T>::Scalar& SetMemProofProver<T>::One()
 }
 template
 const typename SetMemProofProver<Secp256k1>::Scalar& SetMemProofProver<Secp256k1>::One();
+template
+const typename SetMemProofProver<Mcl>::Scalar& SetMemProofProver<Mcl>::One();
 
 template <typename T>
 typename T::Scalar SetMemProofProver<T>::ComputeX(
@@ -51,6 +55,16 @@ typename Secp256k1::Scalar SetMemProofProver<Secp256k1>::ComputeX(
     const Point& T1,
     const Point& T2
 );
+template
+typename Mcl::Scalar SetMemProofProver<Mcl>::ComputeX(
+    const SetMemProofSetup<Mcl>& setup,
+    const Scalar& omega,
+    const Scalar& y,
+    const Scalar& z,
+    const Point& T1,
+    const Point& T2
+);
+
 
 template <typename T>
 CHashWriter SetMemProofProver<T>::GenInitialFiatShamir(
@@ -69,6 +83,17 @@ CHashWriter SetMemProofProver<T>::GenInitialFiatShamir(
 }
 template
 CHashWriter SetMemProofProver<Secp256k1>::GenInitialFiatShamir(
+    const Points& Ys,
+    const Point& A1,
+    const Point& A2,
+    const Point& S1,
+    const Point& S2,
+    const Point& S3,
+    const Point& phi,
+    const Scalar& eta
+);
+template
+CHashWriter SetMemProofProver<Mcl>::GenInitialFiatShamir(
     const Points& Ys,
     const Point& A1,
     const Point& A2,
@@ -107,6 +132,12 @@ typename SetMemProofProver<T>::Points SetMemProofProver<T>::ExtendYs(
 template
 typename SetMemProofProver<Secp256k1>::Points SetMemProofProver<Secp256k1>::ExtendYs(
     const SetMemProofSetup<Secp256k1>& setup,
+    const Points& Ys_src,
+    const size_t& new_size
+);
+template
+typename SetMemProofProver<Mcl>::Points SetMemProofProver<Mcl>::ExtendYs(
+    const SetMemProofSetup<Mcl>& setup,
     const Points& Ys_src,
     const size_t& new_size
 );
@@ -245,6 +276,15 @@ SetMemProof<Secp256k1> SetMemProofProver<Secp256k1>::Prove(
     const Scalar& f,
     const Scalar& eta
 );
+template
+SetMemProof<Mcl> SetMemProofProver<Mcl>::Prove(
+    const SetMemProofSetup<Mcl>& setup,
+    const Points& Ys_src,
+    const Point& sigma,
+    const Scalar& m,
+    const Scalar& f,
+    const Scalar& eta
+);
 
 template <typename T>
 bool SetMemProofProver<T>::Verify(
@@ -373,4 +413,11 @@ bool SetMemProofProver<Secp256k1>::Verify(
     const Points& Ys_src,
     const Scalar& eta,
     const SetMemProof<Secp256k1>& proof
+);
+template
+bool SetMemProofProver<Mcl>::Verify(
+    const SetMemProofSetup<Mcl>& setup,
+    const Points& Ys_src,
+    const Scalar& eta,
+    const SetMemProof<Mcl>& proof
 );

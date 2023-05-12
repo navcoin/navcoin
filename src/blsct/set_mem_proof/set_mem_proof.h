@@ -11,8 +11,8 @@
 
 template <typename T>
 struct SetMemProof {
-    using Scalar = Secp256k1::Scalar;
-    using Point = Secp256k1::Point;
+    using Scalar = typename T::Scalar;
+    using Point = typename T::Point;
     using Scalars = Elements<Scalar>;
     using Points = Elements<Point>;
 
