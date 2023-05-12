@@ -35,6 +35,8 @@ bool SetMemProof<T>::operator!=(const SetMemProof& other) const
 {
     return !operator==(other);
 }
+template
+bool SetMemProof<Secp256k1>::operator!=(const SetMemProof<Secp256k1>& other) const;
 
 template <typename T>
 template <typename Stream>

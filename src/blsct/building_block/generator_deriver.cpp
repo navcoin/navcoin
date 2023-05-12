@@ -1,4 +1,6 @@
 #include <blsct/building_block/generator_deriver.h>
+#include <blsct/arith/mcl/mcl.h>
+#include <blsct/arith/secp256k1/secp256k1.h>
 #include <util/strencodings.h>
 #include <hash.h>
 #include <optional>
@@ -36,3 +38,15 @@ Point GeneratorDeriver<Point>::Derive(
     }
     return ret;
 }
+template
+typename Mcl::Point GeneratorDeriver<typename Mcl::Point>::Derive(
+    const Mcl::Point& p,
+    const size_t index,
+    const std::optional<TokenId>& token_id
+) const;
+template
+typename Secp256k1::Point GeneratorDeriver<typename Secp256k1::Point>::Derive(
+    const Secp256k1::Point& p,
+    const size_t index,
+    const std::optional<TokenId>& token_id
+) const;

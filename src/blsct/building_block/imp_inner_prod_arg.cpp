@@ -1,5 +1,7 @@
+#include <blsct/arith/mcl/mcl.h>
+#include <blsct/arith/secp256k1/secp256k1.h>
 #include <blsct/building_block/imp_inner_prod_arg.h>
-#include <blsct/building_block/lazy_point.h>
+#include <blsct/building_block/lazy_points.h>
 #include <blsct/range_proof/range_proof.h>
 
 template <typename T>
@@ -82,6 +84,18 @@ std::optional<ImpInnerProdArgResult<Mcl>> ImpInnerProdArg::Run(
     const typename Mcl::Scalar& y,
     CHashWriter& fiat_shamir
 );
+template
+std::optional<ImpInnerProdArgResult<Secp256k1>> ImpInnerProdArg::Run(
+    const size_t& N,
+    Elements<typename Secp256k1::Point>& Gi,
+    Elements<typename Secp256k1::Point>& Hi,
+    const typename Secp256k1::Point& u,
+    Elements<typename Secp256k1::Scalar>& a,
+    Elements<typename Secp256k1::Scalar>& b,
+    const typename Secp256k1::Scalar& c_factor,
+    const typename Secp256k1::Scalar& y,
+    CHashWriter& fiat_shamir
+);
 
 template <typename T>
 std::vector<typename T::Scalar> ImpInnerProdArg::GenGeneratorExponents(
@@ -110,6 +124,11 @@ std::vector<Mcl::Scalar> ImpInnerProdArg::GenGeneratorExponents<Mcl>(
     const size_t& num_rounds,
     const Elements<Mcl::Scalar>& xs
 );
+template
+std::vector<Secp256k1::Scalar> ImpInnerProdArg::GenGeneratorExponents<Secp256k1>(
+    const size_t& num_rounds,
+    const Elements<Secp256k1::Scalar>& xs
+);
 
 template <typename T>
 void ImpInnerProdArg::LoopWithYPows(
@@ -132,6 +151,12 @@ void ImpInnerProdArg::LoopWithYPows<Mcl>(
     const size_t& num_loops,
     const Mcl::Scalar& y,
     std::function<void(const size_t&, const Mcl::Scalar&, const Mcl::Scalar&)>
+);
+template
+void ImpInnerProdArg::LoopWithYPows<Secp256k1>(
+    const size_t& num_loops,
+    const Secp256k1::Scalar& y,
+    std::function<void(const size_t&, const Secp256k1::Scalar&, const Secp256k1::Scalar&)>
 );
 
 template <typename T>
@@ -159,5 +184,12 @@ std::optional<Elements<Mcl::Scalar>> ImpInnerProdArg::GenAllRoundXs<Mcl>(
     const size_t& num_rounds,
     const Elements<Mcl::Point>& Ls,
     const Elements<Mcl::Point>& Rs,
+    CHashWriter& fiat_shamir
+);
+template
+std::optional<Elements<Secp256k1::Scalar>> ImpInnerProdArg::GenAllRoundXs<Secp256k1>(
+    const size_t& num_rounds,
+    const Elements<Secp256k1::Point>& Ls,
+    const Elements<Secp256k1::Point>& Rs,
     CHashWriter& fiat_shamir
 );

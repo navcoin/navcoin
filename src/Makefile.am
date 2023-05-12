@@ -160,9 +160,11 @@ BITCOIN_CORE_H = \
   blsct/arith/mcl/mcl_g1point.h \
   blsct/arith/mcl/mcl_init.h \
   blsct/arith/mcl/mcl_scalar.h \
+  blsct/arith/mcl/mcl_util.h \
   blsct/arith/secp256k1/secp256k1.h \
   blsct/arith/secp256k1/secp256k1_point.h \
   blsct/arith/secp256k1/secp256k1_scalar.h \
+  blsct/arith/secp256k1/secp256k1_util.h \
   blsct/arith/elements.h \
   blsct/arith/endianness.h \
   blsct/building_block/fiat_shamir.h \
@@ -170,6 +172,7 @@ BITCOIN_CORE_H = \
   blsct/building_block/g_h_gi_hi_zero_verifier.h \
   blsct/building_block/imp_inner_prod_arg.h \
   blsct/building_block/lazy_point.h \
+  blsct/building_block/lazy_points.h \
   blsct/building_block/pedersen_commitment.h \
   blsct/common.h \
   blsct/double_public_key.h \
@@ -436,6 +439,7 @@ libbitcoin_node_a_SOURCES = \
   blsct/building_block/generator_deriver.cpp \
   blsct/building_block/imp_inner_prod_arg.cpp \
   blsct/building_block/lazy_point.cpp \
+  blsct/building_block/lazy_points.cpp \
   blsct/building_block/g_h_gi_hi_zero_verifier.cpp \
   blsct/common.cpp \
   blsct/double_public_key.cpp \

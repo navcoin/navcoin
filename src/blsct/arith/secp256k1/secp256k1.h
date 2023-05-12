@@ -7,10 +7,12 @@
 
 #include <blsct/arith/secp256k1/secp256k1_point.h>
 #include <blsct/arith/secp256k1/secp256k1_scalar.h>
+#include <blsct/arith/secp256k1/secp256k1_util.h>
 
 struct Secp256k1 {
     using Scalar = Secp256k1Scalar;
     using Point = Secp256k1Point;
+    using Util = Secp256k1Util;
 };
 
 #endif // NAVCOIN_BLSCT_ARITH_SECP256K1_SECP256K1_H

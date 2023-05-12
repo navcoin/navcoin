@@ -5,7 +5,7 @@
 #include <blsct/common.h>
 #include <blsct/building_block/fiat_shamir.h>
 #include <blsct/building_block/imp_inner_prod_arg.h>
-#include <blsct/building_block/lazy_point.h>
+#include <blsct/building_block/lazy_points.h>
 #include <blsct/building_block/g_h_gi_hi_zero_verifier.h>
 #include <blsct/set_mem_proof/set_mem_proof_prover.h>
 #include <stdexcept>

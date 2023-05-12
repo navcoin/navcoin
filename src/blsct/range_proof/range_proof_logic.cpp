@@ -7,7 +7,7 @@
 #include <blsct/arith/mcl/mcl_scalar.h>
 #include <blsct/building_block/fiat_shamir.h>
 #include <blsct/building_block/imp_inner_prod_arg.h>
-#include <blsct/building_block/lazy_point.h>
+#include <blsct/building_block/lazy_points.h>
 #include <blsct/building_block/g_h_gi_hi_zero_verifier.h>
 #include <blsct/common.h>
 #include <blsct/range_proof/range_proof_logic.h>
