@@ -18,6 +18,7 @@
 
 BOOST_FIXTURE_TEST_SUITE(set_mem_proof_prover_tests, BasicTestingSetup)
 
+//using Arith = Mcl;
 using Arith = Secp256k1;
 using Point = Arith::Point;
 using Scalar = Arith::Scalar;

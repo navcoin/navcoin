@@ -90,9 +90,7 @@ Secp256k1Point Secp256k1Point::operator*(const Secp256k1Point::Scalar& rhs) cons
 
     secp256k1_gej_alias sum, bit_val;
     secp256k1_export_group_set_infinity(&sum);
-    secp256k1_export_group_set_infinity(&bit_val);
-
-    secp256k1_export_group_get_generator(&bit_val);
+    memcpy(&bit_val, &m_point, sizeof(Secp256k1Point::Underlying));
 
     for (auto it = bits.rbegin(); it != bits.rend(); ++it) {
         if (*it) {

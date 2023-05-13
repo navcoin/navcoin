@@ -59,13 +59,26 @@ BOOST_AUTO_TEST_CASE(test_point_add_sub)
 
 BOOST_AUTO_TEST_CASE(test_point_mul)
 {
-    const auto g = Point::GetBasePoint();
-    Point g_sum;
+    // consistency check with addition
+    {
+        const auto g = Point::GetBasePoint();
+        Point g_sum;
 
-    for (size_t i=1; i<=50; ++i) {
-        g_sum = g_sum + Point::GetBasePoint();
-        Point q = g * i;
-        BOOST_CHECK(g_sum == q);
+        for (size_t i=1; i<=50; ++i) {
+            g_sum = g_sum + Point::GetBasePoint();
+            Point q = g * i;
+            BOOST_CHECK(g_sum == q);
+        }
+    }
+    // non base point times scalar
+    {
+        auto g = Point::GetBasePoint();
+        Scalar two(2);
+        Scalar four(4);
+        auto g_times_2 = g * two;
+        auto lhs = g_times_2 * two;
+        auto rhs = g * four;
+        BOOST_CHECK(lhs == rhs);
     }
 }
 
