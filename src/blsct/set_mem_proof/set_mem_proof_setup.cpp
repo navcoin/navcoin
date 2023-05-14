@@ -4,6 +4,7 @@
 #include <blsct/set_mem_proof/set_mem_proof_setup.h>
 #include <blsct/building_block/generator_deriver.h>
 #include <ctokens/tokenid.h>
+#include <util/strencodings.h>
 
 template <typename T>
 const SetMemProofSetup<T>& SetMemProofSetup<T>::Get()
@@ -100,9 +101,10 @@ typename Mcl::Scalar SetMemProofSetup<Mcl>::H4(const std::vector<uint8_t>& msg) 
 template <typename T>
 typename T::Point SetMemProofSetup<T>::GenPoint(const std::vector<uint8_t>& msg, const uint64_t& i)
 {
-    Scalar x;
-    x.SetVch(msg);
-    uint256 hash = x.GetHashWithSalt(i);
+    CHashWriter hasher(0, 0);
+    hasher << msg;
+    hasher << i;
+    uint256 hash = hasher.GetHash();
     Point p(hash);
     return p;
 }

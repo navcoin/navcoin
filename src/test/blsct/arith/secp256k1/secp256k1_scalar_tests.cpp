@@ -73,4 +73,21 @@ BOOST_AUTO_TEST_CASE(test_hash_with_salt)
     BOOST_CHECK(act == exp);
 }
 
+BOOST_AUTO_TEST_CASE(test_deserialization)
+{
+    Scalar n;
+    {
+        std::vector<uint8_t> buf(32, 1);
+        BOOST_CHECK_NO_THROW(n.SetVch(buf));
+    }
+    {
+        std::vector<uint8_t> buf(31, 1);
+        BOOST_CHECK_THROW(n.SetVch(buf), std::runtime_error);
+    }
+    {
+        std::vector<uint8_t> buf(33, 1);
+        BOOST_CHECK_THROW(n.SetVch(buf), std::runtime_error);
+    }
+}
+
 BOOST_AUTO_TEST_SUITE_END()

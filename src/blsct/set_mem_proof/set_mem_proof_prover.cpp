@@ -15,6 +15,7 @@
 #include <hash.h>
 #include <streams.h>
 #include <version.h>
+#include <util/strencodings.h>
 
 template <typename T>
 const typename SetMemProofProver<T>::Scalar& SetMemProofProver<T>::One()

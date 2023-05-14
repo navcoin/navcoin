@@ -6,7 +6,6 @@
 #define NAVCOIN_BLSCT_SET_MEM_PROOF_SET_MEM_SETUP_H
 
 #include <vector>
-#include <blsct/arith/secp256k1/secp256k1.h>
 #include <blsct/arith/elements.h>
 #include <blsct/building_block/generator_deriver.h>
 #include <blsct/building_block/pedersen_commitment.h>
