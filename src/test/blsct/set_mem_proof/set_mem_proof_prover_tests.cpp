@@ -9,7 +9,6 @@
 #include <test/util/setup_common.h>
 #include <cstdio>
 #include <sstream>
-#include <blsct/arith/mcl/mcl.h>
 #include <blsct/arith/elements.h>
 #include <blsct/building_block/pedersen_commitment.h>
 #include <blsct/set_mem_proof/set_mem_proof_prover.h>
@@ -18,7 +17,6 @@
 
 BOOST_FIXTURE_TEST_SUITE(set_mem_proof_prover_tests, BasicTestingSetup)
 
-//using Arith = Mcl;
 using Arith = Secp256k1;
 using Point = Arith::Point;
 using Scalar = Arith::Scalar;
