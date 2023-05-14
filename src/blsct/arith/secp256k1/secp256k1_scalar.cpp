@@ -236,7 +236,7 @@ std::vector<uint8_t> Secp256k1Scalar::GetVch(const bool trim_preceeding_zeros) c
 void Secp256k1Scalar::SetVch(const std::vector<uint8_t>& v)
 {
     if (v.size() != SERIALIZATION_SIZE) {
-        throw new std::runtime_error("Vector for deserialization must be a 32-byte long");
+        throw std::runtime_error("Vector for deserialization must be a 32-byte long");
     }
     secp256k1_export_scalar_set_bytes(&m_scalar, &v[0]);
 }

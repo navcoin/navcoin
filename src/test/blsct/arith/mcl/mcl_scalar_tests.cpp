@@ -455,4 +455,71 @@ BOOST_AUTO_TEST_CASE(test_create_64_bit_shift)
     BOOST_CHECK(s == "spaghetti meatballs");
 }
 
+BOOST_AUTO_TEST_CASE(test_setvch)
+{
+    {
+        std::vector<uint8_t> vec{
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+        };
+        Scalar a;
+        a.SetVch(vec);
+
+        Scalar b(vec);
+        BOOST_CHECK(a == b);
+    }
+    {
+        // setting curveOrder - 1 should succeed
+        CURVE_ORDER_MINUS_1_VEC(vec);
+        Scalar a;
+        a.SetVch(vec);
+        Scalar b(vec);
+        BOOST_CHECK(a == b);
+    }
+    {
+        // setting curve order should succeed, but Scalar should get the modulo value
+        CURVE_ORDER_VEC(vec);
+        Scalar a;
+        a.SetVch(vec);
+        BOOST_CHECK_EQUAL(a.GetString(), "0");
+    }
+    {
+        std::vector<uint8_t> vec;
+        Scalar a(100);
+        a.SetVch(vec);
+        BOOST_CHECK_EQUAL(a.GetUint64(), 0);
+    }
+}
+
+
 BOOST_AUTO_TEST_SUITE_END()
