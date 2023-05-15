@@ -9,6 +9,7 @@
 #include <test/util/setup_common.h>
 #include <cstdio>
 #include <sstream>
+#include <blsct/arith/secp256k1/secp256k1.h>
 #include <blsct/arith/elements.h>
 #include <blsct/building_block/pedersen_commitment.h>
 #include <blsct/set_mem_proof/set_mem_proof_prover.h>
