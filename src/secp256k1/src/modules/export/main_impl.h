@@ -213,6 +213,28 @@ SECP256K1_API void secp256k1_export_group_subtract(
     secp256k1_gej_add_var(UNALIAS_GEJ(r), UNALIAS_GEJ(a), &b_neg, NULL);
 }
 
+/**
+ * Multiply: R = q*A (in constant-time)
+ * Here `bits` should be set to the maximum bitlength of the _absolute value_ of `q`, plus
+ * one because we internally sometimes add 2 to the number during the WNAF conversion.
+ * A must not be infinity.
+ */
+SECP256K1_API void secp256k1_export_group_ecmult_const(
+    secp256k1_gej_alias *r,
+    const secp256k1_gej_alias *a,
+    const secp256k1_scalar *q
+) {
+    secp256k1_ge a_ge;
+
+    /* return zero if a is zero */
+    if (secp256k1_gej_is_infinity(UNALIAS_GEJ(a)) != 0) {
+        secp256k1_gej_set_infinity(UNALIAS_GEJ(r));
+        return;
+    }
+    secp256k1_ge_set_gej(&a_ge, UNALIAS_GEJ(a));
+    secp256k1_ecmult_const(UNALIAS_GEJ(r), &a_ge, q, 258); /* 256 + 2 bits */
+}
+
 SECP256K1_API int secp256k1_export_group_is_valid(
     const secp256k1_gej_alias* a
 ) {
