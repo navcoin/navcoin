@@ -296,6 +296,7 @@ RPCHelpMan keypoolrefill()
             HELP_REQUIRING_PASSPHRASE,
         {
             {"newsize", RPCArg::Type::NUM, RPCArg::DefaultHint{strprintf("%u, or as set by -keypool", DEFAULT_KEYPOOL_SIZE)}, "The new keypool size"},
+            {"blsct", RPCArg::Type::BOOL, RPCArg::DefaultHint{strprintf("%u", true)}, "Whether it should fill the blsct subaddress pool"},
         },
         RPCResult{RPCResult::Type::NONE, "", ""},
         RPCExamples{
@@ -318,8 +319,15 @@ RPCHelpMan keypoolrefill()
                 kpSize = (unsigned int)request.params[0].getInt<int>();
             }
 
+            bool fBlsct = true;
+
+            if (!request.params[1].isNull()) {
+                if (!request.params[1].get_bool())
+                    fBlsct = false;
+            }
+
             EnsureWalletIsUnlocked(*pwallet);
-            pwallet->TopUpKeyPool(kpSize);
+            pwallet->TopUpKeyPool(kpSize, fBlsct);
 
             if (pwallet->GetKeyPoolSize() < kpSize) {
                 throw JSONRPCError(RPC_WALLET_ERROR, "Error refreshing keypool.");
@@ -489,9 +497,12 @@ RPCHelpMan getaddressinfo()
                                               {RPCResult::Type::BOOL, "solvable", "If we know how to spend coins sent to this address, ignoring the possible lack of private keys."},
                                               {RPCResult::Type::STR, "desc", /*optional=*/true, "A descriptor for spending coins sent to this address (only when solvable)."},
                                               {RPCResult::Type::STR, "parent_desc", /*optional=*/true, "The descriptor used to derive this address if this is a descriptor wallet"},
-                                              {RPCResult::Type::BOOL, "isscript", "If the key is a script."},
+                                              {RPCResult::Type::BOOL, "isscript", /*optional=*/true, "If the key is a script."},
+                                              {RPCResult::Type::BOOL, "isblsct", /*optional=*/true, "If the address is of type blsct."},
+                                              {RPCResult::Type::STR_HEX, "spendKey", /*optional=*/true, "The spending key of the address."},
+                                              {RPCResult::Type::STR_HEX, "viewKey", /*optional=*/true, "The view key of the address."},
                                               {RPCResult::Type::BOOL, "ischange", "If the address was used for change output."},
-                                              {RPCResult::Type::BOOL, "iswitness", "If the address is a witness address."},
+                                              {RPCResult::Type::BOOL, "iswitness", /*optional=*/true, "If the address is a witness address."},
                                               {RPCResult::Type::NUM, "witness_version", /*optional=*/true, "The version number of the witness program."},
                                               {RPCResult::Type::STR_HEX, "witness_program", /*optional=*/true, "The hex value of the witness program."},
                                               {RPCResult::Type::STR, "script", /*optional=*/true, "The output script type. Only if isscript is true and the redeemscript is known. Possible\n"

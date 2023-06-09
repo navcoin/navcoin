@@ -2464,16 +2464,18 @@ unsigned int CWallet::GetSubAddressPoolSize(const uint64_t& account) const
     return 0;
 }
 
-bool CWallet::TopUpKeyPool(unsigned int kpSize)
+bool CWallet::TopUpKeyPool(unsigned int kpSize, bool fBlsct)
 {
     LOCK(cs_wallet);
     bool res = true;
     for (auto spk_man : GetActiveScriptPubKeyMans()) {
         res &= spk_man->TopUp(kpSize);
     }
-    auto blsct_km = GetBLSCTKeyMan();
-    if (blsct_km) {
-        res &= blsct_km->TopUp(kpSize);
+    if (fBlsct) {
+        auto blsct_km = GetBLSCTKeyMan();
+        if (blsct_km) {
+            res &= blsct_km->TopUp(kpSize);
+        }
     }
     return res;
 }
@@ -2913,7 +2915,6 @@ std::shared_ptr<CWallet> CWallet::Create(WalletContext& context, const std::stri
     std::shared_ptr<CWallet> walletInstance(new CWallet(chain, name, std::move(database)), ReleaseWallet);
     walletInstance->m_keypool_size = std::max(args.GetIntArg("-keypool", DEFAULT_KEYPOOL_SIZE), int64_t{1});
     walletInstance->m_notify_tx_changed_script = args.GetArg("-walletnotify", "");
-
     // Load wallet
     bool rescan_required = false;
     DBErrors nLoadWalletRet = walletInstance->LoadWallet();
@@ -2968,21 +2969,13 @@ std::shared_ptr<CWallet> CWallet::Create(WalletContext& context, const std::stri
 
         walletInstance->SetupBLSCTKeyMan();
 
-        {
-            auto blsct_man = walletInstance->GetBLSCTKeyMan();
-
-            if (blsct_man) {
-                blsct_man->SetupGeneration();
-            }
-        }
-
         // Only create LegacyScriptPubKeyMan when not descriptor wallet
         if (!walletInstance->IsWalletFlagSet(WALLET_FLAG_DESCRIPTORS)) {
             walletInstance->SetupLegacyScriptPubKeyMan();
         }
 
-        if (!walletInstance->IsWalletFlagSet(WALLET_FLAG_BLSCT) &&
-            ((wallet_creation_flags & WALLET_FLAG_EXTERNAL_SIGNER) || !(wallet_creation_flags & (WALLET_FLAG_DISABLE_PRIVATE_KEYS | WALLET_FLAG_BLANK_WALLET)))) {
+        if ((wallet_creation_flags & WALLET_FLAG_EXTERNAL_SIGNER) ||
+            !(wallet_creation_flags & (WALLET_FLAG_DISABLE_PRIVATE_KEYS | WALLET_FLAG_BLANK_WALLET))) {
             LOCK(walletInstance->cs_wallet);
             if (walletInstance->IsWalletFlagSet(WALLET_FLAG_DESCRIPTORS)) {
                 walletInstance->SetupDescriptorScriptPubKeyMans();

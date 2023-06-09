@@ -12,8 +12,7 @@ bool KeyMan::IsHDEnabled() const
 
 bool KeyMan::CanGenerateKeys() const
 {
-    // A wallet can generate keys if it has an HD seed (IsHDEnabled) or it is a non-HD wallet (pre FEATURE_HD)
-    LOCK(cs_KeyStore);
+    // A wallet can generate keys if it has an HD seed (IsHDEnabled)
     return IsHDEnabled();
 }
 
@@ -60,7 +59,6 @@ bool KeyMan::AddViewKey(const PrivateKey& secret, const PublicKey& pubkey)
         return batch.WriteViewKey(pubkey, secret,
                                   mapKeyMetadata[pubkey.GetID()]);
     }
-    m_storage.UnsetBlankWalletFlag(batch);
     return true;
 }
 
@@ -69,24 +67,18 @@ bool KeyMan::AddSpendKey(const PublicKey& pubkey)
     LOCK(cs_KeyStore);
     wallet::WalletBatch batch(m_storage.GetDatabase());
     AssertLockHeld(cs_KeyStore);
-
     if (!fSpendKeyDefined) {
         KeyRing::AddSpendKey(pubkey);
-
         if (!batch.WriteSpendKey(pubkey))
             return false;
     }
 
-    m_storage.UnsetBlankWalletFlag(batch);
     return true;
 }
 
 bool KeyMan::AddKeyPubKeyWithDB(wallet::WalletBatch& batch, const PrivateKey& secret, const PublicKey& pubkey)
 {
     AssertLockHeld(cs_KeyStore);
-
-    // Make sure we aren't adding private keys to private key disabled wallets
-    assert(!m_storage.IsWalletFlagSet(wallet::WALLET_FLAG_DISABLE_PRIVATE_KEYS));
 
     bool needsDB = !encrypted_batch;
     if (needsDB) {
@@ -103,22 +95,21 @@ bool KeyMan::AddKeyPubKeyWithDB(wallet::WalletBatch& batch, const PrivateKey& se
                               secret,
                               mapKeyMetadata[pubkey.GetID()]);
     }
-    m_storage.UnsetBlankWalletFlag(batch);
     return true;
 }
 
-bool KeyMan::AddSubAddressPoolWithDB(wallet::WalletBatch& batch, const SubAddressIdentifier& id, const SubAddress& subAddress)
+bool KeyMan::AddSubAddressPoolWithDB(wallet::WalletBatch& batch, const SubAddressIdentifier& id, const SubAddress& subAddress, const bool& fLock)
 {
-    AssertLockHeld(cs_KeyStore);
+    LOCK(cs_KeyStore);
 
-    AddSubAddressPoolInner(id);
+    setSubAddressPool[id.account].insert(id.address);
 
     return batch.WriteSubAddressPool(id, SubAddressPool(subAddress.GetKeys().GetID()));
 }
 
-bool KeyMan::AddSubAddressPoolInner(const SubAddressIdentifier& id)
+bool KeyMan::AddSubAddressPoolInner(const SubAddressIdentifier& id, const bool& fLock)
 {
-    AssertLockHeld(cs_KeyStore);
+    LOCK(cs_KeyStore);
 
     setSubAddressPool[id.account].insert(id.address);
 
@@ -138,10 +129,6 @@ bool KeyMan::LoadCryptedKey(const PublicKey& vchPubKey, const std::vector<unsign
 bool KeyMan::AddCryptedKeyInner(const PublicKey& vchPubKey, const std::vector<unsigned char>& vchCryptedSecret)
 {
     LOCK(cs_KeyStore);
-    for (const KeyMap::value_type& mKey : mapKeys) {
-        const PrivateKey& key = mKey.second;
-        PublicKey pubKey = key.GetPublicKey();
-    }
     assert(mapKeys.empty());
 
     mapCryptedKeys[vchPubKey.GetID()] = make_pair(vchPubKey, vchCryptedSecret);
@@ -166,7 +153,6 @@ bool KeyMan::AddCryptedKey(const PublicKey& vchPubKey,
 
 PrivateKey KeyMan::GenerateNewSeed()
 {
-    assert(!m_storage.IsWalletFlagSet(wallet::WALLET_FLAG_DISABLE_PRIVATE_KEYS));
     PrivateKey key(BLS12_381_KeyGen::derive_master_SK(MclScalar::Rand(true).GetVch()));
     return key;
 }
@@ -265,7 +251,6 @@ void KeyMan::SetHDSeed(const PrivateKey& key)
     AddHDChain(newHdChain);
     NotifyCanGetAddressesChanged();
     wallet::WalletBatch batch(m_storage.GetDatabase());
-    m_storage.UnsetBlankWalletFlag(batch);
 }
 
 bool KeyMan::SetupGeneration(bool force)
@@ -333,6 +318,11 @@ bool KeyMan::LoadKey(const PrivateKey& key, const PublicKey& pubkey)
 bool KeyMan::LoadViewKey(const PrivateKey& key, const PublicKey& pubkey)
 {
     return KeyRing::AddViewKey(key, pubkey);
+}
+
+bool KeyMan::LoadSpendKey(const PublicKey& pubkey)
+{
+    return KeyRing::AddSpendKey(pubkey);
 }
 
 /**
@@ -440,11 +430,15 @@ bool KeyMan::IsMine(const blsct::PublicKey& ephemeralKey, const blsct::PublicKey
     auto D_prime = spendingKey.GetG1Point() + dh;
     auto hashId = PublicKey(D_prime).GetID();
 
-    return HaveSubAddress(hashId);
+    {
+        LOCK(cs_KeyStore);
+        return HaveSubAddress(hashId);
+    }
 }
 
 void KeyMan::LoadSubAddress(const CKeyID& hashId, const SubAddressIdentifier& index)
 {
+    LOCK(cs_KeyStore);
     mapSubAddresses[hashId] = index;
 }
 
@@ -454,7 +448,7 @@ bool KeyMan::AddSubAddress(const CKeyID& hashId, const SubAddressIdentifier& ind
     wallet::WalletBatch batch(m_storage.GetDatabase());
     AssertLockHeld(cs_KeyStore);
 
-    LoadSubAddress(hashId, index);
+    mapSubAddresses[hashId] = index;
 
     return batch.WriteSubAddress(hashId, index);
 }
@@ -500,32 +494,30 @@ SubAddress KeyMan::GenerateNewSubAddress(const uint64_t& account, SubAddressIden
 
 bool KeyMan::NewSubAddressPool(const uint64_t& account)
 {
-    if (m_storage.IsWalletFlagSet(wallet::WALLET_FLAG_DISABLE_PRIVATE_KEYS)) {
+    LOCK(cs_KeyStore);
+    wallet::WalletBatch batch(m_storage.GetDatabase());
+
+    if (setSubAddressPool.count(account)) {
+        for (uint64_t nIndex : setSubAddressPool[account])
+            batch.EraseSubAddressPool({account, nIndex});
+        setSubAddressPool[account].clear();
+    } else {
+        setSubAddressPool.insert(std::make_pair(account, std::set<uint64_t>()));
+    }
+
+    if (!TopUpAccount(account)) {
         return false;
     }
-    {
-        LOCK(cs_KeyStore);
-        wallet::WalletBatch batch(m_storage.GetDatabase());
 
-        if (setSubAddressPool.count(account)) {
-            for (uint64_t nIndex : setSubAddressPool[account])
-                batch.EraseSubAddressPool({account, nIndex});
-            setSubAddressPool[account].clear();
-        } else {
-            setSubAddressPool.insert(std::make_pair(account, std::set<uint64_t>()));
-        }
+    WalletLogPrintf("blsct::KeyMan::NewSubAddressPool rewrote keypool\n");
 
-        if (!TopUpAccount(account)) {
-            return false;
-        }
-
-        WalletLogPrintf("blsct::KeyMan::NewSubAddressPool rewrote keypool\n");
-    }
     return true;
 }
 
 bool KeyMan::TopUp(const unsigned int& size)
 {
+    LOCK(cs_KeyStore);
+
     if (!CanGenerateKeys()) {
         return false;
     }
@@ -560,7 +552,7 @@ bool KeyMan::TopUpAccount(const uint64_t& account, const unsigned int& size)
     wallet::WalletBatch batch(m_storage.GetDatabase());
     for (int64_t i = missing; i--;) {
         auto sa = GenerateNewSubAddress(account, id);
-        AddSubAddressPoolWithDB(batch, id, sa);
+        AddSubAddressPoolWithDB(batch, id, sa, false);
     }
 
     if (missing > 0)
@@ -653,6 +645,7 @@ bool KeyMan::GetSubAddressFromPool(const uint64_t& account, CKeyID& result, SubA
 
 int KeyMan::GetSubAddressPoolSize(const uint64_t& account) const
 {
+    LOCK(cs_KeyStore);
     return setSubAddressPool.count(account) > 0 ? setSubAddressPool.at(account).size() : 0;
 }
 

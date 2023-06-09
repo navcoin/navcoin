@@ -50,9 +50,9 @@ private:
     using SubAddressPoolMapSet = std::map<uint64_t, std::set<uint64_t>>;
 
     CryptedKeyMap mapCryptedKeys GUARDED_BY(cs_KeyStore);
-    SubAddressMap mapSubAddresses;
-    SubAddressPoolMapSet setSubAddressPool;
-    SubAddressPoolMapSet setSubAddressReservePool;
+    SubAddressMap mapSubAddresses GUARDED_BY(cs_KeyStore);
+    SubAddressPoolMapSet setSubAddressPool GUARDED_BY(cs_KeyStore);
+    SubAddressPoolMapSet setSubAddressReservePool GUARDED_BY(cs_KeyStore);
 
     int64_t nTimeFirstKey GUARDED_BY(cs_KeyStore) = 0;
     //! Number of pre-generated SubAddresses
@@ -87,13 +87,14 @@ public:
     //! Adds a key to the store, without saving it to disk (used by LoadWallet)
     bool LoadKey(const PrivateKey& key, const PublicKey& pubkey);
     bool LoadViewKey(const PrivateKey& key, const PublicKey& pubkey);
+    bool LoadSpendKey(const PublicKey& pubkey);
     //! Adds an encrypted key to the store, and saves it to disk.
     bool AddCryptedKey(const PublicKey& vchPubKey, const std::vector<unsigned char>& vchCryptedSecret);
     //! Adds an encrypted key to the store, without saving it to disk (used by LoadWallet)
     bool LoadCryptedKey(const PublicKey& vchPubKey, const std::vector<unsigned char>& vchCryptedSecret, bool checksum_valid);
     bool AddKeyPubKeyWithDB(wallet::WalletBatch& batch, const PrivateKey& secret, const PublicKey& pubkey) EXCLUSIVE_LOCKS_REQUIRED(cs_KeyStore);
-    bool AddSubAddressPoolWithDB(wallet::WalletBatch& batch, const SubAddressIdentifier& id, const SubAddress& subAddress) EXCLUSIVE_LOCKS_REQUIRED(cs_KeyStore);
-    bool AddSubAddressPoolInner(const SubAddressIdentifier& id) EXCLUSIVE_LOCKS_REQUIRED(cs_KeyStore);
+    bool AddSubAddressPoolWithDB(wallet::WalletBatch& batch, const SubAddressIdentifier& id, const SubAddress& subAddress, const bool& fLock = true);
+    bool AddSubAddressPoolInner(const SubAddressIdentifier& id, const bool& fLock = true);
 
     /* KeyRing overrides */
     bool HaveKey(const CKeyID& address) const override;
@@ -126,7 +127,7 @@ public:
     /** SubAddress keypool */
     void LoadSubAddress(const CKeyID& hashId, const SubAddressIdentifier& index);
     bool AddSubAddress(const CKeyID& hashId, const SubAddressIdentifier& index);
-    bool HaveSubAddress(const CKeyID& hashId) const;
+    bool HaveSubAddress(const CKeyID& hashId) const EXCLUSIVE_LOCKS_REQUIRED(cs_KeyStore);
     bool NewSubAddressPool(const uint64_t& account = 0);
     bool TopUp(const unsigned int& size = 0);
     bool TopUpAccount(const uint64_t& account, const unsigned int& size = 0);

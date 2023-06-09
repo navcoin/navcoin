@@ -9,7 +9,6 @@ SubAddress::SubAddress(const PrivateKey& viewKey, const PublicKey& spendKey, con
 {
     if (!viewKey.IsValid() || !spendKey.IsValid()) {
         throw std::runtime_error("blsct::SubAddress::SubAddress(): no valid blsct keys");
-        return;
     }
 
     CHashWriter string(SER_GETHASH, 0);
@@ -23,7 +22,6 @@ SubAddress::SubAddress(const PrivateKey& viewKey, const PublicKey& spendKey, con
     // M = m*G
     // D = B + M
     // C = a*D
-    std::cout << "hash " << string.GetHash().ToString() << "\n";
     MclScalar m{string.GetHash()};
     MclG1Point M = MclG1Point::GetBasePoint() * m;
     MclG1Point B = spendKey.GetG1Point();
