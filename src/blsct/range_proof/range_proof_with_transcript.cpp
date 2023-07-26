@@ -18,6 +18,7 @@ RangeProofWithTranscript<T> RangeProofWithTranscript<T>::Build(const RangeProof<
 
     // build transcript in the same way it was built in the prove function
     CHashWriter fiat_shamir(0,0);
+
 retry:
     for (size_t i = 0; i < proof.Vs.Size(); ++i) {
         fiat_shamir << proof.Vs[i];

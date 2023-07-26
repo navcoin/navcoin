@@ -85,16 +85,16 @@ BOOST_AUTO_TEST_CASE(test_range_proof_recovery_one_value)
     auto proof = rp.Prove(vs, nonce, msg.second, token_id);
 
     size_t index = 0;
-    auto req = AmountRecoveryRequest<T>::of(proof, index, nonce);
+    auto req = AmountRecoveryRequest<T>::of(proof, index, nonce, token_id);
     auto reqs = std::vector<AmountRecoveryRequest<T>> { req };
-    auto result = rp.RecoverAmounts(reqs, token_id);
+    auto result = rp.RecoverAmounts(reqs);
 
     BOOST_CHECK(result.is_completed);
     auto xs = result.amounts;
     BOOST_CHECK(xs.size() == 1);
-    BOOST_CHECK(xs[0].gamma == nonce.GetHashWithSalt(100));
-    BOOST_CHECK(xs[0].amount == 1);
-    BOOST_CHECK(xs[0].message == msg.first);
+    BOOST_CHECK(xs[0].value().gamma == nonce.GetHashWithSalt(100));
+    BOOST_CHECK(xs[0].value().amount == 1);
+    BOOST_CHECK(xs[0].value().message == msg.first);
 }
 
 static std::vector<TestCase> BuildTestCases()
@@ -289,17 +289,19 @@ static void RunTestCase(
     std::vector<AmountRecoveryRequest<T>> reqs;
 
     for (size_t i=0; i<proofs.size(); ++i) {
-        reqs.push_back(AmountRecoveryRequest<T>::of(proofs[i], i, nonce));
+        reqs.push_back(AmountRecoveryRequest<T>::of(proofs[i], i, nonce, token_id));
     }
-    auto recovery_result = rp.RecoverAmounts(reqs, token_id);
+    auto recovery_result = rp.RecoverAmounts(reqs);
     BOOST_CHECK(recovery_result.is_completed == test_case.should_complete_recovery);
 
     if (recovery_result.is_completed) {
         auto amounts = recovery_result.amounts;
-        BOOST_CHECK(amounts.size() == test_case.num_amounts);
+        size_t nRecovered = 0;
 
         for (size_t i=0; i<amounts.size(); ++i) {
-            auto x = amounts[i];
+            if (!amounts[i].has_value()) continue;
+
+            auto x = amounts[i].value();
             auto gamma = nonce.GetHashWithSalt(100 + i);
 
             BOOST_CHECK(((uint64_t) x.amount) == test_case.values[i].GetUint64());
@@ -307,7 +309,11 @@ static void RunTestCase(
 
             std::vector<unsigned char> x_msg(x.message.begin(), x.message.end());
             BOOST_CHECK(x_msg == test_case.msg.second);
+
+            ++nRecovered;
         }
+
+        BOOST_CHECK(nRecovered == test_case.num_amounts);
     }
 }
 

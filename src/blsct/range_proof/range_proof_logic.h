@@ -30,8 +30,9 @@ struct AmountRecoveryRequest {
     Scalar mu;
     Scalar tau_x;
     Point nonce;
+    TokenId token_id;
 
-    static AmountRecoveryRequest<T> of(RangeProof<T>& proof, size_t& index, Point& nonce);
+    static AmountRecoveryRequest<T> of(RangeProof<T>& proof, size_t& index, Point& nonce, TokenId& token_id);
 };
 
 template <typename T>
@@ -53,7 +54,7 @@ struct RecoveredAmount {
 template <typename T>
 struct AmountRecoveryResult {
     bool is_completed; // done doesn't mean recovery success
-    std::vector<RecoveredAmount<T>> amounts;
+    std::vector<std::optional<RecoveredAmount<T>>> amounts;
 
     static AmountRecoveryResult<T> failure();
 };
@@ -88,8 +89,7 @@ public:
         const size_t& max_mn) const;
 
     AmountRecoveryResult<T> RecoverAmounts(
-        const std::vector<AmountRecoveryRequest<T>>& reqs,
-        const TokenId& token_id) const;
+        const std::vector<AmountRecoveryRequest<T>>& reqs) const;
 
     static void ValidateProofsBySizes(
         const std::vector<RangeProof<T>>& proofs);

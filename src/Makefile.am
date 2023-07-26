@@ -187,6 +187,7 @@ BITCOIN_CORE_H = \
   blsct/wallet/hdchain.h \
   blsct/wallet/keyman.h \
   blsct/wallet/keyring.h \
+  blsct/wallet/txfactory.h \
   dandelion.h \
   chain.h \
   chainparams.h \
@@ -566,6 +567,7 @@ libbitcoin_wallet_a_SOURCES = \
   blsct/wallet/address.cpp \
   blsct/wallet/keyman.cpp \
   blsct/wallet/keyring.cpp \
+  blsct/wallet/txfactory.cpp \
   wallet/coincontrol.cpp \
   wallet/context.cpp \
   wallet/crypter.cpp \

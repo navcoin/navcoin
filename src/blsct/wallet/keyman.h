@@ -10,6 +10,7 @@
 #include <blsct/eip_2333/bls12_381_keygen.h>
 #include <blsct/private_key.h>
 #include <blsct/public_key.h>
+#include <blsct/range_proof/range_proof_logic.h>
 #include <blsct/wallet/address.h>
 #include <blsct/wallet/hdchain.h>
 #include <blsct/wallet/keyring.h>
@@ -104,7 +105,7 @@ public:
     bool CheckDecryptionKey(const wallet::CKeyingMaterial& master_key, bool accept_no_keys);
 
     SubAddress GenerateNewSubAddress(const uint64_t& account, SubAddressIdentifier& id);
-    SubAddress GetSubAddress(const SubAddressIdentifier& id = {0, 0});
+    SubAddress GetSubAddress(const SubAddressIdentifier& id = {0, 0}) const;
     util::Result<CTxDestination> GetNewDestination(const uint64_t& account = 0);
 
     /* Set the HD chain model (chain child index counters) and writes it to the database */
@@ -121,13 +122,18 @@ public:
     bool DeleteKeys();
 
     /** Detect ownership of outputs **/
-    bool IsMine(const CTxOut& txout) { return IsMine(txout.blsctData.ephemeralKey, txout.blsctData.spendingKey, txout.blsctData.viewTag); };
-    bool IsMine(const blsct::PublicKey& ephemeralKey, const blsct::PublicKey& spendingKey, const uint16_t& viewTag);
+    bool IsMine(const CTxOut& txout) { return IsMine(txout.blsctData.blindingKey, txout.blsctData.spendingKey, txout.blsctData.viewTag); };
+    bool IsMine(const blsct::PublicKey& blindingKey, const blsct::PublicKey& spendingKey, const uint16_t& viewTag);
+    CKeyID GetHashId(const CTxOut& txout) { return GetHashId(txout.blsctData.blindingKey, txout.blsctData.spendingKey); };
+    CKeyID GetHashId(const blsct::PublicKey& blindingKey, const blsct::PublicKey& spendingKey);
+    std::optional<AmountRecoveryResult<Mcl>> RecoverOutputs(const std::vector<CTxOut>& outs);
 
     /** SubAddress keypool */
     void LoadSubAddress(const CKeyID& hashId, const SubAddressIdentifier& index);
     bool AddSubAddress(const CKeyID& hashId, const SubAddressIdentifier& index);
     bool HaveSubAddress(const CKeyID& hashId) const EXCLUSIVE_LOCKS_REQUIRED(cs_KeyStore);
+    bool GetSubAddress(const CKeyID& hashId, SubAddress& address) const;
+    bool GetSubAddressId(const CKeyID& hashId, SubAddressIdentifier& subAddId) const;
     bool NewSubAddressPool(const uint64_t& account = 0);
     bool TopUp(const unsigned int& size = 0);
     bool TopUpAccount(const uint64_t& account, const unsigned int& size = 0);

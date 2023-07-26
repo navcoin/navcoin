@@ -32,12 +32,12 @@ template <typename T>
 GeneratorsFactory<T>* RangeProofLogic<T>::m_gf = nullptr;
 
 template <typename T>
-AmountRecoveryRequest<T> AmountRecoveryRequest<T>::of(RangeProof<T>& proof, size_t& index, typename T::Point& nonce)
+AmountRecoveryRequest<T> AmountRecoveryRequest<T>::of(RangeProof<T>& proof, size_t& index, typename T::Point& nonce, TokenId& token_id)
 {
     auto proof_with_transcript = RangeProofWithTranscript<T>::Build(proof);
 
     AmountRecoveryRequest<T> req{
-        1,
+        index,
         proof_with_transcript.x,
         proof_with_transcript.z,
         proof.Vs,
@@ -45,17 +45,18 @@ AmountRecoveryRequest<T> AmountRecoveryRequest<T>::of(RangeProof<T>& proof, size
         proof.Rs,
         proof.mu,
         proof.tau_x,
-        nonce};
+        nonce,
+        token_id};
     return req;
 }
-template AmountRecoveryRequest<Mcl> AmountRecoveryRequest<Mcl>::of(RangeProof<Mcl>&, size_t&, Mcl::Point&);
+template AmountRecoveryRequest<Mcl> AmountRecoveryRequest<Mcl>::of(RangeProof<Mcl>&, size_t&, Mcl::Point&, TokenId&);
 
 template <typename T>
 AmountRecoveryResult<T> AmountRecoveryResult<T>::failure()
 {
     return {
         false,
-        std::vector<RecoveredAmount<T>>()};
+        std::vector<std::optional<RecoveredAmount<T>>>()};
 }
 template AmountRecoveryResult<Mcl> AmountRecoveryResult<Mcl>::failure();
 
@@ -481,17 +482,16 @@ template bool RangeProofLogic<Mcl>::Verify(
 
 template <typename T>
 AmountRecoveryResult<T> RangeProofLogic<T>::RecoverAmounts(
-    const std::vector<AmountRecoveryRequest<T>>& reqs,
-    const TokenId& token_id) const
+    const std::vector<AmountRecoveryRequest<T>>& reqs) const
 {
     using Scalar = typename T::Scalar;
     using Point = typename T::Point;
 
     // will contain result of successful requests only
-    std::vector<RecoveredAmount<T>> recovered_amounts;
+    std::vector<std::optional<RecoveredAmount<T>>> recovered_amounts;
 
     for (const AmountRecoveryRequest<T>& req : reqs) {
-        const Generators<T> gens = m_gf->GetInstance(token_id);
+        const Generators<T> gens = m_gf->GetInstance(req.token_id);
         Point G = gens.G;
         Point H = gens.H.get();
 
@@ -528,7 +528,9 @@ AmountRecoveryResult<T> RangeProofLogic<T>::RecoverAmounts(
 
         // skip this request if recovered input value 0 commitment doesn't match with Vs[0]
         Point input_value0_commitment = (H * input_value0_gamma) + (G * input_value0);
+
         if (input_value0_commitment != req.Vs[0]) {
+            recovered_amounts.push_back(std::nullopt);
             continue;
         }
 
@@ -565,5 +567,4 @@ AmountRecoveryResult<T> RangeProofLogic<T>::RecoverAmounts(
         recovered_amounts};
 }
 template AmountRecoveryResult<Mcl> RangeProofLogic<Mcl>::RecoverAmounts(
-    const std::vector<AmountRecoveryRequest<Mcl>>&,
-    const TokenId&) const;
+    const std::vector<AmountRecoveryRequest<Mcl>>&) const;

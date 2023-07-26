@@ -40,6 +40,7 @@ private:
     DoublePublicKey pk;
 
 public:
+    SubAddress(){};
     SubAddress(const PrivateKey& viewKey, const PublicKey& spendKey, const SubAddressIdentifier& subAddressId);
     SubAddress(const DoublePublicKey& pk) : pk(pk){};
 

@@ -341,7 +341,7 @@ void KeyMan::UpdateTimeFirstKey(int64_t nCreateTime)
     }
 }
 
-SubAddress KeyMan::GetSubAddress(const SubAddressIdentifier& id)
+SubAddress KeyMan::GetSubAddress(const SubAddressIdentifier& id) const
 {
     return SubAddress(viewKey, spendPublicKey, id);
 };
@@ -414,21 +414,47 @@ bool KeyMan::Encrypt(const wallet::CKeyingMaterial& master_key, wallet::WalletBa
     return true;
 }
 
-bool KeyMan::IsMine(const blsct::PublicKey& ephemeralKey, const blsct::PublicKey& spendingKey, const uint16_t& viewTag)
+CKeyID KeyMan::GetHashId(const blsct::PublicKey& blindingKey, const blsct::PublicKey& spendingKey)
+{
+    if (!fViewKeyDefined || !viewKey.IsValid())
+        throw std::runtime_error(strprintf("%s: the wallet has no view key available"));
+
+    auto t = blindingKey.GetG1Point() * viewKey.GetScalar();
+    auto dh = MclG1Point::GetBasePoint() * t.GetHashWithSalt(0).Negate();
+    auto D_prime = spendingKey.GetG1Point() + dh;
+
+    return PublicKey(D_prime).GetID();
+};
+
+std::optional<AmountRecoveryResult<Mcl>> KeyMan::RecoverOutputs(const std::vector<CTxOut>& outs)
+{
+    if (!fViewKeyDefined || !viewKey.IsValid())
+        return std::nullopt;
+
+    RangeProofLogic<Mcl> rp;
+    std::vector<AmountRecoveryRequest<Mcl>> reqs;
+    reqs.reserve(outs.size());
+    for (size_t i = 0; i < outs.size(); i++) {
+        CTxOut out = outs[i];
+        auto nonce = out.blsctData.blindingKey * viewKey.GetScalar();
+        reqs.push_back(AmountRecoveryRequest<Mcl>::of(out.blsctData.rangeProof, i, nonce, out.tokenId));
+    }
+
+    return rp.RecoverAmounts(reqs);
+}
+
+bool KeyMan::IsMine(const blsct::PublicKey& blindingKey, const blsct::PublicKey& spendingKey, const uint16_t& viewTag)
 {
     if (!fViewKeyDefined || !viewKey.IsValid())
         return false;
 
     CHashWriter hash(SER_GETHASH, PROTOCOL_VERSION);
-    hash << (ephemeralKey.GetG1Point() * viewKey.GetScalar());
 
-    if (viewTag != (hash.GetHash().GetUint64(0) & 0xFF))
-        return false;
+    hash << (blindingKey.GetG1Point() * viewKey.GetScalar());
 
-    auto t = ephemeralKey.GetG1Point() * viewKey.GetScalar();
-    auto dh = MclG1Point::GetBasePoint() * t.GetHashWithSalt(0).Invert();
-    auto D_prime = spendingKey.GetG1Point() + dh;
-    auto hashId = PublicKey(D_prime).GetID();
+    if (viewTag != (hash.GetHash().GetUint64(0) & 0xFFFF)) return false;
+
+    auto hashId = GetHashId(blindingKey, spendingKey);
 
     {
         LOCK(cs_KeyStore);
@@ -456,6 +482,20 @@ bool KeyMan::AddSubAddress(const CKeyID& hashId, const SubAddressIdentifier& ind
 bool KeyMan::HaveSubAddress(const CKeyID& hashId) const
 {
     return mapSubAddresses.count(hashId) > 0;
+}
+
+bool KeyMan::GetSubAddress(const CKeyID& hashId, SubAddress& address) const
+{
+    if (!HaveSubAddress(hashId)) return false;
+    address = GetSubAddress(mapSubAddresses.at(hashId));
+    return true;
+}
+
+bool KeyMan::GetSubAddressId(const CKeyID& hashId, SubAddressIdentifier& subAddId) const
+{
+    if (!HaveSubAddress(hashId)) return false;
+    subAddId = mapSubAddresses.at(hashId);
+    return true;
 }
 
 SubAddress KeyMan::GenerateNewSubAddress(const uint64_t& account, SubAddressIdentifier& id)
@@ -679,9 +719,11 @@ util::Result<CTxDestination> KeyMan::GetNewDestination(const uint64_t& account)
     // Generate a new key that is added to wallet
     SubAddressIdentifier id;
     CKeyID keyId;
+
     if (!GetSubAddressFromPool(account, keyId, id)) {
         return util::Error{_("Error: Keypool ran out, please call keypoolrefill first")};
     }
+
     return CTxDestination(GetSubAddress(id).GetKeys());
 }
 } // namespace blsct

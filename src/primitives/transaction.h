@@ -277,7 +277,7 @@ public:
 
     bool IsNull() const
     {
-        return (nValue == -1);
+        return (nValue == -1 && blsctData.viewTag == 0 && scriptPubKey.size() == 0);
     }
 
     friend bool operator==(const CTxOut& a, const CTxOut& b)
