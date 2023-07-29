@@ -48,10 +48,12 @@ private:
 
     using CryptedKeyMap = std::map<CKeyID, std::pair<PublicKey, std::vector<unsigned char>>>;
     using SubAddressMap = std::map<CKeyID, SubAddressIdentifier>;
+    using SubAddressStrMap = std::map<SubAddress, CKeyID>;
     using SubAddressPoolMapSet = std::map<uint64_t, std::set<uint64_t>>;
 
     CryptedKeyMap mapCryptedKeys GUARDED_BY(cs_KeyStore);
     SubAddressMap mapSubAddresses GUARDED_BY(cs_KeyStore);
+    SubAddressStrMap mapSubAddressesStr GUARDED_BY(cs_KeyStore);
     SubAddressPoolMapSet setSubAddressPool GUARDED_BY(cs_KeyStore);
     SubAddressPoolMapSet setSubAddressReservePool GUARDED_BY(cs_KeyStore);
 
@@ -134,6 +136,10 @@ public:
     bool HaveSubAddress(const CKeyID& hashId) const EXCLUSIVE_LOCKS_REQUIRED(cs_KeyStore);
     bool GetSubAddress(const CKeyID& hashId, SubAddress& address) const;
     bool GetSubAddressId(const CKeyID& hashId, SubAddressIdentifier& subAddId) const;
+    void LoadSubAddressStr(const SubAddress& subAddress, const CKeyID& hashId);
+    bool AddSubAddressStr(const SubAddress& subAddress, const CKeyID& hashId);
+    bool HaveSubAddressStr(const SubAddress& subAddress) const;
+    bool GetSubAddressIdByStr(const SubAddress& address, CKeyID& hashId) const;
     bool NewSubAddressPool(const uint64_t& account = 0);
     bool TopUp(const unsigned int& size = 0);
     bool TopUpAccount(const uint64_t& account, const unsigned int& size = 0);

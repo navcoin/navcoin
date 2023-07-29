@@ -29,16 +29,19 @@ struct UnsignedInput {
     Scalar gamma;
 };
 
+struct Amounts {
+    CAmount nFromInputs;
+    CAmount nFromOutputs;
+};
+
 class TxFactory
 {
 private:
     KeyMan* km;
     CMutableTransaction tx;
-    Scalar gammaAcc;
-    std::vector<UnsignedOutput> vOutputs;
-    std::vector<UnsignedInput> vInputs;
-    CAmount nInputAmount;
-    CAmount nOutputAmount;
+    std::map<TokenId, std::vector<UnsignedOutput>> vOutputs;
+    std::map<TokenId, std::vector<UnsignedInput>> vInputs;
+    std::map<TokenId, Amounts> nAmounts;
 
 public:
     TxFactory(KeyMan* km) : km(km){};
@@ -46,6 +49,7 @@ public:
     static UnsignedOutput CreateOutput(const SubAddress& destination, const CAmount& nAmount, std::string sMemo, const TokenId& tokenId = TokenId());
     void AddOutput(const SubAddress& destination, const CAmount& nAmount, std::string sMemo, const TokenId& tokenId = TokenId());
     bool AddInput(const CCoinsViewCache& cache, const COutPoint& outpoint);
+    std::optional<CMutableTransaction> BuildTx();
 };
 } // namespace blsct
 

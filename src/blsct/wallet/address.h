@@ -49,6 +49,11 @@ public:
     std::string GetString() const;
     CTxDestination GetDestination() const;
     DoublePublicKey GetKeys() const { return pk; };
+
+    SERIALIZE_METHODS(SubAddress, obj) { READWRITE(obj.pk); }
+
+    bool operator==(const SubAddress& rhs) const;
+    bool operator<(const SubAddress& rhs) const;
 };
 } // namespace blsct
 

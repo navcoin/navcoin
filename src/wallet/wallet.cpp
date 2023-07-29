@@ -1101,6 +1101,23 @@ CWalletTx* CWallet::AddToWallet(CTransactionRef tx, const TxState& state, const 
         }
     }
 
+    for (auto& txout : wtx.tx->vout) {
+        if (txout.IsBLSCT()) {
+            auto blsct_man = GetBLSCTKeyMan();
+            if (blsct_man) {
+                auto result = blsct_man->RecoverOutputs({wtx.tx->vout}).value();
+                if (result.is_completed) {
+                    auto xs = result.amounts;
+                    for (auto& res : xs) {
+                        if (res.has_value()) {
+                            wtx.blsctRecoveryData[res.value().id] = res.value();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     //// debug print
     WalletLogPrintf("AddToWallet %s  %s%s\n", hash.ToString(), (fInsertedNew ? "new" : ""), (fUpdated ? "update" : ""));
 
@@ -1504,12 +1521,25 @@ CAmount CWallet::GetDebit(const CTxIn& txin, const isminefilter& filter) const
 isminetype CWallet::IsMine(const CTxOut& txout) const
 {
     AssertLockHeld(cs_wallet);
+    if (txout.IsBLSCT()) {
+        auto blsct_man = GetBLSCTKeyMan();
+        if (blsct_man) {
+            return blsct_man->IsMine(txout) ? ISMINE_SPENDABLE_BLSCT : ISMINE_NO;
+        }
+    }
     return IsMine(txout.scriptPubKey);
 }
+
 
 isminetype CWallet::IsMine(const CTxDestination& dest) const
 {
     AssertLockHeld(cs_wallet);
+    if (std::holds_alternative<blsct::DoublePublicKey>(dest)) {
+        auto blsct_man = GetBLSCTKeyMan();
+        if (blsct_man) {
+            return blsct_man->HaveSubAddressStr(blsct::SubAddress(std::get<blsct::DoublePublicKey>(dest))) ? ISMINE_SPENDABLE_BLSCT : ISMINE_NO;
+        }
+    }
     return IsMine(GetScriptForDestination(dest));
 }
 

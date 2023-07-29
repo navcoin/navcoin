@@ -69,6 +69,7 @@ extern const std::string BLSCTKEY;
 extern const std::string BLSCTKEYMETA;
 extern const std::string BLSCTSUBADDRESS;
 extern const std::string BLSCTSUBADDRESSPOOL;
+extern const std::string BLSCTSUBADDRESSSTR;
 extern const std::string CRYPTED_BLSCTKEY;
 extern const std::string CRYPTED_KEY;
 extern const std::string CSCRIPT;
@@ -254,6 +255,7 @@ public:
     bool WriteSpendKey(const blsct::PublicKey& pubKey);
 
     bool WriteSubAddress(const CKeyID& hashId, const blsct::SubAddressIdentifier& index);
+    bool WriteSubAddressStr(const blsct::SubAddress& subAddress, const CKeyID& hashId);
 
     bool ReadSubAddressPool(const blsct::SubAddressIdentifier& id, blsct::SubAddressPool& keypool);
     bool WriteSubAddressPool(const blsct::SubAddressIdentifier& id, const blsct::SubAddressPool& keypool);

@@ -20,6 +20,7 @@ RangeProofWithTranscript<T> RangeProofWithTranscript<T>::Build(const RangeProof<
     CHashWriter fiat_shamir(0,0);
 
 retry:
+
     for (size_t i = 0; i < proof.Vs.Size(); ++i) {
         fiat_shamir << proof.Vs[i];
     }
@@ -39,7 +40,6 @@ retry:
     fiat_shamir << proof.t_hat;
 
     GEN_FIAT_SHAMIR_VAR(c_factor, fiat_shamir, retry);
-
     auto num_rounds = RangeProofWithTranscript<T>::RecoverNumRounds(proof.Vs.Size());
     auto maybe_xs = ImpInnerProdArg::GenAllRoundXs<T>(num_rounds, proof.Ls, proof.Rs, fiat_shamir);
     if (!maybe_xs.has_value()) goto retry;

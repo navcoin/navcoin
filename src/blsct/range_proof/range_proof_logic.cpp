@@ -490,18 +490,20 @@ AmountRecoveryResult<T> RangeProofLogic<T>::RecoverAmounts(
     // will contain result of successful requests only
     std::vector<std::optional<RecoveredAmount<T>>> recovered_amounts;
 
+
     for (const AmountRecoveryRequest<T>& req : reqs) {
         const Generators<T> gens = m_gf->GetInstance(req.token_id);
         Point G = gens.G;
         Point H = gens.H.get();
-
         // failure if sizes of Ls and Rs differ or Vs is empty
         auto Ls_Rs_valid = req.Ls.Size() > 0 && req.Ls.Size() == req.Rs.Size();
         if (req.Vs.Size() == 0 || !Ls_Rs_valid) {
-            return AmountRecoveryResult<T>::failure();
+            recovered_amounts.push_back(std::nullopt);
+            continue;
         }
         // recovery can only be done when the number of value commitment is 1
         if (req.Vs.Size() != 1) {
+            recovered_amounts.push_back(std::nullopt);
             continue;
         }
 
@@ -560,6 +562,7 @@ AmountRecoveryResult<T> RangeProofLogic<T>::RecoverAmounts(
             (int64_t)input_value0.GetUint64(), // valid values are of type int64_t
             input_value0_gamma,
             std::string(msg1.begin(), msg1.end()) + std::string(msg2.begin(), msg2.end()));
+
         recovered_amounts.push_back(recovered_amount);
     }
     return {

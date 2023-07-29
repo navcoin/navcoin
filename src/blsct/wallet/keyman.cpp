@@ -434,6 +434,7 @@ std::optional<AmountRecoveryResult<Mcl>> KeyMan::RecoverOutputs(const std::vecto
     RangeProofLogic<Mcl> rp;
     std::vector<AmountRecoveryRequest<Mcl>> reqs;
     reqs.reserve(outs.size());
+
     for (size_t i = 0; i < outs.size(); i++) {
         CTxOut out = outs[i];
         auto nonce = out.blsctData.blindingKey * viewKey.GetScalar();
@@ -491,10 +492,32 @@ bool KeyMan::GetSubAddress(const CKeyID& hashId, SubAddress& address) const
     return true;
 }
 
-bool KeyMan::GetSubAddressId(const CKeyID& hashId, SubAddressIdentifier& subAddId) const
+void KeyMan::LoadSubAddressStr(const SubAddress& subAddress, const CKeyID& hashId)
 {
-    if (!HaveSubAddress(hashId)) return false;
-    subAddId = mapSubAddresses.at(hashId);
+    LOCK(cs_KeyStore);
+    mapSubAddressesStr[subAddress] = hashId;
+}
+
+bool KeyMan::AddSubAddressStr(const SubAddress& subAddress, const CKeyID& hashId)
+{
+    LOCK(cs_KeyStore);
+    wallet::WalletBatch batch(m_storage.GetDatabase());
+    AssertLockHeld(cs_KeyStore);
+
+    mapSubAddressesStr[subAddress] = hashId;
+
+    return batch.WriteSubAddressStr(subAddress, hashId);
+}
+
+bool KeyMan::HaveSubAddressStr(const SubAddress& subAddress) const
+{
+    return mapSubAddressesStr.count(subAddress) > 0;
+}
+
+bool KeyMan::GetSubAddressIdByStr(const SubAddress& address, CKeyID& hashId) const
+{
+    if (!HaveSubAddressStr(address)) return false;
+    hashId = mapSubAddressesStr.at(address);
     return true;
 }
 
@@ -526,6 +549,9 @@ SubAddress KeyMan::GenerateNewSubAddress(const uint64_t& account, SubAddressIden
 
     if (!AddSubAddress(subAddress.GetKeys().GetID(), id))
         throw std::runtime_error("CWallet::GenerateNewSubAddress(): AddSubAddress failed");
+
+    if (!AddSubAddressStr(subAddress, subAddress.GetKeys().GetID()))
+        throw std::runtime_error("CWallet::GenerateNewSubAddress(): AddSubAddressStr failed");
 
     return subAddress;
 }

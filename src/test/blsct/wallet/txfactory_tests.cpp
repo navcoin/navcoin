@@ -79,6 +79,36 @@ BOOST_FIXTURE_TEST_CASE(addinput_test, TestingSetup)
 
     CCoinsViewCache coins_view_cache{&base, /*deterministic=*/true};
     BOOST_ASSERT(tx.AddInput(coins_view_cache, outpoint));
+
+    tx.AddOutput(recvAddress, 900, "test");
+
+    auto finalTx = tx.BuildTx();
+
+    BOOST_ASSERT(finalTx.has_value());
+
+    bool nFoundChange = false;
+
+    auto result = blsct_km->RecoverOutputs(finalTx.value().vout).value();
+
+    for (auto& res : result.amounts) {
+        if (!res.has_value()) continue;
+        if (res.value().message == "Change" && res.value().amount == 100) nFoundChange = true;
+    }
+
+    BOOST_ASSERT(nFoundChange);
+
+    wallet->transactionAddedToMempool(MakeTransactionRef(finalTx.value()));
+
+    auto wtx = wallet->GetWalletTx(finalTx.value().GetHash());
+    BOOST_ASSERT(wtx != nullptr);
+
+    nFoundChange = false;
+
+    for (auto& res : wtx->blsctRecoveryData) {
+        if (res.second.message == "Change" && res.second.amount == 100) nFoundChange = true;
+    }
+
+    BOOST_ASSERT(nFoundChange);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

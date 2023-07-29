@@ -280,6 +280,11 @@ public:
         return (nValue == -1 && blsctData.viewTag == 0 && scriptPubKey.size() == 0);
     }
 
+    bool IsBLSCT() const
+    {
+        return blsctData.rangeProof.Vs.Size() > 0;
+    }
+
     friend bool operator==(const CTxOut& a, const CTxOut& b)
     {
         return (a.nValue == b.nValue &&

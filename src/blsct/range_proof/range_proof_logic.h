@@ -45,10 +45,17 @@ struct RecoveredAmount {
         const Scalar& gamma,
         const std::string& message) : id{id}, amount{amount}, gamma{gamma}, message{message} {}
 
+    RecoveredAmount() {}
+
     size_t id;
     CAmount amount;
     Scalar gamma;
     std::string message;
+
+    SERIALIZE_METHODS(RecoveredAmount<T>, obj)
+    {
+        READWRITE(obj.amount, obj.gamma, obj.message);
+    }
 };
 
 template <typename T>

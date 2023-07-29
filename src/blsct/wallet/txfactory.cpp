@@ -77,9 +77,16 @@ void TxFactory::AddOutput(const SubAddress& destination, const CAmount& nAmount,
 {
     UnsignedOutput out;
     out = TxFactory::CreateOutput(destination, nAmount, sMemo, tokenId);
-    gammaAcc = gammaAcc + out.gamma;
-    nOutputAmount += nAmount;
-    vOutputs.push_back(out);
+
+    if (nAmounts.count(tokenId) <= 0)
+        nAmounts[tokenId] = {0, 0};
+
+    nAmounts[tokenId].nFromOutputs += nAmount;
+
+    if (vOutputs.count(tokenId) <= 0)
+        vOutputs[tokenId] = std::vector<UnsignedOutput>();
+
+    vOutputs[tokenId].push_back(out);
 }
 
 bool TxFactory::AddInput(const CCoinsViewCache& cache, const COutPoint& outpoint)
@@ -94,9 +101,64 @@ bool TxFactory::AddInput(const CCoinsViewCache& cache, const COutPoint& outpoint
     if (!recoveredInfo.has_value())
         return false;
 
-    vInputs.push_back({CTxIn(outpoint), recoveredInfo.value().amounts[0].value().gamma});
-    nInputAmount += recoveredInfo.value().amounts[0].value().amount;
+    if (vInputs.count(coin.out.tokenId) <= 0)
+        vInputs[coin.out.tokenId] = std::vector<UnsignedInput>();
+
+    vInputs[coin.out.tokenId].push_back({CTxIn(outpoint), recoveredInfo.value().amounts[0].value().gamma});
+
+    if (nAmounts.count(coin.out.tokenId) <= 0)
+        nAmounts[coin.out.tokenId] = {0, 0};
+
+    nAmounts[coin.out.tokenId].nFromInputs += recoveredInfo.value().amounts[0].value().amount;
 
     return true;
 }
+
+std::optional<CMutableTransaction> TxFactory::BuildTx()
+{
+    bool fBreak = false;
+    CAmount nFee = 200000 * (vInputs.size() + vOutputs.size() + 1);
+
+    while (true) {
+        CMutableTransaction tx;
+        Scalar gammaAcc;
+        std::map<TokenId, CAmount> mapChange;
+
+        for (auto& amounts : nAmounts) {
+            if (amounts.second.nFromInputs < amounts.second.nFromOutputs)
+                return std::nullopt;
+            mapChange[amounts.first] = amounts.second.nFromInputs - amounts.second.nFromOutputs;
+        }
+
+        for (auto& in_ : vInputs) {
+            for (auto& in : in_.second) {
+                tx.vin.push_back(in.in);
+                gammaAcc = gammaAcc + in.gamma;
+            }
+        }
+
+        for (auto& out_ : vOutputs) {
+            for (auto& out : out_.second) {
+                tx.vout.push_back(out.out);
+                gammaAcc = gammaAcc - out.gamma;
+            }
+        }
+
+        for (auto& change : mapChange) {
+            auto changeOutput = CreateOutput(blsct::SubAddress(std::get<blsct::DoublePublicKey>(km->GetNewDestination(0).value())), change.second, "Change", change.first);
+            tx.vout.push_back(changeOutput.out);
+            gammaAcc = gammaAcc - changeOutput.gamma;
+        }
+
+        if (nFee == 200000 * (tx.vin.size() + tx.vout.size() + 1)) {
+            tx.vout.push_back(CTxOut(nFee, CScript(OP_RETURN)));
+            return tx;
+        }
+
+        nFee = 200000 * (tx.vin.size() + tx.vout.size() + 1);
+    }
+
+    return std::nullopt;
+}
+
 } // namespace blsct
