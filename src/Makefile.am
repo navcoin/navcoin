@@ -564,7 +564,9 @@ libbitcoin_wallet_a_SOURCES = \
   blsct/eip_2333/bls12_381_keygen.cpp \
   blsct/private_key.cpp \
   blsct/public_key.cpp \
+  blsct/building_block/g_h_gi_hi_zero_verifier.cpp \
   blsct/building_block/generator_deriver.cpp \
+  blsct/building_block/lazy_point.cpp \
   blsct/building_block/imp_inner_prod_arg.cpp \
   blsct/common.cpp \
   blsct/range_proof/generators.cpp \
