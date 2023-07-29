@@ -6,6 +6,7 @@
 #include <test/util/random.h>
 #include <test/util/setup_common.h>
 #include <txdb.h>
+#include <wallet/receive.h>
 #include <wallet/test/util.h>
 #include <wallet/wallet.h>
 
@@ -86,29 +87,52 @@ BOOST_FIXTURE_TEST_CASE(addinput_test, TestingSetup)
 
     BOOST_ASSERT(finalTx.has_value());
 
-    bool nFoundChange = false;
+    bool fFoundChange = false;
 
     auto result = blsct_km->RecoverOutputs(finalTx.value().vout).value();
 
     for (auto& res : result.amounts) {
         if (!res.has_value()) continue;
-        if (res.value().message == "Change" && res.value().amount == 100) nFoundChange = true;
+        if (res.value().message == "Change" && res.value().amount == 100) fFoundChange = true;
     }
 
-    BOOST_ASSERT(nFoundChange);
+    BOOST_ASSERT(fFoundChange);
 
     wallet->transactionAddedToMempool(MakeTransactionRef(finalTx.value()));
 
     auto wtx = wallet->GetWalletTx(finalTx.value().GetHash());
     BOOST_ASSERT(wtx != nullptr);
 
-    nFoundChange = false;
+    fFoundChange = false;
+    uint32_t nChangePosition = 0;
 
     for (auto& res : wtx->blsctRecoveryData) {
-        if (res.second.message == "Change" && res.second.amount == 100) nFoundChange = true;
+        if (res.second.message == "Change" && res.second.amount == 100) {
+            nChangePosition = res.second.id;
+            fFoundChange = true;
+            break;
+        }
     }
 
-    BOOST_ASSERT(nFoundChange);
+    BOOST_ASSERT(fFoundChange);
+
+    auto tx2 = blsct::TxFactory(blsct_km);
+    auto outpoint2 = COutPoint(finalTx.value().GetHash(), nChangePosition);
+    Coin coin2;
+    coin2.nHeight = 1;
+    coin2.out = finalTx.value().vout[nChangePosition];
+    coins_view_cache.AddCoin(outpoint2, std::move(coin2), true);
+
+    BOOST_ASSERT(tx2.AddInput(coins_view_cache, outpoint2));
+
+    blsct::SubAddress randomAddress(blsct::DoublePublicKey(MclG1Point::MapToG1("test1"), MclG1Point::MapToG1("test2")));
+    tx2.AddOutput(randomAddress, 50, "test");
+
+    auto finalTx2 = tx2.BuildTx();
+    wallet->transactionAddedToMempool(MakeTransactionRef(finalTx2.value()));
+
+    BOOST_ASSERT(wallet->GetDebit(CTransaction(finalTx2.value()), wallet::ISMINE_SPENDABLE_BLSCT) == 100);
+    BOOST_ASSERT(TxGetCredit(*wallet, CTransaction(finalTx2.value()), wallet::ISMINE_SPENDABLE_BLSCT) == 50);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

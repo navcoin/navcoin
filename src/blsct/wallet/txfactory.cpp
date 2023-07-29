@@ -38,6 +38,7 @@ UnsignedOutput TxFactory::CreateOutput(const SubAddress& destination, const CAmo
     auto ret = UnsignedOutput();
 
     ret.out.tokenId = tokenId;
+    ret.out.scriptPubKey = CScript(OP_TRUE);
 
     Scalars vs;
     vs.Add(nAmount);

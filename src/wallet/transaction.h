@@ -241,7 +241,7 @@ public:
     }
 
     CTransactionRef tx;
-    std::map<uint8_t, RecoveredAmount<Mcl>> blsctRecoveryData;
+    std::map<uint32_t, RecoveredAmount<Mcl>> blsctRecoveryData;
     TxState m_state;
 
     template<typename Stream>
