@@ -16,6 +16,7 @@
 #include <script/script.h>
 #include <serialize.h>
 #include <uint256.h>
+#include <util/moneystr.h>
 
 #include <cstddef>
 #include <cstdint>

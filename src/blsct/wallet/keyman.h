@@ -139,7 +139,6 @@ public:
     void LoadSubAddressStr(const SubAddress& subAddress, const CKeyID& hashId);
     bool AddSubAddressStr(const SubAddress& subAddress, const CKeyID& hashId);
     bool HaveSubAddressStr(const SubAddress& subAddress) const;
-    bool GetSubAddressIdByStr(const SubAddress& address, CKeyID& hashId) const;
     bool NewSubAddressPool(const uint64_t& account = 0);
     bool TopUp(const unsigned int& size = 0);
     bool TopUpAccount(const uint64_t& account, const unsigned int& size = 0);

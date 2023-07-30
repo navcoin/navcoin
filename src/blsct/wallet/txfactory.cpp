@@ -56,8 +56,6 @@ UnsignedOutput TxFactory::CreateOutput(const SubAddress& destination, const CAmo
     auto nonce = vk * blindingKey;
     nonces.Add(nonce);
 
-    Scalar gamma = nonce.GetHashWithSalt(100);
-
     std::vector<unsigned char> memo{sMemo.begin(), sMemo.end()};
 
     RangeProofLogic<T> rp;
@@ -117,7 +115,6 @@ bool TxFactory::AddInput(const CCoinsViewCache& cache, const COutPoint& outpoint
 
 std::optional<CMutableTransaction> TxFactory::BuildTx()
 {
-    bool fBreak = false;
     CAmount nFee = 200000 * (vInputs.size() + vOutputs.size() + 1);
 
     while (true) {
@@ -151,7 +148,7 @@ std::optional<CMutableTransaction> TxFactory::BuildTx()
             gammaAcc = gammaAcc - changeOutput.gamma;
         }
 
-        if (nFee == 200000 * (tx.vin.size() + tx.vout.size() + 1)) {
+        if (nFee == (long long)(200000 * (tx.vin.size() + tx.vout.size() + 1))) {
             tx.vout.push_back(CTxOut(nFee, CScript(OP_RETURN)));
             return tx;
         }

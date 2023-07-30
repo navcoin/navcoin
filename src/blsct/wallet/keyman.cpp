@@ -514,13 +514,6 @@ bool KeyMan::HaveSubAddressStr(const SubAddress& subAddress) const
     return mapSubAddressesStr.count(subAddress) > 0;
 }
 
-bool KeyMan::GetSubAddressIdByStr(const SubAddress& address, CKeyID& hashId) const
-{
-    if (!HaveSubAddressStr(address)) return false;
-    hashId = mapSubAddressesStr.at(address);
-    return true;
-}
-
 SubAddress KeyMan::GenerateNewSubAddress(const uint64_t& account, SubAddressIdentifier& id)
 {
     if (m_hd_chain.nSubAddressCounter.count(account) == 0)
