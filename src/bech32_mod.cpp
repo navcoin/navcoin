@@ -301,8 +301,12 @@ bool CheckCharacters(const std::string& str, std::vector<int>& errors)
                 upper = true;
             }
         } else if (c < 33 || c > 126) {
+            printf("bad char at %lu c=%c\n", i, str[i]);
             errors.push_back(i);
         }
+    }
+    for(size_t i=0; i<errors.size(); ++i) {
+        printf("error %lu\n", i);
     }
     return errors.empty();
 }
@@ -362,7 +366,9 @@ std::string Encode(Encoding encoding, const std::string& hrp, const data& values
     data combined = Cat(values, checksum);
     std::string ret = hrp + '1';
     ret.reserve(ret.size() + combined.size());
+    size_t i=0;
     for (const auto c : combined) {
+        printf("Adding %lu c=%d\n", i++,  c);
         ret += CHARSET[c];
     }
     return ret;
@@ -371,11 +377,14 @@ std::string Encode(Encoding encoding, const std::string& hrp, const data& values
 /** Decode a Bech32 or Bech32m string. */
 DecodeResult Decode(const std::string& str) {
     std::vector<int> errors;
+    printf("0\n");
     if (!CheckCharacters(str, errors)) return {};
     size_t pos = str.rfind('1');
+    printf("1\n");
     if (str.size() > 90 || pos == str.npos || pos == 0 || pos + 7 > str.size()) {
         return {};
     }
+    printf("2\n");
     data values(str.size() - 1 - pos);
     for (size_t i = 0; i < str.size() - 1 - pos; ++i) {
         unsigned char c = str[i + pos + 1];
@@ -386,12 +395,15 @@ DecodeResult Decode(const std::string& str) {
         }
         values[i] = rev;
     }
+    printf("3\n");
     std::string hrp;
     for (size_t i = 0; i < pos; ++i) {
         hrp += LowerCase(str[i]);
     }
+    printf("4\n");
     Encoding result = VerifyChecksum(hrp, values);
     if (result == Encoding::INVALID) return {};
+    printf("5\n");
     return {result, std::move(hrp), data(values.begin(), values.end() - 6)};
 }
 
