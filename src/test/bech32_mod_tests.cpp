@@ -17,10 +17,11 @@ BOOST_AUTO_TEST_CASE(bech32_mod_blsct_address)
     size_t data_size=33;
     printf("---> testing data size=%lu\n", data_size);
 
+    std::string input_hex = "0279BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798";
     std::vector<uint8_t> data;
-    data.resize(data_size);
-    for (size_t i=0; i<data_size; ++i) {
-        data[i] = i;
+    data.resize(input_hex.size());
+    for (size_t i=0; i<input_hex.size(); ++i) {
+        data[i] = input_hex[i];
     }
     auto enc = bech32_mod::Encode(
         bech32_mod::Encoding::BECH32,
