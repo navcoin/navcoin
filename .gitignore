@@ -154,7 +154,7 @@ dist/
 # ide related
 .vscode
 confdefs.h
-.cache
+.cache/
 compile_commands.json
 
 # others
