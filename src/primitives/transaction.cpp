@@ -60,9 +60,10 @@ CTxOut::CTxOut(const CAmount& nValueIn, CScript scriptPubKeyIn, TokenId tokenIdI
 
 std::string CTxOut::ToString() const
 {
-    return strprintf("CTxOut(scriptPubKey=%s%s%s%s%s)", HexStr(scriptPubKey).substr(0, 30),
+    return strprintf("CTxOut(scriptPubKey=%s%s%s%s)", HexStr(scriptPubKey).substr(0, 30),
                      IsBLSCT() ? strprintf(", spendingKey=%s, blindingKey=%s, ephemeralKey=%s", HexStr(blsctData.spendingKey.GetVch()), HexStr(blsctData.blindingKey.GetVch()), HexStr(blsctData.ephemeralKey.GetVch())) : "",
-                     tokenId.IsNull() ? "" : strprintf(", tokenId=%s", tokenId.ToString(), IsBLSCT() ? "" : strprintf(", nAmount=%s", FormatMoney(nValue))));
+                     tokenId.IsNull() ? "" : strprintf(", tokenId=%s", tokenId.ToString()),
+                     IsBLSCT() ? "" : strprintf(", nAmount=%s", FormatMoney(nValue)));
 }
 
 CMutableTransaction::CMutableTransaction() : nVersion(CTransaction::CURRENT_VERSION), nLockTime(0) {}

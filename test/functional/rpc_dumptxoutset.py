@@ -25,7 +25,7 @@ class DumptxoutsetTest(BitcoinTestFramework):
         node.setmocktime(mocktime)
         self.generate(node, COINBASE_MATURITY)
 
-        @ TODO: fix test
+        # TODO: fix test
         return
         FILENAME = 'txoutset.dat'
         out = node.dumptxoutset(FILENAME)
