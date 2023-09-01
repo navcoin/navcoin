@@ -755,12 +755,11 @@ ReadKeyValue(CWallet* pwallet, DataStream& ssKey, CDataStream& ssValue,
 
             pwallet->GetOrCreateBLSCTKeyMan()->LoadSubAddress(hashId, id);
         } else if (strType == DBKeys::BLSCTSUBADDRESSSTR) {
-            CKeyID hashId;
-            ssKey >> hashId;
-
             blsct::SubAddress subAddress;
+            ssKey >> subAddress;
 
-            ssValue >> subAddress;
+            CKeyID hashId;
+            ssValue >> hashId;
 
             pwallet->GetOrCreateBLSCTKeyMan()->LoadSubAddressStr(subAddress, hashId);
         } else if (strType == DBKeys::BLSCTSUBADDRESSPOOL) {
