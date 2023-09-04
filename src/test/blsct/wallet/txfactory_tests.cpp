@@ -34,10 +34,7 @@ BOOST_FIXTURE_TEST_CASE(ismine_test, TestingSetup)
     auto hashId = blsct_km->GetHashId(out.out);
     blsct::SubAddress subAddressId;
 
-    {
-        LOCK(blsct_km->cs_KeyStore);
-        BOOST_ASSERT(blsct_km->GetSubAddress(hashId, subAddressId));
-    }
+    BOOST_ASSERT(blsct_km->GetSubAddress(hashId, subAddressId));
 
     auto result = blsct_km->RecoverOutputs({out.out}).value();
 

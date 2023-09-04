@@ -487,6 +487,8 @@ bool KeyMan::HaveSubAddress(const CKeyID& hashId) const
 
 bool KeyMan::GetSubAddress(const CKeyID& hashId, SubAddress& address) const
 {
+    LOCK(cs_KeyStore);
+    if (!HaveSubAddress(hashId)) return false;
     address = GetSubAddress(mapSubAddresses.at(hashId));
     return true;
 }
@@ -510,6 +512,7 @@ bool KeyMan::AddSubAddressStr(const SubAddress& subAddress, const CKeyID& hashId
 
 bool KeyMan::HaveSubAddressStr(const SubAddress& subAddress) const
 {
+    LOCK(cs_KeyStore);
     return mapSubAddressesStr.count(subAddress) > 0;
 }
 

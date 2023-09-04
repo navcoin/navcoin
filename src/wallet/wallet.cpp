@@ -1540,7 +1540,6 @@ isminetype CWallet::IsMine(const CTxDestination& dest) const
     if (std::holds_alternative<blsct::DoublePublicKey>(dest)) {
         auto blsct_man = GetBLSCTKeyMan();
         if (blsct_man) {
-            LOCK(blsct_man->cs_KeyStore);
             return blsct_man->HaveSubAddressStr(blsct::SubAddress(std::get<blsct::DoublePublicKey>(dest))) ? ISMINE_SPENDABLE_BLSCT : ISMINE_NO;
         }
     }
