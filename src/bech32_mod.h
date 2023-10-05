@@ -1,4 +1,5 @@
-// Copyright (c) 2023 The Navcoin developers
+// Copyright (c) 2017, 2021 Pieter Wuille
+// Copyright (c) 2021 The Bitcoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -10,14 +11,14 @@
 //
 // For more information, see BIP 173 and BIP 350.
 
-#ifndef BITCOIN_BECH32_MOD_H
-#define BITCOIN_BECH32_MOD_H
+#ifndef BITCOIN_BECH32_H
+#define BITCOIN_BECH32_H
 
 #include <stdint.h>
 #include <string>
 #include <vector>
 
-namespace bech32_mod
+namespace bech32
 {
 
 enum class Encoding {
@@ -47,6 +48,6 @@ DecodeResult Decode(const std::string& str);
 /** Return the positions of errors in a Bech32 string. */
 std::pair<std::string, std::vector<int>> LocateErrors(const std::string& str);
 
-} // namespace bech32_mod
+} // namespace bech32
 
-#endif // BITCOIN_BECH32_MOD_H
+#endif // BITCOIN_BECH32_H
