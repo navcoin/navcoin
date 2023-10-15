@@ -16,18 +16,18 @@ BOOST_AUTO_TEST_CASE(bech32_mod_locate_errors)
 {
     std::string hrp = "tc";
 
-    std::vector<uint8_t> org_input;
-    for (size_t i=0; i<96; ++i) {
-        org_input.push_back(i);
-        ++i;
-    }
-    std::vector<uint8_t> data; // = encode_byte_string(org_input); 
+    std::vector<uint8_t> data {1, 2, 3, 4, 5, 6, 7, 8};
 
     auto encoded = bech32_mod::Encode(bech32_mod::Encoding::BECH32, hrp, data);
     printf("encoded str = %s\n", encoded.c_str());
     auto res = bech32_mod::Decode(encoded);
 
     BOOST_CHECK_EQUAL(res.data.size(), data.size());
+}
+
+BOOST_AUTO_TEST_CASE(bech32_mod_vec8_vec5_conversion)
+{
+
 }
 
 /*

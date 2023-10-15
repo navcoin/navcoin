@@ -592,7 +592,7 @@ std::vector<uint8_t> Vec8ToVec5(const std::vector<uint8_t>& vec8)
         if (beg_bit < 4) {
             // if beg_bit is 0~3, get all 5 bits from vec8[i]
             uint8_t v = (vec8[i] >> beg_bit) & 0x1f;
-            vec5.push(v);
+            vec5.push_back(v);
         } else {
             // otherwise combine bits from vec8[i] and vec8[i+1]
             uint8_t v_curr = vec8[i] >> beg_bit;
@@ -600,7 +600,7 @@ std::vector<uint8_t> Vec8ToVec5(const std::vector<uint8_t>& vec8)
             uint8_t mask = ~(0xff << num_next_bits);
             uint8_t v_next = vec8[i+1] & mask;
             uint8_t v = (v_next << (8 - beg_bit)) | v_curr;
-            vec5.push(v);
+            vec5.push_back(v);
             ++i;
         }
         beg_bit = (beg_bit + 5) % 8;
@@ -624,11 +624,12 @@ std::vector<uint8_t> Vec5ToVec8(const std::vector<uint8_t>& vec5)
             // otherwise fill the rest of v wity the lower bits of vec5[i]
             size_t num_lower_bits = 8 - beg_bit;
             uint8_t mask = ~(0xff << num_lower_bits);
-            uint8_t lower = (vec5 & mask) << beg_bit;
+            uint8_t lower = (vec5[i] & mask) << beg_bit;
             v |= lower;
+            vec8.push_back(v);
           
             // then let the higher bits of vec5[i] the new v
-            v = vec5 & ~(0xff << (5 - num_lower_bits));
+            v = vec5[i]  & ~(0xff << (5 - num_lower_bits));
         }
         ++i;
         beg_bit = (beg_bit + 5) % 8;
