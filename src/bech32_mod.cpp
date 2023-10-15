@@ -3,7 +3,7 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <bech32.h>
+#include <bech32_mod.h>
 #include <util/vector.h>
 
 #include <array>
@@ -11,7 +11,7 @@
 #include <numeric>
 #include <optional>
 
-namespace bech32
+namespace bech32_mod
 {
 
 namespace
