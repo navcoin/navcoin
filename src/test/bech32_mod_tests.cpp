@@ -14,20 +14,29 @@ BOOST_AUTO_TEST_SUITE(bech32_mod_tests)
 
 BOOST_AUTO_TEST_CASE(bech32_mod_locate_errors)
 {
-    std::string hrp = "tc";
+    std::string hrp = "navcoin";
+    std::string s = "navcoin bech32";
+    std::vector<uint8_t> data_v8(s.begin(), s.end());
+    auto data_v5 = bech32_mod::Vec8ToVec5(data_v8);
 
-    std::vector<uint8_t> data {1, 2, 3, 4, 5, 6, 7, 8};
-
-    auto encoded = bech32_mod::Encode(bech32_mod::Encoding::BECH32, hrp, data);
+    auto encoded = bech32_mod::Encode(bech32_mod::Encoding::BECH32, hrp, data_v5);
     printf("encoded str = %s\n", encoded.c_str());
     auto res = bech32_mod::Decode(encoded);
+    auto data_v8r = bech32_mod::Vec5ToVec8(res.data);
 
-    BOOST_CHECK_EQUAL(res.data.size(), data.size());
+    BOOST_CHECK(data_v8r == data_v8);
 }
 
 BOOST_AUTO_TEST_CASE(bech32_mod_vec8_vec5_conversion)
 {
+    std::string s1 = "navcoin bech32 mod test";
+    std::vector<uint8_t> v8(s1.begin(), s1.end());
 
+    auto v5 = bech32_mod::Vec8ToVec5(v8);
+    auto v8r = bech32_mod::Vec5ToVec8(v5);
+
+    std::string s2(v8r.begin(), v8r.end());
+    BOOST_CHECK_EQUAL(s1, s2);
 }
 
 /*

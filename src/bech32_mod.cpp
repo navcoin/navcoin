@@ -364,33 +364,22 @@ std::string Encode(Encoding encoding, const std::string& hrp, const data& values
     for (const char& c : hrp) assert(c < 'A' || c > 'Z');
     data checksum = CreateChecksum(encoding, hrp, values);
     data combined = Cat(values, checksum);
-    for (size_t i=0; i<combined.size(); ++i) {
-        printf("%lu: %u\n", i, combined[i]);
-    }
     std::string ret = hrp + '1';
     ret.reserve(ret.size() + combined.size());
     for (const auto c : combined) {
-        printf("Adding char %d -> %d -> %c\n", c, CHARSET[c], CHARSET[c]);
         ret += CHARSET[c];
     }
-    for (size_t i=0; i<117; ++i) {
-        printf("%lu: %c\n", i, CHARSET[i]);
-    }
-
     return ret;
 }
 
 /** Decode a Bech32 or Bech32m string. */
 DecodeResult Decode(const std::string& str) {
     std::vector<int> errors;
-    printf("-1\n");
     if (!CheckCharacters(str, errors)) return {};
     size_t pos = str.rfind('1');
-    printf("0\n");
     if (str.size() > 90 || pos == str.npos || pos == 0 || pos + 7 > str.size()) {
         return {};
     }
-    printf("1\n");
     data values(str.size() - 1 - pos);
     for (size_t i = 0; i < str.size() - 1 - pos; ++i) {
         unsigned char c = str[i + pos + 1];
@@ -401,14 +390,12 @@ DecodeResult Decode(const std::string& str) {
         }
         values[i] = rev;
     }
-    printf("2\n");
     std::string hrp;
     for (size_t i = 0; i < pos; ++i) {
         hrp += LowerCase(str[i]);
     }
     Encoding result = VerifyChecksum(hrp, values);
     if (result == Encoding::INVALID) return {};
-    printf("3\n");
     return {result, std::move(hrp), data(values.begin(), values.end() - 6)};
 }
 
@@ -625,16 +612,16 @@ std::vector<uint8_t> Vec5ToVec8(const std::vector<uint8_t>& vec5)
             size_t num_lower_bits = 8 - beg_bit;
             uint8_t mask = ~(0xff << num_lower_bits);
             uint8_t lower = (vec5[i] & mask) << beg_bit;
+
             v |= lower;
             vec8.push_back(v);
           
             // then let the higher bits of vec5[i] the new v
-            v = vec5[i]  & ~(0xff << (5 - num_lower_bits));
+            v = 0x1f & (vec5[i] >> num_lower_bits);
         }
         ++i;
         beg_bit = (beg_bit + 5) % 8;
     }
-
     return vec8;
 }
 
