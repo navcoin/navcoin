@@ -28,6 +28,9 @@ enum class Encoding {
     BECH32M, //!< Bech32m encoding as defined in BIP350
 };
 
+std::vector<uint8_t> Vec8ToVec5(const std::vector<uint8_t>& vec8);
+std::vector<uint8_t> Vec5ToVec8(const std::vector<uint8_t>& vec5);
+
 /** Encode a Bech32 or Bech32m string. If hrp contains uppercase characters, this will cause an
  *  assertion error. Encoding must be one of BECH32 or BECH32M. */
 std::string Encode(Encoding encoding, const std::string& hrp, const std::vector<uint8_t>& values);

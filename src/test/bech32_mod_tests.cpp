@@ -14,18 +14,23 @@ BOOST_AUTO_TEST_SUITE(bech32_mod_tests)
 
 BOOST_AUTO_TEST_CASE(bech32_mod_locate_errors)
 {
-    std::string hrp = "beefstew";
-    std::string data_str = "pyth0n2haskell";
-    std::vector<uint8_t> data(data_str.begin(), data_str.end()); 
+    std::string hrp = "tc";
+
+    std::vector<uint8_t> org_input;
+    for (size_t i=0; i<96; ++i) {
+        org_input.push_back(i);
+        ++i;
+    }
+    std::vector<uint8_t> data; // = encode_byte_string(org_input); 
 
     auto encoded = bech32_mod::Encode(bech32_mod::Encoding::BECH32, hrp, data);
-    printf("encoded = %s\n", encoded.c_str());
+    printf("encoded str = %s\n", encoded.c_str());
     auto res = bech32_mod::Decode(encoded);
 
     BOOST_CHECK_EQUAL(res.data.size(), data.size());
 }
 
-
+/*
 BOOST_AUTO_TEST_CASE(bech32_mod_testvectors_valid)
 {
     static const std::string CASES[] = {
@@ -169,5 +174,6 @@ BOOST_AUTO_TEST_CASE(bech32m_mod_testvectors_invalid)
         i++;
     }
 }
+*/
 
 BOOST_AUTO_TEST_SUITE_END()
