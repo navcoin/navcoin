@@ -12,19 +12,70 @@
 
 BOOST_AUTO_TEST_SUITE(bech32_mod_tests)
 
-BOOST_AUTO_TEST_CASE(bech32_mod_locate_errors)
+BOOST_AUTO_TEST_CASE(bech32_mod_no_error)
+{
+    std::string hrp = "navcoin";
+    std::string s = "navcoin bech32";
+
+    std::vector<uint8_t> data_v8(s.begin(), s.end());
+    auto data_v5 = bech32_mod::Vec8ToVec5(data_v8);
+
+    auto bech32_str = bech32_mod::Encode(bech32_mod::Encoding::BECH32, hrp, data_v5);
+
+    auto res = bech32_mod::Decode(bech32_str);
+    auto data_v8r = bech32_mod::Vec5ToVec8(res.data);
+
+    BOOST_CHECK(data_v8r == data_v8);
+}
+
+BOOST_AUTO_TEST_CASE(bech32_mod_locating_one_error)
 {
     std::string hrp = "navcoin";
     std::string s = "navcoin bech32";
     std::vector<uint8_t> data_v8(s.begin(), s.end());
     auto data_v5 = bech32_mod::Vec8ToVec5(data_v8);
 
-    auto encoded = bech32_mod::Encode(bech32_mod::Encoding::BECH32, hrp, data_v5);
-    printf("encoded str = %s\n", encoded.c_str());
-    auto res = bech32_mod::Decode(encoded);
-    auto data_v8r = bech32_mod::Vec5ToVec8(res.data);
+    // navcoin1wtcvh3ad0t6uxsgvztexx5dxn3vq6qxyax
+    auto good_bech32_str = bech32_mod::Encode(bech32_mod::Encoding::BECH32, hrp, data_v5);
 
-    BOOST_CHECK(data_v8r == data_v8);
+    auto sep_index = good_bech32_str.find('1');
+
+    for (size_t i=sep_index + 1; i<good_bech32_str.size(); ++i) {
+        auto bad_bech32_str = good_bech32_str;
+        // replace a chars by '2' that is not included in the original str
+        bad_bech32_str[i] = '2';
+
+        auto errors = bech32_mod::LocateErrors(bad_bech32_str).second;
+        BOOST_CHECK(errors.size() == 1);  // should contain 1 error
+        BOOST_CHECK(errors[0] == i);  // the error should be at index i
+    }
+}
+
+BOOST_AUTO_TEST_CASE(bech32_mod_locating_two_errors)
+{
+    std::string hrp = "navcoin";
+    std::string s = "navcoin bech32";
+    std::vector<uint8_t> data_v8(s.begin(), s.end());
+    auto data_v5 = bech32_mod::Vec8ToVec5(data_v8);
+
+    // navcoin1wtcvh3ad0t6uxsgvztexx5dxn3vq6qxyax
+    auto good_bech32_str = bech32_mod::Encode(bech32_mod::Encoding::BECH32, hrp, data_v5);
+
+    auto sep_index = good_bech32_str.find('1');
+
+    for (size_t i=sep_index + 1; i<good_bech32_str.size() - 1; ++i) {
+        for (size_t j=i + 1; j<good_bech32_str.size(); ++j) {
+            auto bad_bech32_str = good_bech32_str;
+            // replace 2 chars by '2' and '4' that are not included in the original str
+            bad_bech32_str[i] = '2';
+            bad_bech32_str[j] = '4';
+
+            auto errors = bech32_mod::LocateErrors(bad_bech32_str).second;
+            BOOST_CHECK(errors.size() == 2);  // should contain 2 errors
+            BOOST_CHECK(errors[0] == i);  // the first error should be at index i
+            BOOST_CHECK(errors[1] == j);  // the second error should be at index j
+        }
+    }
 }
 
 BOOST_AUTO_TEST_CASE(bech32_mod_vec8_vec5_conversion)
