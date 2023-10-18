@@ -12,6 +12,21 @@
 
 BOOST_AUTO_TEST_SUITE(bech32_mod_tests)
 
+/** The Bech32 and Bech32m character set for encoding. */
+const char* CHARSET = "qpzry9x8gf2tvdw0s3jn54khce6mua7l";
+
+/** The Bech32 and Bech32m character set for decoding. */
+const int8_t CHARSET_REV[128] = {
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    15, -1, 10, 17, 21, 20, 26, 30,  7,  5, -1, -1, -1, -1, -1, -1,
+    -1, 29, -1, 24, 13, 25,  9,  8, 23, -1, 18, 22, 31, 27, 19, -1,
+     1,  0,  3, 16, 11, 28, 12, 14,  6,  4,  2, -1, -1, -1, -1, -1,
+    -1, 29, -1, 24, 13, 25,  9,  8, 23, -1, 18, 22, 31, 27, 19, -1,
+     1,  0,  3, 16, 11, 28, 12, 14,  6,  4,  2, -1, -1, -1, -1, -1
+};
+
 BOOST_AUTO_TEST_CASE(bech32_mod_no_error)
 {
     std::string hrp = "navcoin";
@@ -42,8 +57,8 @@ BOOST_AUTO_TEST_CASE(bech32_mod_locating_one_error)
 
     for (size_t i=sep_index + 1; i<good_bech32_str.size(); ++i) {
         auto bad_bech32_str = good_bech32_str;
-        // replace a chars by '2' that is not included in the original str
-        bad_bech32_str[i] = '2';
+        // change 1 character in good_bech32_str
+        bad_bech32_str[i] = CHARSET[CHARSET_REV[bad_bech32_str[i]] + 1 % 32];
 
         auto errors = bech32_mod::LocateErrors(bad_bech32_str).second;
         BOOST_CHECK(errors.size() == 1);  // should contain 1 error
@@ -66,9 +81,9 @@ BOOST_AUTO_TEST_CASE(bech32_mod_locating_two_errors)
     for (size_t i=sep_index + 1; i<good_bech32_str.size() - 1; ++i) {
         for (size_t j=i + 1; j<good_bech32_str.size(); ++j) {
             auto bad_bech32_str = good_bech32_str;
-            // replace 2 chars by '2' and '4' that are not included in the original str
-            bad_bech32_str[i] = '2';
-            bad_bech32_str[j] = '4';
+            // change 2 characters in good_bech32_str
+            bad_bech32_str[i] = CHARSET[CHARSET_REV[bad_bech32_str[i]] + 1 % 32];
+            bad_bech32_str[j] = CHARSET[CHARSET_REV[bad_bech32_str[j]] + 1 % 32];
 
             auto errors = bech32_mod::LocateErrors(bad_bech32_str).second;
             BOOST_CHECK(errors.size() == 2);  // should contain 2 errors
