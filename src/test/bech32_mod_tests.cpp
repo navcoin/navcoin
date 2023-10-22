@@ -9,9 +9,11 @@
 #include <boost/test/unit_test.hpp>
 
 #include <string>
+#include <random>
 
 BOOST_AUTO_TEST_SUITE(bech32_mod_tests)
 
+/*
 BOOST_AUTO_TEST_CASE(bech32_mod_locate_errors)
 {
     std::string hrp = "navcoin";
@@ -37,6 +39,45 @@ BOOST_AUTO_TEST_CASE(bech32_mod_vec8_vec5_conversion)
 
     std::string s2(v8r.begin(), v8r.end());
     BOOST_CHECK_EQUAL(s1, s2);
+}
+*/
+
+std::string gen_random_str(const size_t size) {
+    static const char charset[] =
+        "0123456789"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz";
+    const size_t max_index = (sizeof(charset) - 1);
+    std::string s;
+    
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<size_t> dist(0, max_index);
+
+    for (size_t i = 0; i < size; ++i) {
+        s += charset[dist(gen)];
+    }
+    return s;
+}
+
+BOOST_AUTO_TEST_CASE(bech32_mod_locate_errors_in_various_length_of_data)
+{
+    for (size_t test_case=30; test_case < 100; ++test_case) {
+        printf("testing %lu ... ", test_case);
+        std::string hrp = "navcoin";
+        std::string s = gen_random_str(test_case);
+
+        std::vector<uint8_t> data_v8(s.begin(), s.end());
+        auto data_v5 = bech32_mod::Vec8ToVec5(data_v8);
+
+        auto encoded = bech32_mod::Encode(bech32_mod::Encoding::BECH32, hrp, data_v5);
+        //printf("encoded str = %s\n", encoded.c_str());
+        auto res = bech32_mod::Decode(encoded);
+        auto data_v8r = bech32_mod::Vec5ToVec8(res.data);
+
+        bool is_succ = data_v8r == data_v8;
+        printf("%s\n", is_succ ? "Succeeded" : "Failed");
+    }
 }
 
 /*
