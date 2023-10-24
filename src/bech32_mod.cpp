@@ -377,7 +377,7 @@ DecodeResult Decode(const std::string& str) {
     std::vector<int> errors;
     if (!CheckCharacters(str, errors)) return {};
     size_t pos = str.rfind('1');
-    if (str.size() > 90 || pos == str.npos || pos == 0 || pos + 7 > str.size()) {
+    if (str.size() > 900 || pos == str.npos || pos == 0 || pos + 7 > str.size()) {
         return {};
     }
     data values(str.size() - 1 - pos);
@@ -403,8 +403,8 @@ DecodeResult Decode(const std::string& str) {
 std::pair<std::string, std::vector<int>> LocateErrors(const std::string& str) {
     std::vector<int> error_locations{};
 
-    if (str.size() > 90) {
-        error_locations.resize(str.size() - 90);
+    if (str.size() > 900) {
+        error_locations.resize(str.size() - 900);
         std::iota(error_locations.begin(), error_locations.end(), 90);
         return std::make_pair("Bech32 string too long", std::move(error_locations));
     }

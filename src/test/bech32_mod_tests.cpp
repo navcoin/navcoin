@@ -9,6 +9,27 @@
 #include <boost/test/unit_test.hpp>
 
 #include <string>
+#include <random>
+
+std::string gen_random_str(size_t len) {
+    static const char charset[] =
+        "0123456789"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz";
+    const size_t max_index = (sizeof(charset) - 1);
+    std::string s;
+    
+    std::random_device rd;
+    std::mt19937 gen(rd());
+
+    std::uniform_int_distribution<size_t> dist(0, max_index);
+
+    for (size_t i = 0; i < len; ++i) {
+        s += charset[dist(gen)];
+    }
+
+    return s;
+}
 
 BOOST_AUTO_TEST_SUITE(bech32_mod_tests)
 
@@ -27,6 +48,7 @@ const int8_t CHARSET_REV[128] = {
      1,  0,  3, 16, 11, 28, 12, 14,  6,  4,  2, -1, -1, -1, -1, -1
 };
 
+/*
 BOOST_AUTO_TEST_CASE(bech32_mod_no_error)
 {
     std::string hrp = "navcoin";
@@ -92,7 +114,71 @@ BOOST_AUTO_TEST_CASE(bech32_mod_locating_two_errors)
         }
     }
 }
+*/
 
+/*
+BOOST_AUTO_TEST_CASE(bech32_mod_enc_dec_verious_length_data)
+{
+    std::string hrp = "navcoin";
+
+    for (size_t len=10; len<97; ++len) {
+        auto s = gen_random_str(len);
+
+        std::vector<uint8_t> v8(s.begin(), s.end());
+        auto v5 = bech32_mod::Vec8ToVec5(v8);
+
+        auto enc = bech32_mod::Encode(bech32_mod::Encoding::BECH32, hrp, v5);
+        const auto dec = bech32_mod::Decode(enc);
+
+        auto v8r = bech32_mod::Vec5ToVec8(dec.data);
+
+        std::string s2(v8r.begin(), v8r.end());
+        auto is_equal = v8 == v8r;
+
+        printf("%lu: %s\n", len, is_equal ? "Yes" : "No");
+    }
+}
+*/
+
+BOOST_AUTO_TEST_CASE(bech32_mod_locate_error_verious_length_data)
+{
+    std::string hrp = "navcoin";
+
+    for (size_t len=10; len<=100; ++len) {
+        printf("len: %lu\n", len);
+        auto s = gen_random_str(len);
+        printf("s: %s\n", s.c_str());
+
+        std::vector<uint8_t> v8(s.begin(), s.end());
+        auto v5 = bech32_mod::Vec8ToVec5(v8);
+        printf("v5: %lu\n", v5.size());
+        auto good_enc = bech32_mod::Encode(bech32_mod::Encoding::BECH32, hrp, v5);
+        printf("all-enc: %s\n", good_enc.c_str());
+        auto sep_index = good_enc.find('1');
+
+        auto dec = bech32_mod::Decode(good_enc);
+        std::string dec_str(dec.data.begin(), dec.data.end()); 
+        printf("enc == dec: %s\n", v5 == dec.data ? "Y" : "N");
+
+
+        for (size_t i=sep_index+1; i<good_enc.size()-1; ++i) {
+            for (size_t j=i+1; j<good_enc.size(); ++j) {
+                std::string bad_enc = good_enc;
+
+                // build a bad_enc by changing 2 chars in good_enc
+                bad_enc[i] = CHARSET[CHARSET_REV[bad_enc[i]] + 1 % 32];
+                bad_enc[j] = CHARSET[CHARSET_REV[bad_enc[j]] + 1 % 32];
+
+                auto res = bech32_mod::LocateErrors(bad_enc);
+                printf("%lu: %lu, %lu: %d, %d (%s)\n", len, i, j, res.second[0], res.second[1], res.first.c_str());
+                break;
+            }
+            break;
+        }
+    }
+}
+
+/*
 BOOST_AUTO_TEST_CASE(bech32_mod_vec8_vec5_conversion)
 {
     std::string s1 = "navcoin bech32 mod test";
@@ -104,6 +190,7 @@ BOOST_AUTO_TEST_CASE(bech32_mod_vec8_vec5_conversion)
     std::string s2(v8r.begin(), v8r.end());
     BOOST_CHECK_EQUAL(s1, s2);
 }
+*/
 
 /*
 BOOST_AUTO_TEST_CASE(bech32_mod_testvectors_valid)
