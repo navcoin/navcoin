@@ -4,13 +4,30 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <bech32_mod.h>
+#include <boost/test/unit_test_suite.hpp>
 #include <test/util/str.h>
 
 #include <boost/test/unit_test.hpp>
 
-#include <string>
 #include <random>
+#include <set>
+#include <string>
+#include <sstream>
 
+/** The Bech32 and Bech32m character set for encoding. */
+const char* CHARSET = "qpzry9x8gf2tvdw0s3jn54khce6mua7l";
+
+/** The Bech32 and Bech32m character set for decoding. */
+const int8_t CHARSET_REV[128] = {
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    15, -1, 10, 17, 21, 20, 26, 30,  7,  5, -1, -1, -1, -1, -1, -1,
+    -1, 29, -1, 24, 13, 25,  9,  8, 23, -1, 18, 22, 31, 27, 19, -1,
+     1,  0,  3, 16, 11, 28, 12, 14,  6,  4,  2, -1, -1, -1, -1, -1,
+    -1, 29, -1, 24, 13, 25,  9,  8, 23, -1, 18, 22, 31, 27, 19, -1,
+     1,  0,  3, 16, 11, 28, 12, 14,  6,  4,  2, -1, -1, -1, -1, -1
+};
 BOOST_AUTO_TEST_SUITE(bech32_mod_tests)
 
 /*
@@ -42,6 +59,30 @@ BOOST_AUTO_TEST_CASE(bech32_mod_vec8_vec5_conversion)
 }
 */
 
+void add_errors(std::string& s, const size_t num_errors) {
+    // build a list of indices to change
+    std::random_device rd;
+    std::mt19937 gen(rd());
+
+    std::set<size_t> indices; 
+
+    auto sep_idx = s.rfind("1"); 
+    while (indices.size() < num_errors) {
+        std::uniform_int_distribution<size_t> dist(sep_idx + 1, s.size() - 9);
+        indices.insert(dist(gen));
+    }
+
+    //printf("s=%s\n", s.c_str());
+    // alter char at the indices
+    for (auto it = indices.begin(); it != indices.end(); ++it) {
+        auto from_idx = CHARSET_REV[static_cast<size_t>(s[*it])];
+        auto to_idx = (from_idx + 1) % 32;
+
+        //printf("%d (%c) at %lu to %d (%c)\n", from_idx, s[*it], *it, to_idx, s[to_idx]);
+        s[*it] = CHARSET[to_idx];
+    }
+}
+
 std::string gen_random_str(const size_t size) {
     static const char charset[] =
         "0123456789"
@@ -60,23 +101,50 @@ std::string gen_random_str(const size_t size) {
     return s;
 }
 
-BOOST_AUTO_TEST_CASE(bech32_mod_locate_errors_in_various_length_of_data)
-{
-    for (size_t test_case=30; test_case < 100; ++test_case) {
-        printf("testing %lu ... ", test_case);
-        std::string hrp = "navcoin";
-        std::string s = gen_random_str(test_case);
+size_t test_error_detection(
+    const std::string& hrp,
+    const size_t num_errors,
+    const size_t num_tests,
+    const bool expect_errors
+) {
+    size_t unexpected_results = 0;
+
+    for (size_t i=0; i<num_tests; ++i) {
+        std::string s = gen_random_str(96);
 
         std::vector<uint8_t> data_v8(s.begin(), s.end());
         auto data_v5 = bech32_mod::Vec8ToVec5(data_v8);
 
         auto encoded = bech32_mod::Encode(bech32_mod::Encoding::BECH32, hrp, data_v5);
-        //printf("encoded str = %s\n", encoded.c_str());
+        add_errors(encoded, num_errors);
+
         auto res = bech32_mod::Decode(encoded);
         auto data_v8r = bech32_mod::Vec5ToVec8(res.data);
 
-        bool is_succ = data_v8r == data_v8;
-        printf("%s\n", is_succ ? "Succeeded" : "Failed");
+        if (expect_errors) {
+            if (data_v8r == data_v8) ++unexpected_results;
+        } else {
+            if (data_v8r != data_v8) ++unexpected_results;
+        }
+    }
+    return unexpected_results;
+}
+
+BOOST_AUTO_TEST_CASE(bech32_mod_test_detecting_errors)
+{
+    std::string hrp = "nav";
+
+    for (size_t num_errors = 0; num_errors <= 10; ++num_errors) {
+        printf("trying %lu error case...\n", num_errors);
+        size_t unexpected_results =
+            test_error_detection(hrp, num_errors, 100, num_errors > 0);
+
+        if (unexpected_results > 0) {
+            std::ostringstream msg;
+            msg << num_errors << "-error cases failed " << unexpected_results << " times";
+            //BOOST_FAIL(msg.str());
+            printf("%s\n", msg.str().c_str());
+        }
     }
 }
 
