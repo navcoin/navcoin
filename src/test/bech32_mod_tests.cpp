@@ -30,35 +30,6 @@ const int8_t CHARSET_REV[128] = {
 };
 BOOST_AUTO_TEST_SUITE(bech32_mod_tests)
 
-/*
-BOOST_AUTO_TEST_CASE(bech32_mod_locate_errors)
-{
-    std::string hrp = "navcoin";
-    std::string s = "navcoin bech32";
-    std::vector<uint8_t> data_v8(s.begin(), s.end());
-    auto data_v5 = bech32_mod::Vec8ToVec5(data_v8);
-
-    auto encoded = bech32_mod::Encode(bech32_mod::Encoding::BECH32, hrp, data_v5);
-    printf("encoded str = %s\n", encoded.c_str());
-    auto res = bech32_mod::Decode(encoded);
-    auto data_v8r = bech32_mod::Vec5ToVec8(res.data);
-
-    BOOST_CHECK(data_v8r == data_v8);
-}
-
-BOOST_AUTO_TEST_CASE(bech32_mod_vec8_vec5_conversion)
-{
-    std::string s1 = "navcoin bech32 mod test";
-    std::vector<uint8_t> v8(s1.begin(), s1.end());
-
-    auto v5 = bech32_mod::Vec8ToVec5(v8);
-    auto v8r = bech32_mod::Vec5ToVec8(v5);
-
-    std::string s2(v8r.begin(), v8r.end());
-    BOOST_CHECK_EQUAL(s1, s2);
-}
-*/
-
 void add_errors(std::string& s, const size_t num_errors) {
     // build a list of indices to change
     std::random_device rd;
