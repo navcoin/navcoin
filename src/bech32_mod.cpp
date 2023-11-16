@@ -423,5 +423,5 @@ std::vector<uint8_t> Vec5ToVec8(const std::vector<uint8_t>& vec5)
     return vec8;
 }
 
-} // namespace bech32
+} // namespace bech32_mod
 
