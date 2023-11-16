@@ -255,7 +255,7 @@ bool CheckCharacters(const std::string& str, std::vector<int>& errors)
 data ExpandHRP(const std::string& hrp)
 {
     data ret;
-    ret.reserve(hrp.size() + 109 + 14);  // 109 for 96 char key. 14 for ext hrp + sep
+    ret.reserve(hrp.size() + 154 + 5 + 1);  // 154=data part, 5=expanded 2-char hrp, 1=seperator
     ret.resize(hrp.size() * 2 + 1);
     for (size_t i = 0; i < hrp.size(); ++i) {
         unsigned char c = hrp[i];
@@ -283,6 +283,7 @@ Encoding VerifyChecksum(const std::string& hrp, const data& values)
 /** Create a checksum. */
 data CreateChecksum(Encoding encoding, const std::string& hrp, const data& values)
 {
+    auto exp_hrp = ExpandHRP(hrp);
     data enc = Cat(ExpandHRP(hrp), values);
     //enc.resize(enc.size() + 6); // Append 6 zeroes
     enc.resize(enc.size() + 8); // Append 8 zeroes
@@ -318,13 +319,17 @@ DecodeResult Decode(const std::string& str) {
     std::vector<int> errors;
     if (!CheckCharacters(str, errors)) return {};
     size_t pos = str.rfind('1');
-    // TODO change this check accordingly
-    // - 96 in 8-bit vec is 191 in 5-bit vec
-    // - pos == str.npos means '1' was not in str
-    // - pos + 7 should point to the first data byte if the checksum is 6-byte long,
-    //   so if the size is smaller than that the checksum is shorter than expected
-    //printf("str.size = %lu\n", str.size());
-    if (str.size() > 203 || pos == str.npos || pos == 0 || pos + 9 > str.size()) {
+
+    // double public key bech32 string is 165-byte long and consists of:
+    // - 2-byte hrp
+    // - 1-byte seperator '1'
+    // - 154-byte key data (96 bytes / 5 bits = 153.6)
+    // - 8-byte checksum
+    if (str.size() != 165  // double public key should be encoded to 165-byte bech32 string
+        || pos == str.npos  // separator '1' should be included
+        || pos == 0  // hrp part should not be empty
+        || pos + 9 > str.size()  // data part should not be empty
+    ) {
         return {};
     }
     data values(str.size() - 1 - pos);
@@ -361,14 +366,23 @@ std::vector<uint8_t> Vec8ToVec5(const std::vector<uint8_t>& vec8)
         } else {
             // otherwise combine bits from vec8[i] and vec8[i+1]
             uint8_t v_curr = vec8[i] >> beg_bit;
-            size_t num_next_bits = 5 - (8 - beg_bit);
-            uint8_t mask = ~(0xff << num_next_bits);
-            uint8_t v_next = vec8[i+1] & mask;
-            uint8_t v = (v_next << (8 - beg_bit)) | v_curr;
-            vec5.push_back(v);
+
+            // if there is the next byte, add bits from the next byte
+            if (i < vec8.size() - 1) {
+                size_t num_next_bits = 5 - (8 - beg_bit);
+                uint8_t mask = ~(0xff << num_next_bits);
+                uint8_t v_next = vec8[i+1] & mask;
+                uint8_t v = (v_next << (8 - beg_bit)) | v_curr;
+                vec5.push_back(v);
+            } else {
+                vec5.push_back(v_curr);
+            }
+        }
+        beg_bit += 5;
+        if (beg_bit > 7) {
+            beg_bit %= 8;
             ++i;
         }
-        beg_bit = (beg_bit + 5) % 8;
     }
 
     return vec5;
@@ -386,7 +400,7 @@ std::vector<uint8_t> Vec5ToVec8(const std::vector<uint8_t>& vec5)
             // if beg_bit is 0~3, append entire vec5[i] to v
             v |= (vec5[i] << beg_bit);
         } else {
-            // otherwise fill the rest of v wity the lower bits of vec5[i]
+            // otherwise fill the rest of v with the lower bits of vec5[i]
             size_t num_lower_bits = 8 - beg_bit;
             uint8_t mask = ~(0xff << num_lower_bits);
             uint8_t lower = (vec5[i] & mask) << beg_bit;
@@ -400,6 +414,12 @@ std::vector<uint8_t> Vec5ToVec8(const std::vector<uint8_t>& vec5)
         ++i;
         beg_bit = (beg_bit + 5) % 8;
     }
+
+    // if there are bits hasn't been added, add them 
+    if (v > 0) { 
+        vec8.push_back(v);
+    }
+
     return vec8;
 }
 

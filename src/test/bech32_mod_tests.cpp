@@ -103,7 +103,7 @@ size_t test_error_detection(
 
 BOOST_AUTO_TEST_CASE(bech32_mod_test_detecting_errors)
 {
-    std::string hrp = "nav";
+    std::string hrp = "nv";
 
     for (size_t num_errors = 0; num_errors <= 5; ++num_errors) {
         printf("trying %lu error case...\n", num_errors);
@@ -119,6 +119,157 @@ BOOST_AUTO_TEST_CASE(bech32_mod_test_detecting_errors)
     }
 }
 
+BOOST_AUTO_TEST_CASE(bech32_mod_test_vec8_to_vec5)
+{
+    {
+        // 1 byte case
+        std::vector<uint8_t> data_v8 {0b1111'1111};
+        auto data_v5 = bech32_mod::Vec8ToVec5(data_v8);
+        //  1111 1111
+        //  111 11111
+        BOOST_CHECK(data_v5.size() == 2);
+        BOOST_CHECK(data_v5[0] == 0b11111);
+        BOOST_CHECK(data_v5[1] == 0b00111);
+    }
+    {
+        // 2 byte case
+        std::vector<uint8_t> data_v8 {0b1010'0101, 0b1011'1001};
+        auto data_v5 = bech32_mod::Vec8ToVec5(data_v8);
+        //  1011 1001 1010 0101
+        //  1 01110 01101 00101
+        BOOST_CHECK(data_v5.size() == 4);
+        BOOST_CHECK(data_v5[0] == 0b00101);
+        BOOST_CHECK(data_v5[1] == 0b01101);
+        BOOST_CHECK(data_v5[2] == 0b01110);
+        BOOST_CHECK(data_v5[3] == 0b00001);
+    }
+    {
+        // 3 byte case
+        std::vector<uint8_t> data_v8 {0b1010'0101, 0b1011'1001, 0b1100'1101};
+        auto data_v5 = bech32_mod::Vec8ToVec5(data_v8);
+        // 1100 1101 1011 1001 1010 0101
+        // 1100 11011 01110 01101 00101
+        BOOST_CHECK(data_v5.size() == 5);
+        BOOST_CHECK(data_v5[0] == 0b00101);
+        BOOST_CHECK(data_v5[1] == 0b01101);
+        BOOST_CHECK(data_v5[2] == 0b01110);
+        BOOST_CHECK(data_v5[3] == 0b11011);
+        BOOST_CHECK(data_v5[4] == 0b01100);
+    }
+    {
+        // 4 byte case
+        std::vector<uint8_t> data_v8 {0b1010'0101, 0b1011'1001, 0b1100'1101, 0b1110'1110};
+        auto data_v5 = bech32_mod::Vec8ToVec5(data_v8);
+        // 1110 1110 1100 1101 1011 1001 1010 0101
+        // 11 10111 01100 11011 01110 01101 00101
+        BOOST_CHECK(data_v5.size() == 7);
+        BOOST_CHECK(data_v5[0] == 0b00101);
+        BOOST_CHECK(data_v5[1] == 0b01101);
+        BOOST_CHECK(data_v5[2] == 0b01110);
+        BOOST_CHECK(data_v5[3] == 0b11011);
+        BOOST_CHECK(data_v5[4] == 0b01100);
+        BOOST_CHECK(data_v5[5] == 0b10111);
+        BOOST_CHECK(data_v5[6] == 0b00011);
+    }
+    {
+        // 5 byte case
+        std::vector<uint8_t> data_v8 {0b1010'0101, 0b1011'1001, 0b1100'1101, 0b1110'1110, 0b1001'1110};
+        auto data_v5 = bech32_mod::Vec8ToVec5(data_v8);
+        // 1001 1110 1110 1110 1100 1101 1011 1001 1010 0101
+        // 10011 11011 10111 01100 11011 01110 01101 00101
+        BOOST_CHECK(data_v5[0] == 0b00101);
+        BOOST_CHECK(data_v5[1] == 0b01101);
+        BOOST_CHECK(data_v5[2] == 0b01110);
+        BOOST_CHECK(data_v5[3] == 0b11011);
+        BOOST_CHECK(data_v5[4] == 0b01100);
+        BOOST_CHECK(data_v5[5] == 0b10111);
+        BOOST_CHECK(data_v5[6] == 0b11011);
+        BOOST_CHECK(data_v5[7] == 0b10011);
+        BOOST_CHECK(data_v5.size() == 8);
+    }
+}
+
+BOOST_AUTO_TEST_CASE(bech32_mod_test_vec5_to_vec8)
+{
+    {
+        // 1 byte case
+        std::vector<uint8_t> data_v5 {0b11111, 0b00111};
+        auto data_v8 = bech32_mod::Vec5ToVec8(data_v5);
+        //  111 11111
+        //  1111 1111
+        BOOST_CHECK(data_v8.size() == 1);
+        BOOST_CHECK(data_v8[0] == 0b1111'1111);
+    }
+    {
+        // 2 byte case
+        std::vector<uint8_t> data_v5 {0b00101, 0b01101, 0b01110, 0b00001};
+        auto data_v8 = bech32_mod::Vec5ToVec8(data_v5);
+        //  1 01110 01101 00101
+        //  1011 1001 1010 0101
+        BOOST_CHECK(data_v8.size() == 2);
+        BOOST_CHECK(data_v8[0] == 0b1010'0101);
+        BOOST_CHECK(data_v8[1] == 0b1011'1001);
+    }
+    {
+        // 3 byte case
+        std::vector<uint8_t> data_v5 {
+            0b00101,
+            0b01101,
+            0b01110,
+            0b11011,
+            0b01100,
+        };
+        auto data_v8 = bech32_mod::Vec5ToVec8(data_v5);
+        // 1100 11011 01110 01101 00101
+        // 1100 1101 1011 1001 1010 0101
+        BOOST_CHECK(data_v8.size() == 3);
+        BOOST_CHECK(data_v8[0] == 0b1010'0101);
+        BOOST_CHECK(data_v8[1] == 0b1011'1001);
+        BOOST_CHECK(data_v8[2] == 0b1100'1101);
+    }
+    {
+        // 4 byte case
+        std::vector<uint8_t> data_v5 {
+            0b00101,
+            0b01101,
+            0b01110,
+            0b11011,
+            0b01100,
+            0b10111,
+            0b00011,
+        };
+        auto data_v8 = bech32_mod::Vec5ToVec8(data_v5);
+        // 11 10111 01100 11011 01110 01101 00101
+        // 1110 1110 1100 1101 1011 1001 1010 0101
+        BOOST_CHECK(data_v8.size() == 4);
+        BOOST_CHECK(data_v8[0] == 0b1010'0101);
+        BOOST_CHECK(data_v8[1] == 0b1011'1001);
+        BOOST_CHECK(data_v8[2] == 0b1100'1101);
+        BOOST_CHECK(data_v8[3] == 0b1110'1110);
+    }
+    {
+        // 5 byte case
+        std::vector<uint8_t> data_v5 {
+            0b00101,
+            0b01101,
+            0b01110,
+            0b11011,
+            0b01100,
+            0b10111,
+            0b11011,
+            0b10011,
+        };
+        auto data_v8 = bech32_mod::Vec5ToVec8(data_v5);
+        // 10011 11011 10111 01100 11011 01110 01101 00101
+        // 1001 1110 1110 1110 1100 1101 1011 1001 1010 0101
+        BOOST_CHECK(data_v8.size() == 5);
+        BOOST_CHECK(data_v8[0] == 0b1010'0101);
+        BOOST_CHECK(data_v8[1] == 0b1011'1001);
+        BOOST_CHECK(data_v8[2] == 0b1100'1101);
+        BOOST_CHECK(data_v8[3] == 0b1110'1110);
+        BOOST_CHECK(data_v8[4] == 0b1001'1110);
+    }
+}
 /*
 BOOST_AUTO_TEST_CASE(bech32_mod_testvectors_valid)
 {
