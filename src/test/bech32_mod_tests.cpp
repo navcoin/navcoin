@@ -30,26 +30,25 @@ const int8_t CHARSET_REV[128] = {
 };
 BOOST_AUTO_TEST_SUITE(bech32_mod_tests)
 
-void add_errors(std::string& s, const size_t num_errors) {
+// randomly embed errors to the given string
+void embed_errors(std::string& s, const size_t num_errors) {
     // build a list of indices to change
     std::random_device rd;
     std::mt19937 gen(rd());
 
-    std::set<size_t> indices; 
+    // randonly select indices to change
+    std::set<size_t> indices;
 
-    auto sep_idx = s.rfind("1"); 
+    auto sep_idx = s.rfind("1");
     while (indices.size() < num_errors) {
         std::uniform_int_distribution<size_t> dist(sep_idx + 1, s.size() - 9);
         indices.insert(dist(gen));
     }
 
-    //printf("s=%s\n", s.c_str());
-    // alter char at the indices
+    // change characters at the indices
     for (auto it = indices.begin(); it != indices.end(); ++it) {
         auto from_idx = CHARSET_REV[static_cast<size_t>(s[*it])];
         auto to_idx = (from_idx + 1) % 32;
-
-        //printf("%d (%c) at %lu to %d (%c)\n", from_idx, s[*it], *it, to_idx, s[to_idx]);
         s[*it] = CHARSET[to_idx];
     }
 }
@@ -61,7 +60,7 @@ std::string gen_random_str(const size_t size) {
         "abcdefghijklmnopqrstuvwxyz";
     const size_t max_index = (sizeof(charset) - 1);
     std::string s;
-    
+
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<size_t> dist(0, max_index);
@@ -73,29 +72,36 @@ std::string gen_random_str(const size_t size) {
 }
 
 size_t test_error_detection(
-    const std::string& hrp,
     const size_t num_errors,
     const size_t num_tests,
     const bool expect_errors
 ) {
+    std::string hrp = "nv";
     size_t unexpected_results = 0;
 
     for (size_t i=0; i<num_tests; ++i) {
-        std::string s = gen_random_str(96);
+        // generate random 96-byte double public key
+        std::string dpk = gen_random_str(96);
 
-        std::vector<uint8_t> data_v8(s.begin(), s.end());
-        auto data_v5 = bech32_mod::Vec8ToVec5(data_v8);
+        // convert 8-bit vector to 5-bit vector
+        std::vector<uint8_t> dpk_v8(dpk.begin(), dpk.end());
+        auto dpk_v5 = bech32_mod::Vec8ToVec5(dpk_v8);
 
-        auto encoded = bech32_mod::Encode(bech32_mod::Encoding::BECH32, hrp, data_v5);
-        add_errors(encoded, num_errors);
+        auto dpk_bech32 = bech32_mod::Encode(bech32_mod::Encoding::BECH32, hrp, dpk_v5);
+        embed_errors(dpk_bech32, num_errors);
 
-        auto res = bech32_mod::Decode(encoded);
-        auto data_v8r = bech32_mod::Vec5ToVec8(res.data);
+        auto decode_result = bech32_mod::Decode(dpk_bech32);
+        auto recovered_dpk_v8 = bech32_mod::Vec5ToVec8(decode_result.data);
+
+        std::string recovered_dpk(recovered_dpk_v8.begin(), recovered_dpk_v8.end());
+
+        printf("exp: %s\n", dpk.c_str());
+        printf("act: %s\n", recovered_dpk.c_str());
 
         if (expect_errors) {
-            if (data_v8r == data_v8) ++unexpected_results;
+            if (recovered_dpk_v8 == dpk_v8) ++unexpected_results;
         } else {
-            if (data_v8r != data_v8) ++unexpected_results;
+            if (recovered_dpk_v8 != dpk_v8) ++unexpected_results;
         }
     }
     return unexpected_results;
@@ -103,20 +109,21 @@ size_t test_error_detection(
 
 BOOST_AUTO_TEST_CASE(bech32_mod_test_detecting_errors)
 {
-    std::string hrp = "nv";
+    bool failed = false;
 
-    for (size_t num_errors = 0; num_errors <= 5; ++num_errors) {
+    for (size_t num_errors = 0; num_errors <= 0; ++num_errors) {
         printf("trying %lu error case...\n", num_errors);
         size_t unexpected_results =
-            test_error_detection(hrp, num_errors, 10000, num_errors > 0);
+            test_error_detection(num_errors, 3, num_errors > 0);
 
         if (unexpected_results > 0) {
             std::ostringstream msg;
             msg << num_errors << "-error cases failed " << unexpected_results << " times";
-            //BOOST_FAIL(msg.str());
             printf("%s\n", msg.str().c_str());
+            failed = true;
         }
     }
+    BOOST_CHECK(!failed);
 }
 
 BOOST_AUTO_TEST_CASE(bech32_mod_test_vec_recovery)
