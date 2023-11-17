@@ -87,18 +87,11 @@ size_t test_error_detection(
         std::vector<uint8_t> dpk_v8(dpk.begin(), dpk.end());
         auto dpk_v5 = bech32_mod::Vec8ToVec5(dpk_v8);
 
-        // auto dpk_bech32 = bech32_mod::Encode(bech32_mod::Encoding::BECH32, hrp, dpk_v5);
-        // embed_errors(dpk_bech32, num_errors);
-        //
-        // auto decode_result = bech32_mod::Decode(dpk_bech32);
-        // auto recovered_dpk_v8 = bech32_mod::Vec5ToVec8(decode_result.data);
-        //
-        // std::string recovered_dpk(recovered_dpk_v8.begin(), recovered_dpk_v8.end());
+        auto dpk_bech32 = bech32_mod::Encode(bech32_mod::Encoding::BECH32, hrp, dpk_v5);
+        embed_errors(dpk_bech32, num_errors);
 
-        auto recovered_dpk_v8 = bech32_mod::Vec5ToVec8(dpk_v5);
-        std::string recovered_dpk(recovered_dpk_v8.begin(), recovered_dpk_v8.end());
-        printf("exp: %s\n", dpk.c_str());
-        printf("act: %s\n", recovered_dpk.c_str());
+        auto decode_result = bech32_mod::Decode(dpk_bech32);
+        auto recovered_dpk_v8 = bech32_mod::Vec5ToVec8(decode_result.data);
 
         if (expect_errors) {
             if (recovered_dpk_v8 == dpk_v8) ++unexpected_results;
@@ -109,15 +102,14 @@ size_t test_error_detection(
     return unexpected_results;
 }
 
-/*
 BOOST_AUTO_TEST_CASE(bech32_mod_test_detecting_errors)
 {
     bool failed = false;
 
-    for (size_t num_errors = 0; num_errors <= 0; ++num_errors) {
+    for (size_t num_errors = 0; num_errors <= 5; ++num_errors) {
         printf("trying %lu error case...\n", num_errors);
         size_t unexpected_results =
-            test_error_detection(num_errors, 3, num_errors > 0);
+            test_error_detection(num_errors, 10000, num_errors > 0);
 
         if (unexpected_results > 0) {
             std::ostringstream msg;
@@ -128,35 +120,32 @@ BOOST_AUTO_TEST_CASE(bech32_mod_test_detecting_errors)
     }
     BOOST_CHECK(!failed);
 }
-*/
 
-bool TestVecRecovery(std::vector<uint8_t> data_v8)
+bool TestVecRecovery(const std::vector<uint8_t>& data_v8)
 {
     auto data_v5 = bech32_mod::Vec8ToVec5(data_v8);
     auto data_v8r = bech32_mod::Vec5ToVec8(data_v5);
     return data_v8 == data_v8r;
 }
 
+std::vector<uint8_t> GenTestVec8Vec(const size_t& size)
+{
+    uint8_t x = 0b1;
+    std::vector<uint8_t> xs;
+    xs.reserve(size);
+
+    for (size_t i=0; i<size; ++i) {
+        xs.push_back(x);
+        x <<= 1;
+        if (x == 0) x = 0b1;
+    }
+    return xs;
+}
+
 BOOST_AUTO_TEST_CASE(bech32_mod_test_vec_recovery)
 {
-    {
-        // 1 byte case
-        std::vector<uint8_t> data_v8 {0b1111'1111};
-        BOOST_CHECK(TestVecRecovery(data_v8));
-    }
-    {
-        // 2 byte case
-        std::vector<uint8_t> data_v8 {0b1010'0101, 0b1011'1001};
-        BOOST_CHECK(TestVecRecovery(data_v8));
-    }
-    {
-        // 3 byte case
-        std::vector<uint8_t> data_v8 {0b1010'0101, 0b1011'1001, 0b1100'1101};
-        BOOST_CHECK(TestVecRecovery(data_v8));
-    }
-    {
-        // 4 byte case
-        std::vector<uint8_t> data_v8 {0b1010'0101, 0b1011'1001, 0b1100'1101, 0b1110'1110};
+    for (size_t i=1; i<=165; ++i) {
+        auto data_v8 = GenTestVec8Vec(i);
         BOOST_CHECK(TestVecRecovery(data_v8));
     }
 }

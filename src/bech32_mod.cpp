@@ -208,16 +208,11 @@ uint32_t PolyMod(const data& v)
         //         v = v*32 + coef.integer_representation()
         //     print("0x%x" % v)
         //
-        // if (c0 & 1)  c ^= 0x54c9b9d3eb;  //  {1}k(x) = {10}x^7 + {19}x^6 + {4}x^5 + {27}x^4 + {19}x^3 + {20}x^2 + {31}x + {11}
-        // if (c0 & 2)  c ^= 0xa3d1f786f6;  //  {2}k(x) =
-        // if (c0 & 4)  c ^= 0xfa17f08e5;   //  {4}k(x) =
-        // if (c0 & 8)  c ^= 0x15527a91ca;  //  {8}k(x) =
-        // if (c0 & 16)  c ^= 0x20e4e1a394; //  {16}k(x) =
-        if (c0 & 1)  c ^= 0x14c3a295; //     k(x) = {10}x^7 + {12}x^4 + {7}x^3 + {8}x^2 + {20}x + {21}
-        if (c0 & 2)  c ^= 0x29874023; //  {2}k(x) =
-        if (c0 & 4)  c ^= 0x39e2446;  //  {4}k(x) =
-        if (c0 & 8)  c ^= 0x5b8c88c;  //  {8}k(x) =
-        if (c0 & 16) c ^= 0x9f5b518;  // {16}k(x) =
+        if (c0 & 1)  c ^= 0x54c9b9d3eb;  //  {1}k(x) = {10}x^7 + {19}x^6 + {4}x^5 + {27}x^4 + {19}x^3 + {20}x^2 + {31}x + {11}
+        if (c0 & 2)  c ^= 0xa3d1f786f6;  //  {2}k(x) =
+        if (c0 & 4)  c ^= 0xfa17f08e5;   //  {4}k(x) =
+        if (c0 & 8)  c ^= 0x15527a91ca;  //  {8}k(x) =
+        if (c0 & 16)  c ^= 0x20e4e1a394; //  {16}k(x) =
     }
     return c;
 }
@@ -404,6 +399,12 @@ std::vector<uint8_t> Vec5ToVec8(const std::vector<uint8_t>& vec5)
         if (beg_bit < 4) {
             // if beg_bit is 0~3, append entire vec5[i] to v
             v |= (vec5[i] << beg_bit);
+
+            // if v is entirely filled, add v to the result
+            if (beg_bit == 3) {
+                vec8.push_back(v);
+                v = 0;
+            }
         } else {
             // otherwise fill the rest of v with the lower bits of vec5[i]
             size_t num_lower_bits = 8 - beg_bit;
@@ -416,8 +417,8 @@ std::vector<uint8_t> Vec5ToVec8(const std::vector<uint8_t>& vec5)
             // then let the higher bits of vec5[i] the new v
             v = 0x1f & (vec5[i] >> num_lower_bits);
         }
-        ++i;
         beg_bit = (beg_bit + 5) % 8;
+        ++i;
     }
 
     // if there are bits hasn't been added, add them
