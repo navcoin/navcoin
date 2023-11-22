@@ -3,6 +3,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+// Based on bech32.h with modifications by the Navcoin developers
+
 // Bech32 and Bech32m are string encoding formats used in newer
 // address types. The outputs consist of a human-readable part
 // (alphanumeric), a separator character (1), and a base32 data

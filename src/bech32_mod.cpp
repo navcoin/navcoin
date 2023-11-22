@@ -3,6 +3,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+// Based on bech32.cpp with modifications by the Navcoin developers
+
 #include <bech32_mod.h>
 #include <util/vector.h>
 
@@ -124,22 +126,21 @@ uint32_t EncodingConstant(Encoding encoding) {
     return encoding == Encoding::BECH32 ? 1 : 0x2bc830a3;
 }
 
-/** This function will compute what 6 5-bit values to XOR into the last 6 input values, in order to
- *  make the checksum 0. These 6 values are packed together in a single 30-bit integer. The higher
+/** This function will compute what 8 5-bit values to XOR into the last 8 input values, in order to
+ *  make the checksum 0. These 8 values are packed together in a single 40-bit integer. The higher
  *  bits correspond to earlier values. */
 uint32_t PolyMod(const data& v)
 {
     // The input is interpreted as a list of coefficients of a polynomial over F = GF(32), with an
     // implicit 1 in front. If the input is [v0,v1,v2,v3,v4], that polynomial is v(x) =
-    // 1*x^5 + v0*x^4 + v1*x^3 + v2*x^2 + v3*x + v4. The implicit 1 guarantees that
+    // 1*x^7 + v0*x^6 + v1*x^5 + v2*x^4 + v3*x^3 + v4*x^2 + v5*x + v6. The implicit 1 guarantees that
     // [v0,v1,v2,...] has a distinct checksum from [0,v0,v1,v2,...].
 
-    // The output is a 30-bit integer whose 5-bit groups are the coefficients of the remainder of
+    // The output is a 40-bit integer whose 5-bit groups are the coefficients of the remainder of
     // v(x) mod g(x), where g(x) is the Bech32 generator,
-    // x^6 + {29}x^5 + {22}x^4 + {20}x^3 + {21}x^2 + {29}x + {18}. g(x) is chosen in such a way
-    // that the resulting code is a BCH code, guaranteeing detection of up to 3 errors within a
-    // window of 1023 characters. Among the various possible BCH codes, one was selected to in
-    // fact guarantee detection of up to 4 errors within a window of 89 characters.
+    // x^8 + {30}*x^7 + {1}x^6 + {25}*x^5 + {18}*x^4 + {27}*x^3 + {16}*x^2 + {10}*x + {7}. g(x) is
+    // chosen in such a way that the resulting code is a BCH code, guaranteeing detection of up to 5
+    // errors in a 165-character string.
 
     // Note that the coefficients are elements of GF(32), here represented as decimal numbers
     // between {}. In this finite field, addition is just XOR of the corresponding numbers. For
@@ -155,26 +156,8 @@ uint32_t PolyMod(const data& v)
     // v, it corresponds to x^2 + v0*x + v1 mod g(x). As 1 mod g(x) = 1, that is the starting value
     // for `c`.
 
-    // The following Sage code constructs the generator used:
-    //
-    // B = GF(2) # Binary field
-    // BP.<b> = B[] # Polynomials over the binary field
-    // F_mod = b**5 + b**3 + 1
-    // F.<f> = GF(32, modulus=F_mod, repr='int') # GF(32) definition
-    // FP.<x> = F[] # Polynomials over GF(32)
-    // E_mod = x**2 + F.fetch_int(9)*x + F.fetch_int(23)
-    // E.<e> = F.extension(E_mod) # GF(1024) extension field definition
-    // for p in divisors(E.order() - 1): # Verify e has order 1023.
-    //    assert((e**p == 1) == (p % 1023 == 0))
-    // G = lcm([(e**i).minpoly() for i in range(997,1000)])
-    // print(G) # Print out the generator
-    //
-    // It demonstrates that g(x) is the least common multiple of the minimal polynomials
-    // of 3 consecutive powers (997,998,999) of a primitive element (e) of GF(1024).
-    // That guarantees it is, in fact, the generator of a primitive BCH code with cycle
-    // length 1023 and distance 4. See https://en.wikipedia.org/wiki/BCH_code for more details.
+    // The method used to find the most suitable generator is explained in detail in [bech32-mod-gen-poly.md](../doc/bech32-mod-gen-poly.md)
 
-    //uint32_t c = 1;
     uint64_t c = 1;
     for (const auto v_i : v) {
         // We want to update `c` to correspond to a polynomial with one extra term. If the initial
@@ -184,35 +167,33 @@ uint32_t PolyMod(const data& v)
         // c'(x) = (f(x) * x + v_i) mod g(x)
         //         ((f(x) mod g(x)) * x + v_i) mod g(x)
         //         (c(x) * x + v_i) mod g(x)
-        // If c(x) = c0*x^5 + c1*x^4 + c2*x^3 + c3*x^2 + c4*x + c5, we want to compute
-        // c'(x) = (c0*x^5 + c1*x^4 + c2*x^3 + c3*x^2 + c4*x + c5) * x + v_i mod g(x)
-        //       = c0*x^6 + c1*x^5 + c2*x^4 + c3*x^3 + c4*x^2 + c5*x + v_i mod g(x)
-        //       = c0*(x^6 mod g(x)) + c1*x^5 + c2*x^4 + c3*x^3 + c4*x^2 + c5*x + v_i
-        // If we call (x^6 mod g(x)) = k(x), this can be written as
-        // c'(x) = (c1*x^5 + c2*x^4 + c3*x^3 + c4*x^2 + c5*x + v_i) + c0*k(x)
+        // If c(x) = c0*x^7 + c1*x^6 + c2*x^5 + c3*x^4 + c4*x^3 + c5*x^2 + c6*x + c7, we want to compute
+        // c'(x) = (c0*x^7 + c1*x^6 + c2*x^5 + c3*x^4 + c4*x^3 + c5*x^2 + c6*x + c7) * x + v_i mod g(x)
+        //       = c0*x^8 + c1*x^7 + c2*x^6 + c3*x^5 + c4*x^4 + c5*x^3 + c6*x^2 + c7*x + v_i mod g(x)
+        //       = c0*(x^8 mod g(x)) + c1*x^7 + c2*x^6 + c3*x^5 + c4*x^4 + c5*x^3 + c6*x^2 + c7*x + v_i
+        // If we call (x^8 mod g(x)) = k(x), this can be written as
+        // c'(x) = (c1*x^7 + c2*x^6 + c3*x^5 + c4*x^4 + c5*x^3 + c6*x^2 + c7*x + v_i) + c0*k(x)
 
         // First, determine the value of c0:
-        //uint8_t c0 = c >> 25;
         uint8_t c0 = c >> 35;
 
-        // Then compute c1*x^5 + c2*x^4 + c3*x^3 + c4*x^2 + c5*x + v_i:
-        //c = ((c & 0x1ffffff) << 5) ^ v_i;
+        // Then compute c1*x^7 + c2*x^6 + c3*x^5 + c4*x^4 + c5*x^3 + c6*x^2 + c7*x + v_i:
         c = ((c & 0x07ffffffff) << 5) ^ v_i;
 
         // Finally, for each set bit n in c0, conditionally add {2^n}k(x). These constants can be
         // computed using the following Sage code (continuing the code above):
         //
-        // for i in [1,2,4,8,16]: # Print out {1,2,4,8,16}*(g(x) mod x^6), packed in hex integers.
+        // for i in [1,2,4,8,16]: # Print out {1,2,4,8,16}*(g(x) mod x^8), packed in hex integers.
         //     v = 0
-        //     for coef in reversed((F.fetch_int(i)*(G % x**6)).coefficients(sparse=True)):
+        //     for coef in reversed((F.fetch_int(i)*(G % x**8)).coefficients(sparse=True)):
         //         v = v*32 + coef.integer_representation()
         //     print("0x%x" % v)
         //
-        if (c0 & 1)  c ^= 0x54c9b9d3eb;  //  {1}k(x) = {10}x^7 + {19}x^6 + {4}x^5 + {27}x^4 + {19}x^3 + {20}x^2 + {31}x + {11}
-        if (c0 & 2)  c ^= 0xa3d1f786f6;  //  {2}k(x) =
-        if (c0 & 4)  c ^= 0xfa17f08e5;   //  {4}k(x) =
-        if (c0 & 8)  c ^= 0x15527a91ca;  //  {8}k(x) =
-        if (c0 & 16)  c ^= 0x20e4e1a394; //  {16}k(x) =
+        if (c0 & 1)  c ^= 0xf0732dc147; //  {1}k(x) = {30}*x^7 + {1}x^6 + {25}*x^5 + {18}*x^4 + {27}*x^3 + {16}*x^2 + {10}*x + {7}
+        if (c0 & 2)  c ^= 0xa8b6dfa68e; //  {2}k(x)
+        if (c0 & 4)  c ^= 0x193fabc83c; //  {4}k(x)
+        if (c0 & 8)  c ^= 0x322fd3b451; //  {8}k(x)
+        if (c0 & 16)  c ^= 0x640f37688b; //  {16}k(x)
     }
     return c;
 }
@@ -285,7 +266,6 @@ data CreateChecksum(Encoding encoding, const std::string& hrp, const data& value
 {
     auto exp_hrp = ExpandHRP(hrp);
     data enc = Cat(ExpandHRP(hrp), values);
-    //enc.resize(enc.size() + 6); // Append 6 zeroes
     enc.resize(enc.size() + 8); // Append 8 zeroes
     uint32_t mod = PolyMod(enc) ^ EncodingConstant(encoding); // Determine what to XOR into those 8 zeroes.
     data ret(8);
@@ -348,7 +328,6 @@ DecodeResult Decode(const std::string& str) {
     }
     Encoding result = VerifyChecksum(hrp, values);
     if (result == Encoding::INVALID) return {};
-    //return {result, std::move(hrp), data(values.begin(), values.end() - 6)};
     return {result, std::move(hrp), data(values.begin(), values.end() - 8)};
 }
 
