@@ -239,7 +239,7 @@ G = x^8 + c(30)*x^7 + c(1)*x^6 + c(25)*x^5 + c(18)*x^4 + c(27)*x^3
 + c(16)*x^2 + c(10)*x^1 + c(7)
 ```
 
-Next, we embedded the generated `G = ...` line to the below Sagemath script which is a modified version of a script in `bech32.cpp` comment. Then run it.
+Next, we embedded the generated `G = ...` line to the below Sagemath script which is a modified version of the script in `bech32.cpp` comment. Then run it.
 
 ```python
 B = GF(2) # Binary field
