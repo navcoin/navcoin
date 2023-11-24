@@ -20,7 +20,7 @@ U1PIRGA7
 AJ4RJKVB
 ```
 
-Then we concluded that `U1PIRGA7` performed better in terms of the second condition, and we chose `U1PIRGA7`.
+Then we concluded that `U1PIRGA7` performed better in terms of the second condition and chose `U1PIRGA7`.
 
 ## Actual Steps
 
