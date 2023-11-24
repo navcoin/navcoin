@@ -172,7 +172,7 @@ $ mkdir results2
 $ parallel -a gens.txt ./crccollide_50_4 {} ">" results2/{}.txt
 ```
 
-Comparing the results of `AJ4RJKVB` and `U1PIRGA7` manually, we found that `U1PIRGA7` is slightly performing better and selected it as the best-performing generator polynomial.
+Comparing the results manually, we found that `U1PIRGA7` is slightly performing better and selected it as the best-performing generator polynomial.
 
 ## 4. Building mod constants
 With the following `enc-gen-to-sage-code.py` script, we generated the code to define `U1PIRGA7` in Sagemath script:
