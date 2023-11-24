@@ -1,7 +1,7 @@
 # bech32_mod generator polynomial generation
 
 ## Summary
-We made modification to the original bech32 implementation to accomodate input string whose length is 96 bytes before encoding with 2-character HRP.
+We made modification to the original bech32 implementation to make it work only with input strings whose length is 96 bytes before encoding with 2-character HRP.
 To accomiplish that, we followed the method used by Bitcoin Cash and Monero. That is, we replaced the 6-degree generator polynomial by 8-degree one that is capable of detecting up to 5 errors in 165-character string.
 
 To do so, in principle, we followed the procedure used in Monero's Jamis polynomial search which is explained in detail in [this document](https://gist.github.com/tevador/5b3fbbd0877a3412ede07263c6b2663d).
@@ -239,7 +239,7 @@ G = x^8 + c(30)*x^7 + c(1)*x^6 + c(25)*x^5 + c(18)*x^4 + c(27)*x^3
 + c(16)*x^2 + c(10)*x^1 + c(7)
 ```
 
-Next, we embedded the generated `G = ...` line to the below Sagemath script which is a modified version of a script in `bech32.cpp` comment and run it.
+Next, we embedded the generated `G = ...` line to the below Sagemath script which is a modified version of a script in `bech32.cpp` comment. Then run it.
 
 ```python
 B = GF(2) # Binary field
