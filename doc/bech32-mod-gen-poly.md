@@ -221,7 +221,6 @@ def pf_coeffs(coeffs):
     term_str = ' + '.join(terms)
     return f'G = {term_str}'
 
-print(f'Encoded generator: {gen}')
 acc_coeffs = str_to_gen(gen)
 print(acc_coeffs)
 
@@ -237,7 +236,6 @@ The output was:
 
 ```bash
 $ ./enc-gen-to-sage-code.py U1PIRGA7
-Encoded generator: U1PIRGA7
 (1032724529479, [30, 1, 25, 18, 27, 16, 10, 7])
 G = x^8 + c(30)*x^7 + c(1)*x^6 + c(25)*x^5 + c(18)*x^4 + c(27)*x^3
 + c(16)*x^2 + c(10)*x^1 + c(7)
