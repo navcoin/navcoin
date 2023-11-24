@@ -1,12 +1,13 @@
 # bech32_mod generator polynomial generation
 
 ## Summary
-We made modification to the original bech32 implementation to make it work only with input strings whose length is 96 bytes before encoding with 2-character HRP.
-To accomiplish that, we followed the method used by Bitcoin Cash and Monero. That is, we replaced the 6-degree generator polynomial by 8-degree one that is capable of detecting up to 5 errors in 165-character string.
+We made modification to the original bech32 implementation to make it work only with input strings whose length is 96 bytes before encoding with 2-character HRP allowng detection of up to 5 errors in a 165-character string.
 
-To do so, in principle, we followed the Monero's Jamis polynomial search procedure which is explained in detail in [this document](https://gist.github.com/tevador/5b3fbbd0877a3412ede07263c6b2663d).
+To accomiplish that, we followed the method used by Bitcoin Cash and Monero. That is, to replace the 6-degree generator polynomial originally used in bech32 by an 8-degree one.
 
-But since our requirements differ from those of Jamis, we used different approach to select the best performing polynomial.
+In particular, we followed the Monero's Jamis polynomial search procedure which is explained in detail in [this document](https://gist.github.com/tevador/5b3fbbd0877a3412ede07263c6b2663d).
+
+However since our requirements differ from those of Jamis, we used different approach to select the best performing polynomial.
 
 Here are the conditions we needed to satisfy:
 
