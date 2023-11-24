@@ -164,7 +164,7 @@ U1PIRGA7
 AJ4RJKVB
 ```
 
-Again following the Jamis search procedure, we built [crccollide.cpp](https://github.com/sipa/ezbase32/blob/master/crccollide.cpp) with `LENGTH=50` parameter, and then calculated false positive error detection rates:
+Again following the Jamis search procedure, we built [crccollide.cpp](https://github.com/sipa/ezbase32/blob/master/crccollide.cpp) with `LENGTH=50` parameter, and then calculated false positive error detection rates for those 2 generators:
 
 ```bash
 $ g++ ezbase32/crccollide.cpp -o crccollide_50_4 -lpthread -O3 -DLENGTH=50 -DERRORS=4 -DTHREADS=4
