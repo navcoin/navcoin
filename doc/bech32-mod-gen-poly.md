@@ -24,7 +24,7 @@ U1PIRGA7
 AJ4RJKVB
 ```
 
-After inspecting the details, we concluded that `U1PIRGA7` performed slightly better in terms of the second condition and chose `U1PIRGA7`.
+After inspecting the details, we concluded that `U1PIRGA7` performed slightly better in terms of the second requirement and chose `U1PIRGA7`.
 
 ## Actual steps taken
 
@@ -68,12 +68,13 @@ Then we set the number of errors to 5, the threshold to 120 characters and run i
 $ mkdir results1
 $ parallel -a list.txt ./crccollide {} 5 120 ">" results1/{}.txt
 ```
-
-This generated a huge number of the output files in `results1` directory. The calculation took approximately 25 days on Core i5-13500:
+The calculation took approximately 25 days on Core i5-13500
 
 ```bash
 39762158.30s user 2845631.54s system 1975% cpu 599:14:56.86 total
 ```
+
+and generated a huge number of the output files in `results1` directory.
 
 After removing polynomials below the threshould as Jamis did with:
 
