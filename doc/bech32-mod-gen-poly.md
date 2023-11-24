@@ -68,7 +68,7 @@ $ mkdir results1
 $ parallel -a list.txt ./crccollide {} 5 120 ">" results1/{}.txt
 ```
 
-This generated the a huge number of the output files in `results1` directory. The calculation took approximately 25 days on Core i5-13500:
+This generated a huge number of the output files in `results1` directory. The calculation took approximately 25 days on Core i5-13500:
 
 ```bash
 39762158.30s user 2845631.54s system 1975% cpu 599:14:56.86 total
