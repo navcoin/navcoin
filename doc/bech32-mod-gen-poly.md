@@ -65,26 +65,26 @@ $ mkdir results1
 $ parallel -a list.txt ./crccollide {} 5 120 ">" results1/{}.txt
 ```
 
-So far, we have taken the same steps as those done in the Monero's Jamis search, and this generated the output files in `results1` directotory. The calculation took approx 25 days on Core i5-13500 using 20 threads.
+This generated the a huge number of the output files in `results1` directory. The calculation took approximately 25 days on Core i5-13500.
 
 ```bash
 39762158.30s user 2845631.54s system 1975% cpu 599:14:56.86 total
 ```
 
-After removing polynomial below the threshould with
+After removing polynomials below the threshould with:
 
 ```bash
 $ find results1 -name "*.txt" -type f -size -2k -delete
 ```
 
-Following the Jamis's search steps, `16976` polynomials are left in the `results1` directory.
+`16976` polynomials were left in the `results1` directory.
 
 ```bash
 $ ls -1 results1 | wc -l
 16976
 ```
 
-Each file in `results1` directory looks this:
+Each file in `results1` directory looked like:
 
 ```bash
 ...
@@ -93,7 +93,7 @@ A00C78KL  124   0.000000000000000   0.000000000000000   0.000000000000000   0.00
 ...
 ```
 
-where each column contains the following string/number:
+Here is the description of the columns:
 1. Polynomial encoded in bech32 hex
 1. Number of characters in the input
 1. False positive error detection rate when the input contains 1 error
@@ -103,9 +103,9 @@ where each column contains the following string/number:
 1. False positive error detection rate when the input contains 5 errors
 1. False positive error detection rate when the input contains 6 errors
 
-## 3. Selecting polynomial that can always correctly detect up to 5 errors in 165-byte input string
+## 3. Selecting polynomial that can always detect up to 5 errors in 165-byte input string
 
-To extract polynomials satisfying our requirements, we used `err6-high-perf.py` shown below:
+To extract polynomials satisfying our requirements, we used `err6-high-perf.py` script shown below:
 
 ```python
 #!/usr/bin/python3
@@ -161,7 +161,7 @@ U1PIRGA7
 AJ4RJKVB
 ```
 
-Then again following the Jamis search steps, we built [crccollide.cpp](https://github.com/sipa/ezbase32/blob/master/crccollide.cpp) with `LENGTH=50` parameter, and then calculated false positive error detection rates:
+Again following the Jamis search procedure, we built [crccollide.cpp](https://github.com/sipa/ezbase32/blob/master/crccollide.cpp) with `LENGTH=50` parameter, and then calculated false positive error detection rates:
 
 ```bash
 $ g++ ezbase32/crccollide.cpp -o crccollide_50_4 -lpthread -O3 -DLENGTH=50 -DERRORS=4 -DTHREADS=4
@@ -172,7 +172,7 @@ $ parallel -a gens.txt ./crccollide_50_4 {} ">" results2/{}.txt
 Comparing the results of `AJ4RJKVB` and `U1PIRGA7` manually, we found that `U1PIRGA7` is slightly performing better and selected it as the best-performing generator polynomial.
 
 ## 4. Building mod constants
-With the following `enc-gen-to-sage-code.py` script, we generated code to define  `U1PIRGA7` inside Sagemath script:
+With the following `enc-gen-to-sage-code.py` script, we generated the code to define `U1PIRGA7` in Sagemath script:
 
 ```Python
 #!/usr/bin/python3
@@ -236,7 +236,7 @@ G = x^8 + c(30)*x^7 + c(1)*x^6 + c(25)*x^5 + c(18)*x^4 + c(27)*x^3
 + c(16)*x^2 + c(10)*x^1 + c(7)
 ```
 
-Then we embedded the `G = ...` line to the below Sagemath script which is a modified version of a script in `bech32.cpp` comments and run it.
+Next, we embedded the generated `G = ...` line to the below Sagemath script which is a modified version of a script in `bech32.cpp` comment and run it.
 
 ```python
 B = GF(2) # Binary field
@@ -270,7 +270,7 @@ for (i, mod_const) in enumerate(mod_consts):
 
 ## 5. Updating mod constants in PolyMod function
 
-Running the above script, we got the following `C++` code. We replaced the corresponding part in the `PolyMod` function with it to use `U1PIRGA7` as the generator polynomial.
+Running the above script, we got the following `C++` code:
 
 ```c++
         if (c0 & 1)  c ^= 0xf0732dc147; //  {1}k(x) = {30}*x^7 + {1}x^6 + {25}*x^5 + {18}*x^4 + {27}*x^3 + {16}*x^2 + {10}*x + {7}
@@ -279,3 +279,5 @@ Running the above script, we got the following `C++` code. We replaced the corre
         if (c0 & 8)  c ^= 0x322fd3b451; //  {8}k(x)
         if (c0 & 16)  c ^= 0x640f37688b; //  {16}k(x)
 ```
+
+We replaced the corresponding part in the `PolyMod` function with it to use `U1PIRGA7` as the generator polynomial.
