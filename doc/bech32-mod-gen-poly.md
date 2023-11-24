@@ -18,7 +18,7 @@ AJ4RJKVB
 
 Regarding the second condition, `U1PIRGA7` performed better, so the polynomial was selected.
 
-## Steps in details
+## Actual Steps
 
 ### 1. Generating random 10-million degree-8 polynomials
 We used [gen_crc.py](https://gist.github.com/tevador/5b3fbbd0877a3412ede07263c6b2663d#:~:text=2.1-,gen_crc.py,-The%20gen_crc.py) used for Jamis search shown below:
@@ -61,7 +61,7 @@ $ mkdir results1
 $ parallel -a list.txt ./crccollide {} 5 120 ">" results1/{}.txt
 ```
 
-So far, we have taken the same steps as those done in the Monero's Jamis search, and this generated the output files in `results1` directotory. The calculation took approx 25 days on Core i5-13600K using 20 cores.
+So far, we have taken the same steps as those done in the Monero's Jamis search, and this generated the output files in `results1` directotory. The calculation took approx 25 days on Core i5-13500 using 20 threads.
 
 ```bash
 39762158.30s user 2845631.54s system 1975% cpu 599:14:56.86 total
@@ -157,7 +157,7 @@ U1PIRGA7
 AJ4RJKVB
 ```
 
-Then again following the Jamis search steps, we built `crccollide.cpp` with `LENGTH=50` parameter, and then calculated false positive error detection rates:
+Then again following the Jamis search steps, we built [crccollide.cpp](https://github.com/sipa/ezbase32/blob/master/crccollide.cpp) with `LENGTH=50` parameter, and then calculated false positive error detection rates:
 
 ```bash
 $ g++ ezbase32/crccollide.cpp -o crccollide_50_4 -lpthread -O3 -DLENGTH=50 -DERRORS=4 -DTHREADS=4
