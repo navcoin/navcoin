@@ -158,7 +158,7 @@ for gen in gens[:top_n]:
 This output 2 polynomials.
 
 ```bash
-~/repos/bch ./err6-high-perf.py > gens.txt
+$ ./err6-high-perf.py > gens.txt
 ~/repos/bch cat gens.txt
 U1PIRGA7
 AJ4RJKVB
@@ -175,7 +175,7 @@ $ parallel -a gens.txt ./crccollide_50_4 {} ">" results2/{}.txt
 Comparing the results manually, we found that `U1PIRGA7` is slightly performing better and selected it as the best-performing generator polynomial.
 
 ## 4. Building mod constants
-With the following `enc-gen-to-sage-code.py` script, we generated the code to define `U1PIRGA7` as `G` in Sagemath script:
+With the following `enc-gen-to-sage-code.py` script, we generated the code to define `U1PIRGA7` as `G` in a Sagemath script:
 
 ```Python
 #!/usr/bin/python3
