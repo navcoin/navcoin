@@ -8,7 +8,7 @@ Since our requirements differ from those of Jamis, we used different approach to
 Here are the conditions we needed to satisfy:
 
 1. The generator polynomial should be capable of detecting up to 5 errors in 165-character bech32 string.
-   - We wanted a 96-byte double public key to be encoded to bech32 format. Converting 8-bit based vector to 5-bit vector, the vector length for the double public key becomes 96 * 8 / 5 = 153.6 which is 154 bytes. In addition to that, 8-byte checksum, 2-byte HRP and 1-byte separator are needed. At the end the corresponding bech32 string becomes 165-character long.
+   - We wanted a 96-byte double public key to be encoded to bech32 format. Converting 8-bit based vector to 5-bit vector, the vector length for the double public key becomes 96 * 8 / 5 = 153.6 which is 154 bytes. In addition to that, 8-byte checksum, 2-byte HRP and 1-byte separator are needed. Adding those togethger, the resulting bech32 string becomes 165-character long.
 2. Also we want the polynomial to have the lowest false-positive error rate for 7 and 8 error cases up to 50 characters.
 
 Amongst 10 million randomly generated degree-8 generator polynomials, there existed 2 generator polynomials satisfying the first condition, namely:
