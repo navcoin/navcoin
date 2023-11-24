@@ -61,7 +61,7 @@ To calculate the set of candidate polynomials, we used [crccollide.cpp](https://
 $ g++ ezbase32/crccollide.cpp -o crccollide -lpthread -O3
 ```
 
-Then we set the number of errors to 5 and the threshold to 120 characters and run it.
+Then we set the number of errors to 5, the threshold to 120 characters and run it.
 
 ```bash
 $ mkdir results1
