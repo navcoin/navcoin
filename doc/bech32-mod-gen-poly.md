@@ -9,7 +9,7 @@ Since our requirements for the best performing generator polynomial differs from
    - Our input string is 96-byte double public key. By converting 8-bit based vector to 5-bit vector, the vector length becomes 96 * 8 / 5 = 153.6. so the data part requires 154 bytes. In addition to that, 8-byte checksum, 2-byte HRP and 1-byte separator are needed. Then the bech32 string becomes 165 character long.
 2. Also we want the polynomial that has the lowest false-positive error rate for 7 and 8 error cases up to 50 characters.
 
-Amongst 10 million randomly generated degree-8 generator polynomials, there existed only 2 generator polynomials satisfying the first condition which are:
+Amongst 10 million randomly generated degree-8 generator polynomials, there existed only 2 generator polynomials satisfying the first condition. Namely:
 
 ```
 U1PIRGA7
