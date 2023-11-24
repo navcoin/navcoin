@@ -1,0 +1,10 @@
+prefix=/Users/kazumunemasaki/repos/navcoin/depends/aarch64-apple-darwin22.2.0
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: Navcoin Core consensus library
+Description: Library for the Bitcoin consensus protocol.
+Version: 25.99.0
+Libs: -L${libdir} -lbitcoinconsensus
+Cflags: -I${includedir}
