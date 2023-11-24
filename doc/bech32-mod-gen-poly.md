@@ -96,7 +96,7 @@ A00C78KL  124   0.000000000000000   0.000000000000000   0.000000000000000   0.00
 ...
 ```
 
-Here is the description of the columns in the files:
+The description of the columns are:
 1. Polynomial encoded in bech32 hex
 1. Number of characters in the input
 1. False positive error detection rate when the input contains 1 error
