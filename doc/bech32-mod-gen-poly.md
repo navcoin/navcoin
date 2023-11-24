@@ -280,4 +280,4 @@ Running the above script, we got the following `C++` code:
         if (c0 & 16)  c ^= 0x640f37688b; //  {16}k(x)
 ```
 
-We replaced the corresponding part in the `PolyMod` function with it to use `U1PIRGA7` as the generator polynomial.
+We replaced the corresponding part of the `PolyMod` function with this in order to use `U1PIRGA7` as the generator polynomial.
