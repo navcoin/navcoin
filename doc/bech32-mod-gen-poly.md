@@ -1,9 +1,12 @@
 # bech32_mod generator polynomial generation
 
 ## Summary
-In principle, we followed the method used by Monero's Jamis polynomial search which is explained in detail in [this document](https://gist.github.com/tevador/5b3fbbd0877a3412ede07263c6b2663d) to generate the best-performing generator polynomial for our need.
+We made modification to the original bech32 implementation to accomodate input string whose length is 96 bytes before encoding with 2-character HRP.
+To accomiplish that, we followed the method used by Bitcoin Cash and Monero. That is, we replaced the 6-degree generator polynomial by 8-degree one that is capable of detecting up to 5 errors in 165-character string.
 
-Since our requirements differ from those of Jamis, we used different approach to select the best performing polynomial.
+To do so, in principle, we followed the procedure used in Monero's Jamis polynomial search which is explained in detail in [this document](https://gist.github.com/tevador/5b3fbbd0877a3412ede07263c6b2663d).
+
+But since our requirements differ from those of Jamis, we used different approach to select the best performing polynomial.
 
 Here are the conditions we needed to satisfy:
 
