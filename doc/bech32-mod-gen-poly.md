@@ -17,7 +17,7 @@ Here are the requirements we had:
 
 To find a polynomial best satisfying the requirements, we generated 10-million randomly generated degree-8 generator polynomials, and computed their false positive error rates for the cases of various numbers of errors in the same way Jamis did.
 
-As a result, we found two generator polynomials satisfying the first condition:
+As a result, we found two generator polynomials satisfying the first requirement:
 
 ```
 U1PIRGA7
