@@ -1,0 +1,4 @@
+conftest.cpp:64:18: fatal error: 'libdb5.3/db_cxx.h' file not found
+        #include <libdb5.3/db_cxx.h>
+                 ^~~~~~~~~~~~~~~~~~~
+1 error generated.
