@@ -110,7 +110,7 @@ The description of the columns are:
 
 ## 3. Selecting polynomial that detects up to 5 errors in 165-byte input string
 
-To extract polynomials satisfying our requirements, we used `err6-high-perf.py` script based on Jamis's [crc_res.py](https://gist.github.com/tevador/5b3fbbd0877a3412ede07263c6b2663d#:~:text=2.3-,crc_res.py,-The%20crc_res.py) shown below:
+To extract polynomials satisfying our requirements, we used `err6-high-perf.py` script that is based on Jamis's [crc_res.py](https://gist.github.com/tevador/5b3fbbd0877a3412ede07263c6b2663d#:~:text=2.3-,crc_res.py,-The%20crc_res.py) shown below:
 
 ```python
 #!/usr/bin/python3
