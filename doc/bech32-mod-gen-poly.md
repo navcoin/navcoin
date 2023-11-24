@@ -11,7 +11,7 @@ Here are the conditions we needed to satisfy:
    - We wanted a 96-byte double public key to be encoded to bech32 format. Converting 8-bit based vector to 5-bit vector, the vector length for the double public key becomes 96 * 8 / 5 = 153.6 which is 154 bytes. In addition to that, 8-byte checksum, 2-byte HRP and 1-byte separator are needed. Adding those togethger, the resulting bech32 string becomes 165-character long.
 2. Also we want the polynomial to have the lowest false-positive error rate for 7 and 8 error cases up to 50 characters.
 
-We generated 10-million randomly generated degree-8 generator polynomials, and computed their false positive error rates for the cases of various numbers of errors.
+We generated 10-million randomly generated degree-8 generator polynomials, and computed their false positive error rates for the cases of various numbers of errors in the same way Jamis did.
 
 Amongst them, there were two generator polynomials satisfying the first condition, namely:
 
@@ -20,7 +20,7 @@ U1PIRGA7
 AJ4RJKVB
 ```
 
-Then we found that `U1PIRGA7` performed better for the second condition, so we choose `U1PIRGA7`.
+Then we concluded that `U1PIRGA7` performed better for the second condition, and we chose `U1PIRGA7`.
 
 ## Actual Steps
 
