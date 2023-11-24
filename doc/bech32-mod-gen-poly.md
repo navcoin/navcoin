@@ -68,7 +68,7 @@ $ mkdir results1
 $ parallel -a list.txt ./crccollide {} 5 120 ">" results1/{}.txt
 ```
 
-This generated the a huge number of the output files in `results1` directory. The calculation took approximately 25 days on Core i5-13500.
+This generated the a huge number of the output files in `results1` directory. The calculation took approximately 25 days on Core i5-13500:
 
 ```bash
 39762158.30s user 2845631.54s system 1975% cpu 599:14:56.86 total
@@ -87,7 +87,7 @@ $ ls -1 results1 | wc -l
 16976
 ```
 
-Each file in `results1` directory looked like:
+Each file in the `results1` directory looked like:
 
 ```bash
 ...
@@ -96,7 +96,7 @@ A00C78KL  124   0.000000000000000   0.000000000000000   0.000000000000000   0.00
 ...
 ```
 
-Here is the description of the columns:
+Here is the description of the columns in the files:
 1. Polynomial encoded in bech32 hex
 1. Number of characters in the input
 1. False positive error detection rate when the input contains 1 error
