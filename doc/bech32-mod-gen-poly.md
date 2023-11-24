@@ -99,10 +99,9 @@ where each column contains the following string/number:
 1. False positive error detection rate when the input contains 5 errors
 1. False positive error detection rate when the input contains 6 errors
 
-## Selecting polynomail that can detect 5 errors without any failure in 165-byte input string
+## 3. Selecting polynomial that can always correctly detect up to 5 errors in 165-byte input string
 
-
-To extract polynomials meeting our requirements, we used the following Python script
+To extract polynomials satisfying our requirements, we used `err6-high-perf.py` shown below:
 
 ```python
 #!/usr/bin/python3
@@ -158,7 +157,7 @@ U1PIRGA7
 AJ4RJKVB
 ```
 
-Then again following the Jamis method, we built `crccollide.cpp` with `LENGTH=50` and calculated false positive error detection rates as follows:
+Then again following the Jamis search steps, we built `crccollide.cpp` with `LENGTH=50` parameter, and then calculated false positive error detection rates:
 
 ```bash
 $ g++ ezbase32/crccollide.cpp -o crccollide_50_4 -lpthread -O3 -DLENGTH=50 -DERRORS=4 -DTHREADS=4
@@ -166,10 +165,10 @@ $ mkdir results2
 $ parallel -a gens.txt ./crccollide_50_4 {} ">" results2/{}.txt
 ```
 
-Comparing `AJ4RJKVB` and `U1PIRGA7` manually, we found that `U1PIRGA7` is slightly performing better and selected it as the best-performing generator polynomial.
+Comparing the results of `AJ4RJKVB` and `U1PIRGA7` manually, we found that `U1PIRGA7` is slightly performing better and selected it as the best-performing generator polynomial.
 
-## Building mod constants
-We prepared following `enc-gen-to-sage-code.py` script to generate to define  `U1PIRGA7` inside Sagemath script:
+## 4. Building mod constants
+With the following `enc-gen-to-sage-code.py` script, we generated code to define  `U1PIRGA7` inside Sagemath script:
 
 ```Python
 #!/usr/bin/python3
@@ -223,7 +222,7 @@ ered_gen}')
 print(pf_coeffs(acc_coeffs[1]))
 ```
 
-and got the following output:
+Below is the output:
 
 ```bash
 $ ./enc-gen-to-sage-code.py U1PIRGA7
@@ -233,7 +232,7 @@ G = x^8 + c(30)*x^7 + c(1)*x^6 + c(25)*x^5 + c(18)*x^4 + c(27)*x^3
 + c(16)*x^2 + c(10)*x^1 + c(7)
 ```
 
-Then we embeddef `G = ...` line to the script in `bech32.cpp` comment with slight modification
+Then we embedded the `G = ...` line to the below Sagemath script which is a modified version of a script in `bech32.cpp` comments and run it.
 
 ```python
 B = GF(2) # Binary field
@@ -265,7 +264,9 @@ for (i, mod_const) in enumerate(mod_consts):
     print(s)
 ```
 
-which generated the following `C++` code
+## 5. Updating mod constants in PolyMod function
+
+Running the above script, we got the following `C++` code. We replaced the corresponding part in the `PolyMod` function with it to use `U1PIRGA7` as the generator polynomial.
 
 ```c++
         if (c0 & 1)  c ^= 0xf0732dc147; //  {1}k(x) = {30}*x^7 + {1}x^6 + {25}*x^5 + {18}*x^4 + {27}*x^3 + {16}*x^2 + {10}*x + {7}
@@ -274,5 +275,3 @@ which generated the following `C++` code
         if (c0 & 8)  c ^= 0x322fd3b451; //  {8}k(x)
         if (c0 & 16)  c ^= 0x640f37688b; //  {16}k(x)
 ```
-
-Then we replaced the corresponding part in the `PolyMod` function to use `U1PIRGA7` as the generator polynomial.
