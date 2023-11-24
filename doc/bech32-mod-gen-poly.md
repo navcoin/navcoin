@@ -1,30 +1,30 @@
 # bech32_mod generator polynomial generation
 
 ## Summary
-We made modification to bech32 implementation of Bitcoin so that it works with 165-character bech32 string only allowing to detect up to 5 errors.
+We made modification to bech32 implementation of Bitcoin so that it worked with 165-character bech32 string perfectly detecting up to 5 errors.
 
-To accomiplish that, we replace the 6-degree generator polynomial originally used by bech32 by an 8-degree one following [Bitcoin Cash's cashaddr implementation](https://github.com/bitcoin-cash-node/bitcoin-cash-node/blob/master/src/cashaddr.cpp) and [Jamtis](https://gist.github.com/tevador/50160d160d24cfc6c52ae02eb3d17024) of Monero.
+To accomiplish that, we replaced the 6-degree generator polynomial originally used by bech32 by an 8-degree one as [Bitcoin Cash's cashaddr implementation](https://github.com/bitcoin-cash-node/bitcoin-cash-node/blob/master/src/cashaddr.cpp) and [Jamtis](https://gist.github.com/tevador/50160d160d24cfc6c52ae02eb3d17024) of Monero have done.
 
-In order to find an 8-degree polynomial for our need, we basically followed the Jamtis polynomial search procedure which is explained in detail in [this document](https://gist.github.com/tevador/5b3fbbd0877a3412ede07263c6b2663d) with a little modificaiton since our requirements differ from those of Jamtis.
+In order to find an 8-degree polynomial for our need, we followed the Jamtis polynomial search procedure which is explained in detail in [this document](https://gist.github.com/tevador/5b3fbbd0877a3412ede07263c6b2663d) with a little modificaiton to meet our requirements.
 
 Here are the requirements we had:
 
-1. The generator polynomial should be capable of always detecting up to 5 errors in 165-character bech32 string.
-   - We encode 96-byte double public keys into bech32 format. Converting 96-byte vector utilizing all bits of each byte into those that only uses 5 bits of each byte, we get 154-byte vector (96 * 8 / 5 = 153.6). In addition, 8-byte checksum, 2-byte HRP and 1-byte separator are needed. Adding those together, the resulting bech32 string becomes 165-character long.
+1. The generator polynomial should be capable of perfectly detecting up to 5 errors in 165-character bech32 string.
+   - We encode 96-byte double public keys into bech32 format. Converting 96-byte vector utilizing all bits of each byte into those that only uses 5 bits of each byte, we end up with 154-byte vector (96 * 8 / 5 = 153.6). In addition, 8-byte checksum, 2-byte HRP and 1-byte separator are needed. Putting those together, the resulting bech32 string became 165-character long.
 2. The generator polynomial should have the lowest false-positive error rate for 7 and 8 error cases when the input string is 50-character long.
 
-To find a polynomial satisfying the requirements, we first generated 10-million randomly generated degree-8 generator polynomials, and computed false positive error rates of each polynomial generated.
+To find a polynomial satisfying above requirements, we first generated 10-million random degree-8 polynomials, and computed false positive error rates for them.
 
-Then we got two generator polynomials satisfying the first requirement:
+Amongst all, there were two generator polynomials satisfying the first requirement:
 
 ```
 U1PIRGA7
 AJ4RJKVB
 ```
 
-For both of the polynomials, we computed false positive errors rates of 7 and 8 error cases, and we concluded that `U1PIRGA7` performed slightly better in terms of the second requirement and chose it as the generator polynomial.
+For both of the polynomials, we computed false positive errors rates for 7 and 8 error cases, and we concluded that `U1PIRGA7` performed better and chose it as the generator polynomial.
 
-## Concrete procedure
+## Actual procedure
 
 ### 1. Generation of random 10-million degree-8 polynomials
 We used [gen_crc.py](https://gist.github.com/tevador/5b3fbbd0877a3412ede07263c6b2663d#:~:text=2.1-,gen_crc.py,-The%20gen_crc.py) used in Jamtis search that is shown below:
@@ -55,7 +55,7 @@ gen_crc(8, 10000000, 0x584d52)
 
 ### 2. Calculation of false-positive error rates
 
-To see the performance of all generated polynomials, we used [crccollide.cpp](https://github.com/sipa/ezbase32/blob/master/crccollide.cpp) that is developed by Bitcoin developers compiled with the default parameters as in:
+To see the performance of all generated polynomials, we used [crccollide.cpp](https://github.com/sipa/ezbase32/blob/master/crccollide.cpp) that is developed by Bitcoin developers. We compiled it with the default parameters as in:
 
 ```bash
 $ g++ ezbase32/crccollide.cpp -o crccollide -lpthread -O3
@@ -68,7 +68,7 @@ $ mkdir results1
 $ parallel -a list.txt ./crccollide {} 5 120 ">" results1/{}.txt
 ```
 
-The execution took approximately 25 days on Core i5-13500
+The execution took approximately 25 days on Core i5-13500!!
 
 ```bash
 39762158.30s user 2845631.54s system 1975% cpu 599:14:56.86 total
@@ -89,7 +89,7 @@ $ ls -1 results1 | wc -l
 16976
 ```
 
-Each file in the `results1` directory looks like:
+Each file in the `results1` directory looked like:
 
 ```bash
 ...
@@ -101,19 +101,19 @@ A00C78KL  124   0.000000000000000   0.000000000000000   0.000000000000000   0.00
 The descriptions of the columns are:
 1. Polynomial in bech32 hex
 1. Input string size
-1. False positive error detection rate when the input contains 1 error
-1. False positive error detection rate when the input contains 2 errors
-1. False positive error detection rate when the input contains 3 errors
-1. False positive error detection rate when the input contains 4 errors
-1. False positive error detection rate when the input contains 5 errors
-1. False positive error detection rate when the input contains 6 errors
+1. False positive error rate for 1-error case
+1. False positive error rate for 2-error case
+1. False positive error rate for 3-error case
+1. False positive error rate for 4-error case
+1. False positive error rate for 5-error case
+1. False positive error rate for 6-error case
 
 ## 3. Extration of polynomials satisfying the requirements
 
 To extract polynomials that can perfectly detect up to 5 errors, we used `err6-high-perf.py` script below that is a modified version of Jamis's [crc_res.py](https://gist.github.com/tevador/5b3fbbd0877a3412ede07263c6b2663d#:~:text=2.3-,crc_res.py,-The%20crc_res.py) script:
 
 ```python
-#!/usr/bin/python3
+# err6-high-perf.py
 
 import os
 from typing import Optional, Tuple
@@ -157,7 +157,7 @@ for gen in gens[:top_n]:
     print(f"{gen[0]}")
 ```
 
-Running this extracted 2 polynomials.
+This script extracted 2 polynomials.
 
 ```bash
 $ ./err6-high-perf.py > gens.txt
@@ -166,7 +166,7 @@ U1PIRGA7
 AJ4RJKVB
 ```
 
-Next we again built [crccollide.cpp](https://github.com/sipa/ezbase32/blob/master/crccollide.cpp) with `LENGTH=50` and `ERRORS=4` parameters, and then calculated false positive error detection rates for the extracted generators:
+Then we built [crccollide.cpp](https://github.com/sipa/ezbase32/blob/master/crccollide.cpp) again with `LENGTH=50` and `ERRORS=4` parameters, and calculated false positive error detection rates of the extracted generators for 7 an 8 error cases:
 
 ```bash
 $ g++ ezbase32/crccollide.cpp -o crccollide_50_4 -lpthread -O3 -DLENGTH=50 -DERRORS=4 -DTHREADS=4
@@ -177,10 +177,10 @@ $ parallel -a gens.txt ./crccollide_50_4 {} ">" results2/{}.txt
 Comparing the results manually, we found that `U1PIRGA7` is slightly performing better and selected it as the best-performing generator polynomial.
 
 ## 4. Generation of mod constants
-With the following `enc-gen-to-sage-code.py` script, we generated SageMath code to define `U1PIRGA7` as `G`:
+With the below `enc-gen-to-sage-code.py` script, we generated `SageMath` code to define `U1PIRGA7` as `G`:
 
 ```Python
-#!/usr/bin/python3
+# enc-gen-to-sage-code.py
 
 import sys
 
@@ -231,7 +231,7 @@ ered_gen}')
 print(pf_coeffs(acc_coeffs[1]))
 ```
 
-Below is the output:
+The output was:
 
 ```bash
 $ ./enc-gen-to-sage-code.py U1PIRGA7
@@ -241,7 +241,7 @@ G = x^8 + c(30)*x^7 + c(1)*x^6 + c(25)*x^5 + c(18)*x^4 + c(27)*x^3
 + c(16)*x^2 + c(10)*x^1 + c(7)
 ```
 
-Then we embedded the generated `G = ...` line to the below SageMath script which is a modified version of the script in `bech32.cpp` comment, and run it to generate C++ code snippet to compute a modulo by the generator polymial.
+Then we embedded the generated `G = ...` line to the below `SageMath` script which is a modified version of the script in `bech32.cpp` comment, and run it to generate `C++` code to compute a modulo by the generator polynomial.
 
 ```python
 B = GF(2) # Binary field
@@ -276,11 +276,11 @@ for (i, mod_const) in enumerate(mod_consts):
 The generated `C++` code was:
 
 ```c++
-if (c0 & 1)  c ^= 0xf0732dc147; //  {1}k(x) = {30}*x^7 + {1}x^6 + {25}*x^5 + {18}*x^4 + {27}*x^3 + {16}*x^2 + {10}*x + {7}
-if (c0 & 2)  c ^= 0xa8b6dfa68e; //  {2}k(x)
-if (c0 & 4)  c ^= 0x193fabc83c; //  {4}k(x)
-if (c0 & 8)  c ^= 0x322fd3b451; //  {8}k(x)
-if (c0 & 16)  c ^= 0x640f37688b; //  {16}k(x)
+if (c0 & 1)  c ^= 0xf0732dc147; //  {1}k(x) =
+if (c0 & 2)  c ^= 0xa8b6dfa68e; //  {2}k(x) =
+if (c0 & 4)  c ^= 0x193fabc83c; //  {4}k(x) =
+if (c0 & 8)  c ^= 0x322fd3b451; //  {8}k(x) =
+if (c0 & 16)  c ^= 0x640f37688b; //  {16}k(x) =
 ```
 
 We replaced the corresponding part of the `PolyMod` function with this to use `U1PIRGA7` as the generator polynomial.
