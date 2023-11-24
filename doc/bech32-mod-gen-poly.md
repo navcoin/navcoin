@@ -20,12 +20,12 @@ U1PIRGA7
 AJ4RJKVB
 ```
 
-Then we concluded that `U1PIRGA7` performed better for the second condition, and we chose `U1PIRGA7`.
+Then we concluded that `U1PIRGA7` performed better in terms of the second condition, and we chose `U1PIRGA7`.
 
 ## Actual Steps
 
 ### 1. Generating random 10-million degree-8 polynomials
-We used [gen_crc.py](https://gist.github.com/tevador/5b3fbbd0877a3412ede07263c6b2663d#:~:text=2.1-,gen_crc.py,-The%20gen_crc.py) used for Jamis search shown below:
+We used [gen_crc.py](https://gist.github.com/tevador/5b3fbbd0877a3412ede07263c6b2663d#:~:text=2.1-,gen_crc.py,-The%20gen_crc.py) used by Jamis search shown below:
 
 ```python
 import random
@@ -52,7 +52,7 @@ gen_crc(8, 10000000, 0x584d52)
 ```
 
 ### 2. Calculating false-positive error rates for each polynomial
-To calculate the set of candidate polynomials, we used [crccollide.cpp](https://github.com/sipa/ezbase32/blob/master/crccollide.cpp) developed by Bitcoin developers compiled with the default parameters as in:
+To calculate the set of candidate polynomials, we used [crccollide.cpp](https://github.com/sipa/ezbase32/blob/master/crccollide.cpp) which is developed by Bitcoin developers compiled with the default parameters as in:
 
 ```bash
 $ g++ ezbase32/crccollide.cpp -o crccollide -lpthread -O3
