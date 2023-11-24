@@ -1,18 +1,108 @@
-g++ ezbase32/crccollide.cpp -o crccollide -lpthread -O3
- 
-parallel -a list.txt ./crccollide {} 5 120 ">" results1/{}.txt
+# bech32_mod generator polynomial generation steps
 
+## Summary
+We followed the method used for Monero's Jamis polynomial search which is explained in [this document](https://gist.github.com/tevador/5b3fbbd0877a3412ede07263c6b2663d) in detail to generate candidate polynomials.
+
+Since our requirements for the best performing generator polynomial differs from those of Jamis, we used different process for selecting the best performing polynomial.
+
+1. Our generator polynomial should be capable of detecting up to 5 errors in 165-character bech32 string.
+   - Our input string is 96-byte double public key. By converting 8-bit based vector to 5-bit vector, the vector length becomes 96 * 8 / 5 = 153.6. so the data part requires 154 bytes. In addition to that, 8-byte checksum, 2-byte HRP and 1-byte separator are needed. Then the bech32 string becomes 165 character long.
+2. Also we want the polynomial that has the lowest false-positive error rate for 7 and 8 error cases up to 50 characters.
+
+Amongst 10 million randomly generated degree-8 generator polynomials, there existed only 2 generator polynomials satisfying the first condition which are:
+
+```
+U1PIRGA7
+AJ4RJKVB
+```
+
+Regarding the second condition, `U1PIRGA7` performed better, so the polynomial was selected.
+
+## Steps in details
+
+### 1. Generating random 10-million degree-8 polynomials
+We used [gen_crc.py](https://gist.github.com/tevador/5b3fbbd0877a3412ede07263c6b2663d#:~:text=2.1-,gen_crc.py,-The%20gen_crc.py) used for Jamis search shown below:
+
+```python
+import random
+
+CHARSET = "0123456789ABCDEFGHIJKLMNOPQRSTUV"
+
+def gen_to_str(val, degree):
+    gen_str = ""
+    for i in range(degree):
+        gen_str = CHARSET[int(val) % 32] + gen_str
+        val /= 32
+    return gen_str
+
+def gen_crc(degree, count, seed=None):
+    random.seed(seed)
+    for i in range(count):
+        while True:
+            r = random.getrandbits(5 * degree)
+            if (r % 32) != 0:
+                break
+        print(gen_to_str(r, degree))
+
+gen_crc(8, 10000000, 0x584d52)
+```
+
+### 2. Calculating false-positive error rates for each polynomial
+To calculate the set of candidate polynomials, we used [crccollide.cpp](https://github.com/sipa/ezbase32/blob/master/crccollide.cpp) developed by Bitcoin developers compiled with the default parameters as in:
+
+```bash
+$ g++ ezbase32/crccollide.cpp -o crccollide -lpthread -O3
+```
+
+Then we set the number of errors to 5 and the threshold to 120 characters
+
+```bash
+$ mkdir results1
+$ parallel -a list.txt ./crccollide {} 5 120 ">" results1/{}.txt
+```
+
+So far, we have taken the same steps as those done in the Monero's Jamis search, and this generated the output files in `results1` directotory. The calculation took approx 25 days on Core i5-13600K using 20 cores.
+
+```bash
 39762158.30s user 2845631.54s system 1975% cpu 599:14:56.86 total
+```
 
- 
-~/repos/bch ls -1 results1 | wc -l
-   16976
+After removing polynomial below the threshould with
 
-it turned out that the double public key encoded in bech32 string has length 165 when the hrp is 2-char
-data length is 96 * 8 / 5 = 153.6. so requires 154 bytes
-when 8-byte checksum and 2-byte hrp and 1-byte separator are added to it, the total size becomes 165 bytes
+```bash
+$ find results1 -name "*.txt" -type f -size -2k -delete
+```
 
-err6-high-perf.py   // prints out all generators above satisfying our need
+Following the Jamis's search steps, `16976` polynomials are left in the `results1` directory.
+
+```bash
+$ ls -1 results1 | wc -l
+16976
+```
+
+Each file in `results1` directory looks this:
+
+```bash
+...
+A00C78KL  123   0.000000000000000   0.000000000000000   0.000000000000000   0.000000000000000   0.000000000000000   1.031711484752184  # 100% done
+A00C78KL  124   0.000000000000000   0.000000000000000   0.000000000000000   0.000000000000000   0.010575746914933   1.030752602001270  # 100% done
+...
+```
+
+where each column contains the following string/number:
+1. Polynomial encoded in bech32 hex
+1. Number of characters in the input
+1. False positive error detection rate when the input contains 1 error
+1. False positive error detection rate when the input contains 2 errors
+1. False positive error detection rate when the input contains 3 errors
+1. False positive error detection rate when the input contains 4 errors
+1. False positive error detection rate when the input contains 5 errors
+1. False positive error detection rate when the input contains 6 errors
+
+## Selecting polynomail that can detect 5 errors without any failure in 165-byte input string
+
+
+To extract polynomials meeting our requirements, we used the following Python script
 
 ```python
 #!/usr/bin/python3
@@ -56,26 +146,32 @@ for entry in os.listdir(dirpath):
 gens.sort(key=lambda x: x[1])
 
 for gen in gens[:top_n]:
-    #print(f"{gen[0]} {gen[1]}")
     print(f"{gen[0]}")
 ```
 
+This output 2 polynomials.
+
+```bash
 ~/repos/bch ./err6-high-perf.py > gens.txt
 ~/repos/bch cat gens.txt
 U1PIRGA7
 AJ4RJKVB
-
-
-g++ ezbase32/crccollide.cpp -o crccollide_50_4 -lpthread -O3 -DLENGTH=50 -DERRORS=4 -DTHREADS=4
-
-parallel -a gens.txt ./crccollide_50_4 {} ">" results2/{}.txt
-
-Compared AJ4RJKVB.txt U1PIRGA7.txt
-U1PIRGA7 is slightly performing better
-
-enc-gen-to-sage-code.py
-
 ```
+
+Then again following the Jamis method, we built `crccollide.cpp` with `LENGTH=50` and calculated false positive error detection rates as follows:
+
+```bash
+$ g++ ezbase32/crccollide.cpp -o crccollide_50_4 -lpthread -O3 -DLENGTH=50 -DERRORS=4 -DTHREADS=4
+$ mkdir results2
+$ parallel -a gens.txt ./crccollide_50_4 {} ">" results2/{}.txt
+```
+
+Comparing `AJ4RJKVB` and `U1PIRGA7` manually, we found that `U1PIRGA7` is slightly performing better and selected it as the best-performing generator polynomial.
+
+## Building mod constants
+We prepared following `enc-gen-to-sage-code.py` script to generate to define  `U1PIRGA7` inside Sagemath script:
+
+```Python
 #!/usr/bin/python3
 
 import sys
@@ -127,14 +223,19 @@ ered_gen}')
 print(pf_coeffs(acc_coeffs[1]))
 ```
 
-~/repos/bch ./enc-gen-to-sage-code.py U1PIRGA7
+and got the following output:
+
+```bash
+$ ./enc-gen-to-sage-code.py U1PIRGA7
 Encoded generator: U1PIRGA7
 (1032724529479, [30, 1, 25, 18, 27, 16, 10, 7])
-G = x^8 + c(30)*x^7 + c(1)*x^6 + c(25)*x^5 + c(18)*x^4 + c(27)*x^3 
+G = x^8 + c(30)*x^7 + c(1)*x^6 + c(25)*x^5 + c(18)*x^4 + c(27)*x^3
 + c(16)*x^2 + c(10)*x^1 + c(7)
+```
 
-mod-coeff.sage
-``` 
+Then we embeddef `G = ...` line to the script in `bech32.cpp` comment with slight modification
+
+```python
 B = GF(2) # Binary field
 BP.<b> = B[] # Polynomials over the binary field
 F_mod = b**5 + b**3 + 1
@@ -160,7 +261,18 @@ for i in [1,2,4,8,16]: # Print out {1,2,4,8,16}*(g(x) mod x^6), packed in hex in
 
 for (i, mod_const) in enumerate(mod_consts):
     p = 2**i
-    s = f'        if (c0 & {p})  c ^= {mod_const}; //  {{{p}}}k(x) =' 
+    s = f'        if (c0 & {p})  c ^= {mod_const}; //  {{{p}}}k(x) ='
     print(s)
 ```
 
+which generated the following `C++` code
+
+```c++
+        if (c0 & 1)  c ^= 0xf0732dc147; //  {1}k(x) = {30}*x^7 + {1}x^6 + {25}*x^5 + {18}*x^4 + {27}*x^3 + {16}*x^2 + {10}*x + {7}
+        if (c0 & 2)  c ^= 0xa8b6dfa68e; //  {2}k(x)
+        if (c0 & 4)  c ^= 0x193fabc83c; //  {4}k(x)
+        if (c0 & 8)  c ^= 0x322fd3b451; //  {8}k(x)
+        if (c0 & 16)  c ^= 0x640f37688b; //  {16}k(x)
+```
+
+Then we replaced the corresponding part in the `PolyMod` function to use `U1PIRGA7` as the generator polynomial.
