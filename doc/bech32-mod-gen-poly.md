@@ -1,22 +1,24 @@
 # bech32_mod generator polynomial generation
 
 ## Summary
-We followed the method used by Monero's Jamis polynomial search which is explained in [this document](https://gist.github.com/tevador/5b3fbbd0877a3412ede07263c6b2663d) in detail to generate the best-performing generator polynomial for our need.
+In principle, we followed the method used by Monero's Jamis polynomial search which is explained in detail in [this document](https://gist.github.com/tevador/5b3fbbd0877a3412ede07263c6b2663d) to generate the best-performing generator polynomial for our need.
 
-Since our requirements for the best performing generator polynomial differs from those of Jamis, we used different process for selecting the best performing polynomial.
+Since our requirements differ from those of Jamis, we used different approach to select the best performing polynomial.
 
-1. Our generator polynomial should be capable of detecting up to 5 errors in 165-character bech32 string.
-   - Our input string is 96-byte double public key. By converting 8-bit based vector to 5-bit vector, the vector length becomes 96 * 8 / 5 = 153.6. so the data part requires 154 bytes. In addition to that, 8-byte checksum, 2-byte HRP and 1-byte separator are needed. Then the bech32 string becomes 165 character long.
-2. Also we want the polynomial that has the lowest false-positive error rate for 7 and 8 error cases up to 50 characters.
+Here are the conditions we needed to satisfy:
 
-Amongst 10 million randomly generated degree-8 generator polynomials, there existed only 2 generator polynomials satisfying the first condition. Namely:
+1. The generator polynomial should be capable of detecting up to 5 errors in 165-character bech32 string.
+   - The input string is 96-byte double public key. Converting 8-bit based vector to 5-bit vector, the vector length for the double public key becomes 96 * 8 / 5 = 153.6 which is 154 bytes. In addition to that, 8-byte checksum, 2-byte HRP and 1-byte separator are needed. At the end the corresponding bech32 string becomes 165-character long.
+2. Also we want the polynomial to have the lowest false-positive error rate for 7 and 8 error cases up to 50 characters.
+
+Amongst 10 million randomly generated degree-8 generator polynomials, there existed 2 generator polynomials satisfying the first condition, namely:
 
 ```
 U1PIRGA7
 AJ4RJKVB
 ```
 
-Regarding the second condition, `U1PIRGA7` performed better, so the polynomial was selected.
+Amongst the two generators, `U1PIRGA7` performed better in terms of the second condition, so we chose `U1PIRGA7`.
 
 ## Actual Steps
 
