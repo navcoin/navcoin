@@ -30,6 +30,8 @@ For both of the polynomials, we computed false positive errors rates for 7 and 8
 We used [gen_crc.py](https://gist.github.com/tevador/5b3fbbd0877a3412ede07263c6b2663d#:~:text=2.1-,gen_crc.py,-The%20gen_crc.py) used in Jamtis search that is shown below:
 
 ```python
+# gen_crc.py
+
 import random
 
 CHARSET = "0123456789ABCDEFGHIJKLMNOPQRSTUV"
