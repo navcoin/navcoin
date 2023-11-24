@@ -1,7 +1,7 @@
 # bech32_mod generator polynomial generation steps
 
 ## Summary
-We followed the method used for Monero's Jamis polynomial search which is explained in [this document](https://gist.github.com/tevador/5b3fbbd0877a3412ede07263c6b2663d) in detail to generate candidate polynomials.
+We followed the method used for Monero's Jamis polynomial search which is explained in [this document](https://gist.github.com/tevador/5b3fbbd0877a3412ede07263c6b2663d) in detail to generate the best-performing generator polynomial for our need.
 
 Since our requirements for the best performing generator polynomial differs from those of Jamis, we used different process for selecting the best performing polynomial.
 
