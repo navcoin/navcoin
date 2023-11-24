@@ -159,7 +159,7 @@ This output 2 polynomials.
 
 ```bash
 $ ./err6-high-perf.py > gens.txt
-~/repos/bch cat gens.txt
+$ cat gens.txt
 U1PIRGA7
 AJ4RJKVB
 ```
