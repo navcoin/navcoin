@@ -74,7 +74,7 @@ This generated a huge number of the output files in `results1` directory. The ca
 39762158.30s user 2845631.54s system 1975% cpu 599:14:56.86 total
 ```
 
-After removing polynomials below the threshould with:
+After removing polynomials below the threshould as Jamis did with:
 
 ```bash
 $ find results1 -name "*.txt" -type f -size -2k -delete
