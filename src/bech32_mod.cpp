@@ -3,8 +3,6 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-// Based on bech32.cpp with modifications by the Navcoin developers
-
 #include <bech32_mod.h>
 #include <util/vector.h>
 
@@ -140,7 +138,7 @@ uint32_t PolyMod(const data& v)
     // v(x) mod g(x), where g(x) is the Bech32 generator,
     // x^8 + {30}*x^7 + {1}x^6 + {25}*x^5 + {18}*x^4 + {27}*x^3 + {16}*x^2 + {10}*x + {7}. g(x) is
     // chosen in such a way that the resulting code is a BCH code, guaranteeing detection of up to 5
-    // errors in a 165-character string.
+    // errors in a 165-character bech32 string.
 
     // Note that the coefficients are elements of GF(32), here represented as decimal numbers
     // between {}. In this finite field, addition is just XOR of the corresponding numbers. For
@@ -156,7 +154,7 @@ uint32_t PolyMod(const data& v)
     // v, it corresponds to x^2 + v0*x + v1 mod g(x). As 1 mod g(x) = 1, that is the starting value
     // for `c`.
 
-    // The method used to find the most suitable generator is explained in detail in [bech32-mod-gen-poly.md](../doc/bech32-mod-gen-poly.md)
+    // The process of selecting the generator poynomial is discussed in detail in [bech32-mod-gen-poly.md](../doc/bech32-mod-gen-poly.md)
 
     uint64_t c = 1;
     for (const auto v_i : v) {

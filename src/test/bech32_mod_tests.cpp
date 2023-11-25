@@ -107,7 +107,6 @@ BOOST_AUTO_TEST_CASE(bech32_mod_test_detecting_errors)
     bool failed = false;
 
     for (size_t num_errors = 0; num_errors <= 5; ++num_errors) {
-        printf("trying %lu error case...\n", num_errors);
         size_t unexpected_results =
             test_error_detection(num_errors, 10000, num_errors > 0);
 
