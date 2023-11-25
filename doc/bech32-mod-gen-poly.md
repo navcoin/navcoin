@@ -110,7 +110,7 @@ The descriptions of the columns are:
 1. False positive error rate for 5-error case
 1. False positive error rate for 6-error case
 
-## 3. Extration of polynomials satisfying the requirements
+## 3. Extraction of polynomials satisfying the requirements
 
 To extract polynomials that can perfectly detect up to 5 errors, we used `err6-high-perf.py` script below that is a modified version of Jamis's [crc_res.py](https://gist.github.com/tevador/5b3fbbd0877a3412ede07263c6b2663d#:~:text=2.3-,crc_res.py,-The%20crc_res.py) script:
 

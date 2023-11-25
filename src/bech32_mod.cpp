@@ -187,11 +187,11 @@ uint32_t PolyMod(const data& v)
         //         v = v*32 + coef.integer_representation()
         //     print("0x%x" % v)
         //
-        if (c0 & 1)  c ^= 0xf0732dc147; //  {1}k(x) = {30}*x^7 + {1}x^6 + {25}*x^5 + {18}*x^4 + {27}*x^3 + {16}*x^2 + {10}*x + {7}
-        if (c0 & 2)  c ^= 0xa8b6dfa68e; //  {2}k(x)
-        if (c0 & 4)  c ^= 0x193fabc83c; //  {4}k(x)
-        if (c0 & 8)  c ^= 0x322fd3b451; //  {8}k(x)
-        if (c0 & 16)  c ^= 0x640f37688b; //  {16}k(x)
+        if (c0 & 1)  c ^= 0xf0732dc147; // {1}k(x) = {30}*x^7 + {1}x^6 + {25}*x^5 + {18}*x^4 + {27}*x^3 + {16}*x^2 + {10}*x + {7}
+        if (c0 & 2)  c ^= 0xa8b6dfa68e; // {2}k(x)
+        if (c0 & 4)  c ^= 0x193fabc83c; // {4}k(x)
+        if (c0 & 8)  c ^= 0x322fd3b451; // {8}k(x)
+        if (c0 & 16)  c ^= 0x640f37688b; // {16}k(x)
     }
     return c;
 }
@@ -210,20 +210,17 @@ bool CheckCharacters(const std::string& str, std::vector<int>& errors)
         unsigned char c{(unsigned char)(str[i])};
         if (c >= 'a' && c <= 'z') {
             if (upper) {
-                printf("got lower in upper mode: '%d'\n", c);
                 errors.push_back(i);
             } else {
                 lower = true;
             }
         } else if (c >= 'A' && c <= 'Z') {
             if (lower) {
-                printf("got upper in lower mode: '%d'\n", c);
                 errors.push_back(i);
             } else {
                 upper = true;
             }
         } else if (c < 33 || c > 126) {
-            printf("outside char range: '%d' at %lu\n", c, i);
             errors.push_back(i);
         }
     }
@@ -234,7 +231,7 @@ bool CheckCharacters(const std::string& str, std::vector<int>& errors)
 data ExpandHRP(const std::string& hrp)
 {
     data ret;
-    ret.reserve(hrp.size() + 154 + 5 + 1);  // 154=data part, 5=expanded 2-char hrp, 1=seperator
+    ret.reserve(hrp.size() + 154 + 5 + 1);  // 154=data part, 5=expanded 2-char hrp, 1=separator
     ret.resize(hrp.size() * 2 + 1);
     for (size_t i = 0; i < hrp.size(); ++i) {
         unsigned char c = hrp[i];
@@ -300,7 +297,7 @@ DecodeResult Decode(const std::string& str) {
 
     // double public key bech32 string is 165-byte long and consists of:
     // - 2-byte hrp
-    // - 1-byte seperator '1'
+    // - 1-byte separator '1'
     // - 154-byte key data (96 bytes / 5 bits = 153.6)
     // - 8-byte checksum
     if (str.size() != 165  // double public key should be encoded to 165-byte bech32 string

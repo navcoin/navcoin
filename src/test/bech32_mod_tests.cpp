@@ -4,7 +4,6 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <bech32_mod.h>
-#include <boost/test/unit_test_suite.hpp>
 #include <test/util/str.h>
 
 #include <boost/test/unit_test.hpp>
@@ -12,7 +11,7 @@
 #include <random>
 #include <set>
 #include <string>
-#include <sstream>
+#include <iostream>
 
 /** The Bech32 and Bech32m character set for encoding. */
 const char* CHARSET = "qpzry9x8gf2tvdw0s3jn54khce6mua7l";
@@ -111,9 +110,7 @@ BOOST_AUTO_TEST_CASE(bech32_mod_test_detecting_errors)
             test_error_detection(num_errors, 10000, num_errors > 0);
 
         if (unexpected_results > 0) {
-            std::ostringstream msg;
-            msg << num_errors << "-error cases failed " << unexpected_results << " times";
-            printf("%s\n", msg.str().c_str());
+            std::cout << num_errors << "-error cases failed " << unexpected_results << " times" << std::endl;
             failed = true;
         }
     }
