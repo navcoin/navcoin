@@ -17,6 +17,15 @@ fi
 CI_EXEC "ccache --zero-stats --max-size=$CCACHE_SIZE"
 PRINT_CCACHE_STATISTICS="ccache --version | head -n 1 && ccache --show-stats"
 
+if [ -n "$LIBBLSCT_ONLY" ]; then
+  CI_EXEC make distclean || true
+  CI_EXEC ./autogen.sh
+  CI_EXEC ./configure --enable-build-libblsct-only || ( (CI_EXEC cat config.log) && false)
+  CI_EXEC "make $MAKEJOBS"
+  CI_EXEC "${PRINT_CCACHE_STATISTICS}"
+  exit 0
+fi
+
 if [ -n "$ANDROID_TOOLS_URL" ]; then
   CI_EXEC make distclean || true
   CI_EXEC ./autogen.sh
