@@ -15,7 +15,7 @@ persistent_worker_template_env: &PERSISTENT_WORKER_TEMPLATE_ENV
   RESTART_CI_DOCKER_BEFORE_RUN: "1"
 
 persistent_worker_template: &PERSISTENT_WORKER_TEMPLATE
-  persistent_worker: {}  # https://cirrus-ci.org/guide/persistent-workers/
+  persistent_worker: {}  # huimttps://cirrus-ci.org/guide/persistent-workers/
 
 base_template: &BASE_TEMPLATE
   merge_base_script:
@@ -332,11 +332,11 @@ task:
     << : *CIRRUS_EPHEMERAL_WORKER_TEMPLATE_ENV
 
 task:
-  name: 'libblsct [jammy]'
+  name: 'libblsct [lunar]'
   << : *GLOBAL_TASK_TEMPLATE
   container:
     docker_arguments:
-      CI_IMAGE_NAME_TAG: ubuntu:jammy
+      CI_IMAGE_NAME_TAG: ubuntu:lunar
       FILE_ENV: "./ci/test/00_setup_env_libblsct.sh"
   << : *CREDITS_TEMPLATE
   env:

@@ -23,6 +23,19 @@ if [ -n "$LIBBLSCT_ONLY" ]; then
   CI_EXEC ./configure --enable-build-libblsct-only || ( (CI_EXEC cat config.log) && false)
   CI_EXEC "make $MAKEJOBS"
   CI_EXEC "${PRINT_CCACHE_STATISTICS}"
+
+  if [ ! -f ./src/libblsct.a ]; then
+    echo "Error: libblsct.a is not generated"
+    exit 1
+  fi
+  if [ ! -f ./src/bls/lib/libbls384_256.a ]; then
+    echo "Error: libbls384_256.a is not generated"
+    exit 1
+  fi
+  if [ ! -f ./src/bls/mcl/lib/libmcl.a ]; then
+    echo "Error: libmcl.a is not generated"
+    exit 1
+  fi
   exit 0
 fi
 

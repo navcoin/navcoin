@@ -6,9 +6,9 @@
 
 export LC_ALL=C.UTF-8
 
-export HOST=ci_libblsct
+export HOST=x86_64-pc-linux-gnu
 export CONTAINER_NAME=ci_libblsct
-export CI_IMAGE_NAME_TAG="ubuntu:jammy"
+export CI_IMAGE_NAME_TAG="ubuntu:lunar"
 export PACKAGES="clang-16 libclang-16-dev llvm-16-dev libomp-16-dev clang-tidy-16 bear cmake libevent-dev libboost-dev libminiupnpc-dev libnatpmp-dev libzmq3-dev systemtap-sdt-dev libsqlite3-dev libdb++-dev"
 
 export LIBBLSCT_ONLY=1
