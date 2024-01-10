@@ -15,8 +15,6 @@ export LIBBLSCT_ONLY=1
 
 export QEMU_USER_CMD=
 export USE_VALGRIND=
-unset QEMU_USER_CMD
-unset USE_VALGRIND
 export RUN_UNIT_TESTS=false
 export RUN_UNIT_TESTS_SEQUENTIAL=false
 export RUN_FUNCTIONAL_TESTS=false
