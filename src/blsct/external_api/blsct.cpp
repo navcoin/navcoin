@@ -37,35 +37,32 @@ bool blsct_init(Chain chain)
 }
 
 bool decode_blsct_address(
-    const char* blsct_address,
-    uint8_t out[blsct::DoublePublicKey::SIZE]
+    const char* blsct_addr,
+    uint8_t dpk[blsct::DoublePublicKey::SIZE]
 ) {
-    std::string blsct_address_str(blsct_address);
-    auto maybe_dpk = DecodeDoublePublicKey(g_chain, blsct_address_str);
+    std::string blsct_addr_str(blsct_addr);
+    if (blsct_addr_str.size() != DOUBLE_PUBKEY_ENC_SIZE) return false;
 
+    auto maybe_dpk = DecodeDoublePublicKey(g_chain, blsct_addr_str);
     if (maybe_dpk) {
         auto dpk = maybe_dpk.value();
         if (dpk.IsValid()) {
             auto vk = dpk.vk.Serialize();
             auto sk = dpk.sk.Serialize();
-            std::memset(out, vk, blsct::PublicKey::SIZE);
-            std::memset(out + blsct::PublicKey::SIZE, sk, blsct::PublicKey::SIZE);
+            std::memset(dpk, vk, blsct::PublicKey::SIZE);
+            std::memset(dpk + blsct::PublicKey::SIZE, sk, blsct::PublicKey::SIZE);
             return true;
         }
     }
     return false;
 }
 
-void blsct_test() {
-
-    Mcl::Scalar a(1);
-    Mcl::Scalar b(2);
-
-    auto c = a + b;
-
-    auto s = c.GetString();
-
-    std::cout << "The answer is " << s << std::endl;
+bool encode_blsct_address(
+    const uint8_t dpk[blsct::DoublePublicKey::SIZE],
+    const char* blsct_addr
+) {
+    EncodeDoublePublicKey(g_chain, const bech32_mod::Encoding encoding, const blsct::DoublePublicKey &dpk);
+    return true;
 }
 
 } // extern "C"
