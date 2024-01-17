@@ -23,14 +23,14 @@ enum AddressEncoding {
 
 bool blsct_init(Chain chain);
 
-// blsct_addr: null-terminated c-style string of length DOUBLE_PUBKEY_ENC_SIZE
+// blsct_addr: a null-terminated c-style string of length DOUBLE_PUBKEY_ENC_SIZE
 // ser_dpk: 48-byte vk followed by 48-byte sk
 bool blsct_decode_address(
     const char* blsct_addr,
     uint8_t ser_dpk[blsct::DoublePublicKey::SIZE]
 );
 
-// ser_dpk: 48-byte vk followed by 48-byte sk
+// ser_dpk: a 48-byte vk followed by 48-byte sk
 // blsct_addr: buffer of size at least DOUBLE_PUBKEY_ENC_SIZE + 1
 bool blsct_encode_address(
     const uint8_t ser_dpk[blsct::DoublePublicKey::SIZE],
