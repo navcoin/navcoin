@@ -16,45 +16,42 @@ enum Chain {
     TestNet
 };
 
-struct DoublePublicKey {
-    uint8_t vk[blsct::PublicKey::SIZE];
-    uint8_t sk[blsct::PublicKey::SIZE];
+enum AddressEncoding {
+    Bech32,
+    Bech32M
 };
 
 bool blsct_init(Chain chain);
 
-// blsct_addr is expected to be a null-terminated c-style
-// string of size DOUBLE_PUBKEY_ENC_SIZE
-bool decode_blsct_address(
+// blsct_addr: null-terminated c-style string of length DOUBLE_PUBKEY_ENC_SIZE
+// ser_dpk: 48-byte vk followed by 48-byte sk
+bool blsct_decode_address(
     const char* blsct_addr,
-    uint8_t dpk[blsct::DoublePublicKey::SIZE]
+    uint8_t ser_dpk[blsct::DoublePublicKey::SIZE]
 );
 
-// blsct_addr is expected to be a null-terminated c-style
-// string of size DOUBLE_PUBKEY_ENC_SIZE
-bool encode_blsct_address(
-    const uint8_t dpk[blsct::DoublePublicKey::SIZE],
-    const char* blsct_addr
+// ser_dpk: 48-byte vk followed by 48-byte sk
+// blsct_addr: buffer of size at least DOUBLE_PUBKEY_ENC_SIZE + 1
+bool blsct_encode_address(
+    const uint8_t ser_dpk[blsct::DoublePublicKey::SIZE],
+    char* blsct_addr,
+    AddressEncoding encoding
 );
 
-// address encoding/decoding
-// void EncodeBlsctAddress();
-// void DecodeBlsctAddress();
+// - range proof creation and verification
+// BuildRangeProof
+// VerifyRangeProof
 //
-// // range proof creation and verification
-// void BuildRangeProof();
-// void VerifyRangeProof();
+// - blsct signatures creation/verification
+// Sign
+// VerifySignature
 //
-// // blsct signatures creation/verification
-// void Sign();
-// void VerifySignature();
+// - rangeproof amount/memo recovery
+// RecoverAmount
+// RecoverMemo
 //
-// // rangeproof amount/memo recovery
-// void RecoverAmount();
-// void RecoverMemo()
-//
-// // transaction serialization/deserialization
-// void SerializeTransaction();
-// void DeserializeTransaction();
+// - transaction serialization/deserialization
+// SerializeTransaction
+// DeserializeTransaction
 
 } // extern "C"
