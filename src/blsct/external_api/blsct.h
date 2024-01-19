@@ -1,7 +1,4 @@
-#include "key_io.h"
 #include <stdint.h>
-#include <blsct/double_public_key.h>
-#include <blsct/public_key.h>
 
 #define PUBLIC_KEY_SIZE 48
 #define DOUBLE_PUBLIC_KEY_SIZE 96
