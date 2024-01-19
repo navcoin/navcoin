@@ -15,7 +15,7 @@ static std::mutex g_init_mutex;
 
 extern "C" {
 
-bool blsct_init(Chain chain)
+bool blsct_init(enum Chain chain)
 {
     {
         std::lock_guard<std::mutex> lock(g_init_mutex);
@@ -62,7 +62,7 @@ bool blsct_decode_address(
 bool blsct_encode_address(
     const uint8_t ser_dpk[DOUBLE_PUBLIC_KEY_SIZE],
     char* blsct_addr,
-    AddressEncoding encoding
+    enum AddressEncoding encoding
 ) {
     try {
         if (encoding != Bech32 && encoding != Bech32M) {

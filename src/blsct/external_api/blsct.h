@@ -29,7 +29,7 @@ enum AddressEncoding {
     Bech32M
 };
 
-bool blsct_init(Chain chain);
+bool blsct_init(enum Chain chain);
 
 /*
  * blsct_addr: a null-terminated c-style string of length ENCODED_DPK_SIZE
@@ -47,7 +47,7 @@ bool blsct_decode_address(
 bool blsct_encode_address(
     const uint8_t ser_dpk[ENCODED_DPK_SIZE],
     char* blsct_addr,
-    AddressEncoding encoding
+    enum AddressEncoding encoding
 );
 
 /*
