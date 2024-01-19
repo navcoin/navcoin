@@ -212,7 +212,7 @@ BLSCT_CPP = \
   blsct/common.cpp \
   blsct/double_public_key.cpp \
   blsct/eip_2333/bls12_381_keygen.cpp \
-  blsct/external_api/blsct.h \
+  blsct/external_api/blsct.cpp \
   blsct/private_key.cpp \
   blsct/public_key.cpp \
   blsct/public_keys.cpp \
