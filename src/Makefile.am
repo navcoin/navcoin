@@ -1315,17 +1315,74 @@ EXTRA_DIST = $(CTAES_DIST)
 if BUILD_LIBBLSCT_ONLY
 LIBBLSCT_A = libblsct.a
 noinst_LIBRARIES = $(LIBBLSCT_A)
+
 libblsct_a_SOURCES = \
+  arith_uint256.cpp \
+  bech32.cpp \
+  bitcoin-util.cpp \
+  blsct/bech32_mod.cpp \
+  chainparamsbase.cpp \
+  clientversion.cpp \
+  common/args.cpp \
+  common/config.cpp \
+  consensus/merkle.cpp \
+  core_read.cpp \
+  crypto/chacha20.cpp \
+  crypto/hmac_sha512.cpp \
+  crypto/ripemd160.cpp \
+  crypto/sha1.cpp \
   crypto/sha256_arm_shani.cpp \
   crypto/sha256_avx2.cpp \
   crypto/sha256_sse4.cpp \
   crypto/sha256_sse41.cpp \
   crypto/sha256_x86_shani.cpp \
   crypto/sha256.cpp \
+  crypto/sha512.cpp \
   blsct/external_api/blsct.cpp \
+  blsct/wallet/txfactory_global.cpp \
+  base58.cpp \
+  chainparams.cpp \
+  deploymentinfo.cpp \
+  hash.cpp \
+  init.cpp \
+  kernel/chainparams.cpp \
+  key_io.cpp \
+  key.cpp \
+  logging.cpp \
+  primitives/block.cpp \
+  primitives/transaction.cpp \
+  pubkey.cpp \
+  random.cpp \
+  randomenv.cpp \
+  script/interpreter.cpp \
+  script/script.cpp \
+  script/standard.cpp \
+  secp256k1/src/secp256k1.c \
+  support/cleanse.cpp \
+  support/lockedpool.cpp \
+  uint256.cpp \
+  univalue/lib/univalue.cpp \
+  univalue/lib/univalue_get.cpp \
+  univalue/lib/univalue_read.cpp \
+  univalue/lib/univalue_write.cpp \
+  util/chaintype.cpp \
+  util/check.cpp \
+  util/exception.cpp \
+  util/fs.cpp \
+  util/fs_helpers.cpp \
+  util/getuniquepath.cpp \
+  util/moneystr.cpp \
+  util/settings.cpp \
+  util/strencodings.cpp \
+  util/string.cpp \
+  util/syserror.cpp \
+  util/system.cpp \
+  util/threadnames.cpp \
+  util/time.cpp \
   $(BLSCT_CPP)
+
 libblsct_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-libblsct_a_CPPFLAGS = $(AM_CPPFLAGS) $(BLS_INCLUDES) $(BOOST_CPPFLAGS)
+libblsct_a_CPPFLAGS = $(AM_CPPFLAGS) $(BLS_INCLUDES) $(BOOST_CPPFLAGS) -I$(srcdir)/univalue/include -I$(srcdir)/secp256k1/include -I$(srcdir)/leveldb/include -DENABLE_MODULE_RECOVERY
 
 if ENABLE_SSE41
 libblsct_a_CXXFLAGS += $(SSE41_CXXFLAGS)

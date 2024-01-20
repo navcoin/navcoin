@@ -1334,6 +1334,8 @@ if test "$enable_build_libblsct_only" = "yes"; then
   use_zmq=no
   enable_fuzz=no
   enable_fuzz_binary=no
+
+  AC_DEFINE([ENABLE_MODULE_RECOVERY], [1], [enable secp256k1 recovery module])
 fi
 
 if test "$enable_fuzz_binary" = "yes"; then
