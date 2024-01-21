@@ -1383,8 +1383,19 @@ libblsct_a_SOURCES = \
   util/time.cpp \
   $(BLSCT_CPP)
 
+LIBBLSCT_INCLUDE = \
+  -I$(srcdir)/univalue/include \
+  -I$(srcdir)/secp256k1/include \
+  -I$(srcdir)/leveldb/include
+
+
+LIBBLSCT_SECP256K1_FLAGS = \
+  -DENABLE_MODULE_RECOVERY \
+  -DENABLE_MODULE_EXTRAKEYS \
+  -DENABLE_MODULE_SCHNORRSIG
+
 libblsct_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-libblsct_a_CPPFLAGS = $(AM_CPPFLAGS) $(BLS_INCLUDES) $(BOOST_CPPFLAGS) -I$(srcdir)/univalue/include -I$(srcdir)/secp256k1/include -I$(srcdir)/leveldb/include -DENABLE_MODULE_RECOVERY -DENABLE_MODULE_EXTRAKEYS -DENABLE_MODULE_SCHNORRSIG
+libblsct_a_CPPFLAGS = $(AM_CPPFLAGS) $(BLS_INCLUDES) $(BOOST_CPPFLAGS) $(LIBBLSCT_INCLUDE) $(LIBBLSCT_SECP256K1_FLAGS)
 
 if ENABLE_SSE41
 libblsct_a_CXXFLAGS += $(SSE41_CXXFLAGS)
@@ -1408,7 +1419,7 @@ endif
 
 $(LIBBLSCT_A): $(LIBBLS) $(LIBMCL)
 
-CLEANFILES += $(LIBBLSCT_A) blsct/include/libblsct_a-blsct.o $(LIBBLS) $(LIBMCL)
+CLEANFILES += $(LIBBLSCT_A) $(LIBBLS) $(LIBMCL) blsct/include/libblsct_a-blsct.o
 
 endif
 #
