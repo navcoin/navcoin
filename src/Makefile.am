@@ -1357,6 +1357,8 @@ libblsct_a_SOURCES = \
   script/interpreter.cpp \
   script/script.cpp \
   script/standard.cpp \
+  secp256k1/src/precomputed_ecmult.c \
+  secp256k1/src/precomputed_ecmult_gen.c \
   secp256k1/src/secp256k1.c \
   support/cleanse.cpp \
   support/lockedpool.cpp \
@@ -1382,7 +1384,7 @@ libblsct_a_SOURCES = \
   $(BLSCT_CPP)
 
 libblsct_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-libblsct_a_CPPFLAGS = $(AM_CPPFLAGS) $(BLS_INCLUDES) $(BOOST_CPPFLAGS) -I$(srcdir)/univalue/include -I$(srcdir)/secp256k1/include -I$(srcdir)/leveldb/include -DENABLE_MODULE_RECOVERY
+libblsct_a_CPPFLAGS = $(AM_CPPFLAGS) $(BLS_INCLUDES) $(BOOST_CPPFLAGS) -I$(srcdir)/univalue/include -I$(srcdir)/secp256k1/include -I$(srcdir)/leveldb/include -DENABLE_MODULE_RECOVERY -DENABLE_MODULE_EXTRAKEYS -DENABLE_MODULE_SCHNORRSIG
 
 if ENABLE_SSE41
 libblsct_a_CXXFLAGS += $(SSE41_CXXFLAGS)
@@ -1390,7 +1392,7 @@ libblsct_a_CPPFLAGS += -DENABLE_SSE41
 endif
 
 if ENABLE_AVX2
-libblsct_a_CXXFLAGS += $(AVX2_CXXFLAGS)
+libblsct_a_CXXFLAGS += $(AVX2_CXXFL	AGS)
 libblsct_a_CPPFLAGS += -DENABLE_AVX2
 endif
 
@@ -1406,7 +1408,8 @@ endif
 
 $(LIBBLSCT_A): $(LIBBLS) $(LIBMCL)
 
-CLEANFILES += $(LIBBLSCT_A) blsct/include/libblsct_a-blsct.o
+CLEANFILES += $(LIBBLSCT_A) blsct/include/libblsct_a-blsct.o $(LIBBLS) $(LIBMCL)
+
 endif
 #
 
