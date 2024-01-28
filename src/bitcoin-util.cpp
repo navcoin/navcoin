@@ -149,7 +149,6 @@ static int Grind(const std::vector<std::string>& args, std::string& strPrint)
     return EXIT_SUCCESS;
 }
 
-#ifndef LIBBLSCT_ONLY
 MAIN_FUNCTION
 {
     static volatile MclInit for_side_effect_only;
@@ -196,4 +195,4 @@ MAIN_FUNCTION
 
     return ret;
 }
-#endif
+
