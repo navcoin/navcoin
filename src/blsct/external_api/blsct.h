@@ -23,7 +23,9 @@ extern "C" {
 
 enum Chain {
     MainNet,
-    TestNet
+    TestNet,
+    SigNet,
+    RegTest
 };
 
 struct DoublePublicKey {

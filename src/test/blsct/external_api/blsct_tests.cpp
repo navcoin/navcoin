@@ -12,7 +12,7 @@
 #include <blsct/external_api/blsct.h>
 #include <string>
 
-BOOST_FIXTURE_TEST_SUITE(blsct_external_api_tests, BasicTestingSetup)
+BOOST_FIXTURE_TEST_SUITE(blsct_tests, BasicTestingSetup)
 
 BOOST_AUTO_TEST_CASE(test_encode_decode_blsct_address)
 {

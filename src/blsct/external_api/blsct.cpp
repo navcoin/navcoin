@@ -1,16 +1,16 @@
-#include "blsct/bech32_mod.h"
-#include "blsct/public_key.h"
-#include <blsct/external_api/blsct.h>
 #include <blsct/arith/mcl/mcl.h>
 #include <blsct/arith/mcl/mcl_init.h>
+#include "blsct/bech32_mod.h"
+#include <blsct/external_api/blsct.h>
+#include <blsct/key_io.h>
+#include <blsct/public_key.h>
+
 #include <iostream>
-#include <key_io.h>
-#include <kernel/chainparams.h>
 #include <memory>
 #include <mutex>
 #include <optional>
 
-static std::shared_ptr<const CChainParams> g_chain;
+static std::string g_chain;
 static std::mutex g_init_mutex;
 
 extern "C" {
@@ -19,17 +19,27 @@ bool blsct_init(enum Chain chain)
 {
     {
         std::lock_guard<std::mutex> lock(g_init_mutex);
-        if (g_chain != nullptr) return true;
+        if (!g_chain.empty()) return true;
 
         MclInit for_side_effect_only;
 
         switch (chain) {
             case MainNet:
-                g_chain = std::move(CChainParams::Main());
+                g_chain = blsct::bech32_hrp::Main;
                 break;
+
             case TestNet:
-                g_chain = std::move(CChainParams::TestNet());
+                g_chain = blsct::bech32_hrp::TestNet;
                 break;
+
+            case SigNet:
+                g_chain = blsct::bech32_hrp::SigNet;
+                break;
+
+            case RegTest:
+                g_chain = blsct::bech32_hrp::RegTest;
+                break;
+
             default:
                 return false;
         }
@@ -45,7 +55,7 @@ bool blsct_decode_address(
         std::string blsct_addr_str(blsct_addr);
 
         if (blsct_addr_str.size() != ENCODED_DPK_SIZE) return false;
-        auto maybe_dpk = DecodeDoublePublicKey(*g_chain, blsct_addr_str);
+        auto maybe_dpk = blsct::DecodeDoublePublicKey(g_chain, blsct_addr_str);
         if (maybe_dpk) {
             auto dpk = maybe_dpk.value();
             if (dpk.IsValid()) {
@@ -74,8 +84,8 @@ bool blsct_encode_address(
         std::vector<uint8_t> dpk_vec(ser_dpk, ser_dpk + blsct::DoublePublicKey::SIZE);
         auto dpk = blsct::DoublePublicKey(dpk_vec);
 
-        auto dpk_str = EncodeDoublePublicKey(*g_chain, bech32_encoding, dpk);
-        std::memcpy(blsct_addr, dpk_str.c_str(), DOUBLE_PUBKEY_ENC_SIZE + 1);
+        auto dpk_str = blsct::EncodeDoublePublicKey(g_chain, bech32_encoding, dpk);
+        std::memcpy(blsct_addr, dpk_str.c_str(), ENCODED_DPK_SIZE + 1);
         return true;
 
     } catch(...) {}

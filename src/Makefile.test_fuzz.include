@@ -17,6 +17,7 @@ TEST_FUZZ_H = \
 libtest_fuzz_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(BOOST_CPPFLAGS)
 libtest_fuzz_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libtest_fuzz_a_SOURCES = \
+  blsct/key_io.cpp \
   test/fuzz/fuzz.cpp \
   test/fuzz/util.cpp \
   test/fuzz/util/mempool.cpp \
