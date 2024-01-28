@@ -1,3 +1,10 @@
+// Copyright (c) 2024 The Navcoin developers
+// Distributed under the MIT software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
+#ifndef NAVCOIN_BLSCT_EXTERNAL_API_BLSCT_H
+#define NAVCOIN_BLSCT_EXTERNAL_API_BLSCT_H
+
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -71,3 +78,6 @@ DeserializeTransaction
 #ifdef __cplusplus
 } // extern "C"
 #endif
+
+#endif // NAVCOIN_BLSCT_EXTERNAL_API_BLSCT_H
+
