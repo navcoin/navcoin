@@ -204,6 +204,7 @@ BLSCT_CPP = \
   blsct/arith/mcl/mcl_g1point.cpp \
   blsct/arith/mcl/mcl_scalar.cpp \
   blsct/arith/elements.cpp \
+  blsct/bech32_mod.cpp \
   blsct/building_block/generator_deriver.cpp \
   blsct/building_block/g_h_gi_hi_zero_verifier.cpp \
   blsct/building_block/imp_inner_prod_arg.cpp \
@@ -1326,7 +1327,6 @@ noinst_LIBRARIES = $(LIBBLSCT_A)
 
 libblsct_a_SOURCES = \
   arith_uint256.cpp \
-  bech32.cpp \
   bitcoin-util.cpp \
   chainparamsbase.cpp \
   clientversion.cpp \
