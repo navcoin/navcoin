@@ -1327,11 +1327,6 @@ noinst_LIBRARIES = $(LIBBLSCT_A)
 
 libblsct_a_SOURCES = \
   crypto/ripemd160.cpp \
-  crypto/sha256_arm_shani.cpp \
-  crypto/sha256_avx2.cpp \
-  crypto/sha256_sse4.cpp \
-  crypto/sha256_sse41.cpp \
-  crypto/sha256_x86_shani.cpp \
   crypto/sha256.cpp \
   util/strencodings.cpp \
   $(BLSCT_CPP)
@@ -1342,21 +1337,25 @@ libblsct_a_CPPFLAGS = $(AM_CPPFLAGS) $(BLS_INCLUDES) $(BOOST_CPPFLAGS)
 if ENABLE_SSE41
 libblsct_a_CXXFLAGS += $(SSE41_CXXFLAGS)
 libblsct_a_CPPFLAGS += -DENABLE_SSE41
+libblsct_a_SOURCES += crypto/sha256_sse41
 endif
 
 if ENABLE_AVX2
 libblsct_a_CXXFLAGS += $(AVX2_CXXFL	AGS)
 libblsct_a_CPPFLAGS += -DENABLE_AVX2
+libblsct_a_SOURCES += crypto/sha256_avx2.cpp
 endif
 
 if ENABLE_X86_SHANI
 libblsct_a_CXXFLAGS += $(X86_SHANI_CXXFLAGS)
 libblsct_a_CPPFLAGS += -DENABLE_X86_SHANI
+libblsct_a_SOURCES += crypto/sha256_x86_shani.cpp
 endif
 
 if ENABLE_ARM_SHANI
 libblsct_a_CXXFLAGS += $(ARM_SHANI_CXXFLAGS)
 libblsct_a_CPPFLAGS += -DENABLE_ARM_SHANI
+libblsct_a_SOURCES += crypto/sha256_arm_shani.cpp
 endif
 
 $(LIBBLSCT_A): $(LIBBLS) $(LIBMCL)
