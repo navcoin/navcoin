@@ -1836,6 +1836,7 @@ AM_CONDITIONAL([WORDS_BIGENDIAN], [test "$ac_cv_c_bigendian" = "yes"])
 AM_CONDITIONAL([USE_NATPMP], [test "$use_natpmp" = "yes"])
 AM_CONDITIONAL([USE_UPNP], [test "$use_upnp" = "yes"])
 AM_CONDITIONAL([BUILD_LIBBLSCT_ONLY], [test "$enable_build_libblsct_only" = "yes"])
+AM_CONDITIONAL([ENABLE_NO_SHA256_OPTIMIZATION], [test "$enable_sse41" != "yes" && test "$enable_avx2" != "yes" && test "$enable_x86_shani" != "yes" && test "$enable_arm_shani" != "yes"])
 
 dnl for minisketch
 AM_CONDITIONAL([ENABLE_CLMUL], [test "$enable_clmul" = "yes"])
