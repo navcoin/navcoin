@@ -12,6 +12,13 @@
 #include <blsct/external_api/blsct.h>
 #include <string>
 
+using T = Mcl;
+using Point = T::Point;
+using Scalar = T::Scalar;
+using Points = Elements<Point>;
+using Scalars = Elements<Scalar>;
+using MsgPair = std::pair<std::string, std::vector<uint8_t>>;
+
 BOOST_FIXTURE_TEST_SUITE(blsct_tests, BasicTestingSetup)
 
 BOOST_AUTO_TEST_CASE(test_encode_decode_blsct_address)
@@ -40,6 +47,74 @@ BOOST_AUTO_TEST_CASE(test_encode_decode_blsct_address)
 
     BOOST_CHECK(blsct_addr_str == rec_addr_str);
 }
+
+static Mcl::Point GenNonce()
+{
+    std::string nonce_str("nonce");
+    Mcl::Point nonce = Mcl::Point::HashAndMap(std::vector<uint8_t> { nonce_str.begin(), nonce_str.end() });
+    return nonce;
+}
+
+static TokenId GenTokenId()
+{
+    TokenId token_id(uint256(123));
+    return token_id;
+}
+
+static MsgPair GenMsgPair(std::string s = "spaghetti meatballs")
+{
+    std::vector<unsigned char> message { s.begin(), s.end() };
+    return std::pair(s, message);
+}
+
+BOOST_AUTO_TEST_CASE(test_prove_verify_range_proof)
+{
+    BOOST_CHECK(blsct_init(MainNet));
+
+    auto nonce = GenNonce();
+    auto token_id = GenTokenId();
+    std::string message = "spaghetti meatballs";
+
+    Scalar one(1);
+    std::vector<Scalar> vs_vec;
+    vs_vec.push_back(one);
+    Scalars vs;
+    vs.Add(one);
+
+    // convert blsct_vs
+    // need to create array of pointers to BlsctScalar
+    BlsctScalar blsct_vs[vs.Size()];
+    // IMPLEMENT ME!!
+
+    // convert nonce
+    BlsctPoint blsct_nonce;
+    {
+        auto ser = nonce.GetVch();
+        std::memcpy(blsct_nonce, &ser[0], POINT_SIZE);
+    }
+
+    // convert message
+    const uint8_t* blsct_message =
+        reinterpret_cast<const uint8_t*>(message.c_str());
+
+    // convert token_id
+    BlsctTokenId blsct_token_id;
+
+    BlsctRangeProof blsct_proof;
+
+    const BlsctScalar* const* a;
+
+    blsct_build_range_proof(
+        blsct_vs,
+        vs.Size(),
+        &blsct_nonce,
+        blsct_message,
+        message.size(),
+        &blsct_token_id,
+        &blsct_proof
+    );
+}
+
 
 BOOST_AUTO_TEST_SUITE_END()
 

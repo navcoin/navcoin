@@ -18,7 +18,7 @@ using T = Mcl;
 using Point = T::Point;
 using Scalar = T::Scalar;
 using Scalars = Elements<Scalar>;
-using MsgPair = std::pair<std::string, std::vector<unsigned char>>;
+using MsgPair = std::pair<std::string, std::vector<uint8_t>>;
 
 struct TestCase
 {
@@ -31,10 +31,10 @@ struct TestCase
     MsgPair msg;
 };
 
-static MclG1Point GenNonce()
+static Mcl::Point GenNonce()
 {
     std::string nonce_str("nonce");
-    MclG1Point nonce = MclG1Point::HashAndMap(std::vector<unsigned char> { nonce_str.begin(), nonce_str.end() });
+    MclG1Point nonce = Mcl::Point::HashAndMap(std::vector<uint8_t> { nonce_str.begin(), nonce_str.end() });
     return nonce;
 }
 

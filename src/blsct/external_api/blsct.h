@@ -7,10 +7,15 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stddef.h>
 
 #define PUBLIC_KEY_SIZE 48
 #define DOUBLE_PUBLIC_KEY_SIZE 96
 #define ENCODED_DPK_SIZE 165
+#define SCALAR_SIZE 32
+#define POINT_SIZE 48
+#define PROOF_SIZE 1019
+#define TOKEN_ID_SIZE 40  // uint256 + uint64_t = 32 + 8 = 40
 
 /*
  * API designed for JavaScript, Python, C, Rust, and Golang
@@ -28,10 +33,10 @@ enum Chain {
     RegTest
 };
 
-struct DoublePublicKey {
-    uint8_t vk[PUBLIC_KEY_SIZE];
-    uint8_t sk[PUBLIC_KEY_SIZE];
-};
+typedef uint8_t BlsctScalar[SCALAR_SIZE];
+typedef uint8_t BlsctPoint[POINT_SIZE];
+typedef uint8_t BlsctRangeProof[PROOF_SIZE];
+typedef uint8_t BlsctTokenId[32 + 8]; // uint256 + uint64_t
 
 enum AddressEncoding {
     Bech32,
@@ -59,22 +64,33 @@ bool blsct_encode_address(
     enum AddressEncoding encoding
 );
 
-/*
-- range proof creation and verification
-BuildRangeProof
-VerifyRangeProof
+void blsct_build_range_proof(
+    const BlsctScalar blsct_vs[],
+    const size_t num_blsct_vs,
+    const BlsctPoint* blsct_nonce,
+    const uint8_t* blsct_message,
+    const size_t blsct_message_size,
+    const BlsctTokenId* blsct_token_id,
+    BlsctRangeProof* blsct_proof
+);
 
+bool blsct_verify_range_proof(
+    const BlsctRangeProof* const* blsct_proofs,
+    const size_t num_blsct_proofs
+);
+
+/*
 - blsct signatures creation/verification
-Sign
-VerifySignature
+blsct_sign
+blsct_verify_signature
 
 - rangeproof amount/memo recovery
-RecoverAmount
-RecoverMemo
+blsct_recover_amount
+blsct_recover_memo
 
 - transaction serialization/deserialization
-SerializeTransaction
-DeserializeTransaction
+blsct_serialize_transaction
+blsct_deserialize_transaction
 */
 
 #ifdef __cplusplus

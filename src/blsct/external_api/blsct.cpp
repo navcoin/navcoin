@@ -1,19 +1,26 @@
+#include <blsct/arith/elements.h>
 #include <blsct/arith/mcl/mcl.h>
 #include <blsct/arith/mcl/mcl_init.h>
-#include "blsct/bech32_mod.h"
+#include <blsct/bech32_mod.h>
 #include <blsct/external_api/blsct.h>
 #include <blsct/key_io.h>
 #include <blsct/public_key.h>
+#include <blsct/range_proof/bulletproofs/range_proof.h>
+#include <blsct/range_proof/bulletproofs/range_proof_logic.h>
+#include <streams.h>
 
 #include <iostream>
 #include <memory>
 #include <mutex>
 #include <optional>
+#include <string>
 
 static std::string g_chain;
 static std::mutex g_init_mutex;
 
 extern "C" {
+
+using Scalars = Elements<Mcl::Scalar>;
 
 bool blsct_init(enum Chain chain)
 {
@@ -91,6 +98,77 @@ bool blsct_encode_address(
     } catch(...) {}
 
     return false;
+}
+
+void blsct_build_range_proof(
+    const BlsctScalar blsct_vs[],
+    const size_t num_blsct_vs,
+    const BlsctPoint* blsct_nonce,
+    const uint8_t* blsct_message,
+    const size_t blsct_message_size,
+    const BlsctTokenId* blsct_token_id,
+    BlsctRangeProof* blsct_proof
+) {
+    // blsct_vs to vs
+    Scalars vs;
+    for (size_t i=0; i<num_blsct_vs; ++i) {
+        BlsctScalar v;
+        std::vector<uint8_t> ser_scalar(
+            blsct_vs[i], blsct_vs[i] + sizeof(BlsctScalar)
+        );
+        Mcl::Scalar s;
+        s.SetVch(ser_scalar);
+        vs.Add(s);
+    }
+
+    // blsct_nonce to nonce
+    Mcl::Point nonce;
+    std::vector<uint8_t> ser_point(
+        *blsct_nonce, *blsct_nonce + POINT_SIZE
+    );
+    nonce.SetVch(ser_point);
+
+    // blsct_message to message
+    std::vector<uint8_t> message(
+        blsct_message, blsct_message + blsct_message_size
+    );
+
+    // blsct_token_id to token_id
+    TokenId token_id;
+    {
+        CDataStream st(SER_DISK, PROTOCOL_VERSION);
+        std::vector<uint8_t> token_id_vec(
+            *blsct_token_id, *blsct_token_id + TOKEN_ID_SIZE
+        );
+        st << token_id_vec;
+        token_id.Unserialize(st);
+    }
+
+    // proof to blsct_proof
+    bulletproofs::RangeProofLogic<Mcl> rpl;
+    auto proof = rpl.Prove(
+        vs,
+        nonce,
+        message,
+        token_id
+    );
+    {
+        CDataStream st(SER_DISK, PROTOCOL_VERSION);
+        proof.Serialize(st);
+        std::memcpy(blsct_proof, st.data(), st.size());
+    }
+}
+
+bool blsct_verify_range_proof(
+    const BlsctRangeProof* const* blsct_proofs,
+    const size_t num_blsct_proofs
+) {
+    bulletproofs::RangeProofLogic<Mcl> rpl;
+
+    // convert blsct_proofs to proofs;
+
+    std::vector<bulletproofs::RangeProof<Mcl>> proofs;
+    return rpl.Verify(proofs);
 }
 
 } // extern "C"
