@@ -71,12 +71,12 @@ void blsct_build_range_proof(
     const uint8_t* blsct_message,
     const size_t blsct_message_size,
     const BlsctTokenId* blsct_token_id,
-    BlsctRangeProof* blsct_proof
+    BlsctRangeProof* blsct_range_proof
 );
 
 bool blsct_verify_range_proof(
-    const BlsctRangeProof* const* blsct_proofs,
-    const size_t num_blsct_proofs
+    const BlsctRangeProof blsct_range_proofs[],
+    const size_t num_blsct_range_proofs
 );
 
 /*

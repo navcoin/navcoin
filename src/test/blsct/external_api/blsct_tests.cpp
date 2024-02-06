@@ -100,10 +100,9 @@ BOOST_AUTO_TEST_CASE(test_prove_verify_range_proof)
     // convert token_id
     BlsctTokenId blsct_token_id;
 
-    BlsctRangeProof blsct_proof;
+    BlsctRangeProof blsct_range_proof;
 
-    const BlsctScalar* const* a;
-
+    // generate range proof
     blsct_build_range_proof(
         blsct_vs,
         vs.Size(),
@@ -111,8 +110,19 @@ BOOST_AUTO_TEST_CASE(test_prove_verify_range_proof)
         blsct_message,
         message.size(),
         &blsct_token_id,
-        &blsct_proof
+        &blsct_range_proof
     );
+
+    // build BlsctRangeProof array of size 1
+    BlsctRangeProof blsct_range_proofs[1];
+    std::memcpy(
+        &blsct_range_proofs[0],
+        blsct_range_proof,
+        sizeof(blsct_range_proof)
+    );
+
+    bool res = blsct_verify_range_proof(blsct_range_proofs, 1);
+    printf("is proof valid? %s\n", res ? "yes" : "no");
 }
 
 

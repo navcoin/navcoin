@@ -107,7 +107,7 @@ void blsct_build_range_proof(
     const uint8_t* blsct_message,
     const size_t blsct_message_size,
     const BlsctTokenId* blsct_token_id,
-    BlsctRangeProof* blsct_proof
+    BlsctRangeProof* blsct_range_proof
 ) {
     // blsct_vs to vs
     Scalars vs;
@@ -144,9 +144,9 @@ void blsct_build_range_proof(
         token_id.Unserialize(st);
     }
 
-    // proof to blsct_proof
+    // range_proof to blsct_range_proof
     bulletproofs::RangeProofLogic<Mcl> rpl;
-    auto proof = rpl.Prove(
+    auto range_proof = rpl.Prove(
         vs,
         nonce,
         message,
@@ -154,21 +154,30 @@ void blsct_build_range_proof(
     );
     {
         CDataStream st(SER_DISK, PROTOCOL_VERSION);
-        proof.Serialize(st);
-        std::memcpy(blsct_proof, st.data(), st.size());
+        range_proof.Serialize(st);
+        std::memcpy(blsct_range_proof, st.data(), st.size());
     }
 }
 
 bool blsct_verify_range_proof(
-    const BlsctRangeProof* const* blsct_proofs,
-    const size_t num_blsct_proofs
+    const BlsctRangeProof blsct_range_proofs[],
+    const size_t num_blsct_range_proofs
 ) {
-    bulletproofs::RangeProofLogic<Mcl> rpl;
-
     // convert blsct_proofs to proofs;
+    std::vector<bulletproofs::RangeProof<Mcl>> range_proofs;
 
-    std::vector<bulletproofs::RangeProof<Mcl>> proofs;
-    return rpl.Verify(proofs);
+    for(size_t i=0; i<num_blsct_range_proofs; ++i) {
+        bulletproofs::RangeProof<Mcl> range_proof;
+        CDataStream st(SER_DISK, PROTOCOL_VERSION);
+        for(size_t j=0; j<PROOF_SIZE; ++j) {
+            st << blsct_range_proofs[i][j];
+        }
+        range_proof.Unserialize(st);
+        range_proofs.push_back(range_proof);
+    }
+
+    bulletproofs::RangeProofLogic<Mcl> rpl;
+    return rpl.Verify(range_proofs);
 }
 
 } // extern "C"
