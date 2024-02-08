@@ -79,6 +79,12 @@ bool blsct_verify_range_proof(
     const size_t num_blsct_range_proofs
 );
 
+void blsct_generate_nonce(
+    const uint8_t seed[],
+    const size_t seed_len,
+    BlsctPoint* blsct_nonce
+);
+
 /*
 - blsct signatures creation/verification
 blsct_sign

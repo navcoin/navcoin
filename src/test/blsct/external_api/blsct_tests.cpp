@@ -128,5 +128,45 @@ BOOST_AUTO_TEST_CASE(test_prove_verify_range_proof)
 }
 
 
+BOOST_AUTO_TEST_CASE(test_generate_nonce)
+{
+    const size_t NUM_NONCES = 255;
+    const size_t SEED_LEN = 1000;
+    uint8_t seed[SEED_LEN];
+
+    BlsctPoint ps[NUM_NONCES];
+    for(uint8_t i=0; i<NUM_NONCES; ++i) {
+        // generate seed
+        for(size_t j=0; j<SEED_LEN; ++j) {
+            seed[j] = i;
+        }
+        // generate nonce
+        blsct_generate_nonce(
+            seed,
+            SEED_LEN,
+            &ps[i]
+        );
+    }
+
+    // check if all the generated nonces are unique
+    for(size_t i=0; i<NUM_NONCES; ++i) {
+        for(size_t j=0; j<NUM_NONCES; ++j) {
+            // avoid comparing to itself
+            if (i == j) continue;
+
+            // make sure different seeds have different contents
+            bool is_different = false;
+            for(size_t k=0; k<SEED_LEN; ++k) {
+                if (ps[i][k] != ps[j][k]) {
+                    is_different = true;
+                }
+            }
+            BOOST_CHECK(is_different);
+        }
+    }
+
+    BOOST_CHECK(1);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 

@@ -180,4 +180,16 @@ bool blsct_verify_range_proof(
     return rpl.Verify(range_proofs);
 }
 
+void blsct_generate_nonce(
+    const uint8_t seed[],
+    const size_t seed_len,
+    BlsctPoint* blsct_nonce
+) {
+    std::vector<uint8_t> seed_vec(&seed[0], &seed[0] + seed_len);
+    auto nonce = Mcl::Point::HashAndMap(seed_vec);
+    auto nonce_vec = nonce.GetVch();
+    std::memcpy(blsct_nonce, &nonce_vec[0], nonce_vec.size());
+}
+
 } // extern "C"
+
