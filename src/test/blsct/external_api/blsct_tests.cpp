@@ -124,7 +124,7 @@ BOOST_AUTO_TEST_CASE(test_prove_verify_range_proof)
     );
 
     bool res = blsct_verify_range_proof(blsct_range_proofs, 1);
-    printf("is proof valid? %s\n", res ? "yes" : "no");
+    BOOST_CHECK(res);
 }
 
 
