@@ -81,28 +81,30 @@ BOOST_AUTO_TEST_CASE(test_prove_verify_range_proof)
     Scalars vs;
     vs.Add(one);
 
-    // convert blsct_vs
-    // need to create array of pointers to BlsctScalar
+    // convert blsct_vs to vs
     BlsctScalar blsct_vs[vs.Size()];
-    // IMPLEMENT ME!!
+    for(size_t i=0; i< vs.Size(); ++i) {
+        auto ser_v = vs[i].GetVch(); // v is serialized Scalar
+        std::memcpy(&blsct_vs[i][0], &ser_v[0], SCALAR_SIZE);
+    }
 
-    // convert nonce
+    // convert blsct_nonce to nonce
     BlsctPoint blsct_nonce;
     {
         auto ser = nonce.GetVch();
         std::memcpy(blsct_nonce, &ser[0], POINT_SIZE);
     }
 
-    // convert message
+    // convert blsct_message to message
     const uint8_t* blsct_message =
         reinterpret_cast<const uint8_t*>(message.c_str());
 
-    // convert token_id
+    // convert blsct_token_id to token_id
     BlsctTokenId blsct_token_id;
 
     BlsctRangeProof blsct_range_proof;
 
-    // generate range proof
+    // build BlsctRangeProof
     blsct_build_range_proof(
         blsct_vs,
         vs.Size(),
