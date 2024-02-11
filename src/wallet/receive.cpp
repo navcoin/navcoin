@@ -40,7 +40,7 @@ CAmount OutputGetCredit(const CWallet& wallet, const CTxOut& txout, const ismine
             auto blsct_man = wallet.GetBLSCTKeyMan();
             if (blsct_man) {
                 auto result = blsct_man->RecoverOutputs({txout});
-                if (result.is_completed) {
+                if (result.run_to_completion) {
                     auto xs = result.amounts;
                     for (auto& res : xs) {
                         ret = res.amount;

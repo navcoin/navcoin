@@ -59,36 +59,37 @@ bool blsct_init(enum Chain chain)
     }
 }
 
-bool blsct_decode_address(
+
+uint8_t blsct_decode_address(
     const char* blsct_addr,
     uint8_t ser_dpk[DOUBLE_PUBLIC_KEY_SIZE]
 ) {
     try {
         std::string blsct_addr_str(blsct_addr);
 
-        if (blsct_addr_str.size() != ENCODED_DPK_SIZE) return false;
+        if (blsct_addr_str.size() != ENCODED_DPK_SIZE) return BLSCT_BAD_DPK_SIZE;
         auto maybe_dpk = blsct::DecodeDoublePublicKey(g_chain, blsct_addr_str);
         if (maybe_dpk) {
             auto dpk = maybe_dpk.value();
             if (dpk.IsValid()) {
                 auto buf = dpk.GetVch();
                 std::memcpy(ser_dpk, &buf[0], DOUBLE_PUBLIC_KEY_SIZE);
-                return true;
+                return BLSCT_SUCCESS;
             }
         }
     } catch(...) {}
 
-    return false;
+    return BLSCT_EXCEPTION;
 }
 
-bool blsct_encode_address(
+uint8_t blsct_encode_address(
     const uint8_t ser_dpk[DOUBLE_PUBLIC_KEY_SIZE],
     char* blsct_addr,
     enum AddressEncoding encoding
 ) {
     try {
         if (encoding != Bech32 && encoding != Bech32M) {
-            return false;
+            return BLSCT_UNKNOWN_ENCODING;
         }
         auto bech32_encoding = encoding == Bech32 ?
             bech32_mod::Encoding::BECH32 : bech32_mod::Encoding::BECH32M;
@@ -98,11 +99,11 @@ bool blsct_encode_address(
 
         auto dpk_str = blsct::EncodeDoublePublicKey(g_chain, bech32_encoding, dpk);
         std::memcpy(blsct_addr, dpk_str.c_str(), ENCODED_DPK_SIZE + 1);
-        return true;
+        return BLSCT_SUCCESS;
 
     } catch(...) {}
 
-    return false;
+    return BLSCT_EXCEPTION;
 }
 
 static void blsct_nonce_to_nonce(
@@ -115,7 +116,7 @@ static void blsct_nonce_to_nonce(
     nonce.SetVch(ser_point);
 }
 
-bool blsct_build_range_proof(
+uint8_t blsct_build_range_proof(
     const uint64_t uint64_vs[],
     const size_t num_uint64_vs,
     const BlsctPoint* blsct_nonce,
@@ -128,7 +129,7 @@ bool blsct_build_range_proof(
         // uint64_t to Scalar
         Scalars vs;
         for(size_t i=0; i<num_uint64_vs; ++i) {
-            if (uint64_vs[i] > INT64_MAX) return false;
+            if (uint64_vs[i] > INT64_MAX) return BLSCT_VALUE_OUTSIDE_THE_RANGE;
             Mcl::Scalar x(static_cast<int64_t>(uint64_vs[i]));
             vs.Add(x);
         }
@@ -165,10 +166,10 @@ bool blsct_build_range_proof(
             range_proof.Serialize(st);
             std::memcpy(blsct_range_proof, st.data(), st.size());
         }
-        return true;
+        return BLSCT_SUCCESS;
     } catch(...) {}
 
-    return false;
+    return BLSCT_EXCEPTION;
 }
 
 static void blsct_range_proof_to_range_proof(
@@ -182,9 +183,10 @@ static void blsct_range_proof_to_range_proof(
     range_proof.Unserialize(st);
 }
 
-bool blsct_verify_range_proof(
+uint8_t blsct_verify_range_proof(
     const BlsctRangeProof blsct_range_proofs[],
-    const size_t num_blsct_range_proofs
+    const size_t num_blsct_range_proofs,
+    bool* is_valid
 ) {
     try {
         // convert blsct_proofs to proofs;
@@ -198,11 +200,13 @@ bool blsct_verify_range_proof(
             );
             range_proofs.push_back(range_proof);
         }
-        return g_rpl->Verify(range_proofs);
+        *is_valid = g_rpl->Verify(range_proofs);
+
+        return BLSCT_SUCCESS;
 
     } catch(...) {}
 
-    return false;
+    return BLSCT_EXCEPTION;
 }
 
 void blsct_generate_nonce(
@@ -216,7 +220,14 @@ void blsct_generate_nonce(
     std::memcpy(blsct_nonce, &nonce_vec[0], nonce_vec.size());
 }
 
-bool blsct_recover_amount(
+void blsct_generate_token_id(
+    const uint8_t token[32], /* serialized uint256 */
+    const uint64_t id,
+    BlsctTokenId* blsct_token_id
+) {
+}
+
+uint8_t blsct_recover_amount(
     BlsctAmountRecoveryRequest blsct_amount_recovery_reqs[],
     const size_t num_reqs
 ) {
@@ -250,8 +261,8 @@ bool blsct_recover_amount(
             blsct_amount_recovery_reqs[i].is_succ = false;
         }
 
-        if (!res.is_completed) {
-            return false;
+        if (!res.run_to_completion) {
+            return BLSCT_DID_NOT_RUN_TO_COMPLETION;
         }
         // res contains results of successful recovery only
         // i.e. res.amounts.size() can be less than num_reqs
@@ -267,11 +278,11 @@ bool blsct_recover_amount(
                 amount.message.size()
             );
         }
-        return true;
+        return BLSCT_SUCCESS;
 
     } catch(...) {}
 
-    return false;
+    return BLSCT_EXCEPTION;
 }
 
 } // extern "C"

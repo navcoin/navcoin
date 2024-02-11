@@ -87,7 +87,7 @@ BOOST_AUTO_TEST_CASE(test_range_proof_recovery_one_value)
     auto reqs = std::vector<bulletproofs::AmountRecoveryRequest<T>> { req };
     auto result = rp.RecoverAmounts(reqs);
 
-    BOOST_CHECK(result.is_completed);
+    BOOST_CHECK(result.run_to_completion);
     auto xs = result.amounts;
     BOOST_CHECK(xs.size() == 1);
     BOOST_CHECK(xs[0].gamma == nonce.GetHashWithSalt(100));
@@ -290,9 +290,9 @@ static void RunTestCase(
         reqs.push_back(bulletproofs::AmountRecoveryRequest<T>::of(proofs[i], nonce));
     }
     auto recovery_result = rp.RecoverAmounts(reqs);
-    BOOST_CHECK(recovery_result.is_completed == test_case.should_complete_recovery);
+    BOOST_CHECK(recovery_result.run_to_completion == test_case.should_complete_recovery);
 
-    if (recovery_result.is_completed) {
+    if (recovery_result.run_to_completion) {
         auto amounts = recovery_result.amounts;
         BOOST_CHECK(amounts.size() == test_case.num_amounts);
 

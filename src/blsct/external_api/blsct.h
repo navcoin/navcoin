@@ -10,6 +10,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+/* constants */
 #define PUBLIC_KEY_SIZE 48
 #define DOUBLE_PUBLIC_KEY_SIZE 96
 #define ENCODED_DPK_SIZE 165
@@ -17,6 +18,16 @@
 #define POINT_SIZE 48
 #define PROOF_SIZE 1019
 #define TOKEN_ID_SIZE 40  // uint256 + uint64_t = 32 + 8 = 40
+
+/* return codes */
+#define BLSCT_SUCCESS 0
+#define BLSCT_EXCEPTION 1
+#define BLSCT_BAD_DPK_SIZE 2
+#define BLSCT_UNKNOWN_ENCODING 3
+#define BLSCT_VALUE_OUTSIDE_THE_RANGE 4
+#define BLSCT_DID_NOT_RUN_TO_COMPLETION 5
+
+
 
 /*
  * API designed for JavaScript, Python, C, Rust, and Golang
@@ -50,7 +61,7 @@ bool blsct_init(enum Chain chain);
  * blsct_addr: a null-terminated c-style string of length ENCODED_DPK_SIZE
  * ser_dpk: a 48-byte vk followed by a 48-byte sk
  */
-bool blsct_decode_address(
+uint8_t blsct_decode_address(
     const char* blsct_addr,
     uint8_t ser_dpk[ENCODED_DPK_SIZE]
 );
@@ -59,13 +70,13 @@ bool blsct_decode_address(
  * ser_dpk: a 48-byte vk followed by a 48-byte sk
  * blsct_addr: a buffer of size at least ENCODED_DPK_SIZE + 1
  */
-bool blsct_encode_address(
+uint8_t blsct_encode_address(
     const uint8_t ser_dpk[ENCODED_DPK_SIZE],
     char* blsct_addr,
     enum AddressEncoding encoding
 );
 
-bool blsct_build_range_proof(
+uint8_t blsct_build_range_proof(
     const uint64_t uint64_vs[],
     const size_t num_uint64_vs,
     const BlsctPoint* blsct_nonce,
@@ -75,15 +86,22 @@ bool blsct_build_range_proof(
     BlsctRangeProof* blsct_range_proof
 );
 
-bool blsct_verify_range_proof(
+uint8_t blsct_verify_range_proof(
     const BlsctRangeProof blsct_range_proofs[],
-    const size_t num_blsct_range_proofs
+    const size_t num_blsct_range_proofs,
+    bool* is_valid
 );
 
 void blsct_generate_nonce(
     const uint8_t seed[],
     const size_t seed_len,
     BlsctPoint* blsct_nonce
+);
+
+void blsct_generate_token_id(
+    const uint8_t token[32], /* serialized uint256 */
+    const uint64_t id,
+    BlsctTokenId* blsct_token_id
 );
 
 /* holds both request (in) and result (out) */
@@ -97,7 +115,7 @@ typedef struct {
 } BlsctAmountRecoveryRequest;
 
 /* returns false if exception is thrown. otherwise returns true */
-bool blsct_recover_amount(
+uint8_t blsct_recover_amount(
     BlsctAmountRecoveryRequest blsct_amount_recovery_reqs[],
     const size_t num_reqs
 );

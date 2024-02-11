@@ -32,19 +32,23 @@ BOOST_AUTO_TEST_CASE(test_encode_decode_blsct_address)
     std::string blsct_addr_str = "nv1jlca8fe3jltegf54vwxyl2dvplpk3rz0ja6tjpdpfcar79cm43vxc40g8luh5xh0lva0qzkmytrthftje04fqnt8g6yq3j8t2z552ryhy8dnpyfgqyj58ypdptp43f32u28htwu0r37y9su6332jn0c0fcvan8l53m";
 
     uint8_t ser_dpk[blsct::DoublePublicKey::SIZE];
-    auto decode_result = blsct_decode_address(
-         blsct_addr_str.c_str(),
-        ser_dpk
-    );
-    BOOST_CHECK(decode_result);
+    {
+        auto res = blsct_decode_address(
+             blsct_addr_str.c_str(),
+            ser_dpk
+        );
+        BOOST_CHECK(res == BLSCT_SUCCESS);
+    }
 
     char rec_addr_buf[DOUBLE_PUBKEY_ENC_SIZE + 1];  // 1 for null-termination
-    auto encode_result = blsct_encode_address(
-        ser_dpk,
-        rec_addr_buf,
-        Bech32M
-    );
-    BOOST_CHECK(encode_result);
+    {
+        auto res = blsct_encode_address(
+            ser_dpk,
+            rec_addr_buf,
+            Bech32M
+        );
+        BOOST_CHECK(res == BLSCT_SUCCESS);
+    }
 
     std::string rec_addr_str((char*) rec_addr_buf, DOUBLE_PUBKEY_ENC_SIZE);
 
@@ -107,16 +111,18 @@ BOOST_AUTO_TEST_CASE(test_prove_verify_range_proof)
 
     // build BlsctRangeProof
     BlsctRangeProof blsct_range_proof;
-    auto is_succ = blsct_build_range_proof(
-        uint64_vs,
-        1,
-        &blsct_nonce,
-        blsct_message,
-        message.size(),
-        &blsct_token_id,
-        &blsct_range_proof
-    );
-    BOOST_CHECK(is_succ);
+    {
+        auto res = blsct_build_range_proof(
+            uint64_vs,
+            1,
+            &blsct_nonce,
+            blsct_message,
+            message.size(),
+            &blsct_token_id,
+            &blsct_range_proof
+        );
+        BOOST_CHECK(res == BLSCT_SUCCESS);
+    }
 
     // build BlsctRangeProof array of size 1
     BlsctRangeProof blsct_range_proofs[1];
@@ -126,8 +132,13 @@ BOOST_AUTO_TEST_CASE(test_prove_verify_range_proof)
         sizeof(blsct_range_proof)
     );
 
-    bool res = blsct_verify_range_proof(blsct_range_proofs, 1);
-    BOOST_CHECK(res);
+    {
+        bool is_valid;
+        uint8_t res = blsct_verify_range_proof(
+            blsct_range_proofs, 1, &is_valid
+        );
+        BOOST_CHECK(res == BLSCT_SUCCESS);
+    }
 }
 
 BOOST_AUTO_TEST_CASE(test_generate_nonce)
@@ -178,7 +189,7 @@ static void build_range_proof_for_amount_recovery(
     BlsctTokenId blsct_token_id;
     TokenIdToBlsctTokenId(token_id, blsct_token_id);
 
-    bool is_succ = blsct_build_range_proof(
+    auto res = blsct_build_range_proof(
         &uint64_vs[0],
         uint64_vs.size(),
         &blsct_nonce,
@@ -187,7 +198,7 @@ static void build_range_proof_for_amount_recovery(
         &blsct_token_id,
         &blsct_range_proof
     );
-    BOOST_CHECK(is_succ);
+    BOOST_CHECK(res == BLSCT_SUCCESS);
 }
 
 BOOST_AUTO_TEST_CASE(test_amount_recovery)
@@ -223,8 +234,8 @@ BOOST_AUTO_TEST_CASE(test_amount_recovery)
         );
     }
 
-    bool is_succ = blsct_recover_amount(reqs, 2);
-    BOOST_CHECK(is_succ);
+    auto res = blsct_recover_amount(reqs, 2);
+    BOOST_CHECK(res == BLSCT_SUCCESS);
 
     for(size_t i=0; i<msgs.size(); ++i) {
         BOOST_CHECK(reqs[i].is_succ);

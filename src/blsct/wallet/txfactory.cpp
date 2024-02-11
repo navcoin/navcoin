@@ -38,7 +38,7 @@ bool TxFactory::AddInput(const CCoinsViewCache& cache, const COutPoint& outpoint
 
     auto recoveredInfo = km->RecoverOutputs(std::vector<CTxOut>{coin.out});
 
-    if (!recoveredInfo.is_completed)
+    if (!recoveredInfo.run_to_completion)
         return false;
 
     if (vInputs.count(coin.out.tokenId) <= 0)

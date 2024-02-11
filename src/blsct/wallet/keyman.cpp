@@ -519,7 +519,7 @@ blsct::PrivateKey KeyMan::GetSpendingKeyForOutput(const CTxOut& out, const SubAd
 bulletproofs::AmountRecoveryResult<Mcl> KeyMan::RecoverOutputs(const std::vector<CTxOut>& outs)
 {
     if (!fViewKeyDefined || !viewKey.IsValid())
-        return bulletproofs::AmountRecoveryResult<Mcl>::failure();
+        return bulletproofs::AmountRecoveryResult<Mcl>::failed();
 
     bulletproofs::RangeProofLogic<Mcl> rp;
     std::vector<bulletproofs::AmountRecoveryRequest<Mcl>> reqs;

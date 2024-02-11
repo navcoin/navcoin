@@ -38,7 +38,7 @@ BOOST_FIXTURE_TEST_CASE(ismine_test, TestingSetup)
 
     auto result = blsct_km->RecoverOutputs({out.out});
 
-    BOOST_CHECK(result.is_completed);
+    BOOST_CHECK(result.run_to_completion);
     auto xs = result.amounts;
     BOOST_CHECK(xs.size() == 1);
     BOOST_CHECK(xs[0].amount == 1000);

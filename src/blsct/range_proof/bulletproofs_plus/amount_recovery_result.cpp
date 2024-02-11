@@ -8,13 +8,13 @@
 namespace bulletproofs_plus {
 
 template <typename T>
-AmountRecoveryResult<T> AmountRecoveryResult<T>::failure()
+AmountRecoveryResult<T> AmountRecoveryResult<T>::failed()
 {
     return {
         false,
         std::vector<range_proof::RecoveredData<T>>()
     };
 }
-template AmountRecoveryResult<Mcl> AmountRecoveryResult<Mcl>::failure();
+template AmountRecoveryResult<Mcl> AmountRecoveryResult<Mcl>::failed();
 
 } // namespace bulletproofs_plus
