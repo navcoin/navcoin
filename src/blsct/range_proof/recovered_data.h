@@ -19,15 +19,15 @@ struct RecoveredData
     using Scalar = typename T::Scalar;
 
     RecoveredData(
-        const size_t& id,
+        const size_t& idx,
         const CAmount& amount,
         const Scalar& gamma,
         const std::string& message
-    ): id{id}, amount{amount}, gamma{gamma}, message{message} {}
+    ): idx{idx}, amount{amount}, gamma{gamma}, message{message} {}
 
     RecoveredData() {}
 
-    size_t id;
+    size_t idx;
     CAmount amount;
     Scalar gamma;
     std::string message;

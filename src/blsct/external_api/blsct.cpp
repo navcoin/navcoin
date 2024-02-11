@@ -7,6 +7,7 @@
 #include <blsct/public_key.h>
 #include <blsct/range_proof/bulletproofs/range_proof.h>
 #include <blsct/range_proof/bulletproofs/range_proof_logic.h>
+#include <blsct/range_proof/bulletproofs/amount_recovery_request.h>
 #include <streams.h>
 
 #include <cstdint>
@@ -18,6 +19,7 @@
 
 static std::string g_chain;
 static std::mutex g_init_mutex;
+static bulletproofs::RangeProofLogic<Mcl>* g_rpl;
 
 extern "C" {
 
@@ -30,6 +32,8 @@ bool blsct_init(enum Chain chain)
         if (!g_chain.empty()) return true;
 
         MclInit for_side_effect_only;
+
+        g_rpl = new bulletproofs::RangeProofLogic<Mcl>();
 
         switch (chain) {
             case MainNet:
@@ -101,6 +105,16 @@ bool blsct_encode_address(
     return false;
 }
 
+static void blsct_nonce_to_nonce(
+    const BlsctPoint& blsct_nonce,
+    Mcl::Point& nonce
+) {
+    std::vector<uint8_t> ser_point(
+        blsct_nonce, blsct_nonce + POINT_SIZE
+    );
+    nonce.SetVch(ser_point);
+}
+
 bool blsct_build_range_proof(
     const uint64_t uint64_vs[],
     const size_t num_uint64_vs,
@@ -110,72 +124,85 @@ bool blsct_build_range_proof(
     const BlsctTokenId* blsct_token_id,
     BlsctRangeProof* blsct_range_proof
 ) {
-    // uint64_t to Scalar
-    Scalars vs;
-    for(size_t i=0; i<num_uint64_vs; ++i) {
-        if (uint64_vs[i] > INT64_MAX) return false;
-        Mcl::Scalar x(static_cast<int64_t>(uint64_vs[i]));
-        vs.Add(x);
-    }
+    try {
+        // uint64_t to Scalar
+        Scalars vs;
+        for(size_t i=0; i<num_uint64_vs; ++i) {
+            if (uint64_vs[i] > INT64_MAX) return false;
+            Mcl::Scalar x(static_cast<int64_t>(uint64_vs[i]));
+            vs.Add(x);
+        }
 
-    // blsct_nonce to nonce
-    Mcl::Point nonce;
-    std::vector<uint8_t> ser_point(
-        *blsct_nonce, *blsct_nonce + POINT_SIZE
-    );
-    nonce.SetVch(ser_point);
+        // blsct_nonce to nonce
+        Mcl::Point nonce;
+        blsct_nonce_to_nonce(*blsct_nonce, nonce);
 
-    // blsct_message to message
-    std::vector<uint8_t> message(
-        blsct_message, blsct_message + blsct_message_size
-    );
-
-    // blsct_token_id to token_id
-    TokenId token_id;
-    {
-        CDataStream st(SER_DISK, PROTOCOL_VERSION);
-        std::vector<uint8_t> token_id_vec(
-            *blsct_token_id, *blsct_token_id + TOKEN_ID_SIZE
+        // blsct_message to message
+        std::vector<uint8_t> message(
+            blsct_message, blsct_message + blsct_message_size
         );
-        st << token_id_vec;
-        token_id.Unserialize(st);
-    }
 
-    // range_proof to blsct_range_proof
-    bulletproofs::RangeProofLogic<Mcl> rpl;
-    auto range_proof = rpl.Prove(
-        vs,
-        nonce,
-        message,
-        token_id
-    );
-    {
-        CDataStream st(SER_DISK, PROTOCOL_VERSION);
-        range_proof.Serialize(st);
-        std::memcpy(blsct_range_proof, st.data(), st.size());
+        // blsct_token_id to token_id
+        TokenId token_id;
+        {
+            CDataStream st(SER_DISK, PROTOCOL_VERSION);
+            std::vector<uint8_t> token_id_vec(
+                *blsct_token_id, *blsct_token_id + TOKEN_ID_SIZE
+            );
+            st << token_id_vec;
+            token_id.Unserialize(st);
+        }
+
+        // range_proof to blsct_range_proof
+        auto range_proof = g_rpl->Prove(
+            vs,
+            nonce,
+            message,
+            token_id
+        );
+        {
+            CDataStream st(SER_DISK, PROTOCOL_VERSION);
+            range_proof.Serialize(st);
+            std::memcpy(blsct_range_proof, st.data(), st.size());
+        }
+        return true;
+    } catch(...) {}
+
+    return false;
+}
+
+static void blsct_range_proof_to_range_proof(
+    const BlsctRangeProof& blsct_range_proof,
+    bulletproofs::RangeProof<Mcl>& range_proof
+) {
+    CDataStream st(SER_DISK, PROTOCOL_VERSION);
+    for(size_t i=0; i<PROOF_SIZE; ++i) {
+        st << blsct_range_proof[i];
     }
-    return true;
+    range_proof.Unserialize(st);
 }
 
 bool blsct_verify_range_proof(
     const BlsctRangeProof blsct_range_proofs[],
     const size_t num_blsct_range_proofs
 ) {
-    // convert blsct_proofs to proofs;
-    std::vector<bulletproofs::RangeProof<Mcl>> range_proofs;
+    try {
+        // convert blsct_proofs to proofs;
+        std::vector<bulletproofs::RangeProof<Mcl>> range_proofs;
 
-    for(size_t i=0; i<num_blsct_range_proofs; ++i) {
-        bulletproofs::RangeProof<Mcl> range_proof;
-        CDataStream st(SER_DISK, PROTOCOL_VERSION);
-        for(size_t j=0; j<PROOF_SIZE; ++j) {
-            st << blsct_range_proofs[i][j];
+        for(size_t i=0; i<num_blsct_range_proofs; ++i) {
+            bulletproofs::RangeProof<Mcl> range_proof;
+            blsct_range_proof_to_range_proof(
+                blsct_range_proofs[i],
+                range_proof
+            );
+            range_proofs.push_back(range_proof);
         }
-        range_proof.Unserialize(st);
-        range_proofs.push_back(range_proof);
-    }
+        return g_rpl->Verify(range_proofs);
 
-    bulletproofs::RangeProofLogic<Mcl> rpl;
-    return rpl.Verify(range_proofs);
+    } catch(...) {}
+
+    return false;
 }
 
 void blsct_generate_nonce(
@@ -187,6 +214,64 @@ void blsct_generate_nonce(
     auto nonce = Mcl::Point::HashAndMap(seed_vec);
     auto nonce_vec = nonce.GetVch();
     std::memcpy(blsct_nonce, &nonce_vec[0], nonce_vec.size());
+}
+
+bool blsct_recover_amount(
+    BlsctAmountRecoveryRequest blsct_amount_recovery_reqs[],
+    const size_t num_reqs
+) {
+    try {
+        // build AmountRecoveryRequest's
+        std::vector<bulletproofs::AmountRecoveryRequest<Mcl>> reqs;
+
+        for(size_t i=0; i<num_reqs; ++i) {
+            auto& r = blsct_amount_recovery_reqs[i];
+
+            Mcl::Point nonce;
+            blsct_nonce_to_nonce(r.nonce, nonce);
+
+            bulletproofs::RangeProof<Mcl> range_proof;
+            blsct_range_proof_to_range_proof(
+                r.range_proof,
+                range_proof
+            );
+
+            auto req = bulletproofs::AmountRecoveryRequest<Mcl>::of(
+                range_proof,
+                nonce
+            );
+            reqs.push_back(req);
+        }
+
+        auto res = g_rpl->RecoverAmounts(reqs);
+
+        // initially mark all the requests to be failure
+        for(size_t i=0; i<num_reqs; ++i) {
+            blsct_amount_recovery_reqs[i].is_succ = false;
+        }
+
+        if (!res.is_completed) {
+            return false;
+        }
+        // res contains results of successful recovery only
+        // i.e. res.amounts.size() can be less than num_reqs
+        for(size_t i=0; i<res.amounts.size(); ++i) {
+            auto amount = res.amounts[i];
+            auto& r = blsct_amount_recovery_reqs[amount.idx];
+            r.is_succ = true;
+            r.amount = amount.amount;
+            r.msg_size = amount.message.size();
+            std::memcpy(
+                r.msg,
+                amount.message.c_str(),
+                amount.message.size()
+            );
+        }
+        return true;
+
+    } catch(...) {}
+
+    return false;
 }
 
 } // extern "C"

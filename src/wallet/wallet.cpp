@@ -1111,7 +1111,7 @@ CWalletTx* CWallet::AddToWallet(CTransactionRef tx, const TxState& state, const 
                 if (result.is_completed) {
                     auto xs = result.amounts;
                     for (auto& res : xs) {
-                        wtx.blsctRecoveryData[res.id] = res;
+                        wtx.blsctRecoveryData[res.idx] = res;
                     }
                 }
             }

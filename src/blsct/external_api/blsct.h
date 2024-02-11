@@ -5,6 +5,7 @@
 #ifndef NAVCOIN_BLSCT_EXTERNAL_API_BLSCT_H
 #define NAVCOIN_BLSCT_EXTERNAL_API_BLSCT_H
 
+#include "blsct/range_proof/setup.h"
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -85,14 +86,26 @@ void blsct_generate_nonce(
     BlsctPoint* blsct_nonce
 );
 
+/* holds both request (in) and result (out) */
+typedef struct {
+    BlsctRangeProof range_proof; /* in */
+    BlsctPoint nonce; /* in */
+    bool is_succ; /* out */
+    uint64_t amount;  /* out */
+    char msg[range_proof::Setup::max_message_size]; /* out */
+    size_t msg_size; /* out */
+} BlsctAmountRecoveryRequest;
+
+/* returns false if exception is thrown. otherwise returns true */
+bool blsct_recover_amount(
+    BlsctAmountRecoveryRequest blsct_amount_recovery_reqs[],
+    const size_t num_reqs
+);
+
 /*
 - blsct signatures creation/verification
 blsct_sign
 blsct_verify_signature
-
-- rangeproof amount/memo recovery
-blsct_recover_amount
-blsct_recover_memo
 
 - transaction serialization/deserialization
 blsct_serialize_transaction

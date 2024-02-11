@@ -5,11 +5,14 @@
 #include "blsct/double_public_key.h"
 #include "key_io.h"
 #include <boost/function/function_base.hpp>
+#include <sys/types.h>
 #define BOOST_UNIT_TEST
 
 #include <boost/test/unit_test.hpp>
 #include <test/util/setup_common.h>
 #include <blsct/external_api/blsct.h>
+
+#include <cstring>
 #include <string>
 
 using T = Mcl;
@@ -67,6 +70,15 @@ static MsgPair GenMsgPair(std::string s = "spaghetti meatballs")
     return std::pair(s, message);
 }
 
+static void TokenIdToBlsctTokenId(
+    const TokenId& token_id,
+    BlsctTokenId& blsct_token_id
+) {
+    CDataStream st(SER_DISK, PROTOCOL_VERSION);
+    token_id.Serialize(st);
+    std::memcpy(blsct_token_id, st.data(), st.size());
+}
+
 BOOST_AUTO_TEST_CASE(test_prove_verify_range_proof)
 {
     BOOST_CHECK(blsct_init(MainNet));
@@ -91,18 +103,20 @@ BOOST_AUTO_TEST_CASE(test_prove_verify_range_proof)
 
     // convert blsct_token_id to token_id
     BlsctTokenId blsct_token_id;
+    TokenIdToBlsctTokenId(token_id, blsct_token_id);
 
     // build BlsctRangeProof
     BlsctRangeProof blsct_range_proof;
     auto is_succ = blsct_build_range_proof(
         uint64_vs,
-        sizeof(uint64_vs) / sizeof(uint64_vs[0]),
+        1,
         &blsct_nonce,
         blsct_message,
         message.size(),
         &blsct_token_id,
         &blsct_range_proof
     );
+    BOOST_CHECK(is_succ);
 
     // build BlsctRangeProof array of size 1
     BlsctRangeProof blsct_range_proofs[1];
@@ -115,7 +129,6 @@ BOOST_AUTO_TEST_CASE(test_prove_verify_range_proof)
     bool res = blsct_verify_range_proof(blsct_range_proofs, 1);
     BOOST_CHECK(res);
 }
-
 
 BOOST_AUTO_TEST_CASE(test_generate_nonce)
 {
@@ -153,8 +166,72 @@ BOOST_AUTO_TEST_CASE(test_generate_nonce)
             BOOST_CHECK(is_different);
         }
     }
+}
 
-    BOOST_CHECK(1);
+static void build_range_proof_for_amount_recovery(
+    const std::vector<uint64_t> uint64_vs,
+    const BlsctPoint& blsct_nonce,
+    const std::string& msg,
+    const TokenId& token_id,
+    BlsctRangeProof& blsct_range_proof
+) {
+    BlsctTokenId blsct_token_id;
+    TokenIdToBlsctTokenId(token_id, blsct_token_id);
+
+    bool is_succ = blsct_build_range_proof(
+        &uint64_vs[0],
+        uint64_vs.size(),
+        &blsct_nonce,
+        reinterpret_cast<const uint8_t*>(msg.c_str()),
+        msg.size(),
+        &blsct_token_id,
+        &blsct_range_proof
+    );
+    BOOST_CHECK(is_succ);
+}
+
+BOOST_AUTO_TEST_CASE(test_amount_recovery)
+{
+    BOOST_CHECK(blsct_init(MainNet));
+
+    BlsctAmountRecoveryRequest reqs[2];
+    std::vector<std::string> msgs = { "apple", "orange" };
+    std::vector<uint64_t> amounts = { 123, 456 };
+    TokenId token_id(uint256(123));
+    Mcl::Point nonce(uint256(123));
+
+    {
+        std::vector<uint64_t> uint64_vs { amounts[0] };
+        std::memcpy(&reqs[0].nonce, &nonce.GetVch()[0], POINT_SIZE);
+        build_range_proof_for_amount_recovery(
+            uint64_vs,
+            reqs[0].nonce,
+            msgs[0],
+            token_id,
+            reqs[0].range_proof
+        );
+    }
+    {
+        std::vector<uint64_t> uint64_vs { amounts[1] };
+        std::memcpy(&reqs[1].nonce, &nonce.GetVch()[0], POINT_SIZE);
+        build_range_proof_for_amount_recovery(
+            uint64_vs,
+            reqs[1].nonce,
+            msgs[1],
+            token_id,
+            reqs[1].range_proof
+        );
+    }
+
+    bool is_succ = blsct_recover_amount(reqs, 2);
+    BOOST_CHECK(is_succ);
+
+    for(size_t i=0; i<msgs.size(); ++i) {
+        BOOST_CHECK(reqs[i].is_succ);
+        BOOST_CHECK(reqs[i].amount == amounts[i]);
+        BOOST_CHECK(reqs[i].msg_size == msgs[i].size());
+        BOOST_CHECK(std::strcmp(reqs[i].msg, msgs[i].c_str()) == 0);
+    }
 }
 
 BOOST_AUTO_TEST_SUITE_END()

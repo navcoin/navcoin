@@ -170,7 +170,7 @@ BOOST_FIXTURE_TEST_CASE(addinput_test, TestingSetup)
 
     for (auto& res : wtx->blsctRecoveryData) {
         if (res.second.message == "Change" && res.second.amount == (1000 - 900 - 0.006) * COIN) {
-            nChangePosition = res.second.id;
+            nChangePosition = res.second.idx;
             fFoundChange = true;
             break;
         }
