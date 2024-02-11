@@ -16,6 +16,8 @@ public:
     uint256 token;
     uint64_t subid;
 
+    // when subid is set to UINT64_MAX, the TokenId is for NFT
+    // when subis is less than UINT64_MAX, the TokenId is for non-NFT
     TokenId(const uint256& t = uint256(), const uint64_t& i = std::numeric_limits<uint64_t>::max()) : token(t), subid(i) {}
 
     void SetNull()
