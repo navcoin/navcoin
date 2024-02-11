@@ -75,18 +75,8 @@ BOOST_AUTO_TEST_CASE(test_prove_verify_range_proof)
     auto token_id = GenTokenId();
     std::string message = "spaghetti meatballs";
 
-    Scalar one(1);
-    std::vector<Scalar> vs_vec;
-    vs_vec.push_back(one);
-    Scalars vs;
-    vs.Add(one);
-
-    // convert blsct_vs to vs
-    BlsctScalar blsct_vs[vs.Size()];
-    for(size_t i=0; i< vs.Size(); ++i) {
-        auto ser_v = vs[i].GetVch(); // v is serialized Scalar
-        std::memcpy(&blsct_vs[i][0], &ser_v[0], SCALAR_SIZE);
-    }
+    uint64_t uint64_vs[1];
+    uint64_vs[0] = 1;
 
     // convert blsct_nonce to nonce
     BlsctPoint blsct_nonce;
@@ -102,12 +92,11 @@ BOOST_AUTO_TEST_CASE(test_prove_verify_range_proof)
     // convert blsct_token_id to token_id
     BlsctTokenId blsct_token_id;
 
-    BlsctRangeProof blsct_range_proof;
-
     // build BlsctRangeProof
-    blsct_build_range_proof(
-        blsct_vs,
-        vs.Size(),
+    BlsctRangeProof blsct_range_proof;
+    auto is_succ = blsct_build_range_proof(
+        uint64_vs,
+        sizeof(uint64_vs) / sizeof(uint64_vs[0]),
         &blsct_nonce,
         blsct_message,
         message.size(),

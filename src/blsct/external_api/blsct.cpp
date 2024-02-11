@@ -9,6 +9,7 @@
 #include <blsct/range_proof/bulletproofs/range_proof_logic.h>
 #include <streams.h>
 
+#include <cstdint>
 #include <iostream>
 #include <memory>
 #include <mutex>
@@ -100,25 +101,21 @@ bool blsct_encode_address(
     return false;
 }
 
-void blsct_build_range_proof(
-    const BlsctScalar blsct_vs[],
-    const size_t num_blsct_vs,
+bool blsct_build_range_proof(
+    const uint64_t uint64_vs[],
+    const size_t num_uint64_vs,
     const BlsctPoint* blsct_nonce,
     const uint8_t* blsct_message,
     const size_t blsct_message_size,
     const BlsctTokenId* blsct_token_id,
     BlsctRangeProof* blsct_range_proof
 ) {
-    // blsct_vs to vs
+    // uint64_t to Scalar
     Scalars vs;
-    for (size_t i=0; i<num_blsct_vs; ++i) {
-        BlsctScalar v;
-        std::vector<uint8_t> ser_scalar(
-            blsct_vs[i], blsct_vs[i] + sizeof(BlsctScalar)
-        );
-        Mcl::Scalar s;
-        s.SetVch(ser_scalar);
-        vs.Add(s);
+    for(size_t i=0; i<num_uint64_vs; ++i) {
+        if (uint64_vs[i] > INT64_MAX) return false;
+        Mcl::Scalar x(static_cast<int64_t>(uint64_vs[i]));
+        vs.Add(x);
     }
 
     // blsct_nonce to nonce
@@ -157,6 +154,7 @@ void blsct_build_range_proof(
         range_proof.Serialize(st);
         std::memcpy(blsct_range_proof, st.data(), st.size());
     }
+    return true;
 }
 
 bool blsct_verify_range_proof(

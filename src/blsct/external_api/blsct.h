@@ -64,9 +64,9 @@ bool blsct_encode_address(
     enum AddressEncoding encoding
 );
 
-void blsct_build_range_proof(
-    const BlsctScalar blsct_vs[],
-    const size_t num_blsct_vs,
+bool blsct_build_range_proof(
+    const uint64_t uint64_vs[],
+    const size_t num_uint64_vs,
     const BlsctPoint* blsct_nonce,
     const uint8_t* blsct_message,
     const size_t blsct_message_size,
