@@ -80,11 +80,11 @@ uint8_t blsct_encode_address(
 uint8_t blsct_build_range_proof(
     const uint64_t uint64_vs[],
     const size_t num_uint64_vs,
-    const BlsctPoint* blsct_nonce,
+    const BlsctPoint blsct_nonce,
     const char* blsct_message,
     const size_t blsct_message_size,
-    const BlsctTokenId* blsct_token_id,
-    BlsctRangeProof* blsct_range_proof
+    const BlsctTokenId blsct_token_id,
+    BlsctRangeProof blsct_range_proof
 );
 
 uint8_t blsct_verify_range_proof(

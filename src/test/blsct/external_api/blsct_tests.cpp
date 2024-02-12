@@ -96,11 +96,11 @@ BOOST_AUTO_TEST_CASE(test_prove_verify_range_proof)
         auto res = blsct_build_range_proof(
             uint64_vs,
             1,
-            &blsct_nonce,
+            blsct_nonce,
             blsct_message,
             std::strlen(blsct_message),
-            &blsct_token_id,
-            &blsct_range_proof
+            blsct_token_id,
+            blsct_range_proof
         );
         BOOST_CHECK(res == BLSCT_SUCCESS);
     }
@@ -169,11 +169,11 @@ static void build_range_proof_for_amount_recovery(
     auto res = blsct_build_range_proof(
         &uint64_vs[0],
         uint64_vs.size(),
-        &blsct_nonce,
+        blsct_nonce,
         msg,
         std::strlen(msg),
-        &blsct_token_id,
-        &blsct_range_proof
+        blsct_token_id,
+        blsct_range_proof
     );
     BOOST_CHECK(res == BLSCT_SUCCESS);
 }

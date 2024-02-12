@@ -115,7 +115,7 @@ uint8_t blsct_encode_address(
 }
 
 static void blsct_nonce_to_nonce(
-    const BlsctPoint& blsct_nonce,
+    const BlsctPoint blsct_nonce,
     Mcl::Point& nonce
 ) {
     std::vector<uint8_t> ser_point(
@@ -127,11 +127,11 @@ static void blsct_nonce_to_nonce(
 uint8_t blsct_build_range_proof(
     const uint64_t uint64_vs[],
     const size_t num_uint64_vs,
-    const BlsctPoint* blsct_nonce,
+    const BlsctPoint blsct_nonce,
     const char* blsct_message,
     const size_t blsct_message_size,
-    const BlsctTokenId* blsct_token_id,
-    BlsctRangeProof* blsct_range_proof
+    const BlsctTokenId blsct_token_id,
+    BlsctRangeProof blsct_range_proof
 ) {
     try {
         // uint64_t to Scalar
@@ -144,7 +144,7 @@ uint8_t blsct_build_range_proof(
 
         // blsct_nonce to nonce
         Mcl::Point nonce;
-        blsct_nonce_to_nonce(*blsct_nonce, nonce);
+        blsct_nonce_to_nonce(blsct_nonce, nonce);
 
         // blsct_message to message
         std::vector<uint8_t> message(
