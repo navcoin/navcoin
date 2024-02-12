@@ -78,8 +78,6 @@ BOOST_AUTO_TEST_CASE(test_uint64_to_blsct_uint256)
     for(size_t i=0; i<ns.size(); ++i) {
         BlsctUint256 blsct_uint256;
         blsct_uint64_to_blsct_uint256(ns[i], blsct_uint256);
-
-        uint256 n256(ns[i]);
         uint256 rec_n256(blsct_uint256);
 
         BOOST_CHECK(rec_n256.GetUint64(0) == ns[i]);
