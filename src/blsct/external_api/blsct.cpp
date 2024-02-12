@@ -20,10 +20,17 @@
 static std::string g_chain;
 static std::mutex g_init_mutex;
 static bulletproofs::RangeProofLogic<Mcl>* g_rpl;
+static bool g_is_little_endian;
 
 extern "C" {
 
 using Scalars = Elements<Mcl::Scalar>;
+
+static bool is_little_endian() {
+    uint16_t n = 1;
+    uint8_t* p = (uint8_t*) &n;
+    return *p == 1;
+}
 
 bool blsct_init(enum Chain chain)
 {
@@ -34,6 +41,7 @@ bool blsct_init(enum Chain chain)
         MclInit for_side_effect_only;
 
         g_rpl = new bulletproofs::RangeProofLogic<Mcl>();
+        g_is_little_endian = is_little_endian();
 
         switch (chain) {
             case MainNet:
@@ -120,7 +128,7 @@ uint8_t blsct_build_range_proof(
     const uint64_t uint64_vs[],
     const size_t num_uint64_vs,
     const BlsctPoint* blsct_nonce,
-    const uint8_t* blsct_message,
+    const char* blsct_message,
     const size_t blsct_message_size,
     const BlsctTokenId* blsct_token_id,
     BlsctRangeProof* blsct_range_proof
@@ -167,6 +175,7 @@ uint8_t blsct_build_range_proof(
             std::memcpy(blsct_range_proof, st.data(), st.size());
         }
         return BLSCT_SUCCESS;
+
     } catch(...) {}
 
     return BLSCT_EXCEPTION;
@@ -220,11 +229,34 @@ void blsct_generate_nonce(
     std::memcpy(blsct_nonce, &nonce_vec[0], nonce_vec.size());
 }
 
-void blsct_generate_token_id(
-    const uint8_t token[32], /* serialized uint256 */
-    const uint64_t id,
-    BlsctTokenId* blsct_token_id
+void blsct_uint64_to_blsct_uint256(
+    const uint64_t n,
+    BlsctUint256 uint256
 ) {
+    std::memset(uint256, 0, UINT256_SIZE);
+    if (g_is_little_endian) {
+        for (size_t i=0; i<8; ++i) {
+            uint256[i] = (n >> (i * 8)) & 0xFF;
+        }
+    } else {
+        for (size_t i=0; i<8; ++i) {
+            uint256[7 - i] = (n >> (i * 8)) & 0xFF;
+        }
+    }
+}
+
+void blsct_generate_token_id(
+    const BlsctUint256 token,
+    BlsctTokenId blsct_token_id,
+    const uint64_t subid
+) {
+    std::vector<uint8_t> token_vec(token, token + UINT256_SIZE);
+    uint256 token_uint256(token_vec);
+    TokenId token_id(token_uint256, subid);
+
+    CDataStream st(SER_DISK, PROTOCOL_VERSION);
+    token_id.Serialize(st);
+    std::memcpy(blsct_token_id, st.data(), st.size());
 }
 
 uint8_t blsct_recover_amount(

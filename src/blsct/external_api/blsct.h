@@ -6,6 +6,7 @@
 #define NAVCOIN_BLSCT_EXTERNAL_API_BLSCT_H
 
 #include "blsct/range_proof/setup.h"
+#include <cstdint>
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -18,6 +19,7 @@
 #define POINT_SIZE 48
 #define PROOF_SIZE 1019
 #define TOKEN_ID_SIZE 40  // uint256 + uint64_t = 32 + 8 = 40
+#define UINT256_SIZE 32
 
 /* return codes */
 #define BLSCT_SUCCESS 0
@@ -26,8 +28,6 @@
 #define BLSCT_UNKNOWN_ENCODING 3
 #define BLSCT_VALUE_OUTSIDE_THE_RANGE 4
 #define BLSCT_DID_NOT_RUN_TO_COMPLETION 5
-
-
 
 /*
  * API designed for JavaScript, Python, C, Rust, and Golang
@@ -48,7 +48,8 @@ enum Chain {
 typedef uint8_t BlsctScalar[SCALAR_SIZE];
 typedef uint8_t BlsctPoint[POINT_SIZE];
 typedef uint8_t BlsctRangeProof[PROOF_SIZE];
-typedef uint8_t BlsctTokenId[32 + 8]; // uint256 + uint64_t
+typedef uint8_t BlsctTokenId[TOKEN_ID_SIZE];
+typedef uint8_t BlsctUint256[UINT256_SIZE];
 
 enum AddressEncoding {
     Bech32,
@@ -80,7 +81,7 @@ uint8_t blsct_build_range_proof(
     const uint64_t uint64_vs[],
     const size_t num_uint64_vs,
     const BlsctPoint* blsct_nonce,
-    const uint8_t* blsct_message,
+    const char* blsct_message,
     const size_t blsct_message_size,
     const BlsctTokenId* blsct_token_id,
     BlsctRangeProof* blsct_range_proof
@@ -98,10 +99,15 @@ void blsct_generate_nonce(
     BlsctPoint* blsct_nonce
 );
 
+void blsct_uint64_to_blsct_uint256(
+    const uint64_t n,
+    BlsctUint256 uint256
+);
+
 void blsct_generate_token_id(
-    const uint8_t token[32], /* serialized uint256 */
-    const uint64_t id,
-    BlsctTokenId* blsct_token_id
+    const BlsctUint256 token,
+    BlsctTokenId blsct_token_id,
+    const uint64_t subid = UINT64_MAX
 );
 
 /* holds both request (in) and result (out) */

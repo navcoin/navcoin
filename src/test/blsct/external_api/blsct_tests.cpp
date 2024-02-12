@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE(test_encode_decode_blsct_address)
     uint8_t ser_dpk[blsct::DoublePublicKey::SIZE];
     {
         auto res = blsct_decode_address(
-             blsct_addr_str.c_str(),
+            blsct_addr_str.c_str(),
             ser_dpk
         );
         BOOST_CHECK(res == BLSCT_SUCCESS);
@@ -55,61 +55,42 @@ BOOST_AUTO_TEST_CASE(test_encode_decode_blsct_address)
     BOOST_CHECK(blsct_addr_str == rec_addr_str);
 }
 
-static Mcl::Point GenNonce()
+BOOST_AUTO_TEST_CASE(test_generate_token_id)
 {
-    std::string nonce_str("nonce");
-    Mcl::Point nonce = Mcl::Point::HashAndMap(std::vector<uint8_t> { nonce_str.begin(), nonce_str.end() });
-    return nonce;
-}
+    BlsctUint256 token;
+    blsct_uint64_to_blsct_uint256(100, token);
 
-static TokenId GenTokenId()
-{
-    TokenId token_id(uint256(123));
-    return token_id;
-}
+    BlsctTokenId blsct_token_id;
+    blsct_generate_token_id(token, blsct_token_id, 200);
 
-static MsgPair GenMsgPair(std::string s = "spaghetti meatballs")
-{
-    std::vector<unsigned char> message { s.begin(), s.end() };
-    return std::pair(s, message);
-}
-
-static void TokenIdToBlsctTokenId(
-    const TokenId& token_id,
-    BlsctTokenId& blsct_token_id
-) {
+    TokenId token_id;
     CDataStream st(SER_DISK, PROTOCOL_VERSION);
-    token_id.Serialize(st);
-    std::memcpy(blsct_token_id, st.data(), st.size());
+    st << blsct_token_id;
+    token_id.Unserialize(st);
+
+    BOOST_CHECK(token_id.token == uint256(100));
+    BOOST_CHECK(token_id.subid == 200);
 }
 
 BOOST_AUTO_TEST_CASE(test_prove_verify_range_proof)
 {
     BOOST_CHECK(blsct_init(MainNet));
 
-    auto nonce = GenNonce();
-    auto token_id = GenTokenId();
-    std::string message = "spaghetti meatballs";
+    uint8_t seed[1] = { 1 };
+    BlsctPoint blsct_nonce;
+    blsct_generate_nonce(seed, 1, &blsct_nonce);
+
+    BlsctUint256 token;
+    blsct_uint64_to_blsct_uint256(100, token);
+
+    BlsctTokenId blsct_token_id;
+    blsct_generate_token_id(token, blsct_token_id);
+
+    const char* blsct_message = "spaghetti meatballs";
 
     uint64_t uint64_vs[1];
     uint64_vs[0] = 1;
 
-    // convert blsct_nonce to nonce
-    BlsctPoint blsct_nonce;
-    {
-        auto ser = nonce.GetVch();
-        std::memcpy(blsct_nonce, &ser[0], POINT_SIZE);
-    }
-
-    // convert blsct_message to message
-    const uint8_t* blsct_message =
-        reinterpret_cast<const uint8_t*>(message.c_str());
-
-    // convert blsct_token_id to token_id
-    BlsctTokenId blsct_token_id;
-    TokenIdToBlsctTokenId(token_id, blsct_token_id);
-
-    // build BlsctRangeProof
     BlsctRangeProof blsct_range_proof;
     {
         auto res = blsct_build_range_proof(
@@ -117,26 +98,25 @@ BOOST_AUTO_TEST_CASE(test_prove_verify_range_proof)
             1,
             &blsct_nonce,
             blsct_message,
-            message.size(),
+            std::strlen(blsct_message),
             &blsct_token_id,
             &blsct_range_proof
         );
         BOOST_CHECK(res == BLSCT_SUCCESS);
     }
 
-    // build BlsctRangeProof array of size 1
     BlsctRangeProof blsct_range_proofs[1];
     std::memcpy(
         &blsct_range_proofs[0],
         blsct_range_proof,
         sizeof(blsct_range_proof)
     );
-
     {
         bool is_valid;
         uint8_t res = blsct_verify_range_proof(
             blsct_range_proofs, 1, &is_valid
         );
+        BOOST_CHECK(is_valid);
         BOOST_CHECK(res == BLSCT_SUCCESS);
     }
 }
@@ -180,21 +160,18 @@ BOOST_AUTO_TEST_CASE(test_generate_nonce)
 }
 
 static void build_range_proof_for_amount_recovery(
-    const std::vector<uint64_t> uint64_vs,
+    const std::vector<uint64_t>& uint64_vs,
     const BlsctPoint& blsct_nonce,
-    const std::string& msg,
-    const TokenId& token_id,
+    const char* msg,
+    const BlsctTokenId& blsct_token_id,
     BlsctRangeProof& blsct_range_proof
 ) {
-    BlsctTokenId blsct_token_id;
-    TokenIdToBlsctTokenId(token_id, blsct_token_id);
-
     auto res = blsct_build_range_proof(
         &uint64_vs[0],
         uint64_vs.size(),
         &blsct_nonce,
-        reinterpret_cast<const uint8_t*>(msg.c_str()),
-        msg.size(),
+        msg,
+        std::strlen(msg),
         &blsct_token_id,
         &blsct_range_proof
     );
@@ -206,42 +183,36 @@ BOOST_AUTO_TEST_CASE(test_amount_recovery)
     BOOST_CHECK(blsct_init(MainNet));
 
     BlsctAmountRecoveryRequest reqs[2];
-    std::vector<std::string> msgs = { "apple", "orange" };
+    const char* msgs[] = { "apple", "orange" };
     std::vector<uint64_t> amounts = { 123, 456 };
-    TokenId token_id(uint256(123));
-    Mcl::Point nonce(uint256(123));
 
-    {
-        std::vector<uint64_t> uint64_vs { amounts[0] };
-        std::memcpy(&reqs[0].nonce, &nonce.GetVch()[0], POINT_SIZE);
+    BlsctUint256 token;
+    BlsctTokenId blsct_token_id;
+    blsct_generate_token_id(token, blsct_token_id);
+
+    for(size_t i=0; i<2; ++i) {
+        std::vector<uint64_t> uint64_vs { amounts[i] };
+
+        uint8_t seed[] = { (uint8_t) i };
+        blsct_generate_nonce(seed, 1, &reqs[i].nonce);
+
         build_range_proof_for_amount_recovery(
             uint64_vs,
-            reqs[0].nonce,
-            msgs[0],
-            token_id,
-            reqs[0].range_proof
-        );
-    }
-    {
-        std::vector<uint64_t> uint64_vs { amounts[1] };
-        std::memcpy(&reqs[1].nonce, &nonce.GetVch()[0], POINT_SIZE);
-        build_range_proof_for_amount_recovery(
-            uint64_vs,
-            reqs[1].nonce,
-            msgs[1],
-            token_id,
-            reqs[1].range_proof
+            reqs[i].nonce,
+            msgs[i],
+            blsct_token_id,
+            reqs[i].range_proof
         );
     }
 
     auto res = blsct_recover_amount(reqs, 2);
     BOOST_CHECK(res == BLSCT_SUCCESS);
 
-    for(size_t i=0; i<msgs.size(); ++i) {
+    for(size_t i=0; i<2; ++i) {
         BOOST_CHECK(reqs[i].is_succ);
         BOOST_CHECK(reqs[i].amount == amounts[i]);
-        BOOST_CHECK(reqs[i].msg_size == msgs[i].size());
-        BOOST_CHECK(std::strcmp(reqs[i].msg, msgs[i].c_str()) == 0);
+        BOOST_CHECK(reqs[i].msg_size == std::strlen(msgs[i]));
+        BOOST_CHECK(std::strcmp(reqs[i].msg, msgs[i]) == 0);
     }
 }
 
