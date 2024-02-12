@@ -29,14 +29,11 @@ BOOST_AUTO_TEST_CASE(test_encode_decode_blsct_address)
     BOOST_CHECK(blsct_init(MainNet));
 
     // bech32_mod-encoded
-    std::string blsct_addr_str = "nv1jlca8fe3jltegf54vwxyl2dvplpk3rz0ja6tjpdpfcar79cm43vxc40g8luh5xh0lva0qzkmytrthftje04fqnt8g6yq3j8t2z552ryhy8dnpyfgqyj58ypdptp43f32u28htwu0r37y9su6332jn0c0fcvan8l53m";
+    const char* blsct_addr = "nv1jlca8fe3jltegf54vwxyl2dvplpk3rz0ja6tjpdpfcar79cm43vxc40g8luh5xh0lva0qzkmytrthftje04fqnt8g6yq3j8t2z552ryhy8dnpyfgqyj58ypdptp43f32u28htwu0r37y9su6332jn0c0fcvan8l53m";
 
     uint8_t ser_dpk[blsct::DoublePublicKey::SIZE];
     {
-        auto res = blsct_decode_address(
-            blsct_addr_str.c_str(),
-            ser_dpk
-        );
+        auto res = blsct_decode_address(blsct_addr, ser_dpk);
         BOOST_CHECK(res == BLSCT_SUCCESS);
     }
 
@@ -50,9 +47,9 @@ BOOST_AUTO_TEST_CASE(test_encode_decode_blsct_address)
         BOOST_CHECK(res == BLSCT_SUCCESS);
     }
 
-    std::string rec_addr_str((char*) rec_addr_buf, DOUBLE_PUBKEY_ENC_SIZE);
+    std::string rec_addr((char*) rec_addr_buf, DOUBLE_PUBKEY_ENC_SIZE);
 
-    BOOST_CHECK(blsct_addr_str == rec_addr_str);
+    BOOST_CHECK(std::strcmp(blsct_addr, rec_addr.c_str()) == 0);
 }
 
 BOOST_AUTO_TEST_CASE(test_generate_token_id)
@@ -76,7 +73,7 @@ BOOST_AUTO_TEST_CASE(test_prove_verify_range_proof)
 {
     BOOST_CHECK(blsct_init(MainNet));
 
-    uint8_t seed[1] = { 1 };
+    uint8_t seed[] = { 1 };
     BlsctPoint blsct_nonce;
     blsct_generate_nonce(seed, 1, &blsct_nonce);
 
@@ -88,8 +85,7 @@ BOOST_AUTO_TEST_CASE(test_prove_verify_range_proof)
 
     const char* blsct_message = "spaghetti meatballs";
 
-    uint64_t uint64_vs[1];
-    uint64_vs[0] = 1;
+    uint64_t uint64_vs[] = { 1 };
 
     BlsctRangeProof blsct_range_proof;
     {
@@ -184,7 +180,7 @@ BOOST_AUTO_TEST_CASE(test_amount_recovery)
 
     BlsctAmountRecoveryRequest reqs[2];
     const char* msgs[] = { "apple", "orange" };
-    std::vector<uint64_t> amounts = { 123, 456 };
+    uint64_t amounts[] = { 123, 456 };
 
     BlsctUint256 token;
     BlsctTokenId blsct_token_id;
