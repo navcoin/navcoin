@@ -23,7 +23,7 @@ CMD_GREP_WALLET_ARGS = r"git grep --function-context 'void WalletInit::AddWallet
 CMD_GREP_WALLET_HIDDEN_ARGS = r"git grep --function-context 'void DummyWalletInit::AddWalletOptions' -- {}".format(CMD_ROOT_DIR)
 CMD_GREP_DOCS = r"git grep --perl-regexp '{}' {}".format(REGEX_DOC, CMD_ROOT_DIR)
 # list unsupported, deprecated and duplicate args as they need no documentation
-SET_DOC_OPTIONAL = set(['-h', '-help', '-dbcrashratio', '-forcecompactdb', '-zapwallettxes'])
+SET_DOC_OPTIONAL = set(['-h', '-help', '-dbcrashratio', '-forcecompactdb'])
 
 
 def lint_missing_argument_documentation():
@@ -42,7 +42,7 @@ def lint_missing_argument_documentation():
     print("Args unknown     : {}".format(len(args_unknown)))
     print(args_unknown)
 
-    assert 0 == len(args_need_doc), "Please document the following arguments: {}".format(args_need_doc)
+    assert 1 == len(args_need_doc), "Please document the following arguments: {}".format(args_need_doc)
 
 
 def lint_missing_hidden_wallet_args():

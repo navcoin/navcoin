@@ -78,7 +78,7 @@ std::vector<MclG1Point> MclG1Point::operator*(const std::vector<MclG1Point::Scal
     MclG1Point p = *this;
     for (size_t i = 0; i < ss.size(); ++i) {
         MclG1Point q = p * ss[i];
-        ret.push_back(q);
+        ret.emplace_back(q);
     }
     return ret;
 }

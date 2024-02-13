@@ -970,7 +970,7 @@ class BitcoinTestFramework(metaclass=BitcoinTestMetaClass):
 
     def is_bitcoin_util_compiled(self):
         """Checks whether navcoin-util was compiled."""
-        return self.config["components"].getboolean("ENABLE_BITCOIN_UTIL")
+        return self.config["components"].getboolean("ENABLE_NAVCOIN_UTIL")
 
     def is_zmq_compiled(self):
         """Checks whether the zmq module was compiled."""

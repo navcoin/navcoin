@@ -348,7 +348,7 @@ bool RangeProofLogic<T>::Verify(
 
         // derive transcript from the proof
         auto proof_transcript = RangeProofWithTranscript<T>::Build(proof);
-        proof_transcripts.push_back(proof_transcript);
+        proof_transcripts.emplace_back(proof_transcript);
     }
 
     const size_t max_mn = 1ull << max_num_rounds;
@@ -427,7 +427,7 @@ AmountRecoveryResult<T> RangeProofLogic<T>::RecoverAmounts(
             req.nonce.GetHashWithSalt(100), // gamma for vs[0]
             msg_amt.msg);
 
-        xs.push_back(x);
+        xs.emplace_back(x);
     }
     return {
         true,

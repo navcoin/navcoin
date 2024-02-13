@@ -45,18 +45,18 @@ BOOST_FIXTURE_TEST_CASE(validation_test, TestingSetup)
         CCoinsViewCache coins_view_cache{&base, /*deterministic=*/true};
         coins_view_cache.SetBestBlock(InsecureRand256());
         coins_view_cache.AddCoin(outpoint, std::move(coin), true);
-        BOOST_ASSERT(coins_view_cache.Flush());
+        Assert(coins_view_cache.Flush());
     }
 
     CCoinsViewCache coins_view_cache{&base, /*deterministic=*/true};
-    BOOST_ASSERT(tx.AddInput(coins_view_cache, outpoint));
+    Assert(tx.AddInput(coins_view_cache, outpoint));
 
     tx.AddOutput(recvAddress, 900 * COIN, "test");
 
     auto finalTx = tx.BuildTx();
 
-    BOOST_ASSERT(finalTx.has_value());
-    BOOST_ASSERT(blsct::VerifyTx(CTransaction(finalTx.value()), coins_view_cache));
+    Assert(finalTx.has_value());
+    Assert(blsct::VerifyTx(CTransaction(finalTx.value()), coins_view_cache));
 }
 
 BOOST_FIXTURE_TEST_CASE(validation_reward_test, TestingSetup)
@@ -70,8 +70,8 @@ BOOST_FIXTURE_TEST_CASE(validation_reward_test, TestingSetup)
     tx.vout.push_back(out.out);
     tx.txSig = out.GetSignature();
 
-    BOOST_ASSERT(!blsct::VerifyTx(CTransaction(tx), coins_view_cache));
-    BOOST_ASSERT(blsct::VerifyTx(CTransaction(tx), coins_view_cache, 900 * COIN));
+    Assert(!blsct::VerifyTx(CTransaction(tx), coins_view_cache));
+    Assert(blsct::VerifyTx(CTransaction(tx), coins_view_cache, 900 * COIN));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

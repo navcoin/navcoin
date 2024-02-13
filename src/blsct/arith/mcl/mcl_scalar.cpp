@@ -366,7 +366,7 @@ std::vector<bool> MclScalar::ToBinaryVec() const
     auto bitStr = GetString(2);
     std::vector<bool> vec;
     for (auto& c : bitStr) {
-        vec.push_back(c == '0' ? 0 : 1);
+        vec.emplace_back(c == '0' ? 0 : 1);
     }
     return vec;
 }

@@ -26,7 +26,7 @@ std::vector<T> blsct::Common::TrimPreceedingZeros(
     bool should_take = false;
     for (auto x : vec) {
         if (!should_take && x) should_take = true;
-        if (should_take) trimmed_vec.push_back(x);
+        if (should_take) trimmed_vec.emplace_back(x);
     }
     return trimmed_vec;
 }
@@ -39,7 +39,7 @@ template <typename T>
 void blsct::Common::AddZeroIfEmpty(std::vector<T>& vec)
 {
     if (vec.size() == 0) {
-        vec.push_back(0);
+        vec.emplace_back(0);
     }
 }
 template

@@ -26,7 +26,7 @@ void TxFactory::AddOutput(const SubAddress& destination, const CAmount& nAmount,
     if (vOutputs.count(tokenId) <= 0)
         vOutputs[tokenId] = std::vector<UnsignedOutput>();
 
-    vOutputs[tokenId].push_back(out);
+    vOutputs[tokenId].emplace_back(out);
 }
 
 bool TxFactory::AddInput(const CCoinsViewCache& cache, const COutPoint& outpoint, const bool& rbf)
@@ -99,31 +99,31 @@ std::optional<CMutableTransaction> TxFactory::BuildTx()
 
         for (auto& in_ : vInputs) {
             for (auto& in : in_.second) {
-                tx.vin.push_back(in.in);
+                tx.vin.emplace_back(in.in);
                 gammaAcc = gammaAcc + in.gamma;
-                txSigs.push_back(in.sk.Sign(in.in.GetHash()));
+                txSigs.emplace_back(in.sk.Sign(in.in.GetHash()));
             }
         }
 
         for (auto& out_ : vOutputs) {
             for (auto& out : out_.second) {
-                tx.vout.push_back(out.out);
+                tx.vout.emplace_back(out.out);
                 gammaAcc = gammaAcc - out.gamma;
-                txSigs.push_back(PrivateKey(out.blindingKey).Sign(out.out.GetHash()));
+                txSigs.emplace_back(PrivateKey(out.blindingKey).Sign(out.out.GetHash()));
             }
         }
 
         for (auto& change : mapChange) {
             auto changeOutput = CreateOutput(std::get<blsct::DoublePublicKey>(km->GetNewDestination(-1).value()), change.second, "Change", change.first);
-            tx.vout.push_back(changeOutput.out);
+            tx.vout.emplace_back(changeOutput.out);
             gammaAcc = gammaAcc - changeOutput.gamma;
-            txSigs.push_back(PrivateKey(changeOutput.blindingKey).Sign(changeOutput.out.GetHash()));
+            txSigs.emplace_back(PrivateKey(changeOutput.blindingKey).Sign(changeOutput.out.GetHash()));
         }
 
         if (nFee == (long long)(BLSCT_DEFAULT_FEE * (tx.vin.size() + tx.vout.size()))) {
             CTxOut fee_out{nFee, CScript(OP_RETURN)};
-            tx.vout.push_back(fee_out);
-            txSigs.push_back(PrivateKey(gammaAcc).SignBalance());
+            tx.vout.emplace_back(fee_out);
+            txSigs.emplace_back(PrivateKey(gammaAcc).SignBalance());
             tx.txSig = Signature::Aggregate(txSigs);
             return tx;
         }

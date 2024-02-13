@@ -431,7 +431,7 @@ def main():
 
     logging.debug("Temporary test directory at %s" % tmpdir)
 
-    enable_navcoind = config["components"].getboolean("ENABLE_BITCOIND")
+    enable_navcoind = config["components"].getboolean("ENABLE_NAVCOIND")
 
     if not enable_navcoind:
         print("No functional tests to run.")

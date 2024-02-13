@@ -20,8 +20,8 @@ struct MclUtil {
         std::vector<MclScalar::Underlying> exps;
 
         for (auto point: points) {
-            bases.push_back(point.m_base.GetUnderlying());
-            exps.push_back(point.m_exp.GetUnderlying());
+            bases.emplace_back(point.m_base.GetUnderlying());
+            exps.emplace_back(point.m_exp.GetUnderlying());
         }
         MclG1Point::Underlying pv;
         mclBnG1_mulVec(&pv, bases.data(), exps.data(), points.size());

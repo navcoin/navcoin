@@ -36,8 +36,8 @@ Signature UnsignedOutput::GetSignature() const
 {
     std::vector<Signature> txSigs;
 
-    txSigs.push_back(blsct::PrivateKey(blindingKey).Sign(out.GetHash()));
-    txSigs.push_back(blsct::PrivateKey(gamma.Negate()).SignBalance());
+    txSigs.emplace_back(blsct::PrivateKey(blindingKey).Sign(out.GetHash()));
+    txSigs.emplace_back(blsct::PrivateKey(gamma.Negate()).SignBalance());
 
     return Signature::Aggregate(txSigs);
 }
@@ -94,20 +94,20 @@ CTransactionRef AggregateTransactions(const std::vector<CTransactionRef>& txs)
     CAmount nFee = 0;
 
     for (auto& tx : txs) {
-        vSigs.push_back(tx->txSig);
+        vSigs.emplace_back(tx->txSig);
         for (auto& in : tx->vin) {
-            ret.vin.push_back(in);
+            ret.vin.emplace_back(in);
         }
         for (auto& out : tx->vout) {
             if (out.scriptPubKey.IsFee()) {
                 nFee += out.nValue;
                 continue;
             }
-            ret.vout.push_back(out);
+            ret.vout.emplace_back(out);
         }
     }
 
-    ret.vout.push_back(CTxOut{nFee, CScript{OP_RETURN}});
+    ret.vout.emplace_back(CTxOut{nFee, CScript{OP_RETURN}});
 
     ret.txSig = blsct::Signature::Aggregate(vSigs);
     ret.nVersion = CTransaction::BLSCT_MARKER;

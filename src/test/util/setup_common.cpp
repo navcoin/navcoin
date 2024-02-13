@@ -11,7 +11,7 @@
 #include <blsct/wallet/txfactory_global.h>
 #include <chainparams.h>
 #include <common/url.h>
-#include <config/bitcoin-config.h>
+#include <config/navcoin-config.h>
 #include <consensus/consensus.h>
 #include <consensus/params.h>
 #include <consensus/validation.h>

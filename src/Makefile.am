@@ -41,10 +41,10 @@ LIBBLS=bls/lib/libbls384_256.a
 if ENABLE_ZMQ
 LIBBITCOIN_ZMQ=libbitcoin_zmq.a
 endif
-if BUILD_BITCOIN_LIBS
-LIBBITCOINCONSENSUS=libbitcoinconsensus.la
+if BUILD_NAVCOIN_LIBS
+LIBNAVCOINCONSENSUS=libbitcoinconsensus.la
 endif
-if BUILD_BITCOIN_KERNEL_LIB
+if BUILD_NAVCOIN_KERNEL_LIB
 LIBBITCOINKERNEL=libbitcoinkernel.la
 endif
 if ENABLE_WALLET
@@ -116,33 +116,33 @@ EXTRA_LIBRARIES += \
   $(LIBBITCOIN_WALLET_TOOL) \
   $(LIBBITCOIN_ZMQ)
 
-if BUILD_BITCOIND
+if BUILD_NAVCOIND
   bin_PROGRAMS += navcoind
 endif
 
-if BUILD_BITCOIN_NODE
+if BUILD_NAVCOIN_NODE
   bin_PROGRAMS += navcoin-node
 endif
 
-if BUILD_BITCOIN_CLI
+if BUILD_NAVCOIN_CLI
   bin_PROGRAMS += navcoin-cli
 endif
 
-if BUILD_BITCOIN_TX
+if BUILD_NAVCOIN_TX
   bin_PROGRAMS += navcoin-tx
 endif
 
 if ENABLE_WALLET
-if BUILD_BITCOIN_WALLET
+if BUILD_NAVCOIN_WALLET
   bin_PROGRAMS += navcoin-wallet
 endif
 endif
 
-if BUILD_BITCOIN_UTIL
+if BUILD_NAVCOIN_UTIL
   bin_PROGRAMS += navcoin-util
 endif
 
-if BUILD_BITCOIN_CHAINSTATE
+if BUILD_NAVCOIN_CHAINSTATE
   bin_PROGRAMS += navcoin-chainstate
 endif
 
@@ -1111,12 +1111,12 @@ navcoin_chainstate_LDADD += $(LIBSECP256K1) $(LIBBLS) $(LIBMCL)
 #
 
 # bitcoinkernel library #
-if BUILD_BITCOIN_KERNEL_LIB
+if BUILD_NAVCOIN_KERNEL_LIB
 lib_LTLIBRARIES += $(LIBBITCOINKERNEL)
 
 libbitcoinkernel_la_LDFLAGS = $(AM_LDFLAGS) -no-undefined $(RELDFLAGS) $(PTHREAD_FLAGS)
 libbitcoinkernel_la_LIBADD = $(LIBBITCOIN_CRYPTO) $(LIBUNIVALUE) $(LIBLEVELDB) $(LIBMEMENV) $(LIBSECP256K1) $(LIBBLS) $(LIBMCL)
-libbitcoinkernel_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(builddir)/obj -I$(srcdir)/secp256k1/include $(BLS_INCLUDES) -DBUILD_BITCOIN_INTERNAL $(BOOST_CPPFLAGS) $(LEVELDB_CPPFLAGS) -I$(srcdir)/$(UNIVALUE_INCLUDE_DIR_INT)
+libbitcoinkernel_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(builddir)/obj -I$(srcdir)/secp256k1/include $(BLS_INCLUDES) -DBUILD_NAVCOIN_INTERNAL $(BOOST_CPPFLAGS) $(LEVELDB_CPPFLAGS) -I$(srcdir)/$(UNIVALUE_INCLUDE_DIR_INT)
 
 # libbitcoinkernel requires default symbol visibility, explicitly specify that
 # here so that things still work even when user configures with
@@ -1256,12 +1256,12 @@ libbitcoinkernel_la_SOURCES = \
 # Required for obj/build.h to be generated first.
 # More details: https://www.gnu.org/software/automake/manual/html_node/Built-Sources-Example.html
 libbitcoinkernel_la-clientversion.l$(OBJEXT): obj/build.h
-endif # BUILD_BITCOIN_KERNEL_LIB
+endif # BUILD_NAVCOIN_KERNEL_LIB
 #
 
 # bitcoinconsensus library #
-if BUILD_BITCOIN_LIBS
-lib_LTLIBRARIES += $(LIBBITCOINCONSENSUS)
+if BUILD_NAVCOIN_LIBS
+lib_LTLIBRARIES += $(LIBNAVCOINCONSENSUS)
 
 include_HEADERS = script/bitcoinconsensus.h
 libbitcoinconsensus_la_SOURCES = support/cleanse.cpp $(crypto_libbitcoin_crypto_base_la_SOURCES) $(libbitcoin_consensus_a_SOURCES)
@@ -1271,7 +1271,7 @@ libbitcoinconsensus_la_LIBADD = \
   $(LIBBLS) \
   $(LIBMCL) \
   $(LIBSECP256K1)
-libbitcoinconsensus_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(builddir)/obj -I$(srcdir)/secp256k1/include $(BLS_INCLUDES) -DBUILD_BITCOIN_INTERNAL
+libbitcoinconsensus_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(builddir)/obj -I$(srcdir)/secp256k1/include $(BLS_INCLUDES) -DBUILD_NAVCOIN_INTERNAL
 libbitcoinconsensus_la_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 
 endif
@@ -1351,12 +1351,12 @@ CLEANFILES += $(LIBBLSCT_A) blsct/include/libblsct_a-blsct.o
 endif
 #
 
-config/bitcoin-config.h: config/stamp-h1
+config/navcoin-config.h: config/stamp-h1
 	@$(MAKE) -C $(top_builddir) $(subdir)/$(@)
-config/stamp-h1: $(top_srcdir)/$(subdir)/config/bitcoin-config.h.in $(top_builddir)/config.status
+config/stamp-h1: $(top_srcdir)/$(subdir)/config/navcoin-config.h.in $(top_builddir)/config.status
 	$(AM_V_at)$(MAKE) -C $(top_builddir) $(subdir)/$(@)
-$(top_srcdir)/$(subdir)/config/bitcoin-config.h.in:  $(am__configure_deps)
-	$(AM_V_at)$(MAKE) -C $(top_srcdir) $(subdir)/config/bitcoin-config.h.in
+$(top_srcdir)/$(subdir)/config/navcoin-config.h.in:  $(am__configure_deps)
+	$(AM_V_at)$(MAKE) -C $(top_srcdir) $(subdir)/config/navcoin-config.h.in
 
 clean-local:
 	-$(MAKE) -C secp256k1 clean

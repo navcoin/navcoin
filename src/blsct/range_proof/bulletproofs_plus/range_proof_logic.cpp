@@ -507,7 +507,7 @@ bool RangeProofLogic<T>::Verify(
 
         // derive transcript from the proof
         auto proof_transcript = RangeProofWithTranscript<T>::Build(proof);
-        proof_transcripts.push_back(proof_transcript);
+        proof_transcripts.emplace_back(proof_transcript);
     }
 
     const size_t max_mn = 1ull << max_num_rounds;
@@ -601,7 +601,7 @@ AmountRecoveryResult<T> RangeProofLogic<T>::RecoverAmounts(
             req.nonce.GetHashWithSalt(100), // gamma for vs[0]
             msg_amt.msg
         );
-        xs.push_back(x);
+        xs.emplace_back(x);
 
         Scalar msg2_scalar = ((req.tau_x - (tau2 * req.y.Square()) - (req.z.Square() * gamma_vs0)) * req.y.Invert()) - tau1;
         std::vector<uint8_t> msg2 = msg2_scalar.GetVch(true);

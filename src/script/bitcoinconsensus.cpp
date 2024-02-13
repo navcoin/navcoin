@@ -119,5 +119,5 @@ int bitcoinconsensus_verify_script(const unsigned char *scriptPubKey, unsigned i
 unsigned int bitcoinconsensus_version()
 {
     // Just use the API version for now
-    return BITCOINCONSENSUS_API_VER;
+    return NAVCOINCONSENSUS_API_VER;
 }

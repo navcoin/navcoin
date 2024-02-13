@@ -12,14 +12,14 @@ LazyPoints<T>::LazyPoints(const Elements<typename T::Point>& bases, const Elemen
         throw std::runtime_error("sizes of bases and exps don't match");
     }
     for (size_t i=0; i<bases.Size(); ++i) {
-        m_points.push_back(LazyPoint<T>(bases[i], exps[i]));
+        m_points.emplace_back(LazyPoint<T>(bases[i], exps[i]));
     }
 }
 template LazyPoints<Mcl>::LazyPoints(const Elements<Mcl::Point>& bases, const Elements<Mcl::Scalar>& exps);
 
 template <typename T>
 void LazyPoints<T>::Add(const LazyPoint<T>& point) {
-    m_points.push_back(point);
+    m_points.emplace_back(point);
 }
 template void LazyPoints<Mcl>::Add(const LazyPoint<Mcl>& point);
 

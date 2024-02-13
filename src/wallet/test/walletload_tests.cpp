@@ -178,7 +178,7 @@ BOOST_FIXTURE_TEST_CASE(wallet_load_verif_crypted_key_checksum, TestingSetup)
         std::unique_ptr<WalletDatabase> db = get_db(dbs);
         {
             CPubKey invalid_key;
-            BOOST_ASSERT(!invalid_key.IsValid());
+            Assert(!invalid_key.IsValid());
             const auto key = std::make_pair(DBKeys::CRYPTED_KEY, invalid_key);
             std::pair<std::vector<unsigned char>, uint256> value;
             BOOST_CHECK(db->MakeBatch(false)->Write(key, value, /*fOverwrite=*/true));
@@ -305,7 +305,7 @@ BOOST_FIXTURE_TEST_CASE(wallet_load_verif_crypted_blsct, TestingSetup)
         std::unique_ptr<WalletDatabase> db = get_db(dbs);
         {
             CPubKey invalid_key;
-            BOOST_ASSERT(!invalid_key.IsValid());
+            Assert(!invalid_key.IsValid());
             const auto key = std::make_pair(DBKeys::CRYPTED_KEY, invalid_key);
             std::pair<std::vector<unsigned char>, uint256> value;
             BOOST_CHECK(db->MakeBatch(false)->Write(key, value, /*fOverwrite=*/true));

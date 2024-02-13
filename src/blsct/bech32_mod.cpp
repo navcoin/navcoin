@@ -128,18 +128,18 @@ bool CheckCharacters(const std::string& str, std::vector<int>& errors)
         unsigned char c{(unsigned char)(str[i])};
         if (c >= 'a' && c <= 'z') {
             if (upper) {
-                errors.push_back(i);
+                errors.emplace_back(i);
             } else {
                 lower = true;
             }
         } else if (c >= 'A' && c <= 'Z') {
             if (lower) {
-                errors.push_back(i);
+                errors.emplace_back(i);
             } else {
                 upper = true;
             }
         } else if (c < 33 || c > 126) {
-            errors.push_back(i);
+            errors.emplace_back(i);
         }
     }
     return errors.empty();

@@ -8,8 +8,8 @@
 
 #include <stdint.h>
 
-#if defined(BUILD_BITCOIN_INTERNAL) && defined(HAVE_CONFIG_H)
-#include <config/bitcoin-config.h>
+#if defined(BUILD_NAVCOIN_INTERNAL) && defined(HAVE_CONFIG_H)
+#include <config/navcoin-config.h>
   #if defined(_WIN32)
     #if defined(HAVE_DLLEXPORT_ATTRIBUTE)
       #define EXPORT_SYMBOL __declspec(dllexport)
@@ -19,7 +19,7 @@
   #elif defined(HAVE_DEFAULT_VISIBILITY_ATTRIBUTE)
     #define EXPORT_SYMBOL __attribute__ ((visibility ("default")))
   #endif
-#elif defined(MSC_VER) && !defined(STATIC_LIBBITCOINCONSENSUS)
+#elif defined(MSC_VER) && !defined(STATIC_LIBNAVCOINCONSENSUS)
   #define EXPORT_SYMBOL __declspec(dllimport)
 #endif
 
@@ -31,7 +31,7 @@
 extern "C" {
 #endif
 
-#define BITCOINCONSENSUS_API_VER 1
+#define NAVCOINCONSENSUS_API_VER 1
 
 typedef enum bitcoinconsensus_error_t
 {

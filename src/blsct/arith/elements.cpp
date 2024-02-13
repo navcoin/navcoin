@@ -114,7 +114,7 @@ template size_t Elements<MclG1Point>::Size() const;
 template <typename T>
 void Elements<T>::Add(const T& x)
 {
-    m_vec.push_back(x);
+    m_vec.emplace_back(x);
 }
 template void Elements<MclScalar>::Add(const MclScalar&);
 template void Elements<MclG1Point>::Add(const MclG1Point&);
@@ -144,7 +144,7 @@ Elements<T> Elements<T>::FirstNPow(const T& k, const size_t& n, const size_t& fr
     T x(1);
     for (size_t i = 0; i < n + from_index; ++i) {
         if (i >= from_index) {
-            ret.m_vec.push_back(x);
+            ret.m_vec.emplace_back(x);
         }
         x = x * k;
     }
@@ -157,7 +157,7 @@ Elements<T> Elements<T>::RepeatN(const T& k, const size_t& n)
 {
     Elements<T> ret;
     for (size_t i = 0; i < n; ++i) {
-        ret.m_vec.push_back(k);
+        ret.m_vec.emplace_back(k);
     }
     return ret;
 }
@@ -170,7 +170,7 @@ Elements<T> Elements<T>::RandVec(const size_t& n, const bool exclude_zero)
     Elements<T> ret;
     for (size_t i = 0; i < n; ++i) {
         auto x = T::Rand(exclude_zero);
-        ret.m_vec.push_back(x);
+        ret.m_vec.emplace_back(x);
     }
     return ret;
 }
@@ -184,7 +184,7 @@ Elements<T> Elements<T>::operator*(const Elements<Scalar>& rhs) const
 
     Elements<T> ret;
     for (size_t i = 0; i < m_vec.size(); ++i) {
-        ret.m_vec.push_back(m_vec[i] * rhs[i]);
+        ret.m_vec.emplace_back(m_vec[i] * rhs[i]);
     }
     return ret;
 }
@@ -197,7 +197,7 @@ Elements<T> Elements<T>::operator*(const Scalar& rhs) const
 {
     Elements<T> ret;
     for (size_t i = 0; i < m_vec.size(); ++i) {
-        ret.m_vec.push_back(m_vec[i] * rhs);
+        ret.m_vec.emplace_back(m_vec[i] * rhs);
     }
     return ret;
 }
@@ -211,7 +211,7 @@ Elements<T> Elements<T>::operator+(const Elements<T>& rhs) const
 
     Elements<T> ret;
     for (size_t i = 0; i < m_vec.size(); ++i) {
-        ret.m_vec.push_back(m_vec[i] + rhs.m_vec[i]);
+        ret.m_vec.emplace_back(m_vec[i] + rhs.m_vec[i]);
     }
     return ret;
 }
@@ -225,7 +225,7 @@ Elements<T> Elements<T>::operator-(const Elements<T>& rhs) const
 
     Elements<T> ret;
     for (size_t i = 0; i < m_vec.size(); ++i) {
-        ret.m_vec.push_back(m_vec[i] - rhs.m_vec[i]);
+        ret.m_vec.emplace_back(m_vec[i] - rhs.m_vec[i]);
     }
     return ret;
 }
@@ -238,7 +238,7 @@ void Elements<T>::operator=(const Elements<T>& rhs)
     m_vec.clear();
     for (size_t i = 0; i < rhs.m_vec.size(); ++i) {
         auto copy = T(rhs.m_vec[i]);
-        m_vec.push_back(copy);
+        m_vec.emplace_back(copy);
     }
 }
 template void Elements<MclScalar>::operator=(const Elements<MclScalar>&);
@@ -276,7 +276,7 @@ Elements<T> Elements<T>::From(const size_t from_index) const
 
     Elements<T> ret;
     for (size_t i = from_index; i < m_vec.size(); ++i) {
-        ret.m_vec.push_back(m_vec[i]);
+        ret.m_vec.emplace_back(m_vec[i]);
     }
     return ret;
 }
@@ -292,7 +292,7 @@ Elements<T> Elements<T>::To(const size_t to_index) const
 
     Elements<T> ret;
     for (size_t i = 0; i < to_index; ++i) {
-        ret.m_vec.push_back(m_vec[i]);
+        ret.m_vec.emplace_back(m_vec[i]);
     }
     return ret;
 }

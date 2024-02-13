@@ -515,7 +515,7 @@ bool ProduceSignature(const SigningProvider& provider, const BaseSignatureCreato
             const auto ms = miniscript::FromScript(witnessscript, ms_satisfier);
             solved = ms && ms->Satisfy(ms_satisfier, result) == miniscript::Availability::YES;
         }
-        result.push_back(std::vector<unsigned char>(witnessscript.begin(), witnessscript.end()));
+        result.emplace_back(std::vector<unsigned char>(witnessscript.begin(), witnessscript.end()));
 
         sigdata.scriptWitness.stack = result;
         sigdata.witness = true;
@@ -532,7 +532,7 @@ bool ProduceSignature(const SigningProvider& provider, const BaseSignatureCreato
 
     if (!sigdata.witness) sigdata.scriptWitness.stack.clear();
     if (P2SH) {
-        result.push_back(std::vector<unsigned char>(subscript.begin(), subscript.end()));
+        result.emplace_back(std::vector<unsigned char>(subscript.begin(), subscript.end()));
     }
     sigdata.scriptSig = PushAll(result);
 

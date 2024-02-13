@@ -288,12 +288,12 @@ void TestSatisfy(const std::string& testcase, const NodeRef& node) {
             const CScript script_pubkey = CScript() << OP_0 << WitnessV0ScriptHash(script);
             CScriptWitness witness_mal;
             const bool mal_success = node->Satisfy(satisfier, witness_mal.stack, false) == miniscript::Availability::YES;
-            witness_mal.stack.push_back(std::vector<unsigned char>(script.begin(), script.end()));
+            witness_mal.stack.emplace_back(std::vector<unsigned char>(script.begin(), script.end()));
 
             // Run non-malleable satisfaction algorithm.
             CScriptWitness witness_nonmal;
             const bool nonmal_success = node->Satisfy(satisfier, witness_nonmal.stack, true) == miniscript::Availability::YES;
-            witness_nonmal.stack.push_back(std::vector<unsigned char>(script.begin(), script.end()));
+            witness_nonmal.stack.emplace_back(std::vector<unsigned char>(script.begin(), script.end()));
 
             if (nonmal_success) {
                 // Non-malleable satisfactions are bounded by GetStackSize().

@@ -79,9 +79,9 @@ bool PublicKeys::VerifyBatch(const std::vector<PublicKey::Message>& msgs, const 
     auto msg = msgs.begin();
     for (auto pk = m_pks.begin(), end = m_pks.end(); pk != end; ++pk, ++msg) {
         if (*msg == blsct::Common::BLSCTBALANCE && fVerifyTx) {
-            aug_msgs.push_back(*msg);
+            aug_msgs.emplace_back(*msg);
         } else {
-            aug_msgs.push_back(pk->AugmentMessage(*msg));
+            aug_msgs.emplace_back(pk->AugmentMessage(*msg));
         }
     }
     return CoreAggregateVerify(aug_msgs, sig);
