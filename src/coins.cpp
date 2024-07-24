@@ -3,6 +3,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <coins.h>
+#include <util/strencodings.h>
 
 #include <consensus/consensus.h>
 #include <logging.h>
@@ -112,6 +113,7 @@ void CCoinsViewCache::AddCoin(const COutPoint& outpoint, Coin&& coin, bool possi
            (bool)it->second.coin.IsCoinBase());
     if (it->second.coin.out.IsStakedCommitment()) {
         GetStakedCommitments();
+        LogPrint(BCLog::POPS, "%s: Added staked commmitment %s at height %d\n", __func__, HexStr(it->second.coin.out.blsctData.rangeProof.Vs[0].GetVch()), it->second.coin.nHeight);
         cacheStakedCommitments.Add(it->second.coin.out.blsctData.rangeProof.Vs[0]);
     }
 }
@@ -152,6 +154,7 @@ bool CCoinsViewCache::SpendCoin(const COutPoint& outpoint, Coin* moveout)
         *moveout = std::move(it->second.coin);
     }
     if (it->second.coin.out.IsStakedCommitment()) {
+        LogPrint(BCLog::POPS, "%s: Removed staked commmitment %s from height %d\n", __func__, HexStr(it->second.coin.out.blsctData.rangeProof.Vs[0].GetVch()), it->second.coin.nHeight);
         cacheStakedCommitments.Remove(it->second.coin.out.blsctData.rangeProof.Vs[0]);
     }
     if (it->second.flags & CCoinsCacheEntry::FRESH) {
