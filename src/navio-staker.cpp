@@ -628,7 +628,7 @@ bool TestSetup()
                         }
                     }
 
-                    LogPrintf("%s: [%s] Rewards address: %s\n", __func__, walletName, coinbase_dest);
+                    LogPrintf("%s: [%s] Rewards address: (%s)\n", __func__, walletName, coinbase_dest);
 
                     return true;
                 } else {
@@ -640,11 +640,11 @@ bool TestSetup()
                 return false;
             }
         } else {
-            LogPrintf("%s: [%s] Could not connect to RPC node: %s\n", __func__, walletName, error.getValStr());
+            LogPrintf("%s: [%s] Could not connect to RPC node: (%s)\n", __func__, walletName, error.getValStr());
             return false;
         }
     } catch (const std::exception& e) {
-        LogPrintf("%s: [%s] error: %s\n", __func__, walletName, e.what());
+        LogPrintf("%s: [%s] error: (%s)\n", __func__, walletName, e.what());
         return false;
     }
 
@@ -786,7 +786,15 @@ void Loop()
     LogPrintf("%s: [%s] Starting staking...\n", __func__, walletName);
 
     while (true) {
-        auto staked_commitments = GetStakedCommitments(rh);
+        std::vector<StakedCommitment> staked_commitments;
+        try {
+            staked_commitments = GetStakedCommitments(rh);
+        } catch (const std::exception& e) {
+            LogPrintf("%s: [%s] Could not load stake commitments, reloading wallet...\n", __func__, walletName);
+            ConnectAndCallRPC(rh.get(), "loadwallet", /* args=*/{walletName});
+            staked_commitments = GetStakedCommitments(rh);
+        }
+
         CBlock proposal;
         CAmount nTotalMoney = 0;
         bool found = false;
@@ -860,11 +868,9 @@ MAIN_FUNCTION
         return EXIT_FAILURE;
     }
 
-    int ret = EXIT_FAILURE;
-
     Setup();
     if (!TestSetup())
-        return ret;
+        return EXIT_FAILURE;
 
     Loop();
 
