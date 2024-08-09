@@ -68,15 +68,8 @@ enum CreateTransactionType {
 CTransactionRef
 AggregateTransactions(const std::vector<CTransactionRef>& txs);
 UnsignedOutput CreateOutput(const blsct::DoublePublicKey& destination, const CAmount& nAmount, std::string sMemo, const TokenId& tokenId = TokenId(), const Scalar& blindingKey = Scalar::Rand(), const CreateTransactionType& type = NORMAL, const CAmount& minStake = 0);
-int32_t GetTransactionWeight(const CTransaction& tx)
-{
-    return ::GetSerializeSize(TX_WITH_WITNESS(tx));
-}
-
-int32_t GetTransactioOutputWeight(const CTxOut& out)
-{
-    return ::GetSerializeSize(out);
-}
+int32_t GetTransactionWeight(const CTransaction& tx);
+int32_t GetTransactioOutputWeight(const CTxOut& out);
 } // namespace blsct
 
 #endif // TXFACTORY_GLOBAL_H
