@@ -206,7 +206,7 @@ class CreateSumTooLarge(BadTxTemplate):
 
 
 class InvalidOPIFConstruction(BadTxTemplate):
-    reject_reason = "mandatory-script-verify-flag-failed (Invalid OP_IF construction)"
+    reject_reason = "mempool-script-verify-flag-failed (Invalid OP_IF construction)"
     expect_disconnect = False
     valid_in_block = True
 
