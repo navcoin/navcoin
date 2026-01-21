@@ -2894,8 +2894,15 @@ DBErrors CWallet::ZapSelectTx(std::vector<uint256>& vHashIn, std::vector<uint256
     for (const uint256& hash : vHashOut) {
         const auto& it = mapWallet.find(hash);
         wtxOrdered.erase(it->second.m_it_wtxOrdered);
-        for (const auto& txin : it->second.tx->vin)
-            mapTxSpends.erase(txin.prevout);
+        for (const auto& txin : it->second.tx->vin) {
+            auto range = mapTxSpends.equal_range(txin.prevout);
+            for (auto iter = range.first; iter != range.second; ++iter) {
+                if (iter->second == hash) {
+                    mapTxSpends.erase(iter);
+                    break;
+                }
+            }
+        }
         mapWallet.erase(it);
         NotifyTransactionChanged(hash, CT_DELETED);
     }
