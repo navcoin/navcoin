@@ -2723,6 +2723,22 @@ RPCHelpMan consolidate()
 
                     const CTransactionRef own = MakeTransactionRef(res->tx);
                     if (!candidates.empty()) {
+                        // Type-refine the cover against the built half, same
+                        // policy as the send paths: consolidation is the most
+                        // reward-heavy tx a wallet builds (the motivating case
+                        // of the type-aware pick), and a type-blind cover
+                        // partitions cleanly away from it. Keep the
+                        // pre-refinement set when the refined weight would
+                        // move the fee (the half is already built for extra).
+                        auto refined = blsct::RefineCoverSelection(*pwallet, res->tx, *pool, candidates);
+                        if (!refined.empty()) {
+                            const CAmount refined_extra = aggregation::RequiredCandidateFee(refined, fee_rate);
+                            if (refined_extra == extra) {
+                                candidates = std::move(refined);
+                            } else {
+                                LogPrint(BCLog::NET, "p2pmsg: consolidation cover refinement skipped (refined set moves the required fee %d -> %d)\n", extra, refined_extra);
+                            }
+                        }
                         std::vector<CTransactionRef> halves;
                         halves.reserve(candidates.size() + 1);
                         halves.push_back(own);

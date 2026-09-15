@@ -45,8 +45,9 @@ public:
     // smallest spendable outputs into a single output paid to `destination`
     // (fee taken from the consolidated amount). Returns std::nullopt when there
     // are fewer than two small outputs to merge, or when the merged amount
-    // cannot fund the fee. Used by the `consolidate` RPC and the staker's
-    // optional auto-consolidation. `additionalFee` over-funds the fee output
+    // cannot fund the fee. Its only caller is the `consolidate` RPC
+    // (navio-staker's -autoconsolidate invokes that RPC over the wallet's
+    // RPC interface, not this function directly). `additionalFee` over-funds the fee output
     // (also out of the merged amount) so an aggregation initiator can cover
     // the combined weight of its half + fee-0 cover candidates.
     // `excludedInputs` are skipped during selection: the aggregated path
