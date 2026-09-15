@@ -239,7 +239,8 @@ static RPCHelpMan listorders()
         "receive times maps this node's uptime since its last restart, and\n"
         "effective_expiry reveals the receive time whenever the 14-day cap binds.\n"
         "Strip both before republishing this output on a public endpoint.\n"
-        "Orders are sorted by effective expiry ascending.\n",
+        "Orders are sorted by declared order_expiry ascending (quote_id tie-break) --\n"
+        "a wire-public key, so the array order itself reveals nothing node-local.\n",
         {
             {"verbose", RPCArg::Type::BOOL, RPCArg::Default{false}, "Also list the cached orders"},
         },
@@ -247,7 +248,7 @@ static RPCHelpMan listorders()
             {RPCResult::Type::BOOL, "enabled", "Whether the cache exists"},
             {RPCResult::Type::NUM, "count", /*optional=*/true, "Cached standing orders (raw cache size; may include expired entries awaiting prune)"},
             {RPCResult::Type::NUM, "bytes", /*optional=*/true, "Approximate cache footprint"},
-            {RPCResult::Type::ARR, "orders", /*optional=*/true, "Live cached orders (verbose only), sorted by effective_expiry ascending", {{RPCResult::Type::OBJ, "", "", {
+            {RPCResult::Type::ARR, "orders", /*optional=*/true, "Live cached orders (verbose only), sorted by declared order_expiry ascending (quote_id tie-break)", {{RPCResult::Type::OBJ, "", "", {
                 {RPCResult::Type::STR_HEX, "quote_id", "Standing-order identifier"},
                 {RPCResult::Type::STR, "buy", "Token the maker delivers to the taker (token id; all-zero hex is NAV)"},
                 {RPCResult::Type::STR, "sell", "Token the maker charges the taker (token id; all-zero hex is NAV)"},

@@ -162,8 +162,13 @@ std::vector<OrderCache::OrderView> OrderCache::Snapshot(int64_t now) const
             out.push_back(OrderView{e.quote, e.received, e.effective_expiry});
         }
     }
+    // Sort by WIRE-PUBLIC keys only. Sorting on effective_expiry would embed
+    // this node's receive times in the array ORDER (the key is received + 14d
+    // whenever the TTL cap binds), so even an operator who strips the
+    // node-local fields before republishing would leak receive order, bounds
+    // on each capped order's receive time, and hence node uptime.
     std::sort(out.begin(), out.end(), [](const OrderView& a, const OrderView& b) {
-        if (a.effective_expiry != b.effective_expiry) return a.effective_expiry < b.effective_expiry;
+        if (a.quote.order_expiry != b.quote.order_expiry) return a.quote.order_expiry < b.quote.order_expiry;
         return a.quote.quote_id < b.quote.quote_id;
     });
     return out;

@@ -103,6 +103,11 @@ class RfqMakerMatchTest(BitcoinTestFramework):
         assert_equal(o["price"], Decimal("0.1"))
         assert_equal(o["order_expiry"], 1893456000)
         assert o["received"] <= o["effective_expiry"] <= 1893456000
+        # The 14-day cap binds for this order (expiry is far out), so the two
+        # node-local fields are rigidly related; emitting either one wrong
+        # (e.g. effective_expiry = order_expiry, or received = effective_expiry)
+        # breaks this equality.
+        assert_equal(o["effective_expiry"], o["received"] + 14 * 86400)
         assert_equal(o["half_txid"], order_half.rehash())
         assert_equal(o["inputs"], ["%064x" % 2])
         assert_equal(len(o["maker_pubkey"]), 96)

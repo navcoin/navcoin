@@ -265,7 +265,8 @@ Maker / debug surface (hidden or `p2pmsg` category):
   restart) and `effective_expiry` (`min(order_expiry, received + 14d)`,
   which leaks `received` whenever the cap binds). Fine over a private
   RPC connection; strip those two fields before republishing the output
-  on a public endpoint. Sorted by effective expiry ascending
+  on a public endpoint; the array is sorted by the wire-public declared
+  `order_expiry` (quote_id tie-break), so its order reveals nothing node-local
 - `getp2pmsginfo` — inbox pubkey + PING counter
 - `sendp2pping inbox_pubkey [stem]` — debug echo
 
