@@ -69,11 +69,19 @@ def main():
     files = get_files(files_cmd)
     reg = re.compile(r'src/[bls,leveldb,secp256k1,minisketch]')
 
+    # Vendored upstream scripts (byte-identical to upstream modulo a provenance
+    # header after the shebang; see each file. Lint findings belong upstream).
+    VENDORED = frozenset({
+        'contrib/guix/guix-install.sh',
+    })
+
     def should_exclude(fname: str) -> bool:
-        return bool(reg.match(fname))
+        return bool(reg.match(fname)) or fname in VENDORED
 
     # remove everything that doesn't match this regex
     files[:] = [file for file in files if not should_exclude(file)]
+    sourced_files[:] = [file for file in sourced_files if not should_exclude(file)]
+    guix_files[:] = [file for file in guix_files if not should_exclude(file)]
 
     # build the `shellcheck` command
     shellcheck_cmd = [
