@@ -69,8 +69,8 @@ def main():
     files = get_files(files_cmd)
     reg = re.compile(r'src/[bls,leveldb,secp256k1,minisketch]')
 
-    # Vendored upstream scripts, kept byte-identical to their source for
-    # auditability -- lint findings belong upstream, not here.
+    # Vendored upstream scripts (byte-identical to upstream modulo a provenance
+    # header after the shebang; see each file. Lint findings belong upstream).
     VENDORED = frozenset({
         'contrib/guix/guix-install.sh',
     })

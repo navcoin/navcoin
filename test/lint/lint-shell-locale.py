@@ -43,7 +43,7 @@ def main():
     for file_path in shell_files:
         if re.search('src/(bls|secp256k1|minisketch)/', file_path):
             continue
-        # vendored upstream installer, kept byte-identical
+        # vendored upstream installer (byte-identical modulo its provenance header)
         if file_path == 'contrib/guix/guix-install.sh':
             continue
 

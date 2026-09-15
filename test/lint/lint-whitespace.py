@@ -18,7 +18,7 @@ from subprocess import check_output
 
 EXCLUDED_DIRS = ["depends/patches/",
                  "contrib/guix/patches/",
-                 # vendored upstream installer, kept byte-identical
+                 # vendored upstream installer (byte-identical modulo its provenance header)
                  "contrib/guix/guix-install.sh",
                  "src/leveldb/",
                  "src/bls/",

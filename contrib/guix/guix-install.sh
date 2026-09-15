@@ -2,8 +2,10 @@
 # VENDORED COPY for navio-core's guix release workflow.
 # Source: guix.git etc/guix-install.sh @ 266a7b9707a8c98d778c07f351af1523fbbcd282 (2026-09-10)
 # Fetched via git protocol from https://git.savannah.gnu.org/git/guix.git
-# (upstream sha256 6af18bee988c9e90c2bdecaf3b8880f544c38070d949ef5e52717eb71b046bbc
-# before this header was prepended). Vendored because both raw-file mirrors
+# (upstream sha256 6af18bee988c9e90c2bdecaf3b8880f544c38070d949ef5e52717eb71b046bbc;
+# the header sits AFTER the shebang, so reproduce it with
+#   (head -1 guix-install.sh; tail -n +13 guix-install.sh) | sha256sum
+# not by stripping the top of the file). Vendored because both raw-file mirrors
 # fail: savannah cgit 404s the path since the forge migration, and codeberg's
 # raw endpoint truncates under load. The workflow pins the guix binary it
 # installs (GUIX_BOOTSTRAP_VERSION), so this script has nothing to go stale
