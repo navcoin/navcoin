@@ -5,11 +5,13 @@
 #include <init/common.h>
 #include <logging.h>
 #include <logging/timer.h>
+#include <scheduler.h>
 #include <test/util/setup_common.h>
 #include <util/string.h>
 
 #include <chrono>
 #include <fstream>
+#include <future>
 #include <iostream>
 #include <unordered_map>
 #include <utility>
@@ -275,6 +277,97 @@ BOOST_FIXTURE_TEST_CASE(logging_Conf, LogSetup)
         BOOST_CHECK(http_it != category_levels.end());
         BOOST_CHECK_EQUAL(http_it->second, BCLog::Level::Info);
     }
+}
+
+struct ScopedScheduler {
+    CScheduler scheduler{};
+
+    ScopedScheduler()
+    {
+        scheduler.m_service_thread = std::thread([this] { scheduler.serviceQueue(); });
+    }
+    ~ScopedScheduler()
+    {
+        scheduler.stop();
+    }
+    void MockForwardAndSync(std::chrono::seconds duration)
+    {
+        scheduler.MockForward(duration);
+        std::promise<void> promise;
+        scheduler.scheduleFromNow([&promise] { promise.set_value(); }, 0ms);
+        promise.get_future().wait();
+    }
+    std::shared_ptr<BCLog::LogRateLimiter> GetLimiter(size_t max_bytes, std::chrono::seconds window)
+    {
+        auto sched_func = [this](auto func, auto w) {
+            scheduler.scheduleEvery(std::move(func), w);
+        };
+        return BCLog::LogRateLimiter::Create(sched_func, max_bytes, window);
+    }
+};
+
+BOOST_AUTO_TEST_CASE(logging_log_rate_limiter)
+{
+    uint64_t max_bytes{1024};
+    auto reset_window{1min};
+    ScopedScheduler scheduler{};
+    auto limiter_{scheduler.GetLimiter(max_bytes, reset_window)};
+    auto& limiter{*Assert(limiter_)};
+
+    using Status = BCLog::LogRateLimiter::Status;
+    const BCLog::SourceLocation source_loc_1{__FILE__, __LINE__};
+    const BCLog::SourceLocation source_loc_2{__FILE__, __LINE__};
+
+    // A fresh limiter should not have any suppressions
+    BOOST_CHECK(!limiter.SuppressionsActive());
+
+    // Resetting an unused limiter is fine
+    limiter.Reset();
+    BOOST_CHECK(!limiter.SuppressionsActive());
+
+    // No suppression should happen until more than max_bytes have been consumed
+    BOOST_CHECK_EQUAL(limiter.Consume(source_loc_1, std::string(max_bytes - 1, 'a')), Status::UNSUPPRESSED);
+    BOOST_CHECK_EQUAL(limiter.Consume(source_loc_1, "a"), Status::UNSUPPRESSED);
+    BOOST_CHECK(!limiter.SuppressionsActive());
+    BOOST_CHECK_EQUAL(limiter.Consume(source_loc_1, "a"), Status::NEWLY_SUPPRESSED);
+    BOOST_CHECK(limiter.SuppressionsActive());
+    BOOST_CHECK_EQUAL(limiter.Consume(source_loc_1, "a"), Status::STILL_SUPPRESSED);
+    BOOST_CHECK(limiter.SuppressionsActive());
+
+    // Location 2  should not be affected by location 1's suppression
+    BOOST_CHECK_EQUAL(limiter.Consume(source_loc_2, std::string(max_bytes, 'a')), Status::UNSUPPRESSED);
+    BOOST_CHECK_EQUAL(limiter.Consume(source_loc_2, "a"), Status::NEWLY_SUPPRESSED);
+    BOOST_CHECK(limiter.SuppressionsActive());
+
+    // After reset_window time has passed, all suppressions should be cleared.
+    scheduler.MockForwardAndSync(reset_window);
+
+    BOOST_CHECK(!limiter.SuppressionsActive());
+    BOOST_CHECK_EQUAL(limiter.Consume(source_loc_1, std::string(max_bytes, 'a')), Status::UNSUPPRESSED);
+    BOOST_CHECK_EQUAL(limiter.Consume(source_loc_2, std::string(max_bytes, 'a')), Status::UNSUPPRESSED);
+}
+
+BOOST_AUTO_TEST_CASE(logging_log_limit_stats)
+{
+    BCLog::LogRateLimiter::Stats stats(BCLog::RATELIMIT_MAX_BYTES);
+
+    // Check that stats gets initialized correctly.
+    BOOST_CHECK_EQUAL(stats.m_available_bytes, BCLog::RATELIMIT_MAX_BYTES);
+    BOOST_CHECK_EQUAL(stats.m_dropped_bytes, uint64_t{0});
+
+    const uint64_t MESSAGE_SIZE{BCLog::RATELIMIT_MAX_BYTES / 2};
+    BOOST_CHECK(stats.Consume(MESSAGE_SIZE));
+    BOOST_CHECK_EQUAL(stats.m_available_bytes, BCLog::RATELIMIT_MAX_BYTES - MESSAGE_SIZE);
+    BOOST_CHECK_EQUAL(stats.m_dropped_bytes, uint64_t{0});
+
+    BOOST_CHECK(stats.Consume(MESSAGE_SIZE));
+    BOOST_CHECK_EQUAL(stats.m_available_bytes, BCLog::RATELIMIT_MAX_BYTES - MESSAGE_SIZE * 2);
+    BOOST_CHECK_EQUAL(stats.m_dropped_bytes, uint64_t{0});
+
+    // Consuming more bytes after already having consumed RATELIMIT_MAX_BYTES should fail.
+    BOOST_CHECK(!stats.Consume(500));
+    BOOST_CHECK_EQUAL(stats.m_available_bytes, uint64_t{0});
+    BOOST_CHECK_EQUAL(stats.m_dropped_bytes, uint64_t{500});
 }
 
 BOOST_AUTO_TEST_SUITE_END()

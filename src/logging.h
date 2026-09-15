@@ -6,15 +6,18 @@
 #ifndef BITCOIN_LOGGING_H
 #define BITCOIN_LOGGING_H
 
+#include <crypto/siphash.h>
 #include <threadsafety.h>
 #include <tinyformat.h>
 #include <util/fs.h>
 #include <util/string.h>
+#include <util/time.h>
 
 #include <atomic>
 #include <cstdint>
 #include <functional>
 #include <list>
+#include <memory>
 #include <mutex>
 #include <string>
 #include <unordered_map>
@@ -81,6 +84,87 @@ enum LogFlags : uint32_t {
         Error,
     };
     constexpr auto DEFAULT_LOG_LEVEL{Level::Debug};
+    constexpr uint64_t RATELIMIT_MAX_BYTES{1024 * 1024}; // maximum number of bytes per source location that can be logged within the RATELIMIT_WINDOW
+    constexpr auto RATELIMIT_WINDOW{1h}; // time window after which log ratelimit stats are reset
+    constexpr bool DEFAULT_LOGRATELIMIT{true};
+
+    //! A logging call site. Rate limiting keeps separate accounting per call site.
+    struct SourceLocation {
+        std::string file;
+        int line;
+        bool operator==(const SourceLocation&) const = default;
+    };
+
+    struct SourceLocationHasher {
+        size_t operator()(const SourceLocation& s) const noexcept
+        {
+            // Use CSipHasher(0, 0) as a simple way to get uniform distribution.
+            return size_t(CSipHasher(0, 0)
+                              .Write(static_cast<uint64_t>(s.line))
+                              .Write(MakeUCharSpan(std::string_view{s.file}))
+                              .Finalize());
+        }
+    };
+
+    //! Fixed window rate limiter for logging.
+    class LogRateLimiter
+    {
+    public:
+        //! Keeps track of an individual source location and how many available bytes are left for logging from it.
+        struct Stats {
+            //! Remaining bytes
+            uint64_t m_available_bytes;
+            //! Number of bytes that were consumed but didn't fit in the available bytes.
+            uint64_t m_dropped_bytes{0};
+
+            Stats(uint64_t max_bytes) : m_available_bytes{max_bytes} {}
+            //! Updates internal accounting and returns true if enough available_bytes were remaining
+            bool Consume(uint64_t bytes);
+        };
+
+    private:
+        mutable StdMutex m_mutex;
+
+        //! Stats for each source location that has attempted to log something.
+        std::unordered_map<SourceLocation, Stats, SourceLocationHasher> m_source_locations GUARDED_BY(m_mutex);
+        //! Whether any log locations are suppressed. Cached view on m_source_locations for performance reasons.
+        std::atomic<bool> m_suppression_active{false};
+        LogRateLimiter(uint64_t max_bytes, std::chrono::seconds reset_window);
+
+    public:
+        using SchedulerFunction = std::function<void(std::function<void()>, std::chrono::milliseconds)>;
+        /**
+         * @param scheduler_func    Callable object used to schedule resetting the window. The first
+         *                          parameter is the function to be executed, and the second is the
+         *                          reset_window interval.
+         * @param max_bytes         Maximum number of bytes that can be logged for each source
+         *                          location.
+         * @param reset_window      Time window after which the stats are reset.
+         */
+        static std::shared_ptr<LogRateLimiter> Create(
+            SchedulerFunction&& scheduler_func,
+            uint64_t max_bytes,
+            std::chrono::seconds reset_window);
+        //! Maximum number of bytes logged per location per window.
+        const uint64_t m_max_bytes;
+        //! Interval after which the window is reset.
+        const std::chrono::seconds m_reset_window;
+        //! Suppression status of a source log location.
+        enum class Status {
+            UNSUPPRESSED,     // string fits within the limit
+            NEWLY_SUPPRESSED, // suppression has started since this string
+            STILL_SUPPRESSED, // suppression is still ongoing
+        };
+        //! Consumes `source_loc`'s available bytes corresponding to the size of the (formatted)
+        //! `str` and returns its status.
+        [[nodiscard]] Status Consume(
+            const SourceLocation& source_loc,
+            const std::string& str) EXCLUSIVE_LOCKS_REQUIRED(!m_mutex);
+        //! Resets all usage to zero. Called periodically by the scheduler.
+        void Reset() EXCLUSIVE_LOCKS_REQUIRED(!m_mutex);
+        //! Returns true if any log locations are currently being suppressed.
+        bool SuppressionsActive() const { return m_suppression_active; }
+    };
 
     class Logger
     {
