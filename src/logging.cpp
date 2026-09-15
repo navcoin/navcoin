@@ -417,10 +417,17 @@ std::string BCLog::Logger::GetLogPrefix(BCLog::LogFlags category, BCLog::Level l
     return s;
 }
 
-void BCLog::Logger::LogPrintStr(const std::string& str, const std::string& logging_function, const std::string& source_file, int source_line, BCLog::LogFlags category, BCLog::Level level)
+void BCLog::Logger::LogPrintStr(const std::string& str, const std::string& logging_function, const std::string& source_file, int source_line, BCLog::LogFlags category, BCLog::Level level, bool should_ratelimit)
 {
     StdLockGuard scoped_lock(m_cs);
+    return LogPrintStr_(str, logging_function, source_file, source_line, category, level, should_ratelimit);
+}
+
+// NOLINTNEXTLINE(misc-no-recursion)
+void BCLog::Logger::LogPrintStr_(const std::string& str, const std::string& logging_function, const std::string& source_file, int source_line, BCLog::LogFlags category, BCLog::Level level, bool should_ratelimit)
+{
     std::string str_prefixed = LogEscapeMessage(str);
+    const bool starts_line{m_started_new_line};
 
     if (m_started_new_line) {
         str_prefixed.insert(0, GetLogPrefix(category, level));
@@ -445,6 +452,31 @@ void BCLog::Logger::LogPrintStr(const std::string& str, const std::string& loggi
         return;
     }
 
+    bool ratelimit{false};
+    if (should_ratelimit && m_limiter) {
+        auto status{m_limiter->Consume({source_file, source_line}, str_prefixed)};
+        if (status == LogRateLimiter::Status::NEWLY_SUPPRESSED) {
+            // NOLINTNEXTLINE(misc-no-recursion)
+            LogPrintStr_(strprintf(
+                             "Excessive logging detected from %s:%d (%s): >%d bytes logged during "
+                             "the last time window of %is. Suppressing logging to disk from this "
+                             "source location until time window resets. Console logging "
+                             "unaffected. Last log entry.\n",
+                             source_file, source_line, logging_function,
+                             m_limiter->m_max_bytes,
+                             Ticks<std::chrono::seconds>(m_limiter->m_reset_window)),
+                         __func__, __FILE__, __LINE__, LogFlags::ALL, Level::Warning, /*should_ratelimit=*/false); // with should_ratelimit=false, this cannot lead to infinite recursion
+        } else if (status == LogRateLimiter::Status::STILL_SUPPRESSED) {
+            ratelimit = true;
+        }
+    }
+
+    // To avoid confusion caused by dropped log messages when debugging an issue,
+    // we prefix log lines with "[*]" when there are any suppressed source locations.
+    if (starts_line && m_limiter && m_limiter->SuppressionsActive()) {
+        str_prefixed.insert(0, "[*] ");
+    }
+
     if (m_print_to_console) {
         // print to console
         fwrite(str_prefixed.data(), 1, str_prefixed.size(), stdout);
@@ -453,7 +485,7 @@ void BCLog::Logger::LogPrintStr(const std::string& str, const std::string& loggi
     for (const auto& cb : m_print_callbacks) {
         cb(str_prefixed);
     }
-    if (m_print_to_file) {
+    if (m_print_to_file && !ratelimit) {
         assert(m_fileout != nullptr);
 
         // reopen the log file, if requested
@@ -512,7 +544,7 @@ void BCLog::LogRateLimiter::Reset()
     for (const auto& [source_loc, stats] : source_locations) {
         if (stats.m_dropped_bytes == 0) continue;
         LogPrintLevel_(
-            LogFlags::ALL, Level::Warning,
+            LogFlags::ALL, Level::Warning, /*should_ratelimit=*/false,
             "Restarting logging from %s:%d: %d bytes were dropped during the last %ss.\n",
             source_loc.file, source_loc.line,
             stats.m_dropped_bytes, Ticks<std::chrono::seconds>(m_reset_window));

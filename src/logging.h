@@ -197,6 +197,13 @@ enum LogFlags : uint32_t {
         /** Slots that connect to the print signal */
         std::list<std::function<void(const std::string&)>> m_print_callbacks GUARDED_BY(m_cs) {};
 
+        //! Manages the rate limiting of each log location.
+        std::shared_ptr<LogRateLimiter> m_limiter GUARDED_BY(m_cs);
+
+        /** Send a string to the log output (internal) */
+        void LogPrintStr_(const std::string& str, const std::string& logging_function, const std::string& source_file, int source_line, BCLog::LogFlags category, BCLog::Level level, bool should_ratelimit)
+            EXCLUSIVE_LOCKS_REQUIRED(m_cs);
+
     public:
         bool m_print_to_console = false;
         bool m_print_to_file = false;
@@ -213,7 +220,8 @@ enum LogFlags : uint32_t {
         std::string GetLogPrefix(LogFlags category, Level level) const;
 
         /** Send a string to the log output */
-        void LogPrintStr(const std::string& str, const std::string& logging_function, const std::string& source_file, int source_line, BCLog::LogFlags category, BCLog::Level level);
+        void LogPrintStr(const std::string& str, const std::string& logging_function, const std::string& source_file, int source_line, BCLog::LogFlags category, BCLog::Level level, bool should_ratelimit)
+            EXCLUSIVE_LOCKS_REQUIRED(!m_cs);
 
         /** Returns whether logs will be written to any output */
         bool Enabled() const
@@ -239,6 +247,12 @@ enum LogFlags : uint32_t {
 
         /** Start logging (and flush all buffered messages) */
         bool StartLogging();
+
+        void SetRateLimiting(std::shared_ptr<LogRateLimiter> limiter) EXCLUSIVE_LOCKS_REQUIRED(!m_cs)
+        {
+            StdLockGuard scoped_lock(m_cs);
+            m_limiter = std::move(limiter);
+        }
         /** Only for testing */
         void DisconnectTestLogger();
 
@@ -300,12 +314,8 @@ static inline bool LogAcceptCategory(BCLog::LogFlags category, BCLog::Level leve
 /** Return true if str parses as a log category and set the flag */
 bool GetLogCategory(BCLog::LogFlags& flag, const std::string& str);
 
-// Be conservative when using LogPrintf/error or other things which
-// unconditionally log to debug.log! It should not be the case that an inbound
-// peer can fill up a user's disk with debug.log entries.
-
 template <typename... Args>
-static inline void LogPrintf_(const std::string& logging_function, const std::string& source_file, const int source_line, const BCLog::LogFlags flag, const BCLog::Level level, const char* fmt, const Args&... args)
+static inline void LogPrintf_(const std::string& logging_function, const std::string& source_file, const int source_line, const BCLog::LogFlags flag, const BCLog::Level level, bool should_ratelimit, const char* fmt, const Args&... args)
 {
     if (LogInstance().Enabled()) {
         std::string log_msg;
@@ -315,30 +325,39 @@ static inline void LogPrintf_(const std::string& logging_function, const std::st
             /* Original format string will have newline so don't add one here */
             log_msg = "Error \"" + std::string(fmterr.what()) + "\" while formatting log message: " + fmt;
         }
-        LogInstance().LogPrintStr(log_msg, logging_function, source_file, source_line, flag, level);
+        LogInstance().LogPrintStr(log_msg, logging_function, source_file, source_line, flag, level, should_ratelimit);
     }
 }
 
-#define LogPrintLevel_(category, level, ...) LogPrintf_(__func__, __FILE__, __LINE__, category, level, __VA_ARGS__)
+#define LogPrintLevel_(category, level, should_ratelimit, ...) LogPrintf_(__func__, __FILE__, __LINE__, category, level, should_ratelimit, __VA_ARGS__)
 
-// Log unconditionally.
-#define LogInfo(...) LogPrintLevel_(BCLog::LogFlags::ALL, BCLog::Level::Info, __VA_ARGS__)
-#define LogWarning(...) LogPrintLevel_(BCLog::LogFlags::ALL, BCLog::Level::Warning, __VA_ARGS__)
-#define LogError(...) LogPrintLevel_(BCLog::LogFlags::ALL, BCLog::Level::Error, __VA_ARGS__)
+// Log unconditionally. Uses basic rate limiting to mitigate disk filling attacks.
+// Be conservative when using functions that unconditionally log to debug.log!
+// It should not be the case that an inbound peer can fill up a user's storage
+// with debug.log entries.
+#define LogInfo(...) LogPrintLevel_(BCLog::LogFlags::ALL, BCLog::Level::Info, /*should_ratelimit=*/true, __VA_ARGS__)
+#define LogWarning(...) LogPrintLevel_(BCLog::LogFlags::ALL, BCLog::Level::Warning, /*should_ratelimit=*/true, __VA_ARGS__)
+#define LogError(...) LogPrintLevel_(BCLog::LogFlags::ALL, BCLog::Level::Error, /*should_ratelimit=*/true, __VA_ARGS__)
 
 // Deprecated unconditional logging.
 #define LogPrintf(...) LogInfo(__VA_ARGS__)
-#define LogPrintfCategory(category, ...) LogPrintLevel_(category, BCLog::Level::Info, __VA_ARGS__)
+#define LogPrintfCategory(category, ...) LogPrintLevel_(category, BCLog::Level::Info, /*should_ratelimit=*/true, __VA_ARGS__)
 
 // Use a macro instead of a function for conditional logging to prevent
 // evaluating arguments when logging for the category is not enabled.
 
-// Log conditionally, prefixing the output with the passed category name and severity level.
-#define LogPrintLevel(category, level, ...)               \
-    do {                                                  \
-        if (LogAcceptCategory((category), (level))) {     \
-            LogPrintLevel_(category, level, __VA_ARGS__); \
-        }                                                 \
+// Log by prefixing the output with the passed category name and severity level. This can either
+// log conditionally if the category is allowed or unconditionally if level >= BCLog::Level::Info
+// is passed. If this function logs unconditionally, logging to disk is rate-limited. This is
+// important so that callers don't need to worry about accidentally introducing a disk-fill
+// vulnerability if level >= Info is used. Additionally, users specifying -debug are assumed to be
+// developers or power users who are aware that -debug may cause excessive disk usage due to logging.
+#define LogPrintLevel(category, level, ...)                           \
+    do {                                                              \
+        if (LogAcceptCategory((category), (level))) {                 \
+            bool rate_limit{level >= BCLog::Level::Info};             \
+            LogPrintLevel_(category, level, rate_limit, __VA_ARGS__); \
+        }                                                             \
     } while (0)
 
 // Log conditionally, prefixing the output with the passed category name.
@@ -348,10 +367,24 @@ static inline void LogPrintf_(const std::string& logging_function, const std::st
 // Deprecated conditional logging
 #define LogPrint(category, ...)  LogDebug(category, __VA_ARGS__)
 
+//! Format string for error(), which also records where error() was called
+//! from: rate limiting is per source location, and error() must not make
+//! every caller share one. The __builtin_* default arguments evaluate at the
+//! call site. std::source_location would do the same, but libc++ 14 (still
+//! built in CI) has no <source_location>.
+struct ErrorFormat {
+    const char* fmt;
+    const char* function;
+    const char* file;
+    int line;
+    ErrorFormat(const char* fmt_in, const char* function_in = __builtin_FUNCTION(), const char* file_in = __builtin_FILE(), int line_in = __builtin_LINE())
+        : fmt{fmt_in}, function{function_in}, file{file_in}, line{line_in} {}
+};
+
 template <typename... Args>
-bool error(const char* fmt, const Args&... args)
+bool error(ErrorFormat fmt, const Args&... args)
 {
-    LogPrintf("ERROR: %s\n", tfm::format(fmt, args...));
+    LogPrintf_(fmt.function, fmt.file, fmt.line, BCLog::LogFlags::ALL, BCLog::Level::Info, /*should_ratelimit=*/true, "ERROR: %s\n", tfm::format(fmt.fmt, args...));
     return false;
 }
 
