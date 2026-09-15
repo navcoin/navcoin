@@ -37,6 +37,10 @@ void UnsignedOutput::GenerateKeys(Scalar blindingKey, DoublePublicKey destKeys)
     // spending key collapses to (1 + H(ephemeralKey))·G — computable from public
     // data alone, so the output would be spendable by anyone. No legitimate
     // destination uses the generator as a key; reject either key being G.
+    // This catches the well-known constant, not the whole class: any
+    // destination whose keys have publicly known discrete logs (-G, 2·G, a
+    // point derived from a published scalar) is equally anyone-can-spend, and
+    // those cannot be enumerated here.
     if (vk == Point::GetBasePoint() || sk == Point::GetBasePoint()) {
         throw std::runtime_error(strprintf("%s: destination keys must not be the group base point\n", __func__));
     }
